@@ -1,4 +1,4 @@
-header {
+.site-navbar {
     background: var(--primary-bg);
     position: sticky;
     top: 0;
@@ -7,7 +7,7 @@ header {
     transition: var(--transition-smooth);
 }
 
-header.scrolled {
+.site-navbar.scrolled {
     background: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(12px);
     box-shadow: var(--shadow-soft);
@@ -130,10 +130,36 @@ header.scrolled {
     color: var(--text-muted);
     font-size: 14px;
     font-weight: 500;
+    padding: 8px 0;
+    position: relative;
+    transition: var(--transition-smooth);
 }
 
-.nav-links a:hover, .nav-links a.active {
+.nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--text-main);
+    transition: var(--transition-smooth);
+}
+
+.nav-links a:hover {
     color: var(--text-main);
+}
+
+.nav-links a:hover::after, 
+.nav-links a.active::after {
+    width: 100%;
+}
+
+.nav-links a.active {
+    color: var(--text-main) !important;
+    font-weight: 700;
+    background: transparent !important;
+    border: none !important;
 }
 
 .offer-link {

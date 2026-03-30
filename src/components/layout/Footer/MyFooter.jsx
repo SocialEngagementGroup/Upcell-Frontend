@@ -22,7 +22,7 @@ const MyFooter = () => {
             <div className="container-max">
                 <div className="footer-grid">
                     <div className="footer-col brand-col">
-                        <img className='footer-logo' src='/logos/logoHeader.png' alt="Global Traders" />
+                        <img className='footer-logo' src='/staticImages/globalgtIcon.png' alt="Global Traders" />
                         <p className="brand-mission">
                             Making technology affordable and sustainable by extending the life of premium electronics.
                         </p>

@@ -1,24 +1,98 @@
-.refurbished{
-    min-height: calc(100vh - 6rem);
+/* Refubrished.css - Modernized */
+.refurbished-page {
+    background-color: var(--primary-bg);
+    min-height: 80vh;
+}
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-
+.refurb-hero {
+    background-color: var(--secondary-bg);
+    padding: 100px 20px;
     text-align: center;
-    text-shadow: 1px 5px 1px white;
+    border-radius: 0 0 60px 60px;
+}
 
-    background-image: -moz-linear-gradient(to bottom right, #75758a 10%, #7bc3d9 51%);
-    background-image: linear-gradient(to bottom right, #75758a 10%, #7bc3d9 51%);
+.refurb-hero h1 {
+    font-size: 56px;
+    font-weight: 800;
+    margin-bottom: 20px;
+    letter-spacing: -2px;
+}
 
-    margin-bottom: -50px;
+.refurb-hero p {
+    font-size: 20px;
+    color: var(--text-muted);
+    max-width: 600px;
+    margin: 0 auto;
+}
 
-    & h3, h4{
-        font-size: 3rem;
-        font-family: 'Times New Roman', serif;
-        font-style: italic;
-        font-weight: bolder;
+.coming-soon-section {
+    padding: 120px 0;
+    text-align: center;
+}
+
+.coming-soon-card {
+    background: white;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 60px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-medium);
+}
+
+.coming-soon-card h2 {
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 24px;
+}
+
+.coming-soon-card p {
+    font-size: 18px;
+    color: var(--text-muted);
+    margin-bottom: 40px;
+    line-height: 1.6;
+}
+
+.notify-form {
+    display: flex;
+    gap: 12px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.notify-form input {
+    flex: 1;
+    padding: 16px 24px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-full);
+    font-size: 16px;
+}
+
+.notify-form button {
+    background-color: var(--accent-color);
+    color: white;
+    padding: 16px 32px;
+    border-radius: var(--radius-full);
+    font-weight: 700;
+    transition: var(--transition-smooth);
+}
+
+.notify-form button:hover {
+    background-color: var(--accent-hover);
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    .refurb-hero h1 {
+        font-size: 40px;
     }
-
+    
+    .notify-form {
+        flex-direction: column;
+    }
+    
+    .coming-soon-card {
+        padding: 40px 20px;
+        margin: 0 20px;
+    }
 }

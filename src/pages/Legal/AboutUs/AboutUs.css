@@ -1,61 +1,116 @@
-#our-mission {
-    background-image: url("/staticImages/bgAboutUs.png");
-    color: white;
+/* AboutUs.css - Modernized */
+.about-us-page {
+    background-color: var(--primary-bg);
+}
+
+.about-hero {
+    background-color: var(--secondary-bg);
+    padding: 100px 20px;
     text-align: center;
-    padding: 3rem;
-
-    & h4{
-        margin-bottom: 2rem;
-        font-size: 1.4rem;
-    }
-    & div{
-        background-color: black;
-        padding: 2rem;
-    }
+    border-radius: 0 0 60px 60px;
+    margin-bottom: 0;
 }
 
+.about-hero h1 {
+    font-size: 56px;
+    font-weight: 800;
+    margin: 0;
+    letter-spacing: -2px;
+}
 
-#why-better h3 {
+.about-hero p {
+    font-size: 20px;
+    color: var(--text-muted);
+    max-width: 600px;
+    margin: 20px auto 0;
+}
+
+.mission-section {
+    padding: 100px 0;
+}
+
+.mission-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+}
+
+.mission-content h2 {
+    font-size: 40px;
+    font-weight: 800;
+    margin-bottom: 30px;
+}
+
+.mission-content p {
+    font-size: 18px;
+    line-height: 1.8;
+    color: var(--text-main);
+}
+
+.values-section {
+    background-color: var(--secondary-bg);
+    padding: 100px 0;
+}
+
+.values-header {
     text-align: center;
-    margin: 5rem 0 2rem 0;
-    font-size: 1.5rem;
+    margin-bottom: 60px;
 }
 
-#why-better>div {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
-
-    & .icons {
-        width: 2.5rem;
-        height: 2.5rem;
-        fill: #0084D6;
-
-        margin-bottom: .5rem;
-    }
-
-    &>div {
-        width: 300px;
-        text-align: center;
-        border-radius: 1rem;
-        border: 1px solid rgba(0, 0, 0, 0.2);
-        margin-bottom: 1rem;
-        padding: 1rem;
-    }
-
-    & h4 {
-        font-size: 1rem;
-        color: #0084D6;
-    }
-
-    & p {
-        font-size: .8rem;
-        font-weight: 300;
-    }
+.values-header h2 {
+    font-size: 36px;
+    font-weight: 800;
 }
 
-@media screen and (max-width:500px) {
-    #our-mission{
-        padding: 2rem 0;
+.values-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.value-card {
+    background: white;
+    padding: 40px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+    transition: var(--transition-smooth);
+}
+
+.value-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-medium);
+}
+
+.value-icon {
+    color: var(--accent-color);
+    margin-bottom: 20px;
+}
+
+.value-icon svg {
+    width: 40px;
+    height: 40px;
+}
+
+.value-card h4 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.value-card p {
+    font-size: 15px;
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+    .mission-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+    
+    .about-hero h1 {
+        font-size: 40px;
     }
 }

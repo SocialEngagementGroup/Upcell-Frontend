@@ -17,35 +17,35 @@ const CartProduct = ({ product, setCart, cart }) => {
     }
     return (
         <div className='single-cart-product'>
-
-            <div className='product-details'>
-                <img src={image} alt='product image'></img>
-                <div>
-                    <h3>{productName}</h3>
-                    <small>Color: {color?.name}</small>
-                    <small>Storage: {storage}</small>
-                    <small>Condition: {condition}</small>
+            <img 
+                src={image} 
+                alt={productName} 
+                className='cart-product-image'
+            />
+            
+            <div className='cart-item-info'>
+                <h3>{productName}</h3>
+                <div className='cart-item-meta'>
+                    <span>Color: {color?.name}</span>
+                    <span>Storage: {storage}</span>
+                    <span>Condition: {condition}</span>
                 </div>
             </div>
 
-            <div className='quantity'>
-                <div>
+            <div className='cart-controls-area'>
+                <p className='cart-price'>$ {price * unit}</p>
+                <div className='quantity-pill'>
                     <button onClick={removeItemFromCart}>-</button>
-                    <p>{unit}</p>
+                    <span>{unit}</span>
                     <button onClick={addItemToCart}>+</button>
                 </div>
+                <button 
+                    className='btn-remove-item' 
+                    onClick={() => setCart(prev => prev.filter(id => id !== _id))}
+                >
+                    Remove
+                </button>
             </div>
-
-            <div className="item-center">
-                <p className='big-hide'>Unit Price</p>
-                <p className='price'>$ {price}</p>
-            </div>
-
-            <div className="item-center">
-                <p className='big-hide'>Subtotal</p>
-                <p className="price"> $ {price * unit}</p>
-            </div>
-
         </div>
     );
 };

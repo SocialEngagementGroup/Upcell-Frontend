@@ -39,7 +39,7 @@ const HeaderComponent = () => {
   }
 
   return (
-    <header className={isScrolled ? 'scrolled' : ''}>
+    <header className={`site-navbar ${isScrolled ? 'scrolled' : ''}`}>
       <div className='header-container container-max'>
         <div className='header-left'>
           <Link to="/" className='gt-logo'>
