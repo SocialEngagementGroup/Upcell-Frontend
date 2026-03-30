@@ -8,8 +8,7 @@
 }
 
 .site-navbar.scrolled {
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(12px);
+    background: var(--primary-bg);
     box-shadow: var(--shadow-soft);
 }
 
