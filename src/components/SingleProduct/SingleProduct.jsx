@@ -21,29 +21,28 @@ const SingleProduct = ({ product }) => {
 
   return (
     <div className='single-product' onClick={handleShowProduct}>
-      <div className='sticker'>
-        <img src="/logos/product-label.png" alt='product sticker' />
-        <small>UP TO <br></br> 3.23% <br></br> OFF</small>
+      <div className="product-image-container">
+        <img className='product-image' src={image ? image : "/staticImages/notAvailable.webp"} alt={productName} />
+        {condition && <span className="product-condition-badge">{condition}</span>}
       </div>
 
-      <img className='product-image' src={image} alt='product image'></img>
+      <div className="product-info">
+        <h3 className="product-name">{productName}</h3>
+        <p className="product-specs">
+          {storage} • {color.name}
+        </p>
 
-      <img className="product-brand-logo" src="/logos/apple.png" alt='product company ' />
-
-      <div className="productDesc">
-        <p className="sinpleP">{productName} {description}</p>
-        <p className="sinpleP"><span>{storage}</span> | <span>{color.name}</span> | <span>{condition}</span></p>
-
-        <p className="sinpleP"><span>Warrenty : 30 days</span></p>
-
-        <p className="sinpleP"><span>Special Price : </span></p>
-        <p className="price">${price}</p>
+        <div className="product-price-row">
+            <span className="product-price">${price}</span>
+            {originalPrice > price && <span className="product-old-price">${originalPrice}</span>}
+        </div>
       </div>
-      {/* <span>{price}$</span> */}
 
-      <div className="buttons">
-        <button className="buy-button"> CHECK IT </button>
-        <button onClick={handleAddCart} className="cart-button"> ADD TO CART</button>
+      <div className="product-card-actions">
+        <button className="btn-details" onClick={(e) => { e.stopPropagation(); handleShowProduct(); }}>View Details</button>
+        <button onClick={handleAddCart} className="btn-cart-add">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        </button>
       </div>
     </div>
   )

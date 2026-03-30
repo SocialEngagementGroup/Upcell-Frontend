@@ -9,36 +9,36 @@ import './index.css'
 import App from './App.jsx'
 
 import { createBrowserRouter, RouterProvider} from "react-router-dom"
-import Cart from './components/Cart/Cart.jsx'
-import MyAccount from './components/MyAccount/MyAccount.jsx'
+import Cart from './pages/Cart/Cart.jsx'
+import MyAccount from './pages/MyAccount/MyAccount.jsx'
 
-import Preowned from "./components/Preowned/Preowned.jsx"
-import Refubrished from "./components/Refubrished/Refubrished.jsx"
-import Wholesale from "./components/Wholesale/Wholesale.jsx"
-import Resources from "./components/Resources/Resources.jsx"
-import Contactus from "./components/Contactus/Contactus.jsx"
-import Offer from "./components/Offer/Offer.jsx"
-import Home from './components/Home/Home.jsx'
+import Preowned from "./pages/Shop/Preowned/Preowned.jsx"
+import Refubrished from "./pages/Shop/Refurbished/Refubrished/Refubrished.jsx"
+import Wholesale from "./pages/Auxiliary/Wholesale/Wholesale.jsx"
+import Resources from "./pages/Auxiliary/Resources/Resources.jsx"
+import Contactus from "./pages/Auxiliary/Contactus/Contactus.jsx"
+import Offer from "./pages/Offer/Offer.jsx"
+import Home from './pages/Home/Home.jsx'
 
-import Catagory from './components/AllCatagory/Catagory.jsx';
-import AdminSecret from './components/AdminSecret/AdminSecret';
-import AddCatagory from './components/AddCatagory/AddCatagory';
-import AdminCatagory from './components/AdminCatagory/AdminCatagory';
-import AdminHome from './components/AdminHome/AdminHome';
-import AllProduct from './components/AllProduct/AllProduct';
-import AddProduct from './components/AddProduct/AddProduct';
-import EditProduct from './components/EditProduct/EditProduct';
-import Checkout from './components/Checkout/Checkout';
-import AdminOrder from './components/AdminOrder/AdminOrder';
-import LoginAndSignup from './components/LoginAndSignup/LoginAndSignup.jsx';
+import Catagory from './pages/Admin/Categories/AllCatagory/Catagory.jsx';
+import AdminSecret from './pages/Admin/AdminSecret/AdminSecret.jsx';
+import AddCatagory from './pages/Admin/Categories/AddCatagory/AddCatagory.jsx';
+import AdminCatagory from './pages/Admin/Categories/AdminCatagory/AdminCatagory.jsx';
+import AdminHome from './pages/Admin/Dashboard/AdminHome/AdminHome.jsx';
+import AllProduct from './pages/Admin/Products/AllProduct/AllProduct.jsx';
+import AddProduct from './pages/Admin/Products/AddProduct/AddProduct.jsx';
+import EditProduct from './pages/Admin/Products/EditProduct/EditProduct.jsx';
+import Checkout from './pages/Checkout/Checkout.jsx';
+import AdminOrder from './pages/Admin/Orders/AdminOrder/AdminOrder.jsx';
+import LoginAndSignup from './pages/Auth/LoginAndSignup/LoginAndSignup.jsx';
 import PrivateRoute from './utilities/PrivateRoute.jsx';
 import UserContextProvider from './utilities/UserContextProvider.jsx';
-import ProductDetailPage from './components/ProductDetailPage/ProductDetailPage.jsx';
-import ReturnPolicy from './components/ReturnPolicy/ReturnPolicy.jsx';
-import PrivacyPolicy from './components/PrivacyPolicy/PrivacyPolicy.jsx';
-import AboutUs from './components/AboutUs/AboutUs.jsx';
+import ProductDetailPage from './pages/ProductDetail/ProductDetailPage/ProductDetailPage.jsx';
+import ReturnPolicy from './pages/Legal/ReturnPolicy/ReturnPolicy.jsx';
+import PrivacyPolicy from './pages/Legal/PrivacyPolicy/PrivacyPolicy.jsx';
+import AboutUs from './pages/Legal/AboutUs/AboutUs.jsx';
 import AdminPrivateRoute from './utilities/AdminPrivateRoute.jsx';
-import ThankYou from './components/ThankYou/ThankYou.jsx';
+import ThankYou from './pages/ThankYou/ThankYou.jsx';
 
 
 

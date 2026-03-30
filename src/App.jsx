@@ -5,8 +5,8 @@ import '@fontsource/roboto/700.css';
 
 import './App.css'
 import { Outlet, ScrollRestoration } from 'react-router-dom'
-import HeaderComponent from './components/Header/HeaderComponent'
-import MyFooter from './components/Footer/MyFooter'
+import HeaderComponent from './components/layout/Header/HeaderComponent'
+import MyFooter from './components/layout/Footer/MyFooter'
 
 import { ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -26,17 +26,15 @@ function App() {
 
 
   return (
-    <>
-      <CartContext.Provider value={{ cart, setCart }}>
-        <ScrollRestoration></ScrollRestoration>
-        <HeaderComponent></HeaderComponent>
-
-        <Outlet></Outlet>
-
-        <MyFooter></MyFooter>
-        <ToastContainer></ToastContainer>
-      </CartContext.Provider>
-    </>
+    <CartContext.Provider value={{ cart, setCart }}>
+      <ScrollRestoration />
+      <div className="app-layout">
+        <HeaderComponent />
+        <Outlet />
+        <MyFooter />
+        <ToastContainer position="top-center" autoClose={1000} />
+      </div>
+    </CartContext.Provider>
   )
 }
 

@@ -1,28 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-body{
-    background-color: #F9F9F7;
+:root {
+    /* Color Palette - Back Market Inspired */
+    --primary-bg: #FFFFFF;
+    --secondary-bg: #F5F5F7;
+    --accent-color: #000000;
+    --accent-hover: #333333;
+    --text-main: #1D1D1F;
+    --text-muted: #86868B;
+    --border-color: #D2D2D7;
+    
+    /* Radii */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 20px;
+    --radius-full: 9999px;
+    
+    /* Shadows */
+    --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.04);
+    --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.08);
+    
+    /* Transitions */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+    background-color: var(--primary-bg);
+    color: var(--text-main);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     max-width: 100vw;
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
 }
 
-a{
+a {
     text-decoration: none;
-    color: black;
+    color: inherit;
+    transition: var(--transition-smooth);
 }
 
-button{
-  border: none
+button {
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    transition: var(--transition-smooth);
 }
 
-/* max-height for all section  */
-.logos, .sub-banner, .products, .adds, .comments section, .footer-section{
-    max-width: 1440px;
+/* Container Utilities */
+.container-max {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
 }
 
-main{
-    width: 90%;
-    margin: auto;
+main {
+    width: 100%;
+    margin: 0;
 }

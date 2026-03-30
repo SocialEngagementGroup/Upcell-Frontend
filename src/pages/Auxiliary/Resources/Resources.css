@@ -1,0 +1,147 @@
+.resource-hero {
+    background: var(--secondary-bg);
+    padding: 100px 20px;
+    text-align: center;
+    border-radius: 0 0 60px 60px;
+    margin-bottom: 80px;
+}
+
+.resource-hero h1 {
+    font-size: 48px;
+    font-weight: 900;
+    margin-bottom: 24px;
+}
+
+.resource-hero p {
+    font-size: 18px;
+    color: var(--text-muted);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.section-title {
+    font-size: 32px;
+    font-weight: 800;
+    margin: 80px 0 40px;
+    text-align: center;
+}
+
+.resource-blogs {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 40px;
+    margin-bottom: 100px;
+}
+
+.blog-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    transition: var(--transition-smooth);
+    display: flex;
+    flex-direction: column;
+}
+
+.blog-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-medium);
+    border-color: var(--accent-color);
+}
+
+.blog-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    background: var(--secondary-bg);
+}
+
+.blog-content {
+    padding: 30px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.blog-content h3 {
+    font-size: 20px;
+    font-weight: 800;
+    line-height: 1.4;
+    margin-bottom: 16px;
+    color: var(--text-main);
+}
+
+.blog-content p {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+}
+
+.blog-link {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent-color);
+    text-decoration: none;
+    margin-top: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.blog-link:hover {
+    text-decoration: underline;
+}
+
+/* FAQ Accordion */
+.accordion-container {
+    max-width: 800px;
+    margin: 0 auto 120px;
+}
+
+.accordion-item {
+    border: none !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    background: transparent !important;
+    margin-bottom: 0 !important;
+}
+
+.accordion-button {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 30px 0 !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    color: var(--text-main) !important;
+}
+
+.accordion-button:not(.collapsed) {
+    color: var(--accent-color) !important;
+}
+
+.accordion-body {
+    padding: 0 0 30px 0 !important;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text-muted);
+}
+
+.accordion-body a {
+    color: var(--accent-color);
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .resource-hero {
+        padding: 60px 20px;
+    }
+
+    .resource-hero h1 {
+        font-size: 32px;
+    }
+
+    .blog-card {
+        max-width: 100%;
+    }
+}

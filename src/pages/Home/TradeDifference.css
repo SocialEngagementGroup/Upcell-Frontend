@@ -1,0 +1,113 @@
+#tradeDifference {
+    background: var(--secondary-bg);
+    padding: 100px 0;
+    margin: 80px 0;
+    border-radius: var(--radius-lg);
+}
+
+#experience {
+    text-align: center;
+    margin-bottom: 80px;
+}
+
+#experience h3 {
+    font-size: 42px;
+    font-weight: 900;
+    margin-bottom: 20px;
+    color: var(--text-main);
+    letter-spacing: -0.02em;
+}
+
+#experience p {
+    font-size: 20px;
+    color: var(--text-muted);
+    max-width: 650px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.container-td {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 40px;
+}
+
+.grid-td {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    justify-content: center;
+}
+
+.td-card {
+    flex: 1;
+    min-width: 260px;
+    max-width: calc(25% - 30px);
+    background: var(--primary-bg);
+    padding: 40px 30px;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-soft);
+    text-align: center;
+    transition: var(--transition-smooth);
+    border: 1px solid var(--border-color);
+}
+
+.td-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-medium);
+    border-color: var(--accent-color);
+}
+
+.td-card img {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 24px;
+}
+
+.td-card p:first-of-type {
+    font-size: 16px;
+    font-weight: 800;
+    margin-bottom: 15px;
+    color: var(--text-main);
+    text-transform: uppercase;
+}
+
+.td-card p:last-child {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+#after-section {
+    margin-top: 60px;
+}
+
+#after-section .td-card {
+    background: var(--accent-color);
+    color: white;
+    border: none;
+}
+
+#after-section .td-card p {
+    color: white;
+}
+
+#after-section .td-card p:last-child {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+#after-section .td-card img {
+    filter: brightness(0) invert(1);
+}
+
+@media (max-width: 1100px) {
+    .td-card {
+        max-width: calc(50% - 30px);
+    }
+}
+
+@media (max-width: 600px) {
+    .td-card {
+        max-width: 100%;
+    }
+}
