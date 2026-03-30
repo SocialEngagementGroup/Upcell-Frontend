@@ -115,42 +115,55 @@ const Home = () => {
                 </section>
 
                 <section className="banner-ad-section">
-                    <Link to="/preowned">
-                        <img className='sub-banner' src="/staticImages/second-banner.png" alt="Special Offer" />
-                    </Link>
+                    <div className="container-max">
+                        <Link to="/preowned" className="promo-banner">
+                            <div className="promo-content">
+                                <h2>Special Edition <br />Refurbished Pro Models</h2>
+                                <p>Get the power of a flagship at a fraction of the cost. Limited stock available.</p>
+                                <span className="btn-promo">Explore Deals</span>
+                            </div>
+                            <img src="/staticImages/second-banner.png" alt="Promo" className="promo-img" />
+                        </Link>
+                    </div>
                 </section>
 
                 <section className="product-section alternate-bg">
-                    <div className="section-header">
-                        <h2>Today's Top Deals</h2>
-                    </div>
-                    <div className='products-grid top-deals'>
-                        {nProducts && nProducts.slice(5, 10).map(product => {
-                            return <TopDeals key={product._id} product={product}></TopDeals>
-                        })}
+                    <div className="container-max">
+                        <div className="section-header">
+                            <h2>Today's Top Deals</h2>
+                        </div>
+                        <div className='products-grid top-deals'>
+                            {nProducts && nProducts.slice(5, 10).map(product => {
+                                return <TopDeals key={product._id} product={product}></TopDeals>
+                            })}
+                        </div>
                     </div>
                 </section>
 
                 <section className="why-us-section">
-                    <div id="what-makes">
-                        <div className="container-max">
-                            <h3>What makes <span>Global Traders</span> the best?</h3>
-                            <div className="info">
-                                <div className="info-card">
-                                    <img src="/logos/whatBest1.svg" alt="phone" />
-                                    <h4>High Quality Phones</h4>
-                                    <p>Only the best fully functional phones are sold here. 30 day hassle free returns.</p>
+                    <div className="container-max">
+                        <h3>What makes <span>Global Traders</span> the best?</h3>
+                        <div className="features-grid">
+                            <div className="feature-item">
+                                <div className="feature-icon-wrapper">
+                                    <Icons.Warranty />
                                 </div>
-                                <div className="info-card">
-                                    <img src="/logos/whatBest2.svg" alt="good quality" />
-                                    <h4>Authentic Photos</h4>
-                                    <p>No shortcuts taken. What you see is what you get.</p>
+                                <h4>Premium Quality</h4>
+                                <p>Only the best fully functional phones are sold here. 30 day hassle free returns.</p>
+                            </div>
+                            <div className="feature-item">
+                                <div className="feature-icon-wrapper">
+                                    <Icons.Seller />
                                 </div>
-                                <div className="info-card">
-                                    <img src="/logos/whatBest3.svg" alt="approved logo" />
-                                    <h4>Trade Certified</h4>
-                                    <p>All phones are inspected and certified. Includes full phone history report.</p>
+                                <h4>Authentic Experience</h4>
+                                <p>No shortcuts taken. What you see is what you get. Real photos, real devices.</p>
+                            </div>
+                            <div className="feature-item">
+                                <div className="feature-icon-wrapper">
+                                    <Icons.Delivery />
                                 </div>
+                                <h4>Trade Certified</h4>
+                                <p>All phones are inspected and certified. Includes full phone history report.</p>
                             </div>
                         </div>
                     </div>
@@ -161,7 +174,7 @@ const Home = () => {
                         <h2>Top Rated Devices</h2>
                     </div>
                     <div className='products-grid'>
-                        {nProducts && nProducts.map(product => {
+                        {nProducts && nProducts.slice(0, 8).map(product => {
                             return <TopDeals key={product._id} product={product}></TopDeals>
                         })}
                     </div>

@@ -1,113 +1,116 @@
-#tradeDifference {
-    background: var(--secondary-bg);
-    padding: 100px 0;
-    margin: 80px 0;
-    border-radius: var(--radius-lg);
+/* TradeDifference.css - Modernized Comparison Layout */
+.trade-difference-section {
+    padding: 120px 0;
+    background-color: var(--primary-bg);
 }
 
-#experience {
+.section-header.center {
     text-align: center;
-    margin-bottom: 80px;
+    flex-direction: column;
+    align-items: center;
+    max-width: 700px;
+    margin: 0 auto 80px;
 }
 
-#experience h3 {
+.section-header.center h3 {
     font-size: 42px;
     font-weight: 900;
     margin-bottom: 20px;
-    color: var(--text-main);
-    letter-spacing: -0.02em;
 }
 
-#experience p {
-    font-size: 20px;
+.section-header.center p {
+    font-size: 18px;
     color: var(--text-muted);
-    max-width: 650px;
-    margin: 0 auto;
     line-height: 1.6;
 }
 
-.container-td {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 40px;
+.comparison-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
 }
 
-.grid-td {
+.comparison-column {
+    padding: 60px;
+    border-radius: var(--radius-lg);
     display: flex;
-    flex-wrap: wrap;
-    gap: 30px;
-    justify-content: center;
+    flex-direction: column;
+    gap: 40px;
+    transition: var(--transition-smooth);
 }
 
-.td-card {
-    flex: 1;
-    min-width: 260px;
-    max-width: calc(25% - 30px);
-    background: var(--primary-bg);
-    padding: 40px 30px;
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-soft);
-    text-align: center;
-    transition: var(--transition-smooth);
+.comparison-column.before {
+    background-color: var(--secondary-bg);
     border: 1px solid var(--border-color);
 }
 
-.td-card:hover {
-    transform: translateY(-8px);
+.comparison-column.after {
+    background-color: var(--text-main);
+    color: white;
     box-shadow: var(--shadow-medium);
-    border-color: var(--accent-color);
 }
 
-.td-card img {
-    width: 64px;
-    height: 64px;
-    margin-bottom: 24px;
+.column-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
-.td-card p:first-of-type {
-    font-size: 16px;
+.column-header h4 {
+    font-size: 24px;
     font-weight: 800;
-    margin-bottom: 15px;
-    color: var(--text-main);
+    margin: 0;
+}
+
+.status-label {
+    font-size: 11px;
+    font-weight: 700;
     text-transform: uppercase;
-}
-
-.td-card p:last-child {
-    font-size: 14px;
+    letter-spacing: 0.1em;
+    padding: 4px 12px;
+    border-radius: var(--radius-full);
+    background: rgba(0, 0, 0, 0.05);
     color: var(--text-muted);
+}
+
+.status-label.positive {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+}
+
+.comparison-items {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.comparison-item h5 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.comparison-item p {
+    font-size: 15px;
     line-height: 1.6;
+    opacity: 0.8;
 }
 
-#after-section {
-    margin-top: 60px;
+.comparison-column.before .comparison-item h5 {
+    color: var(--text-main);
 }
 
-#after-section .td-card {
-    background: var(--accent-color);
-    color: white;
-    border: none;
-}
-
-#after-section .td-card p {
+.comparison-column.after .comparison-item h5 {
     color: white;
 }
 
-#after-section .td-card p:last-child {
-    color: rgba(255, 255, 255, 0.85);
-}
-
-#after-section .td-card img {
-    filter: brightness(0) invert(1);
-}
-
-@media (max-width: 1100px) {
-    .td-card {
-        max-width: calc(50% - 30px);
+@media (max-width: 991px) {
+    .comparison-grid {
+        grid-template-columns: 1fr;
     }
-}
-
-@media (max-width: 600px) {
-    .td-card {
-        max-width: 100%;
+    
+    .comparison-column {
+        padding: 40px;
     }
 }
