@@ -1,5 +1,5 @@
 import "./SingleAdminOrder.css"
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import axiosInstance from "../../../../utilities/axiosInstance";
 import JsBarcode from "jsbarcode";
 
@@ -8,6 +8,7 @@ const SingleAdminOrder = ({ order }) => {
 
     const [shippingStatus, setShippingStatus] = useState(status)
     const [showDetails, setShowDetails] = useState(false)
+    const barcodeRef = useRef(null)
 
     const changeShippingStatus = (e) =>{
         const confirm = window.confirm("Are you sure about the new changed Status ?!")
@@ -18,8 +19,9 @@ const SingleAdminOrder = ({ order }) => {
     }
 
     useEffect(() => {
-        // showing barcode in products details 
-        JsBarcode("#OrderIdBarcode", order?._id.toString(),)
+        if (barcodeRef.current) {
+            JsBarcode(barcodeRef.current, order?._id.toString())
+        }
     }, [])
 
 
@@ -102,7 +104,7 @@ const SingleAdminOrder = ({ order }) => {
                         <p>$ {total}</p>
                     </div>
 
-                    <img id="OrderIdBarcode"/>
+                    <img ref={barcodeRef} alt="order barcode" />
 
                 </div>
 

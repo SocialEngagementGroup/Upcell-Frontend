@@ -1,17 +1,17 @@
 import "./SingleCustomerOrder.css"
-import React, { useEffect, useState } from 'react';
-import axiosInstance from "../../utilities/axiosInstance"
+import React, { useEffect, useRef, useState } from 'react';
 import JsBarcode from "jsbarcode";
-import { Hidden } from "@mui/material";
 
 const SingleCustomerOrder = ({ order }) => {
     const { line_items, name, email, phone, city, postal, street, country, shipping, paid, status, createdAt, updatedAt } = order
 
     const [showDetails, setShowDetails] = useState(false)
+    const barcodeRef = useRef(null)
 
     useEffect(() => {
-        // showing barcode in products details 
-        JsBarcode("#barcodeOfOrderId", order?._id.toString(),)
+        if (barcodeRef.current) {
+            JsBarcode(barcodeRef.current, order?._id.toString())
+        }
     }, [])
 
 
@@ -81,7 +81,7 @@ const SingleCustomerOrder = ({ order }) => {
                         <p>$ {total}</p>
                     </div>
                     
-                    <img id="barcodeOfOrderId" />
+                    <img ref={barcodeRef} alt="order barcode" />
                 </div>
 
                 <div className="shipping-info">

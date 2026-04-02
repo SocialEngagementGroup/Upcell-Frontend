@@ -25,7 +25,7 @@ const ImagesHolder = styled.div`
 
 const AddProduct = () => {
     const [allCatagories, setCatagories] = useState([])
-    const [product, setProduct] = useState({ parentCatagory: "", productName:"", image: "", description: "", storage: "", color: "", price: "", discountPrice: "", originalPrice: "", reviewScore: "", peopleReviewed: "", condition: "", color: { name: "", value: "" } })
+    const [product, setProduct] = useState({ parentCatagory: "", productName: "", image: "", description: "", storage: "", price: "", discountPrice: "", originalPrice: "", reviewScore: "", peopleReviewed: "", condition: "", color: { name: "", value: "" } })
 
     const [images, setImages] = useState([])
     const [selectedImage, setSelectedImage] = useState()
@@ -39,24 +39,18 @@ const AddProduct = () => {
 
     function handleSubmit(e) {
         e.preventDefault()
-        product.image = selectedImage
 
-        let productN = ""
-        if(product.parentCatagory){
-            productN = allCatagories.find(c => c._id == product.parentCatagory)?.modelName
-        }
+        const productN = product.parentCatagory
+            ? allCatagories.find(c => c._id == product.parentCatagory)?.modelName ?? ""
+            : ""
 
-        product.productName = productN
+        const payload = { ...product, image: selectedImage, productName: productN }
 
-        axiosInstance.post("product", product)
+        axiosInstance.post("product", payload)
             .then(res => {
-
-                setProduct({productName: "", parentCatagory: "", description: "", storage: "", color: "", price: "", originalPrice: "", reviewScore: "", peopleReviewed: "", condition: "", color: { name: "", value: "" } })
-
+                setProduct({ parentCatagory: "", productName: "", image: "", description: "", storage: "", price: "", discountPrice: "", originalPrice: "", reviewScore: "", peopleReviewed: "", condition: "", color: { name: "", value: "" } })
                 setSelectedImage("")
-
                 toast("product added !")
-
             })
             .catch(error => alert("error happened !!"))
     }

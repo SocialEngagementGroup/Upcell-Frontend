@@ -23,17 +23,17 @@ const AdminOrder = () => {
         <main className="admin-order">
             <div className="stausFilter">
                 <div className="statusButtons">
-                    <button className={orderStatus === "Processing" ? "active" : {}} onClick={() => setOrderStatus("Processing")}>Paid</button>
+                    <button className={orderStatus === "Processing" ? "active" : ""} onClick={() => setOrderStatus("Processing")}>Paid</button>
 
-                    <button className={orderStatus === "Shipped" ? "active" : {}} onClick={() => setOrderStatus("Shipped")}>Shipped</button>
+                    <button className={orderStatus === "Shipped" ? "active" : ""} onClick={() => setOrderStatus("Shipped")}>Shipped</button>
 
-                    <button className={orderStatus === "Delivered" ? "active" : {}} onClick={() => setOrderStatus("Delivered")}>Delivered</button>
+                    <button className={orderStatus === "Delivered" ? "active" : ""} onClick={() => setOrderStatus("Delivered")}>Delivered</button>
 
-                    <button className={orderStatus === "Returned" ? "active" : {}} onClick={() => setOrderStatus("Returned")}>Returned</button>
+                    <button className={orderStatus === "Returned" ? "active" : ""} onClick={() => setOrderStatus("Returned")}>Returned</button>
 
-                    <button className={orderStatus === "Refunded" ? "active" : {}} onClick={() => setOrderStatus("Refunded")}>Refunded</button>
+                    <button className={orderStatus === "Refunded" ? "active" : ""} onClick={() => setOrderStatus("Refunded")}>Refunded</button>
 
-                    <button className={orderStatus === "payment failed" ? "active" : {}} onClick={() => setOrderStatus("payment failed")}>Payment failed</button>
+                    <button className={orderStatus === "payment failed" ? "active" : ""} onClick={() => setOrderStatus("payment failed")}>Payment failed</button>
                 </div>
 
                 <div className="filterOptions">
