@@ -42,12 +42,16 @@
 }
 
 .unit-card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
     background: #FFFFFF;
     border-radius: 24px;
     padding: 32px;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     box-shadow: 0 4px 20px rgba(0,0,0,0.03);
 }
+
 
 .unit-card:hover {
     transform: translateY(-8px);

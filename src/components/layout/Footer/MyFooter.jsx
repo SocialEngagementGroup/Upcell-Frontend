@@ -1,6 +1,5 @@
 import "./MyFooter.css"
 import { Link } from 'react-router-dom'
-import { toast } from 'react-toastify';
 
 // Modern Icons
 const SocialIcons = {
@@ -10,52 +9,52 @@ const SocialIcons = {
 };
 
 const MyFooter = () => {
-    const handleSubmit = (e) => {
-        e.preventDefault()
-        const email = e.target.email.value
-        toast.success("Thank you for subscribing!")
-        e.target.email.value = ''
-    }
+
 
     return (
         <footer className="modern-footer">
             <div className="container-max">
                 <div className="footer-grid">
+                    {/* Brand Column */}
                     <div className="footer-col brand-col">
                         <img className='footer-logo' src='/staticImages/upcellLogo.png' alt="UpCell" />
                         <p className="brand-mission">
                             Making technology affordable and sustainable by extending the life of premium electronics.
                         </p>
                         <div className="social-links">
-                            <a href="https://instagram.com" target="_blank" rel="noreferrer"><SocialIcons.Instagram /></a>
-                            <a href="https://facebook.com" target="_blank" rel="noreferrer"><SocialIcons.Facebook /></a>
-                            <a href="https://twitter.com" target="_blank" rel="noreferrer"><SocialIcons.Twitter /></a>
+                            <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram"><SocialIcons.Instagram /></a>
+                            <a href="https://facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook"><SocialIcons.Facebook /></a>
+                            <a href="https://twitter.com" target="_blank" rel="noreferrer" aria-label="Twitter"><SocialIcons.Twitter /></a>
                         </div>
                     </div>
 
+                    {/* Shop Column */}
                     <div className="footer-col">
                         <h4>Shop</h4>
                         <Link to="/shop">All Products</Link>
-                        <Link to="/iphone/refurbished">Refurbished iPhones</Link>
-
-
+                        <Link to="/shop?category=iPhone">iPhone</Link>
+                        <Link to="/shop?category=iPad">iPad</Link>
+                        <Link to="/shop?category=MacBook">MacBook</Link>
+                        <Link to="/sell-device">Sell Your Device</Link>
                     </div>
 
+                    {/* Company Column */}
                     <div className="footer-col">
-                        <h4>Support</h4>
+                        <h4>Company</h4>
+                        <Link to="/about-us">About Us</Link>
+                        <Link to="/resources">Blogs & News</Link>
                         <Link to="/contactus">Contact Us</Link>
-                        <Link to="/return-policy">Returns & Warranty</Link>
-                        <Link to="/privacy-policy">Privacy Policy</Link>
-                        <Link to="/about-us">Our Story</Link>
+                        <Link to="/myaccount">My Account</Link>
+                        <Link to="/login">Sign In / Register</Link>
                     </div>
 
-                    <div className="footer-col newsletter-col">
-                        <h4>Stay in the loop</h4>
-                        <p>Get the latest deals and tech news.</p>
-                        <form className="newsletter-form" onSubmit={handleSubmit}>
-                            <input type="email" name="email" placeholder="Email address" required />
-                            <button type="submit">Subscribe</button>
-                        </form>
+                    {/* Legal Column */}
+                    <div className="footer-col">
+                        <h4>Legal</h4>
+                        <Link to="/return-policy">Warranty & Returns</Link>
+                        <Link to="/privacy-policy">Privacy Policy</Link>
+                        
+
                     </div>
                 </div>
 

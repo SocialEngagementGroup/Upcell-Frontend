@@ -1,10 +1,7 @@
 import React, { useState } from 'react'
 import { styled } from 'styled-components'
-import { ref, getDownloadURL, uploadBytesResumable } from "firebase/storage"
 
 import axiosInstance from "../../../../utilities/axiosInstance"
-import { storage } from '../../../../utilities/firebaseConfig'
-
 import ImagesForCatagory from './ImagesForCatagory'
 
 const StyeldDiv = styled.div`
@@ -65,33 +62,9 @@ const SingleCatagory = ({ catagory, setUpdate }) => {
 
 
   const handleAddImage = (e) => {
-    const input = document.createElement("input")
-    input.type = "file"
-    input.click()
-
-    input.onchange = e => {
-      let file = e.target.files[0];
-      if (!file) return;
-
-      const filename = `files/${file.name}`
-
-      const storageRef = ref(storage, filename )
-      const uploadTask = uploadBytesResumable(storageRef, file)
-
-      uploadTask.on("state_changed", (snapshot) => {
-        const porgress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100)
-        setProgressPercent(porgress)
-      },
-        (error) => {
-          alert(error)
-        },
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref).then(getDownloadURL => {
-            setImages(prev => [...prev, {url: getDownloadURL, filename}])
-          })
-        })
-    }
-
+    // Firebase Storage has been removed.
+    // Implement your new storage provider logic here.
+    alert("Image upload logic has been removed. Please implement your new storage provider.");
   }
 
 

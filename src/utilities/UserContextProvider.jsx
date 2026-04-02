@@ -1,31 +1,15 @@
-import { createContext } from "react";
-import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
-import { useEffect, useState } from "react";
-import { app } from "./firebaseConfig";
+import { createContext, useEffect, useState } from "react";
 
 export const userContext = createContext()
 
 const UserContextProvider = ({ children }) => {
-    const [user, setUser] = useState()
-    const [loading, setLoading] = useState(true)
-
-    const auth = getAuth(app)
-
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, currentUser => {
-            if (currentUser) {
-                setUser(currentUser)
-                setLoading(false)
-            } else {
-                setUser(null)
-                setLoading(false)
-            }
-        })
-        return unsubscribe
-    }, [])
+    // Firebase Auth has been removed. 
+    // Re-implement your new authentication provider here.
+    const [user, setUser] = useState(null)
+    const [loading, setLoading] = useState(false)
 
     const logOut = () => {
-        return signOut(auth)
+        setUser(null)
     }
 
     const credencials = {

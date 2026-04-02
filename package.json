@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview",
-    "deploy": "vite build && firebase deploy --only hosting"
+    "preview": "vite preview"
+
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
@@ -18,7 +18,7 @@
     "axios": "^1.5.0",
     "bootstrap": "^5.3.1",
     "eslint": "^8.49.0",
-    "firebase": "^10.5.2",
+
     "jsbarcode": "^3.11.5",
     "react": "^18.2.0",
     "react-bootstrap": "^2.8.0",

@@ -1,15 +1,8 @@
 import React, { useState } from 'react';
-import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth"
-import axiosInstance from '../../../utilities/axiosInstance';
-import { app } from '../../../utilities/firebaseConfig';
-import "./LoginAndSignup.css"
 import { useLocation, useNavigate } from 'react-router-dom';
-
+import "./LoginAndSignup.css"
 
 const LoginAndSignup = () => {
-    const provider = new GoogleAuthProvider()
-    const auth = getAuth(app)
-
     const navigate = useNavigate()
     const location = useLocation()
 
@@ -36,72 +29,21 @@ const LoginAndSignup = () => {
     }
 
     const handleGoogleSignin = () => {
-        signInWithPopup(auth, provider)
-            .then(result => {
-                handleSigninUp()
-
-            })
-            .catch(error => {
-                console.log(error)
-                setErrorMessage(error)
-            })
+        // Firebase Auth has been removed.
+        // Implement your new authentication provider here.
+        alert("Authentication logic has been removed. Please implement your new auth provider.");
     }
 
     const handleSinginWithEmail = (e) => {
         e.preventDefault()
-        const email = e.target.email.value
-        const password = e.target.password.value
-
-        setErrorMessage("")
-
-
-        signInWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => {
-
-                console.log("siggned in properly")
-                e.target.reset()
-                handleSigninUp()
-            })
-            .catch((error) => {
-                const errorCode = error.code;
-                const errorMessage = error.message;
-                console.log("error in signin ***, ", errorMessage)
-                setErrorMessage(errorMessage)
-            });
-
+        // Firebase Auth has been removed.
+        alert("Authentication logic has been removed. Please implement your new auth provider.");
     }
 
     const handleSingupWithEmail = (e) => {
         e.preventDefault()
-        const email = e.target.email.value
-        const password = e.target.password.value
-        const rePassword = e.target.rePassword.value
-
-        setErrorMessage("")
-
-        if (password.length < 8) {
-            setErrorMessage("Password must be at least 8 characters long")
-            return
-        }
-
-        if (password !== rePassword) {
-            setErrorMessage("Passwords do not match")
-            return
-        }
-
-        createUserWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => {
-                settingSingin()
-
-                e.target.reset()
-                handleSigninUp()
-            })
-            .catch((error) => {
-                const errorCode = error.code;
-                const errorMessage = error.message;
-                console.log("error in signup ***, ", errorMessage)
-                setErrorMessage(errorMessage)
-            });
+        // Firebase Auth has been removed.
+        alert("Authentication logic has been removed. Please implement your new auth provider.");
     }
 
     return (

@@ -13,6 +13,8 @@ import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import LocalShippingOutlinedIcon from '@mui/icons-material/LocalShippingOutlined';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 
+import allDummyProducts, { getProductsByParentId } from '../../../utilities/dummyData';
+
 const ProductDetailPage = () => {
     const { parentId, productId } = useParams()
     const [allProducts, setAllProducts] = useState([])
@@ -26,33 +28,48 @@ const ProductDetailPage = () => {
     
     const { cart, setCart } = useContext(CartContext)
 
+    const processProductData = (products) => {
+        setAllProducts(products)
+
+        const selectedProduct = products.find((p) => p._id === productId) || products[0]
+        setProduct(selectedProduct)
+        setSelectedColor(selectedProduct?.color)
+        setSelectedStorage(selectedProduct?.storage)
+
+        const colors = new Set()
+        const storages = new Set()
+
+        products.forEach(p => {
+            if (p.color) colors.add(p.color.name + ":" + p.color.value)
+            if (p.storage) storages.add(p.storage)
+        })
+
+        setAvailableColors(Array.from(colors).map(str => {
+            const [name, value] = str.split(":")
+            return { name, value }
+        }))
+        setAvailableStorages(Array.from(storages))
+    }
+
     useEffect(() => {
+        // 1. Try fetching from API
         axiosInstance.get(`/allSameParentProducts/${parentId}`)
             .then(res => {
                 const products = res.data
-                setAllProducts(products)
-
-                const selectedProduct = products.find((p) => p._id === productId)
-                setProduct(selectedProduct)
-                setSelectedColor(selectedProduct?.color)
-                setSelectedStorage(selectedProduct?.storage)
-
-                const colors = new Set()
-                const storages = new Set()
-
-                products.forEach(p => {
-                    colors.add(p?.color.name + ":" + p?.color.value)
-                    storages.add(p?.storage)
-                })
-
-                setAvailableColors(Array.from(colors).map(str => {
-                    const [name, value] = str.split(":")
-                    return { name, value }
-                }))
-                setAvailableStorages(Array.from(storages))
+                if (products && products.length > 0) {
+                    processProductData(products)
+                } else {
+                    // 2. Fallback to dummy data
+                    const fallbackData = getProductsByParentId(parentId)
+                    if (fallbackData.length > 0) processProductData(fallbackData)
+                }
             })
-            .catch(err => console.log(err))
-    }, [productId])
+            .catch(err => {
+                console.log("API Error, using dummy data:", err)
+                const fallbackData = getProductsByParentId(parentId)
+                if (fallbackData.length > 0) processProductData(fallbackData)
+            })
+    }, [productId, parentId])
 
     const handleFilterButtonClick = (option, value) => {
         let color = selectedColor
@@ -66,7 +83,6 @@ const ProductDetailPage = () => {
             storage = value
         }
 
-        // Default to the best available version (e.g. first one in the list for that storage/color)
         const newProduct = allProducts.find(p => p.color.name === color.name && p.storage === storage)
         if (newProduct) setProduct(newProduct)
     }
@@ -96,9 +112,9 @@ const ProductDetailPage = () => {
                 <section className="product-hero">
                     <div className="product-gallery">
                         <div className="thumbnail-strip">
-                            <img src={product?.image} alt="Thumbnail 1" className="active" />
-                            <img src={product?.image} alt="Thumbnail 2" />
-                            <img src={product?.image} alt="Thumbnail 3" />
+                            <img src={product?.image} alt="Thumb 1" className="active" />
+                            <img src={product?.image} alt="Thumb 2" />
+                            <img src={product?.image} alt="Thumb 3" />
                         </div>
                         <div className="main-image-box">
                             <img src={product?.image} alt={product?.productName} />
@@ -111,7 +127,7 @@ const ProductDetailPage = () => {
                             <h1 className="product-name">{product?.productName}</h1>
                             <div className="price-info">
                                 <span className="main-price">${product?.price}</span>
-                                <span className="monthly-price">or $45.79/mo.</span>
+                                <span className="monthly-price">From $45.79/mo. with 0% APR</span>
                             </div>
                         </div>
 
@@ -131,7 +147,7 @@ const ProductDetailPage = () => {
                         </div>
 
                         <div className="selection-group">
-                            <label className="selection-label">STORAGE</label>
+                            <label className="selection-label">STORAGE: <strong>SELECT CAPACITY</strong></label>
                             <div className="storage-grid">
                                 {availableStorages.map(storage => (
                                     <button 
@@ -139,7 +155,8 @@ const ProductDetailPage = () => {
                                         className={`storage-box ${selectedStorage === storage ? 'active' : ''}`}
                                         onClick={() => handleFilterButtonClick("storage", storage)}
                                     >
-                                        {storage}
+                                        <span>{storage}</span>
+                                        {/* Optional: Add smaller price diff label here */}
                                     </button>
                                 ))}
                             </div>
@@ -147,7 +164,7 @@ const ProductDetailPage = () => {
 
                         <div className="action-row">
                             <div className="qty-picker">
-                                <span>-</span>
+                                <span>−</span>
                                 <strong>1</strong>
                                 <span>+</span>
                             </div>
@@ -158,22 +175,24 @@ const ProductDetailPage = () => {
                         <div className="trust-strip">
                             <div className="trust-item">
                                 <LocalShippingOutlinedIcon />
-                                <span>Free Express Delivery (2-5 Business Days)</span>
+                                <div>
+                                    <strong>Free Express Delivery</strong>
+                                    <p>Delivered within 2–5 business days.</p>
+                                </div>
                             </div>
                             <div className="trust-item">
                                 <VerifiedUserOutlinedIcon />
-                                <span>1-Year UpCell Platinum Warranty Included</span>
-                            </div>
-                            <div className="trust-item">
-                                <HelpOutlineOutlinedIcon />
-                                <span>Help. 24/7 By real specialists</span>
+                                <div>
+                                    <strong>1-Year UpCell Platinum Warranty</strong>
+                                    <p>Full protection and priority support.</p>
+                                </div>
                             </div>
                         </div>
 
                         <div className="stats-icons-row">
                             <div className="stat-item">
                                 <span className="stat-main">6.1"</span>
-                                <span className="stat-sub">SUPER RETINA XDR</span>
+                                <span className="stat-sub">RETINA XDR</span>
                             </div>
                             <div className="stat-item">
                                 <span className="stat-main">A17</span>
@@ -181,7 +200,7 @@ const ProductDetailPage = () => {
                             </div>
                             <div className="stat-item">
                                 <span className="stat-main">48MP</span>
-                                <span className="stat-sub">MAIN CAMERA</span>
+                                <span className="stat-sub">CAMERA</span>
                             </div>
                             <div className="stat-item">
                                 <span className="stat-main">USB-C</span>
@@ -193,30 +212,34 @@ const ProductDetailPage = () => {
 
                 {/* Highlights Section */}
                 <section className="product-highlights">
-                    <h2 className="section-title">Product Highlights</h2>
-                    <div className="highlights-grid">
-                        <div className="highlight-card main-highlight">
-                            <div className="card-content">
-                                <h3>The Pro Camera System.</h3>
-                                <p>A 48MP main camera that's advanced like no other. ProRAW, ProRES, and cinematic video in 4K HDR.</p>
-                            </div>
-                            <img src="https://via.placeholder.com/800x600?text=Camera+System" alt="Camera System" />
-                        </div>
-                        <div className="highlight-right">
-                            <div className="highlight-card titanium-card">
-                                <h3>Titanium.</h3>
-                                <p>Aerospace-grade design. The lightest, strongest Pro models ever.</p>
-                            </div>
-                            <div className="highlight-row">
-                                <div className="highlight-card mini-card">
-                                    <div className="icon">A17</div>
-                                    <h3>A17 Pro chip.</h3>
-                                    <p>A monster win for gaming.</p>
+                    <div className="container-max">
+                        <h2 className="section-title">Product Highlights</h2>
+                        <div className="highlights-grid">
+                            <div className="highlight-card main-highlight">
+                                <div className="card-content">
+                                    <h3>The Pro Camera System.</h3>
+                                    <p>A 48MP main camera that's advanced like no other. ProRAW, ProRES, and cinematic video in 4K HDR.</p>
                                 </div>
-                                <div className="highlight-card mini-card">
-                                    <div className="icon">USB</div>
-                                    <h3>USB-C.</h3>
-                                    <p>Universal connectivity.</p>
+                                <img src="https://via.placeholder.com/800x600?text=Camera+System" alt="Camera System" />
+                            </div>
+                            <div className="highlight-right">
+                                <div className="highlight-card titanium-card">
+                                    <div className="card-content">
+                                        <h3>Titanium.</h3>
+                                        <p>Aerospace-grade design. The lightest, strongest Pro models ever.</p>
+                                    </div>
+                                </div>
+                                <div className="highlight-row">
+                                    <div className="highlight-card mini-card">
+                                        <div className="icon">A17</div>
+                                        <h3>A17 Pro chip.</h3>
+                                        <p>A monster win for gaming.</p>
+                                    </div>
+                                    <div className="highlight-card mini-card">
+                                        <div className="icon">USB</div>
+                                        <h3>USB-C.</h3>
+                                        <p>Universal connectivity.</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -229,23 +252,23 @@ const ProductDetailPage = () => {
                     <div className="specs-grid">
                         <div className="spec-group">
                             <span className="spec-label">DISPLAY</span>
-                            <p><strong>6.1" Super Retina XDR</strong></p>
-                            <span className="spec-detail">ProMotion technology with adaptive refresh rates up to 120Hz.</span>
+                            <strong>6.1" Super Retina XDR</strong>
+                            <p className="spec-detail">ProMotion technology with adaptive refresh rates up to 120Hz.</p>
                         </div>
                         <div className="spec-group">
                             <span className="spec-label">WEIGHT</span>
-                            <p><strong>187 grams</strong></p>
-                            <span className="spec-detail">Lighter than previous generations due to titanium construction.</span>
+                            <strong>187 grams</strong>
+                            <p className="spec-detail">Lighter than previous generations due to titanium construction.</p>
                         </div>
                         <div className="spec-group">
                             <span className="spec-label">BATTERY LIFE</span>
-                            <p><strong>Up to 23 hours video</strong></p>
-                            <span className="spec-detail">MagSafe and Qi2 wireless charging compatible.</span>
+                            <strong>Up to 23 hours video</strong>
+                            <p className="spec-detail">MagSafe and Qi2 wireless charging compatible.</p>
                         </div>
                         <div className="spec-group">
                             <span className="spec-label">CELLULAR</span>
-                            <p><strong>5G Superfast</strong></p>
-                            <span className="spec-detail">Gigabit LTE and Wi-Fi 6E (802.11ax).</span>
+                            <strong>5G Superfast</strong>
+                            <p className="spec-detail">Gigabit LTE and Wi-Fi 6E (802.11ax).</p>
                         </div>
                     </div>
                 </section>
@@ -271,28 +294,29 @@ const ProductDetailPage = () => {
 
                 {/* You Might Also Like */}
                 <section className="you-might-like">
-                    <h2 className="section-title">You might also like</h2>
-                    <div className="recommendations-grid">
-                        {[
-                            { name: "iPhone 15 Pro Max", price: "$1,199", desc: "Large display, even extra optical zoom.", img: "https://via.placeholder.com/300x300?text=iPhone+15+Pro+Max" },
-                            { name: "iPhone 14 Pro", price: "$999", desc: "Dynamic Island. Exceptional performance at a lower price.", img: "https://via.placeholder.com/300x300?text=iPhone+14+Pro" },
-                            { name: "iPhone 15", price: "$799", desc: "Colorful, durable, breakthrough camera.", img: "https://via.placeholder.com/300x300?text=iPhone+15" }
-                        ].map((item, i) => (
-                            <div key={i} className="recommend-card">
-                                <div className="img-box"><img src={item.img} alt={item.name} /></div>
-                                <h3>{item.name}</h3>
-                                <p>{item.desc}</p>
-                                <div className="recommend-footer">
-                                    <span>From <strong>{item.price}</strong></span>
-                                    <Link to="/shop">View Detail</Link>
+                    <div className="container-max">
+                        <h2 className="section-title">You might also like</h2>
+                        <div className="recommendations-grid">
+                            {[
+                                { name: "iPhone 15 Pro Max", price: "$1,199", desc: "Large display, even extra optical zoom.", img: "https://via.placeholder.com/300x300?text=iPhone+15+Pro+Max" },
+                                { name: "iPhone 14 Pro", price: "$999", desc: "Dynamic Island. Exceptional performance at a lower price.", img: "https://via.placeholder.com/300x300?text=iPhone+14+Pro" },
+                                { name: "iPhone 15", price: "$799", desc: "Colorful, durable, breakthrough camera.", img: "https://via.placeholder.com/300x300?text=iPhone+15" }
+                            ].map((item, i) => (
+                                <div key={i} className="recommend-card">
+                                    <div className="img-box"><img src={item.img} alt={item.name} /></div>
+                                    <h3>{item.name}</h3>
+                                    <p>{item.desc}</p>
+                                    <div className="recommend-footer">
+                                        <span>From <strong>{item.price}</strong></span>
+                                        <Link to="/shop">View Detail</Link>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
                 </section>
             </div>
             
-            {/* Newsletter is global if imported in App.jsx, but user design includes it here explicitly */}
             <section className="product-newsletter">
                 <div className="container-max">
                     <div className="signup-content">

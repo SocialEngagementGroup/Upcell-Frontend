@@ -61,3 +61,8 @@ main {
     width: 100%;
     margin: 0;
 }
+
+/* Global Navigation Resets */
+.active, .nav-link.active, a.active {
+    background-color: transparent !important;
+}
