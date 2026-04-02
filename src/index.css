@@ -4,8 +4,8 @@
     /* Color Palette - Back Market Inspired */
     --primary-bg: #FFFFFF;
     --secondary-bg: #F5F5F7;
-    --accent-color: #000000;
-    --accent-hover: #333333;
+    --accent-color: var(--theme-red);
+    --accent-hover: var(--theme-red-hover);
     --text-main: #1D1D1F;
     --text-muted: #86868B;
     --border-color: #D2D2D7;
@@ -16,9 +16,9 @@
     --radius-lg: 20px;
     --radius-full: 9999px;
     
-    /* Shadows */
-    --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.04);
-    --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.08);
+    /* Brand Colors */
+    --theme-red: #D6001C;
+    --theme-red-hover: #b50018;
     
     /* Transitions */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -46,6 +46,7 @@ button {
     border: none;
     cursor: pointer;
     font-family: inherit;
+    font-weight: 700;
     transition: var(--transition-smooth);
 }
 

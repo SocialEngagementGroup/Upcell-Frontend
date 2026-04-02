@@ -42,7 +42,7 @@
 }
 
 .btn-hero-primary {
-    background: #e62e2e;
+    background: var(--theme-red);
     color: white !important;
     padding: 18px 40px;
     border-radius: 12px;
@@ -52,9 +52,9 @@
 }
 
 .btn-hero-primary:hover {
-    background: #ff3333;
+    background: var(--theme-red-hover);
     transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(230, 46, 46, 0.3);
+    box-shadow: 0 10px 20px rgba(214, 0, 28, 0.2);
 }
 
 .btn-hero-secondary {

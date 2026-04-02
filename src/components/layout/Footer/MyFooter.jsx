@@ -38,7 +38,7 @@ const MyFooter = () => {
                         <Link to="/shop">All Products</Link>
                         <Link to="/iphone/refurbished">Refurbished iPhones</Link>
 
-                        <Link to="/offer">Special Offers</Link>
+
                     </div>
 
                     <div className="footer-col">

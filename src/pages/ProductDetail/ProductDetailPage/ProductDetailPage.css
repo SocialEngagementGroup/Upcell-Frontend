@@ -200,12 +200,16 @@
 
 .add-to-cart-red {
     flex: 1;
-    background: #D6001C;
+    background: var(--theme-red);
     color: #FFFFFF;
     padding: 20px;
     border-radius: 12px;
     font-weight: 700;
     font-size: 16px;
+}
+
+.add-to-cart-red:hover {
+    background: var(--theme-red-hover);
 }
 
 .buy-now-black {
@@ -215,6 +219,11 @@
     border-radius: 12px;
     font-weight: 700;
     font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.buy-now-black:hover {
+    background: var(--theme-red);
 }
 
 .trust-strip {

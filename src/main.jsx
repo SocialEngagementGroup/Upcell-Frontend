@@ -15,11 +15,10 @@ import TradeIn from './pages/TradeIn/TradeIn.jsx'
 
 
 import ShopPage from "./pages/Shop/ShopPage.jsx"
-import Refubrished from "./pages/Shop/Refurbished/Refubrished/Refubrished.jsx"
-import Wholesale from "./pages/Auxiliary/Wholesale/Wholesale.jsx"
+
 import Resources from "./pages/Auxiliary/Resources/Resources.jsx"
 import Contactus from "./pages/Auxiliary/Contactus/Contactus.jsx"
-import Offer from "./pages/Offer/Offer.jsx"
+
 import Home from './pages/Home/Home.jsx'
 
 import Catagory from './pages/Admin/Categories/AllCatagory/Catagory.jsx';
@@ -77,14 +76,8 @@ const router = createBrowserRouter([
         path: "shop",
         element: <ShopPage></ShopPage>
       },
-      {
-        path: "refubrished",
-        element: <Refubrished></Refubrished>
-      },
-      {
-        path: "wholesale",
-        element: <Wholesale></Wholesale>
-      },
+
+
       {
         path: "resources",
         element: <Resources></Resources>
@@ -93,10 +86,7 @@ const router = createBrowserRouter([
         path: "contactus",
         element: <Contactus></Contactus>
       },
-      {
-        path: "offer",
-        element: <Offer></Offer>
-      },
+
       {
         path:"return-policy",
         element: <ReturnPolicy></ReturnPolicy>
@@ -110,7 +100,7 @@ const router = createBrowserRouter([
         element:<AboutUs></AboutUs>
       },
       {
-        path: "sell-your-device",
+        path: "sell-device",
         element: <TradeIn></TradeIn>
       },
       {

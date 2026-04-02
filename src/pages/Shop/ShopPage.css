@@ -226,7 +226,7 @@
 
 .add-to-cart-btn {
     width: 100%;
-    background: #1D1D1F;
+    background: var(--theme-red);
     color: #FFFFFF;
     padding: 18px;
     border-radius: 8px;
@@ -236,7 +236,7 @@
 }
 
 .add-to-cart-btn:hover {
-    background: #000000;
+    background: var(--theme-red-hover);
 }
 
 .load-more-btn {
