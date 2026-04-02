@@ -1,0 +1,130 @@
+.flash-deal-banner {
+    padding: 60px 0;
+    background: #FFFFFF;
+}
+
+.banner-wrapper {
+    background: #D6001C;
+    border-radius: 40px;
+    padding: 80px 100px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #FFFFFF;
+    position: relative;
+    overflow: hidden;
+}
+
+.banner-content {
+    flex: 1.2;
+    z-index: 2;
+}
+
+.deal-badge {
+    display: inline-block;
+    background: rgba(0, 0, 0, 0.15);
+    padding: 6px 14px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    margin-bottom: 24px;
+}
+
+.banner-content h2 {
+    font-size: clamp(40px, 6vw, 64px);
+    font-weight: 800;
+    line-height: 1.05;
+    margin-bottom: 40px;
+    letter-spacing: -0.035em;
+}
+
+.promo-code-box {
+    margin-bottom: 48px;
+}
+
+.promo-code-box p {
+    font-size: 18px;
+    opacity: 0.9;
+}
+
+.promo-code-box .highlight {
+    background: #000000;
+    color: #FFFFFF;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-weight: 800;
+}
+
+.sale-btn {
+    background: #000000;
+    color: #FFFFFF;
+    padding: 16px 40px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sale-btn:hover {
+    background: #1d1d1f;
+    transform: translateY(-2px);
+}
+
+.banner-graphic {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.deal-circle {
+    width: 320px;
+    height: 320px;
+    background: #1d1d1f;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.4);
+    position: relative;
+}
+
+.deal-text {
+    font-size: 64px;
+    font-weight: 900;
+    color: #FFFFFF;
+    letter-spacing: 0.1em;
+}
+
+.sub-text {
+    font-size: 12px;
+    font-weight: 700;
+    color: #86868b;
+    letter-spacing: 0.2em;
+    margin-top: 8px;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .banner-wrapper {
+        flex-direction: column;
+        padding: 60px 40px;
+        text-align: center;
+    }
+    
+    .banner-graphic {
+        margin-top: 60px;
+        order: -1;
+    }
+    
+    .deal-circle {
+        width: 250px;
+        height: 250px;
+    }
+    
+    .deal-text {
+        font-size: 48px;
+    }
+}

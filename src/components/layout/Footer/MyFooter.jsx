@@ -22,7 +22,7 @@ const MyFooter = () => {
             <div className="container-max">
                 <div className="footer-grid">
                     <div className="footer-col brand-col">
-                        <img className='footer-logo' src='/staticImages/globalgtIcon.png' alt="Global Traders" />
+                        <img className='footer-logo' src='/staticImages/upcellLogo.png' alt="UpCell" />
                         <p className="brand-mission">
                             Making technology affordable and sustainable by extending the life of premium electronics.
                         </p>
@@ -35,9 +35,9 @@ const MyFooter = () => {
 
                     <div className="footer-col">
                         <h4>Shop</h4>
-                        <Link to="/preowned">All Products</Link>
+                        <Link to="/shop">All Products</Link>
                         <Link to="/iphone/refurbished">Refurbished iPhones</Link>
-                        <Link to="/wholesale">Wholesale Portal</Link>
+
                         <Link to="/offer">Special Offers</Link>
                     </div>
 
@@ -60,7 +60,7 @@ const MyFooter = () => {
                 </div>
 
                 <div className="footer-bottom">
-                    <p>&copy; {new Date().getFullYear()} Global Traders, Inc. All rights reserved.</p>
+                    <p>&copy; {new Date().getFullYear()} UpCell. All rights reserved.</p>
                 </div>
             </div>
         </footer>

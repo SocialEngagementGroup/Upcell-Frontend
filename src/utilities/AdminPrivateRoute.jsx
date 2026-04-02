@@ -22,7 +22,7 @@ const AdminPrivateRoute = ({ children }) => {
     }
 
     return (
-        <Navigate to="/login?admin=ture"></Navigate>
+        <Navigate to="/login?admin=true"></Navigate>
     );
 };
 

@@ -29,12 +29,12 @@ const FrequestlyAsked = () => {
             <Accordion.Item eventKey="3" className='mb-2'>
                 <Accordion.Header><h3>Which payment methods are availbale ?</h3></Accordion.Header>
                 <Accordion.Body>
-                    <p>We accept Visa, MasterCard, Discover, and American Express. PayPal and Klarna are also options if offered by the seller. We don’t accept payments via bank transfer, check, or cash.</p>
+                    <p>We accept Visa, MasterCard, Discover, and American Express, as well as PayPal. We don’t accept payments via bank transfer, check, or cash.</p>
                 </Accordion.Body>
             </Accordion.Item>
 
             <Accordion.Item eventKey="4" className='mb-2'>
-                <Accordion.Header><h3>What's the Global trader quality assurance fee for ?</h3></Accordion.Header>
+                <Accordion.Header><h3>What's the Upcell quality assurance fee for ?</h3></Accordion.Header>
                 <Accordion.Body>
                     <p>This fee allows us to vet and monitor the sellers we partner with, ensuring they meet our rigorous quality and customer-service standards. Your happiness is our top priority!</p>
                 </Accordion.Body>

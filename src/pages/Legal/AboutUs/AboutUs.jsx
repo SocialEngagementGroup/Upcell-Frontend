@@ -17,13 +17,13 @@ const AboutUs = () => {
                         <div className="mission-content">
                             <h2>Our Mission</h2>
                             <p>
-                                Welcome to Global Traders. We specialize in sourcing quality pre-owned products at competitive prices, aiming to make premium technology accessible to everyone. 
+                                Welcome to UpCell. We specialize in sourcing quality pre-owned products at competitive prices, aiming to make premium technology accessible to everyone.
                                 We pride ourselves on honesty, quality, and a commitment to longevity. Our products are fairly priced and accurately represented, because we believe in quality over quantity.
                             </p>
                         </div>
                         <div className="mission-image">
                             {/* Placeholder for a mission-related image or illustration */}
-                            <img src="/staticImages/bgAboutUs.png" alt="About Global Traders" style={{ width: '100%', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-medium)' }} />
+                            <img src="/staticImages/bgAboutUs.png" alt="About UpCell" style={{ width: '100%', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-medium)' }} />
                         </div>
                     </div>
                 </div>

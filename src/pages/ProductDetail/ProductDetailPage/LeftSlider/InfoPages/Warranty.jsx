@@ -17,7 +17,7 @@ const Warranty = () => {
             <p>Return your item for any reason. All without having to say “it’s not you, it’s me.”</p>
 
             <h3><ScheduleOutlinedIcon></ScheduleOutlinedIcon><span>Returns are suuuper easy</span></h3>
-            <p>Contact us via your Global traders Email account for simple return instructions.</p>
+            <p>Contact us via your Upcells Email account for simple return instructions.</p>
 
             <h3><PendingActionsOutlinedIcon></PendingActionsOutlinedIcon><span>Be reunited with your cash</span></h3>
             <p>Your original payment method will be refunded within 7 business days</p>

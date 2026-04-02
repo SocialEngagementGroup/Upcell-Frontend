@@ -110,8 +110,8 @@ const SingleAdminOrder = ({ order }) => {
                     <h5 className="title">Shipping information</h5>
                     <p>Name : <span className="bold">{name}</span></p>
                     <p>Email address : <span className="bold">{email}</span></p>
-                    <p>Phone number : <span className="bold">{name}</span></p>
-                    <p>City : <span className="bold">{name}</span></p>
+                    <p>Phone number : <span className="bold">{phone}</span></p>
+                    <p>City : <span className="bold">{city}</span></p>
                     <p>Street : <span className="bold">{street}</span></p>
                     <p>Postal code : <span className="bold">{postal}</span></p>
                     <p>Country : <span className="bold">{country}</span></p>

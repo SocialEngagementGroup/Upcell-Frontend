@@ -1,6 +1,6 @@
 import { toast } from "react-toastify";
 import "./Wholesale.css"
-// import axiosInstance from "../../utilities/axiosInstance";
+import axiosInstance from "../../../utilities/axiosInstance";
 
 const Wholesale = () => {
 
@@ -14,9 +14,15 @@ const Wholesale = () => {
         
         const data = {name, phone, email, company, note}
 
-        toast("Thank you for your query. We will contact you soon.!!")
-
-        e.target.reset()
+        axiosInstance.post('/add-run-form-submit/', data)
+            .then(res => {
+                toast("Thank you for your query. We will contact you soon.!!")
+                e.target.reset()
+            })
+            .catch(err => {
+                toast.error("Something went wrong. Please try again later.")
+                console.log(err)
+            })
 
     }
     return (

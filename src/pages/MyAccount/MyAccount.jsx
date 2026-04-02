@@ -21,8 +21,11 @@ const MyAccount = () => {
 
     const [orders, setOrders] = useState([])
     const [lineItems, setLineItems] = useState([])
+    const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
+        if (!user?.email) return;
+        setIsLoading(true)
         axiosInstance.get(`client-orders/${user?.email}`)
             .then(res => {
                 const data = res.data
@@ -31,15 +34,20 @@ const MyAccount = () => {
                 let singleOrders = [];
 
                 for(const ord of data){
-                    for(const item in ord.line_items){
-                        singleOrders.push(item)
+                    if (Array.isArray(ord.line_items)) {
+                        for(const item of ord.line_items){
+                            singleOrders.push(item)
+                        }
                     }
                 }
                 setLineItems(singleOrders)
-
+                setIsLoading(false)
             })
-            .catch(error => console.log(error))
-    }, [])
+            .catch(error => {
+                console.log(error)
+                setIsLoading(false)
+            })
+    }, [user?.email])
 
 
     return (
@@ -55,13 +63,17 @@ const MyAccount = () => {
                 <button onClick={() => setShowRecipt(true)}>Order recipts</button>
             </div> */}
 
-            {showRecipt && orders ? 
-                orders.map(order => <SingleCustomerOrder key={order._id} order={order}>
-                </SingleCustomerOrder>)
-                :
-                lineItems.map((item, ind) => <SingleProductOrdered key={ind} line_items={lineItems}>
-                </SingleProductOrdered>)
-            }
+            {isLoading ? (
+                <div className="account-loading">
+                    <div className="spinner-premium"></div>
+                    <p>Fetching your orders...</p>
+                </div>
+            ) : (
+                showRecipt && orders ? 
+                    orders.map(order => <SingleCustomerOrder key={order._id} order={order} />)
+                    :
+                    lineItems.map((item, ind) => <SingleProductOrdered key={ind} line_items={lineItems} />)
+            )}
 
         </div>
     );

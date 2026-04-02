@@ -11,8 +11,10 @@ import App from './App.jsx'
 import { createBrowserRouter, RouterProvider} from "react-router-dom"
 import Cart from './pages/Cart/Cart.jsx'
 import MyAccount from './pages/MyAccount/MyAccount.jsx'
+import TradeIn from './pages/TradeIn/TradeIn.jsx'
 
-import Preowned from "./pages/Shop/Preowned/Preowned.jsx"
+
+import ShopPage from "./pages/Shop/ShopPage.jsx"
 import Refubrished from "./pages/Shop/Refurbished/Refubrished/Refubrished.jsx"
 import Wholesale from "./pages/Auxiliary/Wholesale/Wholesale.jsx"
 import Resources from "./pages/Auxiliary/Resources/Resources.jsx"
@@ -72,8 +74,8 @@ const router = createBrowserRouter([
         element: <PrivateRoute><MyAccount></MyAccount></PrivateRoute>
       },
       {
-        path: "preowned",
-        element: <Preowned></Preowned>
+        path: "shop",
+        element: <ShopPage></ShopPage>
       },
       {
         path: "refubrished",
@@ -104,8 +106,12 @@ const router = createBrowserRouter([
         element:<PrivacyPolicy></PrivacyPolicy>
       },
       {
-        path:"about-us",
+        path: "about-us",
         element:<AboutUs></AboutUs>
+      },
+      {
+        path: "sell-your-device",
+        element: <TradeIn></TradeIn>
       },
       {
         path:"succeed",

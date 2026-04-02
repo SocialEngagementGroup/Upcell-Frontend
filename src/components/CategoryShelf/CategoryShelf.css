@@ -1,0 +1,148 @@
+.category-shelf {
+    padding: 60px 0;
+    background: #FAFAFA;
+}
+
+.category-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    height: 700px;
+}
+
+.category-card {
+    background: #FFFFFF;
+    border-radius: 28px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 40px;
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.03);
+}
+
+.category-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+}
+
+.card-large {
+    grid-column: 1;
+    height: 100%;
+}
+
+.category-stack {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: 24px;
+}
+
+.card-small {
+    flex: 1;
+    height: calc(50% - 12px);
+}
+
+.card-content h3 {
+    font-size: 32px;
+    font-weight: 800;
+    color: #1d1d1f;
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+}
+
+.card-content p {
+    font-size: 16px;
+    color: #86868b;
+    margin-bottom: 40px;
+    max-width: 200px;
+    line-height: 1.4;
+}
+
+.explore-link, .shop-link {
+    font-size: 16px;
+    font-weight: 600;
+    color: #d6001c;
+    text-decoration: none;
+    transition: opacity 0.2s;
+}
+
+.explore-link:hover, .shop-link:hover {
+    opacity: 0.7;
+}
+
+/* Image Placement */
+.card-image {
+    position: absolute;
+    width: 80%;
+    bottom: -10%;
+    right: -10%;
+    z-index: 1;
+}
+
+.iphone-card .card-image {
+    width: 60%;
+    bottom: -5%;
+    right: -5%;
+}
+
+.ipad-card .card-image {
+    width: 50%;
+    top: 50%;
+    right: 5%;
+    transform: translateY(-40%);
+}
+
+.category-card img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
+/* MacBook Dark Theme */
+.dark-theme {
+    background: #000000;
+}
+
+.dark-theme h3 {
+    color: #FFFFFF;
+}
+
+.dark-theme p {
+    color: #86868b;
+}
+
+.dark-theme .card-image {
+    width: 60%;
+    bottom: 5%;
+    right: -5%;
+}
+
+/* Responsive */
+@media (max-width: 991px) {
+    .category-grid {
+        grid-template-columns: 1fr;
+        height: auto;
+    }
+    
+    .category-card {
+        height: 400px !important;
+        padding: 30px;
+    }
+
+    .card-small {
+        height: 400px !important;
+    }
+
+    .card-content h3 {
+        font-size: 28px;
+    }
+
+    .card-image {
+        width: 45% !important;
+        bottom: 5% !important;
+        right: 5% !important;
+        transform: none !important;
+    }
+}

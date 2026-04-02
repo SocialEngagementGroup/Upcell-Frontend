@@ -79,6 +79,16 @@ const LoginAndSignup = () => {
 
         setErrorMessage("")
 
+        if (password.length < 8) {
+            setErrorMessage("Password must be at least 8 characters long")
+            return
+        }
+
+        if (password !== rePassword) {
+            setErrorMessage("Passwords do not match")
+            return
+        }
+
         createUserWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
                 settingSingin()
@@ -89,17 +99,16 @@ const LoginAndSignup = () => {
             .catch((error) => {
                 const errorCode = error.code;
                 const errorMessage = error.message;
-                console.log("error in signin ***, ", errorMessage)
+                console.log("error in signup ***, ", errorMessage)
                 setErrorMessage(errorMessage)
             });
-
     }
 
     return (
         <div className="login-page-container">
             <div className="auth-card">
                 <header className="auth-header">
-                    <h1>{signin ? "Welcome Back" : "Join Global Traders"}</h1>
+                    <h1>{signin ? "Welcome Back" : "Join UpCell"}</h1>
                     <p>{signin ? "Sign in to manage your orders" : "Create an account to start shopping"}</p>
                 </header>
 
@@ -160,7 +169,7 @@ const LoginAndSignup = () => {
 
                 <footer className="auth-footer">
                     {signin ? (
-                        <>New to Global Traders? <button className="btn-link-toggle" type="button" onClick={settingSingup}>Sign up</button></>
+                        <>New to UpCell? <button className="btn-link-toggle" type="button" onClick={settingSingup}>Sign up</button></>
                     ) : (
                         <>Already have an account? <button className="btn-link-toggle" type="button" onClick={settingSingin}>Sign in</button></>
                     )}

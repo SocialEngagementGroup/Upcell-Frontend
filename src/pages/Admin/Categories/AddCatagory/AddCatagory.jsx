@@ -1,4 +1,3 @@
-"use client"
 import React, { createElement, useEffect, useState } from 'react'
 import { styled } from 'styled-components'
 import axiosInstance from '../../../../utilities/axiosInstance'

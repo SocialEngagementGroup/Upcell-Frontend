@@ -63,16 +63,16 @@ const Resources = () => {
                 <div className='accordion-container'>
                     <Accordion>
                         <Accordion.Item eventKey="0">
-                            <Accordion.Header>How do I contact Global Traders?</Accordion.Header>
+                            <Accordion.Header>How do I contact Upcells?</Accordion.Header>
                             <Accordion.Body>
-                                <p>You can contact Global Traders via Facebook, Instagram, or email. For critical issues, we recommend contacting us at <a href="mailto:usa.globaltraders@gmail.com">usa.globaltraders@gmail.com</a>.</p>
+                                <p>You can contact Upcells via Facebook, Instagram, or email. For critical issues, we recommend contacting us at <a href="mailto:usa.Upcells@gmail.com">usa.Upcells@gmail.com</a>.</p>
                             </Accordion.Body>
                         </Accordion.Item>
 
                         <Accordion.Item eventKey="1">
                             <Accordion.Header>How do I cancel an order?</Accordion.Header>
                             <Accordion.Body>
-                                <p>To cancel an order, email us at <a href="mailto:usa.globaltraders@gmail.com">usa.globaltraders@gmail.com</a> with your Order ID. If the order hasn't shipped, we will process a full refund.</p>
+                                <p>To cancel an order, email us at <a href="mailto:usa.Upcells@gmail.com">usa.Upcells@gmail.com</a> with your Order ID. If the order hasn't shipped, we will process a full refund.</p>
                             </Accordion.Body>
                         </Accordion.Item>
 

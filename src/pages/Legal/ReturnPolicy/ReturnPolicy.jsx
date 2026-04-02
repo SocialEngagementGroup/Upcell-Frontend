@@ -11,7 +11,7 @@ const ReturnPolicy = () => {
 
             <main className="container-max">
                 <article className="return-content">
-                    <p>At Global Traders, we believe in that good ol’ saying: when life gives you lemons (or buyer’s remorse), get a return or a refund. </p>
+                    <p>At UpCell, we believe in that good ol’ saying: when life gives you lemons (or buyer’s remorse), get a return or a refund. </p>
 
                     <p className="note">30 days to change your mind</p>
 
@@ -21,7 +21,7 @@ const ReturnPolicy = () => {
 
                     <ol>
                         <li>Compose an Email: <br /><span>Open your email client and compose a new message.</span></li>
-                        <li>Recipient: <br /><span>Address the email to:</span> <a href="mailto:usa.globaltraders@gmail.com"> usa.globaltraders@gmail.com</a></li>
+                        <li>Recipient: <br /><span>Address the email to:</span> <a href="mailto:usa.Upcells@gmail.com"> usa.Upcells@gmail.com</a></li>
                         <li>Subject: <br /><span>Please use the subject line: Product Return Request - [Your Order ID]</span></li>
 
                         <li>Content: <br /><span>In the body of the email, include the following details:</span> <br />

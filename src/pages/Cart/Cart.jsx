@@ -8,13 +8,21 @@ import CartProduct from "./CartProduct";
 
 const Cart = () => {
     const [products, setProducts] = useState([])
+    const [isLoading, setIsLoading] = useState(false)
     const { cart, setCart } = useContext(CartContext)
 
     useEffect(() => {
         if (cart && cart.length) {
+            setIsLoading(true)
             axiosInstance.post("cart", { ids: cart })
-                .then(res => setProducts(res.data))
-                .catch(err => console.log(err))
+                .then(res => {
+                    setProducts(res.data)
+                    setIsLoading(false)
+                })
+                .catch(err => {
+                    console.log(err)
+                    setIsLoading(false)
+                })
         } else {
             setProducts([])
         }
@@ -32,7 +40,7 @@ const Cart = () => {
             <header className="cart-hero">
                 <div className="container-max">
                     <h1>My Cart <span>({cart?.length})</span></h1>
-                    <Link to="/preowned" className="btn-continue-shopping">
+                    <Link to="/shop" className="btn-continue-shopping">
                         ← Continue shopping
                     </Link>
                 </div>
@@ -83,7 +91,7 @@ const Cart = () => {
                     <div className="empty-cart-view">
                         <h2>Your cart is empty</h2>
                         <p>Looks like you haven't added anything to your cart yet.</p>
-                        <Link to="/preowned" className="btn-shop-now">
+                        <Link to="/shop" className="btn-shop-now">
                             Shop Latest Phones
                         </Link>
                     </div>

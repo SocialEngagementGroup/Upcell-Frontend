@@ -1,0 +1,472 @@
+.trade-in-page {
+    background: #FFFFFF;
+    color: #1D1D1F;
+    padding-top: 100px;
+    padding-bottom: 150px;
+}
+
+/* Stepper */
+.stepper-header {
+    margin-bottom: 80px;
+}
+
+.modern-stepper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.modern-stepper::before {
+    content: '';
+    position: absolute;
+    top: 15px;
+    left: 40px;
+    right: 40px;
+    height: 1px;
+    background: #EDEDEF;
+}
+
+.step-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+    z-index: 1;
+}
+
+.step-indicator {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #FAFAFA;
+    border: 1px solid #EDEDEF;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.step-node.active .step-indicator {
+    background: #1D1D1F;
+    color: #FFF;
+    border-color: #1D1D1F;
+}
+
+.step-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #86868B;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.step-node.active .step-label {
+    color: #1D1D1F;
+}
+
+/* Progress-top-bar (Final Steps) */
+.progress-top-bar {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    align-items: center;
+    margin-bottom: 60px;
+    border-bottom: 1px solid #EDEDEF;
+    padding-bottom: 24px;
+}
+
+.progress-top-bar .center {
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.progress-top-bar .bar {
+    width: 200px;
+    height: 4px;
+    background: #F5F5F7;
+    border-radius: 2px;
+    margin-top: 8px;
+    overflow: hidden;
+}
+
+.progress-top-bar .fill {
+    height: 100%;
+    background: #D6001C;
+}
+
+/* Content Sections */
+.step-content {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.step-header {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto 60px auto;
+}
+
+.step-header.centered {
+    text-align: center;
+}
+
+.step-header h1 {
+    font-size: 48px;
+    font-weight: 800;
+    margin-bottom: 16px;
+}
+
+.step-header p {
+    font-size: 16px;
+    color: #86868B;
+    line-height: 1.5;
+}
+
+.red-text {
+    color: #D6001C;
+}
+
+/* Selection Grid */
+.selection-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    margin-bottom: 100px;
+}
+
+.selection-card {
+    background: #FFFFFF;
+    border: 1px solid #EDEDEF;
+    border-radius: 24px;
+    padding: 60px 40px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.selection-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+}
+
+.selection-card .img-box {
+    margin-bottom: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 300px;
+}
+
+.selection-card img {
+    max-height: 100%;
+}
+
+.selection-card h2 {
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 12px;
+}
+
+.selection-card p {
+    font-size: 14px;
+    color: #86868B;
+}
+
+/* Trust Bar */
+.trust-footer-bar {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 60px;
+    padding-top: 80px;
+    border-top: 1px solid #EDEDEF;
+}
+
+.trust-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.trust-item svg {
+    color: #D6001C;
+    font-size: 32px !important;
+}
+
+.trust-item strong {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.trust-item span {
+    font-size: 12px;
+    color: #86868B;
+}
+
+/* Condition Step */
+.condition-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 60px;
+}
+
+.condition-card {
+    border: 1px solid #EDEDEF;
+    border-radius: 16px;
+    padding: 40px 32px;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.condition-card:hover {
+    border-color: #1D1D1F;
+}
+
+.condition-card .icon {
+    font-size: 28px !important;
+    margin-bottom: 24px;
+    color: #86868B;
+}
+
+.condition-card h3 {
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 12px;
+}
+
+.condition-card p {
+    font-size: 13px;
+    color: #86868B;
+    line-height: 1.5;
+}
+
+.live-valuation-banner {
+    background: #000;
+    color: #FFF;
+    padding: 40px 60px;
+    border-radius: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 100px;
+}
+
+.valuation-text .label {
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    color: #86868B;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.valuation-text h2 {
+    font-size: 32px;
+    font-weight: 800;
+}
+
+.btn-get-estimate {
+    background: #D6001C;
+    color: #FFF;
+    padding: 20px 48px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.inspection-guarantee {
+    display: flex;
+    align-items: center;
+    gap: 80px;
+    background: #FBFBFC;
+    padding: 60px;
+    border-radius: 24px;
+}
+
+.inspection-guarantee img {
+    width: 400px;
+    border-radius: 20px;
+}
+
+.guarantee-text h3 {
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 24px;
+}
+
+.guarantee-text p {
+    font-size: 16px;
+    color: #86868B;
+    line-height: 1.6;
+    margin-bottom: 32px;
+}
+
+.flash-payment {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 700;
+}
+
+.flash-payment svg {
+    color: #D6001C;
+}
+
+/* Finalize Step */
+.valuation-hero {
+    background: #FBFBFC;
+    padding: 100px;
+    border-radius: 40px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    margin-bottom: 100px;
+}
+
+.guaranteed-price {
+    font-size: 80px;
+    font-weight: 900;
+    margin: 16px 0;
+}
+
+.trust-mini-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.mini-card {
+    display: flex;
+    gap: 20px;
+    padding: 24px;
+    background: #FFF;
+    border-radius: 16px;
+}
+
+.mini-card svg {
+    color: #D6001C;
+    font-size: 28px !important;
+}
+
+.finalize-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 100px;
+    margin-bottom: 120px;
+}
+
+.finalize-product-preview {
+    text-align: center;
+}
+
+.finalize-product-preview img {
+    max-width: 100%;
+    margin-bottom: 20px;
+}
+
+.p-label {
+    display: inline-block;
+    background: #000;
+    color: #FFF;
+    padding: 6px 16px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 900;
+}
+
+.details-form {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.details-form h2 {
+    font-size: 32px;
+    font-weight: 800;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.input-group label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #86868B;
+}
+
+.input-group input {
+    background: #FBFBFC;
+    border: none;
+    padding: 20px;
+    border-radius: 12px;
+    font-size: 15px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.terms-check {
+    display: flex;
+    gap: 12px;
+    font-size: 12px;
+    color: #86868B;
+}
+
+.btn-submit-trade {
+    background: #D6001C;
+    color: #FFF;
+    padding: 20px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.service-highlights {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+}
+
+.service-card {
+    background: #FBFBFC;
+    padding: 48px 32px;
+    text-align: center;
+    border-radius: 20px;
+}
+
+.service-card svg {
+    font-size: 32px !important;
+    margin-bottom: 24px;
+    color: #1D1D1F;
+}
+
+.success-step {
+    padding: 100px 0;
+}
+
+.success-icon {
+    font-size: 100px !important;
+    color: #2DCA73;
+    margin-bottom: 40px;
+}
+
+@media (max-width: 1024px) {
+    .selection-grid, .condition-grid, .valuation-hero, .finalize-grid, .service-highlights {
+        grid-template-columns: 1fr;
+    }
+}
