@@ -1,50 +1,36 @@
 import React from 'react';
-import "./CartProduct.css"
 
 const CartProduct = ({ product, setCart, cart }) => {
-    const { parentCatagory, _id, productName, description, storage, color, price, discountPrice, originalPrice, reviewScore, peopleReviewed, condition, image } = product
-
+    const { _id, productName, storage, color, price, condition, image } = product
     const unit = cart.filter(id => _id === id).length
 
     const removeItemFromCart = () => {
         const itemIndex = cart.indexOf(_id)
-        if(itemIndex !== -1){
-            setCart(prev => prev.filter((item, ind) => itemIndex !== ind))
-        }
+        if(itemIndex !== -1) setCart(prev => prev.filter((item, ind) => itemIndex !== ind))
     }
-    const addItemToCart = () => {
-        setCart(prev => [...prev, _id])
-    }
+    const addItemToCart = () => setCart(prev => [...prev, _id])
+
     return (
-        <div className='single-cart-product'>
-            <img 
-                src={image} 
-                alt={productName} 
-                className='cart-product-image'
-            />
+        <div className='bg-white p-6 rounded-[20px] border border-border-light grid grid-cols-[120px_1fr_150px] gap-8 items-center transition-all duration-300 ease-smooth hover:border-brand-red hover:shadow-[0_4px_20px_rgba(0,0,0,0.04)] max-md:grid-cols-[80px_1fr] max-md:gap-5 max-md:p-4'>
+            <img src={image} alt={productName} className='w-[120px] h-[120px] object-contain bg-surface-alt rounded-xl p-2.5 max-md:w-20 max-md:h-20' />
             
-            <div className='cart-item-info'>
-                <h3>{productName}</h3>
-                <div className='cart-item-meta'>
-                    <span>Color: {color?.name}</span>
-                    <span>Storage: {storage}</span>
-                    <span>Condition: {condition}</span>
+            <div className='flex flex-col gap-2'>
+                <h3 className='text-lg font-bold m-0'>{productName}</h3>
+                <div className='flex gap-4 flex-wrap'>
+                    <span className='text-[13px] text-apple-gray bg-surface-alt px-3 py-1 rounded-full'>Color: {color?.name}</span>
+                    <span className='text-[13px] text-apple-gray bg-surface-alt px-3 py-1 rounded-full'>Storage: {storage}</span>
+                    <span className='text-[13px] text-apple-gray bg-surface-alt px-3 py-1 rounded-full'>Condition: {condition}</span>
                 </div>
             </div>
 
-            <div className='cart-controls-area'>
-                <p className='cart-price'>$ {price * unit}</p>
-                <div className='quantity-pill'>
-                    <button onClick={removeItemFromCart}>-</button>
-                    <span>{unit}</span>
-                    <button onClick={addItemToCart}>+</button>
+            <div className='flex flex-col items-end gap-4 max-md:col-span-2 max-md:flex-row max-md:justify-between max-md:items-center max-md:border-t max-md:border-border-light max-md:pt-4 max-md:mt-2'>
+                <p className='text-lg font-extrabold'>$ {price * unit}</p>
+                <div className='flex items-center bg-surface-alt rounded-full p-1 gap-3'>
+                    <button className='w-8 h-8 bg-white rounded-full flex items-center justify-center text-lg font-semibold shadow-sm transition-all duration-300 hover:bg-brand-red hover:text-white' onClick={removeItemFromCart}>-</button>
+                    <span className='font-bold min-w-[20px] text-center'>{unit}</span>
+                    <button className='w-8 h-8 bg-white rounded-full flex items-center justify-center text-lg font-semibold shadow-sm transition-all duration-300 hover:bg-brand-red hover:text-white' onClick={addItemToCart}>+</button>
                 </div>
-                <button 
-                    className='btn-remove-item' 
-                    onClick={() => setCart(prev => prev.filter(id => id !== _id))}
-                >
-                    Remove
-                </button>
+                <button className='text-xs text-[#ff3b30] font-semibold bg-transparent p-0 mt-2 uppercase tracking-[0.05em] hover:underline' onClick={() => setCart(prev => prev.filter(id => id !== _id))}>Remove</button>
             </div>
         </div>
     );

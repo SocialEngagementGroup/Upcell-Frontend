@@ -7,11 +7,10 @@ import HomeTrustFeatures from "../../components/HomeTrustFeatures/HomeTrustFeatu
 import FlashDealBanner from "../../components/FlashDealBanner/FlashDealBanner";
 import NewsletterSignup from "../../components/NewsletterSignup/NewsletterSignup";
 import ScrollToTop from "../../utilities/ScrollToTop";
-import "./Home.css";
 
 const Home = () => {
     return (
-        <div className="home-page">
+        <div className="bg-white w-full overflow-x-hidden">
             <ScrollToTop />
             <ModernHero />
             <CategoryShelf />

@@ -1,4 +1,3 @@
-import "./MyFooter.css"
 import { Link } from 'react-router-dom'
 
 // Modern Icons
@@ -9,57 +8,53 @@ const SocialIcons = {
 };
 
 const MyFooter = () => {
-
-
     return (
-        <footer className="modern-footer">
-            <div className="container-max">
-                <div className="footer-grid">
+        <footer className="bg-obsidian text-white pt-20 pb-10 mt-24 border-t border-white/10">
+            <div className="max-w-site mx-auto px-[100px] lg:px-10">
+                <div className="grid grid-cols-[2fr_1fr_1fr_2fr] gap-[60px] mb-[60px] max-lg:grid-cols-2 max-lg:gap-10 max-[550px]:grid-cols-1 max-[550px]:text-center">
                     {/* Brand Column */}
-                    <div className="footer-col brand-col">
-                        <img className='footer-logo' src='/staticImages/upcellLogo.png' alt="UpCell" />
-                        <p className="brand-mission">
+                    <div className="flex flex-col gap-4">
+                        <img className='h-[85px] w-auto object-contain mb-5 self-start max-[550px]:self-center' src='/staticImages/upcellLogo.png' alt="UpCell" />
+                        <p className="text-sm leading-relaxed text-zinc-muted max-w-[280px] mb-6 max-[550px]:mx-auto">
                             Making technology affordable and sustainable by extending the life of premium electronics.
                         </p>
-                        <div className="social-links">
-                            <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram"><SocialIcons.Instagram /></a>
-                            <a href="https://facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook"><SocialIcons.Facebook /></a>
-                            <a href="https://twitter.com" target="_blank" rel="noreferrer" aria-label="Twitter"><SocialIcons.Twitter /></a>
+                        <div className="flex gap-5 max-[550px]:justify-center">
+                            <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram" className="text-zinc-muted transition-all duration-300 ease-smooth hover:text-white hover:-translate-y-[3px]"><SocialIcons.Instagram /></a>
+                            <a href="https://facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook" className="text-zinc-muted transition-all duration-300 ease-smooth hover:text-white hover:-translate-y-[3px]"><SocialIcons.Facebook /></a>
+                            <a href="https://twitter.com" target="_blank" rel="noreferrer" aria-label="Twitter" className="text-zinc-muted transition-all duration-300 ease-smooth hover:text-white hover:-translate-y-[3px]"><SocialIcons.Twitter /></a>
                         </div>
                     </div>
 
                     {/* Shop Column */}
-                    <div className="footer-col">
-                        <h4>Shop</h4>
-                        <Link to="/shop">All Products</Link>
-                        <Link to="/shop?category=iPhone">iPhone</Link>
-                        <Link to="/shop?category=iPad">iPad</Link>
-                        <Link to="/shop?category=MacBook">MacBook</Link>
-                        <Link to="/sell-device">Sell Your Device</Link>
+                    <div className="flex flex-col gap-4">
+                        <h4 className="text-sm font-extrabold uppercase tracking-[0.1em] text-white mb-2">Shop</h4>
+                        <Link to="/shop" className="text-[15px] text-zinc-muted transition-all duration-300 ease-smooth hover:text-brand-red hover:translate-x-1">All Products</Link>
+                        <Link to="/shop?category=iPhone" className="text-[15px] text-zinc-muted transition-all duration-300 ease-smooth hover:text-brand-red hover:translate-x-1">iPhone</Link>
+                        <Link to="/shop?category=iPad" className="text-[15px] text-zinc-muted transition-all duration-300 ease-smooth hover:text-brand-red hover:translate-x-1">iPad</Link>
+                        <Link to="/shop?category=MacBook" className="text-[15px] text-zinc-muted transition-all duration-300 ease-smooth hover:text-brand-red hover:translate-x-1">MacBook</Link>
+                        <Link to="/sell-device" className="text-[15px] text-zinc-muted transition-all duration-300 ease-smooth hover:text-brand-red hover:translate-x-1">Sell Your Device</Link>
                     </div>
 
                     {/* Company Column */}
-                    <div className="footer-col">
-                        <h4>Company</h4>
-                        <Link to="/about-us">About Us</Link>
-                        <Link to="/resources">Blogs & News</Link>
-                        <Link to="/contactus">Contact Us</Link>
-                        <Link to="/myaccount">My Account</Link>
-                        <Link to="/login">Sign In / Register</Link>
+                    <div className="flex flex-col gap-4">
+                        <h4 className="text-sm font-extrabold uppercase tracking-[0.1em] text-white mb-2">Company</h4>
+                        <Link to="/about-us" className="text-[15px] text-zinc-muted transition-all duration-300 ease-smooth hover:text-brand-red hover:translate-x-1">About Us</Link>
+                        <Link to="/resources" className="text-[15px] text-zinc-muted transition-all duration-300 ease-smooth hover:text-brand-red hover:translate-x-1">Blogs & News</Link>
+                        <Link to="/contactus" className="text-[15px] text-zinc-muted transition-all duration-300 ease-smooth hover:text-brand-red hover:translate-x-1">Contact Us</Link>
+                        <Link to="/myaccount" className="text-[15px] text-zinc-muted transition-all duration-300 ease-smooth hover:text-brand-red hover:translate-x-1">My Account</Link>
+                        <Link to="/login" className="text-[15px] text-zinc-muted transition-all duration-300 ease-smooth hover:text-brand-red hover:translate-x-1">Sign In / Register</Link>
                     </div>
 
                     {/* Legal Column */}
-                    <div className="footer-col">
-                        <h4>Legal</h4>
-                        <Link to="/return-policy">Warranty & Returns</Link>
-                        <Link to="/privacy-policy">Privacy Policy</Link>
-                        
-
+                    <div className="flex flex-col gap-4">
+                        <h4 className="text-sm font-extrabold uppercase tracking-[0.1em] text-white mb-2">Legal</h4>
+                        <Link to="/return-policy" className="text-[15px] text-zinc-muted transition-all duration-300 ease-smooth hover:text-brand-red hover:translate-x-1">Warranty & Returns</Link>
+                        <Link to="/privacy-policy" className="text-[15px] text-zinc-muted transition-all duration-300 ease-smooth hover:text-brand-red hover:translate-x-1">Privacy Policy</Link>
                     </div>
                 </div>
 
-                <div className="footer-bottom">
-                    <p>&copy; {new Date().getFullYear()} UpCell. All rights reserved.</p>
+                <div className="pt-10 border-t border-white/10 text-center">
+                    <p className="text-[13px] text-zinc-dark">&copy; {new Date().getFullYear()} UpCell. All rights reserved.</p>
                 </div>
             </div>
         </footer>

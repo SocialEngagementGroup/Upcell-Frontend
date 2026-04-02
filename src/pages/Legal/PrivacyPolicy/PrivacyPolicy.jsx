@@ -1,82 +1,41 @@
-import "./PrivacyPolicy.css"
-
 const PrivacyPolicy = () => {
     return (
-        <div className="privacy-policy-page">
-            <section className="legal-hero">
-                <div className="container-max">
-                    <h1>Privacy Policy</h1>
-                    <p>Last updated: March 2024</p>
+        <div className="bg-white min-h-screen">
+            <section className="bg-surface-alt py-24 text-center rounded-b-6xl mb-20">
+                <div className="max-w-site mx-auto px-[100px] lg:px-10">
+                    <h1 className="text-5xl font-black mb-4">Privacy Policy</h1>
+                    <p className="text-lg text-apple-gray">Last updated: March 2024</p>
                 </div>
             </section>
 
-            <main className="container-max">
-                <article className="legal-content">
+            <main className="max-w-site mx-auto px-[100px] lg:px-10 pb-24">
+                <article className="max-w-[800px] mx-auto [&_h2]:text-2xl [&_h2]:font-extrabold [&_h2]:mt-12 [&_h2]:mb-4 [&_p]:text-base [&_p]:text-apple-gray [&_p]:leading-relaxed [&_p]:mb-4">
                     <h2>INTRODUCTION</h2>
-                    <p>UpCell, LLC (“UpCell,” “us” or “we”) is committed to protecting the privacy of our customers and end users. This Privacy and Cookie Policy (“Policy”) explains how we collect, share and use personal information collected through our corporate websites (including www.Upcells-usa.com, and marketplaces within the UpCell Network) (the “Sites”) and any related UpCell application, marketplace service or tool (collectively, the “Services”), as well as in connection with our events, sales, and marketing activities. “You” or “your” means the individual using the Services and the entity which such individual represents. <br />
-                        If you have any questions or concerns about our use of your personal information, then please contact us using the contact details provided at the bottom of this Policy.
-                    </p>
+                    <p>UpCell, LLC ("UpCell," "us" or "we") is committed to protecting the privacy of our customers and end users. This Privacy and Cookie Policy ("Policy") explains how we collect, share and use personal information collected through our corporate websites and any related UpCell application, marketplace service or tool (collectively, the "Services").</p>
 
                     <h2>ABOUT US</h2>
-                    <p>UpCell is headquartered in the United States. We provide B2B online marketplace solutions and related services that enable our customers to buy and sell bulk lot liquidation inventory. Our customers include major retailers, governments, and manufacturers looking to sell their inventory (“Sellers”) and companies looking to bid on and purchase that inventory (“Buyers”).</p>
-                    <p>For more information about us, please see the “About Us” section of our Site at https://Upcells-usa.com/.</p>
+                    <p>UpCell is headquartered in the United States. We provide B2B online marketplace solutions and related services that enable our customers to buy and sell bulk lot liquidation inventory.</p>
 
                     <h2>INFORMATION THAT WE COLLECT</h2>
-                    <p>The personal information that we may collect about you broadly falls into the following categories: <br />Information you provide us. We may collect the personal information you provide to us voluntarily: for example, when you apply to create an account to access the Services, bid on or buy products sold via the Sites, subscribe to marketing communications from us, submit enquires to us, and/or otherwise contact us. We may also collect personal information from you offline, such as when you attend one of our events, during phone calls with sales representatives, or when you contact customer support. The personal information that you are asked to provide, and the reasons why you are asked to provide it, will be made clear to you at the point we ask you to provide your personal information.</p>
-
-                    <h2>The information we collect may include:</h2>
-                    <p>Contact and identification information, such as your first and last name, the name of the entity which you represent (if applicable), your email address, phone number, business address, fax number, business resale certificate number, and other customer information, including without limitation, the password chosen by you for access to the Services.</p>
-                    <p>Financial information, such as credit card or bank account numbers, and the address of the bank from which you will be wiring funds for purchases.</p>
-                    <p>Bidding, buying, or selling information you provide during a transaction, or other transaction-based content that you generate or that is connected to your account as a result of a transaction you are involved in.</p>
-                    <p>We do not, however, knowingly collect personal information from children under the age of thirteen.</p>
-                    <p>Information we collect automatically. When you visit or use our Services, we automatically collect certain information from your device. In some countries, including countries in the European Economic Area, this information may be considered personal information under applicable data protection laws.</p>
-                    <p>Specifically, the information we collect automatically may include information such as your IP addresses, browser, and device characteristics, operating system, language preferences, referring URLs, broad geographic location (e.g. country or city-level location), and other technical information. We may also collect information about how your device has interacted with our Sites, including pages accessed and links clicked.</p>
-                    <p>This information is primarily used to maintain the security and operation of our Services. Collecting this information also enables us to better understand the users (like you) who come to our Sites, where they come from, and what content on our Sites is of interest to them. We use this information for our internal analytics and reporting purposes and to improve the quality and relevance of our Services to users.</p>
-                    <p>Some of this information may be collected using cookies and similar tracking technologies, as explained further under the heading “Cookies and Similar Technologies”.</p>
-                    <p>Information we obtain from third-party sources. From time to time, we may receive personal information about you from third-party sources (including lists from tradeshow events that you’ve registered for, and sometimes Sellers will provide UpCell a list of buyers for their sites), but only where we have checked that these third parties either have your consent or are otherwise legally permitted or required to disclose your personal information to us.</p>
-                    <p>The types of information we collect from third parties include your first and last name, the name of the entity which you represent (if applicable), your email address, phone number, business address, fax number, business resale certificate number, and other customer information, and we use the information we receive from these third parties to access the Services, bid on or buy products sold via the Sites, subscribe to marketing communications from us, submit enquiries to us and/or otherwise contact us.</p>
+                    <p>The personal information that we may collect about you broadly falls into the following categories: Information you provide us. We may collect the personal information you provide to us voluntarily.</p>
 
                     <h2>HOW WE USE YOUR INFORMATION</h2>
-                    <p>We use personal information collected via our Sites for a variety of business purposes描述如下。If you are from the United States Economic Area, we have also described the legal basis for collecting and using the personal information we collect from you.</p>
-                    <p>We normally collect personal information from you where the processing is in our legitimate business interests (“Business Purposes”), in order to enter into or perform a contract with you (“Contractual”), where we have your consent to so (“Consent”), and/or for compliance with our legal obligations (“Legal Reasons”).</p>
-                    <p>We may use the personal information we collect in the following ways:</p>
-                    <p>To provide access to and use of our Services (for our Business Purposes, Contractual purposes, and/or with your Consent).</p>
-                    <p>To enable us to notify you if you post the winning bid in an auction and/or confirm your purchases (for Contractual purposes and/or with your Consent).</p>
-                    <p>To respond to your requests for support or to provide you with information you have requested about UpCell or any of our Services (for our Business Purposes, Contractual purposes, and/or with your Consent).</p>
-                    <p>To provide our Sellers, service providers, and/or partners with information about your winning bid and/or to confirm your purchases to entities who require such information to ensure the successful fulfillment of any purchases you make through the Services (for Contractual purposes and/or with your Consent).</p>
-                    <p>To send you information about your relationship or transactions with us and other service-related information, including confirmations, invoices, technical notices, updates, security alerts, and support and administrative messages (for our Business Purposes, Contractual purposes, and/or with your Consent).</p>
-                    <p>To communicate with you and to personalize our communications with you (for our Business Purposes and/or with your Consent). For example, we may contact you by phone or email, or other means (where this is in accordance with your marketing preferences) to inform you about auctions, products, services, special offers, or other promotional information related to the Services that we believe will be of interest to you. For more information about managing your marketing preferences, please see “Your Data Protection Rights“</p>
-                    <p>To prevent, detect, mitigate, and investigate fraud, security breaches, and potentially prohibited or illegal activities and enforce our agreements and policies (for our Business Purposes and/or Legal Reasons).</p>
-                    <p>For other Business Purposes such as data analysis, identifying usage trends, determining the effectiveness of our promotional campaigns, and enhancing, customizing, and improving our Services.</p>
+                    <p>We use personal information collected via our Sites for a variety of business purposes. We normally collect personal information from you where the processing is in our legitimate business interests.</p>
 
                     <h2>HOW WE RETAIN YOUR INFORMATION</h2>
-                    <p>We retain your personal information for as long as it is necessary and relevant for the purposes outlined in the section above. When we have no ongoing legitimate business need to process your personal information, we will either delete or anonymize it or, if this is not possible (for example, because your personal information has been stored in backup archives), then we will securely store your personal information and isolate it from further processing until deletion is possible.</p>
-                    <p>In addition, we may retain personal information from closed accounts for Legal Reasons, e.g. to comply with national laws, prevent fraud, collect any fees owed, resolve disputes, troubleshoot problems, assist with any investigation, enforce our customer agreements and take other actions permitted or required by applicable national laws.</p>
+                    <p>We retain your personal information for as long as it is necessary and relevant for the purposes outlined in the section above.</p>
 
                     <h2>HOW WE SHARE YOUR INFORMATION</h2>
-                    <p>We may disclose your personal information to the following categories of recipient’s parties for the following purposes:</p>
-                    <p>With Sellers: If you are purchasing inventory through the Services, UpCell may share such information with the Sellers from whom you bid on or buy products via the Services, as necessary to ensure successful fulfillment of any bids and/or purchases you make via the Services.</p>
-                    <p>Service Providers: UpCell may use other companies to perform services on its behalf and which require access to your information to do that work. Examples include hosting data, analyzing data, providing marketing assistance, facilitating some aspects of the Services, sending e-mails, fulfilling purchase requests, and providing payment processing services. These other companies may be supplied with or have access to your personal information solely for purposes that are described in this Policy or notified to you when we collect your personal information.</p>
-                    <p>UpCell Group Companies: We may share your information with our parent companies, subsidiaries, and/or affiliates for use and processing purposes described in this Policy.</p>
-                    <p>Special Circumstances: There may be instances when UpCell may disclose personal information without providing you with a choice in order to protect the legal rights of its Sellers, UpCell, or any of their affiliates, employees, agents, and contractors; to protect the safety and security of visitors to our Site; to protect against fraud or for risk management purposes; or to comply with the law, governmental request, judicial proceeding or other legal processes (including in response to public authorities to meet national security or law enforcement requirements).</p>
-                    <p>Business Transfers: If UpCell or any Seller sells all or part of its business or makes a sale or transfer of assets or is otherwise involved in a merger or business transfer, or the unlikely event of a bankruptcy, we may transfer your personal information to a potential buyer (and its agents and advisors) in connection with that transaction.</p>
+                    <p>We may disclose your personal information to the following categories of recipients for the following purposes.</p>
 
                     <h2>YOUR DATA PROTECTION RIGHTS</h2>
-                    <p>You have the following data protection rights:</p>
-                    <p>If you wish to access, correct, update or request the deletion of your personal information, you can do so at any time by contacting us using the contact details provided under the “How to contact us” heading below.</p>
-                    <p>In addition, if you are a resident of the United States, you can object to the processing of your personal information, ask us to restrict the processing of your personal information, or request the portability of your personal information. Again, you can exercise these rights by contacting us using the contact details provided under the “How to contact us” heading below.</p>
-                    <p>You have the right to opt out of marketing communications we send you at any time. You can exercise this right by clicking on the “unsubscribe” or “opt-out” link in the marketing e-mails we send you. To opt out of other forms of marketing (such as postal marketing or telemarketing), then please contact us using the contact details provided under the “How to contact us” heading below.</p>
-                    <p>Similarly, if we have collected and processed your personal information with your consent, then you can withdraw your consent at any time. Withdrawing your consent will not affect the lawfulness of any processing we conducted prior to your withdrawal, nor will it affect the processing of your personal information conducted in reliance on lawful processing grounds other than consent.</p>
-                    <p>You have the right to complain to a data protection authority about our collection and use of your personal information. For more information, please contact your local data protection authority. (Contact details for data protection authorities in the United States Area.)</p>
-                    <p>We will consider and act upon any request in accordance with applicable data protection laws.</p>
+                    <p>You have the following data protection rights: If you wish to access, correct, update or request the deletion of your personal information, you can do so at any time by contacting us.</p>
 
                     <h2>SECURITY</h2>
-                    <p>Your personal information may be transferred to and processed in, countries other than the country in which you are resident. These countries may have data protection laws that are different from the laws of your country (and, in some cases, may not be as protective).</p>
-                    <p>Specifically, our Site servers are located in the United States, and our group companies and third-party service providers and partners operate around the world. This means that when we collect your personal information we may process it in any of these countries.</p>
-                    <p>However, we have taken appropriate safeguards to require that your personal information will remain protected in accordance with this Policy. Such measures include implementing the United States Standard Contractual Clauses for transfers of personal information between our group companies and between us and our third-party providers, which require all such recipients to protect the personal information that they process from the EEA in accordance with European data protection laws.</p>
+                    <p>Your personal information may be transferred to and processed in, countries other than the country in which you are resident.</p>
 
                     <h2>COOKIES AND SIMILAR TECHNOLOGIES</h2>
-                    <p>We use cookies (small text files containing a string of alphanumeric characters that we put on your computer) and other similar tracking technologies (like web beacons and pixels) to collect information about the pages you view, the links you click, and other actions you take through our Services, in our Sites, and within our advertising or e-mail content. We use the term “cookies” or “similar technologies” interchangeably in our policies to refer to all technologies that we may use to store data in your browser or device or that collect information or help us to identify in the manner described in this Policy.</p>
+                    <p>We use cookies and other similar tracking technologies to collect information about the pages you view, the links you click, and other actions you take through our Services.</p>
                 </article>
             </main>
         </div>
