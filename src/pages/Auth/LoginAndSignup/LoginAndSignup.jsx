@@ -71,7 +71,7 @@ const LoginAndSignup = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-[#f5f5f7] py-20 px-5">
+        <div className="flex items-center justify-center bg-[#f5f5f7] px-5 py-20">
             <div className="w-full max-w-[480px] bg-white rounded-[40px] p-10 md:p-14 shadow-[0_20px_50px_rgba(0,0,0,0.08)]">
                 <header className="text-center mb-10">
                     <h1 className="text-3xl font-extrabold mb-2">{signin ? "Welcome Back" : "Join UpCell"}</h1>
@@ -156,7 +156,7 @@ const LoginAndSignup = () => {
                 <div className="flex items-center gap-4 my-6 text-sm text-apple-gray before:flex-1 before:h-px before:bg-border-light after:flex-1 after:h-px after:bg-border-light">or</div>
 
                 <div className="flex flex-col gap-3 mt-6">
-                    <button onClick={handleGoogleSignin} className="premium-button-secondary w-full border-black/[0.12] gap-3">
+                    <button onClick={handleGoogleSignin} className="premium-button-secondary w-full gap-3" style={{ border: '1.5px solid black' }}>
                         <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" className="w-5 h-5" />
                         Continue with Google
                     </button>

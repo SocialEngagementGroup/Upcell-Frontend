@@ -8,31 +8,8 @@ import axiosInstance from '../../utilities/axiosInstance';
 import ModernProductCard from '../../components/ModernProductCard/ModernProductCard';
 import { groupProductsByParent, normalizeProduct } from '../../utilities/catalog';
 
-const categories = ['All Devices', 'iPhone', 'iPad', 'MacBook'];
+const topCategories = ['All Devices', 'iPhone', 'iPad', 'MacBook'];
 const storageOrder = ['128GB', '256GB', '512GB', '1TB', '2TB', '4TB'];
-
-const getModelGroup = (name) => {
-    if (!name) return '';
-    const low = name.toLowerCase();
-    
-    // iPhone grouping
-    if (low.includes('pro max')) return 'iPhone Pro Max';
-    if (low.includes('plus')) return 'iPhone Plus';
-    if (low.includes('pro') && low.includes('iphone')) return 'iPhone Pro';
-    if (low.includes('iphone')) return 'iPhone';
-
-    // iPad grouping
-    if (low.includes('ipad pro')) return 'iPad Pro';
-    if (low.includes('ipad air')) return 'iPad Air';
-    if (low.includes('ipad mini')) return 'iPad mini';
-    if (low.includes('ipad')) return 'iPad';
-
-    // MacBook grouping
-    if (low.includes('macbook air')) return 'MacBook Air';
-    if (low.includes('macbook pro')) return 'MacBook Pro';
-
-    return name;
-};
 
 const modelGroupOrder = [
     'iPhone',
@@ -56,53 +33,58 @@ const matchesShopCategory = (product, categoryName) => {
     if (!categoryName) return false;
 
     const normalizedCategory = categoryName.trim().toLowerCase();
-    const derivedGroup = getModelGroup(product.productName)?.toLowerCase();
-    const productName = product.productName?.toLowerCase();
-    const family = product.family?.toLowerCase();
+    const storedCategory = product.categoryName?.toLowerCase();
 
-    return (
-        derivedGroup === normalizedCategory
-        || productName === normalizedCategory
-        || family === normalizedCategory
-    );
+    return storedCategory === normalizedCategory;
 };
 
 const ShopPage = () => {
     const location = useLocation();
     const { setCart } = useContext(CartContext);
     const [products, setProducts] = useState([]);
-    const [allCategories, setAllCategories] = useState([]);
     const [activeCategory, setActiveCategory] = useState('All Devices');
     const [priceRange, setPriceRange] = useState(3500);
     const [selectedModels, setSelectedModels] = useState([]);
     const [selectedStorages, setSelectedStorages] = useState([]);
     const [sortBy, setSortBy] = useState('featured');
 
+    const sidebarCategories = useMemo(() => {
+        const exactCategories = Array.from(new Set(
+            products
+                .map((product) => product.categoryName?.trim())
+                .filter(Boolean)
+        )).sort((left, right) => {
+            const leftIndex = getCategorySortValue(left);
+            const rightIndex = getCategorySortValue(right);
+
+            if (leftIndex !== rightIndex) return leftIndex - rightIndex;
+            return left.localeCompare(right);
+        });
+
+        return exactCategories;
+    }, [products]);
+
     useEffect(() => {
         const queryParams = new URLSearchParams(location.search);
         const categoryParam = queryParams.get('category');
         if (!categoryParam) return;
-        const matchedCategory = categories.find((cat) => cat.toLowerCase() === categoryParam.toLowerCase());
+        const matchedCategory = topCategories.find((cat) => cat.toLowerCase() === categoryParam.toLowerCase());
         if (matchedCategory) setActiveCategory(matchedCategory);
     }, [location.search]);
+
+    useEffect(() => {
+        if (topCategories.includes(activeCategory)) return;
+        setActiveCategory('All Devices');
+    }, [activeCategory]);
 
     useEffect(() => {
         axiosInstance.get('product')
             .then((res) => setProducts(res.data.map(normalizeProduct)))
             .catch((error) => console.log(error));
-            
-        axiosInstance.get('shop-categories')
-            .then((res) => setAllCategories(res.data))
-            .catch((error) => console.log(error));
     }, []);
 
     const availableCategories = useMemo(() => {
-        const categoryNames = allCategories
-            .map((category) => category.modelName?.trim())
-            .filter(Boolean)
-            .filter((name, index, array) => array.indexOf(name) === index);
-
-        return categoryNames
+        return sidebarCategories
             .filter((categoryName) => products.some((product) => (
                 (activeCategory === 'All Devices' || product.family === activeCategory)
                 && matchesShopCategory(product, categoryName)
@@ -114,7 +96,7 @@ const ShopPage = () => {
                 if (leftIndex !== rightIndex) return leftIndex - rightIndex;
                 return left.localeCompare(right);
             });
-    }, [allCategories, products, activeCategory]);
+    }, [sidebarCategories, products, activeCategory]);
 
     const availableStorages = useMemo(() => (
         Array.from(new Set(
@@ -149,9 +131,7 @@ const ShopPage = () => {
 
     const filteredProducts = useMemo(() => {
         const matchingVariations = products.filter((product) => {
-            const categoryLabel = product.family;
-
-            if (activeCategory !== 'All Devices' && categoryLabel !== activeCategory) {
+            if (activeCategory !== 'All Devices' && product.family !== activeCategory) {
                 return false;
             }
 
@@ -217,7 +197,7 @@ const ShopPage = () => {
             <section className="page-container pb-16">
                 <div className="mb-10 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                     <div className="flex flex-wrap gap-2 md:gap-3">
-                        {categories.map((category) => (
+                        {topCategories.map((category) => (
                             <button
                                 key={category}
                                 className={activeCategory === category ? 'premium-button' : 'premium-button-secondary'}

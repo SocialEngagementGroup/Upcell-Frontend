@@ -57,7 +57,7 @@
 
 @layer components {
     .page-shell {
-        @apply min-h-screen pt-[72px];
+        @apply min-h-full pt-[72px];
     }
 
     .page-container {
@@ -130,7 +130,7 @@
     }
 
     .admin-shell {
-        @apply min-h-screen bg-[linear-gradient(180deg,#f6f7fa_0%,#eef1f5_100%)] pt-24 md:pt-28;
+        @apply min-h-full bg-[linear-gradient(180deg,#f6f7fa_0%,#eef1f5_100%)] pt-24 md:pt-28;
     }
 
     .admin-container {

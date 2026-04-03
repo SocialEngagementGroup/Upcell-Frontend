@@ -1,62 +1,145 @@
 import React, { useState } from 'react';
 import axiosInstance from "../../../../utilities/axiosInstance";
-import ImagesForCatagory from './ImagesForCatagory';
+import { Link, useNavigate } from 'react-router-dom';
 
-const SingleCatagory = ({ catagory, setUpdate }) => {
+const SingleCatagory = ({ catagory, setUpdate, productGroups, setProductGroups }) => {
+    const navigate = useNavigate();
     const [editClicked, setEditClicked] = useState(false);
-    const [images, setImages] = useState(catagory.images || []);
-    const [imageUrl, setImageUrl] = useState("");
-
-    const handleAddImage = () => {
-        if (!imageUrl.trim()) return;
-        setImages((prev) => [...prev, { url: imageUrl.trim() }]);
-        setImageUrl("");
-    };
+    const [isProductsOpen, setIsProductsOpen] = useState(false);
 
     const handleSubmit = (e) => {
         e.preventDefault();
         axiosInstance.patch(`shop-categories/${catagory._id}`, {
             modelName: e.target.categoryName.value.trim(),
-            description: e.target.description.value,
-            images,
         }).then(() => {
             setUpdate((prev) => !prev);
             setEditClicked(false);
         }).catch((error) => console.log(error));
     };
 
+    const handleDeleteProduct = (parentId) => {
+        if (window.confirm('Delete this product and all of its variants permanently?')) {
+            axiosInstance.delete(`product-family/${parentId}`).then(() => {
+                setProductGroups((prev) => prev.filter((product) => product.parentId !== parentId));
+            }).catch((err) => console.log(err));
+        }
+    };
+
+    const filteredProducts = productGroups.filter(
+        (product) => product.categoryName === catagory?.modelName
+    );
+
     return (
-        <div className="admin-panel rounded-[30px] p-6">
-            <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                <div>
-                    <h3 className="text-[28px]">{catagory?.modelName}</h3>
-                    <p className="mt-2 text-sm leading-7 text-ink-soft">{catagory?.description || 'No description added yet.'}</p>
+        <div className="admin-panel rounded-[30px] p-6 transition-all duration-300">
+            <div className="flex items-start justify-between gap-4">
+                <div 
+                    onClick={() => setIsProductsOpen(!isProductsOpen)}
+                    className="group flex cursor-pointer items-center gap-3"
+                >
+                    <h3 className={`text-[28px] font-medium transition-colors ${isProductsOpen ? 'text-apple-blue' : 'group-hover:text-apple-blue'}`}>
+                        {catagory?.modelName}
+                    </h3>
+                    <span className={`text-xl transition-transform duration-300 ${isProductsOpen ? 'rotate-180 text-apple-blue' : 'text-ink-soft'}`}>
+                        ⌄
+                    </span>
+                    <span className="rounded-full bg-surface-alt px-3 py-1 text-xs font-bold text-ink-soft">
+                        {filteredProducts.length} Products
+                    </span>
                 </div>
                 <div className="flex gap-3">
-                    <button className="premium-button-secondary" onClick={() => setEditClicked((prev) => !prev)}>
-                        {editClicked ? 'Close editor' : 'Edit'}
+                    <button 
+                        className="premium-button-secondary" 
+                        onClick={(e) => { e.stopPropagation(); setEditClicked((prev) => !prev); }}
+                    >
+                        {editClicked ? 'Close editor' : 'Edit name'}
+                    </button>
+                    <button
+                        className="premium-button h-11 py-0 px-5 text-sm"
+                        onClick={(event) => {
+                            event.stopPropagation();
+                            navigate(`/admin-secret/addproduct?categoryId=${encodeURIComponent(catagory?._id || '')}`);
+                        }}
+                    >
+                        Add product
                     </button>
                 </div>
             </div>
 
             {editClicked && (
                 <div className="mt-6 border-t border-black/[0.06] pt-6">
-                    <div className="mb-5 flex flex-wrap gap-3">
-                        {images.map((image, index) => (
-                            <ImagesForCatagory image={image} setImages={setImages} key={index} />
-                        ))}
-                    </div>
-
-                    <div className="mb-5 flex gap-3">
-                        <input className="admin-input" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="Paste image URL" />
-                        <button className="premium-button-secondary" type="button" onClick={handleAddImage}>Add image</button>
-                    </div>
-
-                    <form className="mt-5 grid gap-4" onSubmit={handleSubmit}>
-                        <input className="admin-input" name="categoryName" type='text' placeholder='Updated category name' defaultValue={catagory?.modelName} required />
-                        <input className="admin-input" name="description" type="text" placeholder='Updated description' defaultValue={catagory?.description} />
+                    <form className="grid max-w-lg gap-4" onSubmit={handleSubmit}>
+                        <input 
+                            className="admin-input" 
+                            name="categoryName" 
+                            type='text' 
+                            placeholder='Category name' 
+                            defaultValue={catagory?.modelName} 
+                            required 
+                        />
                         <button className="premium-button w-fit" type="submit">Save changes</button>
                     </form>
+                </div>
+            )}
+
+            {isProductsOpen && (
+                <div className="mt-8 overflow-hidden rounded-2xl border border-black/[0.06] bg-white">
+                    <div className="max-h-[500px] overflow-y-auto">
+                        <table className="w-full text-left">
+                            <thead className="sticky top-0 bg-surface-alt/70 backdrop-blur-md">
+                                <tr>
+                                    <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-ink-soft">Product</th>
+                                    <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-ink-soft">Price</th>
+                                    <th className="px-6 py-4 text-right text-xs font-bold uppercase tracking-wider text-ink-soft">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-black/[0.04]">
+                                {filteredProducts.length > 0 ? (
+                                    filteredProducts.map((product) => (
+                                        <tr key={product.parentId} className="group hover:bg-surface-alt/20 transition-colors">
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-lg bg-surface-alt p-1">
+                                                        <img src={product.image || '/staticImages/notAvailable.webp'} className="h-full w-full object-contain" alt="" />
+                                                    </div>
+                                                    <div>
+                                                        <span className="block font-semibold text-apple-text">{product.productName}</span>
+                                                        <span className="block text-xs font-bold text-ink-soft">
+                                                            {product.variants.length} variant{product.variants.length === 1 ? '' : 's'}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 text-sm font-medium">
+                                                {product.variants[0]?.price ? `$${product.variants[0].price}` : '-'}
+                                            </td>
+                                            <td className="px-6 py-4 text-right">
+                                                <div className="flex justify-end gap-3">
+                                                    <button 
+                                                        onClick={() => navigate(`/admin-secret/addproduct?product=${encodeURIComponent(product.productName)}`)}
+                                                        className="text-sm font-bold text-apple-blue hover:underline"
+                                                    >
+                                                        Edit
+                                                    </button>
+                                                    <button 
+                                                        onClick={() => handleDeleteProduct(product.parentId)}
+                                                        className="text-sm font-bold text-red-500 hover:underline"
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan="3" className="px-6 py-8 text-center text-sm text-ink-soft">
+                                            No products in this category.
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             )}
         </div>

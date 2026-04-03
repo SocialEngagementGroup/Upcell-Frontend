@@ -9,7 +9,7 @@ const SocialIcons = {
 
 const MyFooter = () => {
     return (
-        <footer className="mt-20 bg-black">
+        <footer className="bg-black">
             <div className="page-container py-14">
                 <div className="overflow-hidden rounded-[36px] bg-white p-8 shadow-[0_20px_50px_rgba(0,0,0,0.15)] md:p-12">
                     <div className="grid gap-10 lg:grid-cols-[1.5fr_1fr_1fr_1.2fr]">

@@ -1,5 +1,5 @@
 export const inferFamily = (product) => {
-    const name = `${product?.productName || ''} ${product?.description || ''}`.toLowerCase();
+    const name = `${product?.categoryName || ''} ${product?.productName || ''} ${product?.description || ''}`.toLowerCase();
     if (name.includes('iphone')) return 'iPhone';
     if (name.includes('ipad')) return 'iPad';
     if (name.includes('macbook')) return 'MacBook';
@@ -24,7 +24,15 @@ export const groupProductsByParent = (products = []) => {
         const key = getProductRouteParent(product);
         if (!key) return;
         const existing = map.get(key);
-        if (!existing || Number(product.price || 0) < Number(existing.price || 0)) {
+        if (product.outOfStock && !existing) {
+            map.set(key, product);
+            return;
+        }
+        if (existing?.outOfStock && !product.outOfStock) {
+            map.set(key, product);
+            return;
+        }
+        if ((!existing || Number(product.price || 0) < Number(existing.price || 0)) && !(product.outOfStock && !existing?.outOfStock)) {
             map.set(key, product);
         }
     });

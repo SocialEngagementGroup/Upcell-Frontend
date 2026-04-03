@@ -84,7 +84,7 @@ const ProductDetailPage = () => {
 
     const syncSelection = (nextColor, nextStorage) => {
         const matchedProduct = allProducts.find((item) => (
-            item.color?.name === nextColor?.name && item.storage === nextStorage
+            item.color?.name === nextColor?.name && item.storage === nextStorage && !item.outOfStock
         ));
         if (matchedProduct) {
             setProduct(matchedProduct);
@@ -106,7 +106,7 @@ const ProductDetailPage = () => {
     const grandTotal = product ? product.price * quantity + addonTotal : 0;
 
     const handleAddToCart = () => {
-        if (!product?._id) return;
+        if (!product?._id || product.outOfStock) return;
         const itemsToAdd = Array.from({ length: quantity }, () => product._id);
         ESSENTIAL_ADDONS.forEach(addon => {
             const qty = addonQtys[addon.id] || 0;
@@ -213,7 +213,7 @@ const ProductDetailPage = () => {
                                         (p) => p.color?.name === selectedColor?.name && p.storage === storage
                                     );
                                     const variantPrice = variantForStorage?.price;
-                                    const isAvailable = !!variantForStorage;
+                                    const isAvailable = !!variantForStorage && !variantForStorage.outOfStock;
 
                                     return (
                                         <button
@@ -280,8 +280,9 @@ const ProductDetailPage = () => {
                         <button
                             className="premium-button mt-5 h-[56px] w-full text-base shadow-[0_16px_32px_rgba(0,0,0,0.10)] active:scale-[0.98]"
                             onClick={handleAddToCart}
+                            disabled={product.outOfStock}
                         >
-                            Add to cart — ${grandTotal}
+                            {product.outOfStock ? 'Out of stock' : `Add to cart — $${grandTotal}`}
                         </button>
 
                         </div>
