@@ -12,6 +12,9 @@ import applePay from '../../assets/applePay.svg';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import { toast } from 'react-toastify';
+import { extractApiError, validateEmailAddress, validatePhoneNumber, validateRequiredText } from '../../utilities/formValidation';
+import useFormAnalytics from '../../utilities/useFormAnalytics';
 
 const Checkout = () => {
     const params = useParams();
@@ -20,6 +23,7 @@ const Checkout = () => {
     const [shipping, setShipping] = useState('standard');
     const [isLoading, setIsLoading] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState('stripe');
+    const { markInteraction, trackSuccess, trackFailure } = useFormAnalytics('checkout');
 
     const isObjectId = (id) => /^[0-9a-fA-F]{24}$/.test(id);
     const productIds = (params.id === 'cart' ? cart : [params.id]).filter(isObjectId);
@@ -47,18 +51,43 @@ const Checkout = () => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        setIsLoading(true);
+        if (isLoading) return;
 
+        if (!productIds.length) {
+            toast.error('Your cart is empty.');
+            trackFailure('Your cart is empty.', { phase: 'validation' });
+            return;
+        }
+
+        const form = event.target;
         const data = {
-            name: event.target.name.value,
-            email: event.target.email.value,
-            phone: event.target.phone.value,
-            city: event.target.city.value,
-            postal: event.target.postalCode.value,
-            street: event.target.street.value,
-            country: event.target.country.value,
+            name: form.name.value,
+            email: form.email.value,
+            phone: form.phone.value,
+            city: form.city.value,
+            postal: form.postalCode.value,
+            street: form.street.value,
+            country: form.country.value,
             orders: productIds,
         };
+
+        const validationMessage =
+            validateRequiredText('Full name', data.name, { min: 2, max: 120 }) ||
+            validateEmailAddress(data.email) ||
+            validatePhoneNumber(data.phone) ||
+            validateRequiredText('Street address', data.street, { min: 5, max: 200 }) ||
+            validateRequiredText('City', data.city, { min: 2, max: 120 }) ||
+            validateRequiredText('Postal code', data.postal, { min: 3, max: 20 }) ||
+            validateRequiredText('Country', data.country, { min: 2, max: 120 });
+
+        if (validationMessage) {
+            toast.error(validationMessage);
+            trackFailure(validationMessage, { phase: 'validation' });
+            return;
+        }
+
+        setIsLoading(true);
+        markInteraction();
 
         try {
             axiosInstance.post('orders', {
@@ -68,6 +97,12 @@ const Checkout = () => {
                 paymentMethod,
                 paidWith: paymentMethod === 'paypal' ? 'Paypal' : 'Card',
             }).then((res) => {
+                trackSuccess({
+                    phase: 'request',
+                    shipping,
+                    paymentMethod,
+                    itemCount: productIds.length,
+                });
                 if (params.id === 'cart') {
                     localStorage.setItem('cart', JSON.stringify([]));
                 }
@@ -75,12 +110,16 @@ const Checkout = () => {
             }).catch((error) => {
                 console.log(error);
                 setIsLoading(false);
-                alert('Something went wrong. Please check your information and try again.');
+                const failureMessage = extractApiError(error, 'Something went wrong. Please check your information and try again.');
+                toast.error(failureMessage);
+                trackFailure(failureMessage, { phase: 'request', shipping, paymentMethod, itemCount: productIds.length });
             });
         } catch (error) {
             console.log(error);
             setIsLoading(false);
-            alert('Something went wrong. Please check your information and try again.');
+            const failureMessage = extractApiError(error, 'Something went wrong. Please check your information and try again.');
+            toast.error(failureMessage);
+            trackFailure(failureMessage, { phase: 'request', shipping, paymentMethod, itemCount: productIds.length });
         }
     };
 
@@ -110,7 +149,7 @@ const Checkout = () => {
             <section className="page-container pb-16">
                 <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
                     <main className="premium-card rounded-[36px] p-8 md:p-10">
-                        <form onSubmit={handleSubmit} className="space-y-10">
+                        <form onSubmit={handleSubmit} onChangeCapture={markInteraction} className="space-y-10">
                             <section>
                                 <h3 className="text-[28px]">Contact information</h3>
                                 <div className="mt-5 grid gap-4 md:grid-cols-2">
@@ -147,7 +186,10 @@ const Checkout = () => {
                                             </div>
                                             <div className="flex items-center gap-4">
                                                 <div className="font-bold text-apple-text">{option.price}</div>
-                                                <input type="radio" checked={shipping === option.id} onChange={() => setShipping(option.id)} />
+                                                <input type="radio" checked={shipping === option.id} onChange={() => {
+                                                    markInteraction();
+                                                    setShipping(option.id);
+                                                }} />
                                             </div>
                                         </label>
                                     ))}
@@ -166,7 +208,10 @@ const Checkout = () => {
                                                 <div className="font-bold text-apple-text">{option.title}</div>
                                                 <div className="mt-1 text-sm text-ink-soft">{option.sub}</div>
                                             </div>
-                                            <input type="radio" checked={paymentMethod === option.id} onChange={() => setPaymentMethod(option.id)} />
+                                            <input type="radio" checked={paymentMethod === option.id} onChange={() => {
+                                                markInteraction();
+                                                setPaymentMethod(option.id);
+                                            }} />
                                         </label>
                                     ))}
                                 </div>

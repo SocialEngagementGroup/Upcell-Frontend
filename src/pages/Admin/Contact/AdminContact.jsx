@@ -1,36 +1,111 @@
 import React, { useEffect, useState } from 'react';
 import axiosInstance from '../../../utilities/axiosInstance';
 import SingleContactSubmission from './SingleContactSubmission';
+import { toast } from 'react-toastify';
+import AdminPagination from '../../../components/AdminPagination/AdminPagination';
+import AdminPageHeader from '../../../components/AdminPageHeader/AdminPageHeader';
+import AdminStatsGrid from '../../../components/AdminStatsGrid/AdminStatsGrid';
+import AdminLoadingState from '../../../components/AdminState/AdminLoadingState';
+import AdminEmptyState from '../../../components/AdminState/AdminEmptyState';
 
 const filters = ["all", "New", "Resolved"];
+const PAGE_LIMIT = 10;
+const defaultPagination = {
+    page: 1,
+    limit: PAGE_LIMIT,
+    totalItems: 0,
+    totalPages: 1,
+};
 
 const AdminContact = () => {
     const [submissions, setSubmissions] = useState([]);
     const [activeFilter, setActiveFilter] = useState('all');
     const [email, setEmail] = useState('');
+    const [page, setPage] = useState(1);
+    const [pagination, setPagination] = useState(defaultPagination);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const fetchSubmissions = async (filter = activeFilter, nextPage = page) => {
+        setIsLoading(true);
+        try {
+            const res = await axiosInstance.get(`admin-contact-submissions/${filter}`, {
+                params: { page: nextPage, limit: PAGE_LIMIT },
+            });
+            setSubmissions(res.data.items || []);
+            setPagination(res.data.pagination || defaultPagination);
+        } catch (error) {
+            console.log(error);
+            toast.error('Failed to load contact submissions');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     useEffect(() => {
-        axiosInstance.get(`admin-contact-submissions/${activeFilter}`)
-            .then((res) => setSubmissions(res.data))
-            .catch((error) => console.log(error));
+        fetchSubmissions(activeFilter, page);
+    }, [activeFilter, page]);
+
+    useEffect(() => {
         setEmail('');
     }, [activeFilter]);
 
-    const handleUpdated = (updatedSubmission) => {
-        setSubmissions((prev) => prev.map((submission) => submission._id === updatedSubmission._id ? updatedSubmission : submission));
+    const applyFilter = (nextFilter) => {
+        if (nextFilter === activeFilter) {
+            if (page === 1) {
+                fetchSubmissions(nextFilter, 1);
+                return;
+            }
+
+            setPage(1);
+            return;
+        }
+
+        setActiveFilter(nextFilter);
+        setPage(1);
+    };
+
+    const handleUpdated = () => {
+        fetchSubmissions(activeFilter, page);
+    };
+
+    const handleDeleted = () => {
+        if (submissions.length === 1 && page > 1) {
+            setPage((prev) => prev - 1);
+            return;
+        }
+
+        fetchSubmissions(activeFilter, page);
     };
 
     const handleSearch = (event) => {
         event.preventDefault();
-        setActiveFilter(`byEmail:${email}`);
+        const nextFilter = `byEmail:${email}`;
+
+        if (nextFilter === activeFilter && page === 1) {
+            fetchSubmissions(nextFilter, 1);
+        } else {
+            setActiveFilter(nextFilter);
+            setPage(1);
+        }
+
     };
+
+    const stats = [
+        { label: 'Results', value: pagination.totalItems, sub: 'contact submissions in this view' },
+        { label: 'Showing', value: submissions.length, sub: 'submissions on the current page' },
+        { label: 'Page', value: `${pagination.page}/${pagination.totalPages}`, sub: 'current pagination position' },
+        { label: 'View', value: activeFilter, sub: 'active submission filter' },
+    ];
 
     return (
         <section className="space-y-6">
-            <div className="admin-panel rounded-[36px] bg-[linear-gradient(180deg,#ffffff_0%,#f3f5f8_100%)] px-8 py-10">
-                <span className="eyebrow mb-5">Contact</span>
-                <h1 className="text-[clamp(2rem,3.8vw,3.6rem)] leading-[0.94]">Manage contact submissions.</h1>
-            </div>
+            <AdminPageHeader
+                eyebrow="Contact"
+                title="Manage contact submissions."
+                description="Review inbound support messages, mark them resolved, and keep the inbox clean."
+            />
+
+            <AdminStatsGrid items={stats} />
 
             <div className="admin-panel rounded-[36px] p-6 md:p-8">
                 <div className="flex flex-col gap-5">
@@ -39,7 +114,7 @@ const AdminContact = () => {
                             <button
                                 key={filter}
                                 className={activeFilter === filter ? 'premium-button' : 'premium-button-secondary'}
-                                onClick={() => setActiveFilter(filter)}
+                                onClick={() => applyFilter(filter)}
                             >
                                 {filter}
                             </button>
@@ -56,17 +131,25 @@ const AdminContact = () => {
                 </div>
             </div>
 
-            {submissions.length ? (
+            {isLoading ? (
+                <AdminLoadingState title="Loading contact inbox" description="Pulling customer support messages and submission statuses." />
+            ) : submissions.length ? (
                 <div className="space-y-5">
                     {submissions.map((submission) => (
-                        <SingleContactSubmission key={submission._id} submission={submission} onUpdated={handleUpdated} />
+                        <SingleContactSubmission key={submission._id} submission={submission} onUpdated={handleUpdated} onDeleted={handleDeleted} />
                     ))}
+                    <AdminPagination
+                        page={pagination.page}
+                        limit={pagination.limit}
+                        totalItems={pagination.totalItems}
+                        totalPages={pagination.totalPages}
+                        currentCount={submissions.length}
+                        itemLabel="contact submissions"
+                        onPageChange={setPage}
+                    />
                 </div>
             ) : (
-                <div className="admin-panel rounded-[30px] p-12 text-center">
-                    <h2 className="text-[28px]">No contact submissions found.</h2>
-                    <p className="mt-3 text-sm text-ink-soft">Try another filter or search email.</p>
-                </div>
+                <AdminEmptyState title="No contact submissions found." description="Try another filter or search email." />
             )}
         </section>
     );

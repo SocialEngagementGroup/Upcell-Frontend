@@ -1,39 +1,113 @@
 import axiosInstance from "../../../../utilities/axiosInstance";
 import React, { useEffect, useState } from 'react';
 import SingleAdminOrder from "./SingleAdminOrder";
+import { toast } from 'react-toastify';
+import AdminPagination from "../../../../components/AdminPagination/AdminPagination";
+import AdminPageHeader from "../../../../components/AdminPageHeader/AdminPageHeader";
+import AdminStatsGrid from "../../../../components/AdminStatsGrid/AdminStatsGrid";
+import AdminLoadingState from "../../../../components/AdminState/AdminLoadingState";
+import AdminEmptyState from "../../../../components/AdminState/AdminEmptyState";
 
 const statuses = ["Processing", "Shipped", "Delivered", "Returned", "Refunded", "payment failed"];
+const PAGE_LIMIT = 10;
+const defaultPagination = {
+    page: 1,
+    limit: PAGE_LIMIT,
+    totalItems: 0,
+    totalPages: 1,
+};
 
 const AdminOrder = () => {
     const [orders, setOrders] = useState([]);
     const [orderStatus, setOrderStatus] = useState("Processing");
     const [email, setEmail] = useState("");
     const [orderId, setOrderId] = useState("");
+    const [page, setPage] = useState(1);
+    const [pagination, setPagination] = useState(defaultPagination);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const fetchOrders = async (status = orderStatus, nextPage = page) => {
+        setIsLoading(true);
+        try {
+            const res = await axiosInstance.get(`admin-orders/${status}`, {
+                params: { page: nextPage, limit: PAGE_LIMIT },
+            });
+            setOrders(res.data.items || []);
+            setPagination(res.data.pagination || defaultPagination);
+        } catch (error) {
+            console.log(error);
+            toast.error('Failed to load orders');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     useEffect(() => {
-        axiosInstance.get(`admin-orders/${orderStatus}`)
-            .then((res) => setOrders(res.data))
-            .catch((error) => console.log(error));
+        fetchOrders(orderStatus, page);
+    }, [orderStatus, page]);
+
+    useEffect(() => {
         setEmail("");
         setOrderId("");
     }, [orderStatus]);
 
+    const applyStatusFilter = (nextStatus) => {
+        if (nextStatus === orderStatus) {
+            if (page === 1) {
+                fetchOrders(nextStatus, 1);
+                return;
+            }
+
+            setPage(1);
+            return;
+        }
+
+        setOrderStatus(nextStatus);
+        setPage(1);
+    };
+
     const handleOrderIdSearch = (event) => {
         event.preventDefault();
-        setOrderStatus(`byOrderId:${orderId}`);
+        const nextFilter = `byOrderId:${orderId}`;
+
+        if (nextFilter === orderStatus && page === 1) {
+            fetchOrders(nextFilter, 1);
+        } else {
+            setOrderStatus(nextFilter);
+            setPage(1);
+        }
+
     };
 
     const handleEmailSearch = (event) => {
         event.preventDefault();
-        setOrderStatus(`byEmail:${email}`);
+        const nextFilter = `byEmail:${email}`;
+
+        if (nextFilter === orderStatus && page === 1) {
+            fetchOrders(nextFilter, 1);
+        } else {
+            setOrderStatus(nextFilter);
+            setPage(1);
+        }
+
     };
+
+    const stats = [
+        { label: 'Results', value: pagination.totalItems, sub: 'orders matching the current filter' },
+        { label: 'Showing', value: orders.length, sub: 'orders on this page' },
+        { label: 'Page', value: `${pagination.page}/${pagination.totalPages}`, sub: 'current pagination position' },
+        { label: 'View', value: orderStatus === 'Processing' ? 'Paid' : orderStatus, sub: 'active order filter' },
+    ];
 
     return (
         <section className="space-y-6">
-            <div className="admin-panel rounded-[36px] bg-[linear-gradient(180deg,#ffffff_0%,#f3f5f8_100%)] px-8 py-10">
-                <span className="eyebrow mb-5">Orders</span>
-                <h1 className="text-[clamp(2rem,3.8vw,3.6rem)] leading-[0.94]">Manage customer orders.</h1>
-            </div>
+            <AdminPageHeader
+                eyebrow="Orders"
+                title="Manage customer orders."
+                description="Track fulfillment, search by customer or order ID, and keep shipping progress moving."
+            />
+
+            <AdminStatsGrid items={stats} />
 
             <div className="admin-panel rounded-[36px] p-6 md:p-8">
                 <div className="flex flex-col gap-5">
@@ -42,7 +116,7 @@ const AdminOrder = () => {
                             <button
                                 key={status}
                                 className={orderStatus === status ? 'premium-button' : 'premium-button-secondary'}
-                                onClick={() => setOrderStatus(status)}
+                                onClick={() => applyStatusFilter(status)}
                             >
                                 {status === 'Processing' ? 'Paid' : status}
                             </button>
@@ -68,15 +142,29 @@ const AdminOrder = () => {
                 </div>
             </div>
 
-            {orders.length ? (
+            {isLoading ? (
+                <AdminLoadingState title="Loading orders" description="Pulling the latest customer orders for this admin view." />
+            ) : orders.length ? (
                 <div className="space-y-5">
-                    {orders.map((order) => <SingleAdminOrder key={order._id} order={order} />)}
+                    {orders.map((order) => (
+                        <SingleAdminOrder
+                            key={order._id}
+                            order={order}
+                            onStatusChanged={() => fetchOrders(orderStatus, page)}
+                        />
+                    ))}
+                    <AdminPagination
+                        page={pagination.page}
+                        limit={pagination.limit}
+                        totalItems={pagination.totalItems}
+                        totalPages={pagination.totalPages}
+                        currentCount={orders.length}
+                        itemLabel="orders"
+                        onPageChange={setPage}
+                    />
                 </div>
             ) : (
-                <div className="admin-panel rounded-[30px] p-12 text-center">
-                    <h2 className="text-[28px]">No orders found.</h2>
-                    <p className="mt-3 text-sm text-ink-soft">Try another status or search filter.</p>
-                </div>
+                <AdminEmptyState title="No orders found." description="Try another status or search filter." />
             )}
         </section>
     );

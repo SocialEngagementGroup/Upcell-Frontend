@@ -10,6 +10,7 @@ const links = [
     { to: 'trade-in', label: 'Trade In' },
     { to: 'newsletter', label: 'Newsletter' },
     { to: 'contact', label: 'Contact' },
+    { to: 'analytics', label: 'Analytics' },
 ];
 
 const AdminSecret = () => {
@@ -20,7 +21,7 @@ const AdminSecret = () => {
                     <aside className="admin-panel h-fit rounded-[36px] p-6 lg:sticky lg:top-28">
                         <span className="eyebrow mb-5">Admin</span>
                         <h2 className="text-[32px] leading-[0.95]">UpCell control room.</h2>
-                        <p className="mt-4 text-sm leading-7 text-ink-soft">Manage products, categories, orders, trade-ins, and merchandising in one cleaner workspace.</p>
+                        <p className="mt-4 text-sm leading-7 text-ink-soft">Manage products, categories, orders, trade-ins, analytics, and merchandising in one cleaner workspace.</p>
                         <nav className="mt-8 flex flex-col gap-3">
                             {links.map((link) => (
                                 <NavLink

@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import axiosInstance from '../../../utilities/axiosInstance';
+import { toast } from 'react-toastify';
+import AdminConfirmModal from '../../../components/AdminConfirmModal/AdminConfirmModal';
 
 const tradeInStatuses = ["New", "Contacted", "Received", "Quoted", "Paid", "Closed"];
 
@@ -16,10 +18,12 @@ const labelize = (value = '') => value
     .replace(/^./, (letter) => letter.toUpperCase())
     .trim();
 
-const SingleTradeInRequest = ({ request, onStatusUpdated }) => {
+const SingleTradeInRequest = ({ request, onStatusUpdated, onDeleted }) => {
     const [status, setStatus] = useState(request.status);
     const [showDetails, setShowDetails] = useState(false);
     const [isUpdating, setIsUpdating] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
     const handleStatusChange = async (event) => {
         const nextStatus = event.target.value;
@@ -29,11 +33,28 @@ const SingleTradeInRequest = ({ request, onStatusUpdated }) => {
         try {
             const response = await axiosInstance.patch(`trade-in-requests/${request._id}/status`, { status: nextStatus });
             onStatusUpdated?.(response.data);
+            toast.success(`Trade-in request marked as ${nextStatus}`);
         } catch (error) {
             setStatus(request.status);
             console.log(error);
+            toast.error('Trade-in status update failed');
         } finally {
             setIsUpdating(false);
+        }
+    };
+
+    const handleDelete = async () => {
+        setIsDeleting(true);
+        try {
+            await axiosInstance.delete(`trade-in-requests/${request._id}`);
+            onDeleted?.(request._id);
+            toast.success('Trade-in request deleted');
+        } catch (error) {
+            console.log(error);
+            toast.error('Failed to delete trade-in request');
+        } finally {
+            setIsDeleting(false);
+            setIsDeleteModalOpen(false);
         }
     };
 
@@ -62,6 +83,13 @@ const SingleTradeInRequest = ({ request, onStatusUpdated }) => {
                     </select>
                     <button className="premium-button-secondary w-full justify-center" onClick={() => setShowDetails((prev) => !prev)}>
                         {showDetails ? 'Hide details' : 'Show details'}
+                    </button>
+                    <button
+                        className="w-full rounded-2xl border border-red-500/15 bg-red-50 px-4 py-3 text-sm font-bold text-red-600 transition-colors hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-70"
+                        onClick={() => setIsDeleteModalOpen(true)}
+                        disabled={isDeleting}
+                    >
+                        {isDeleting ? 'Deleting...' : 'Delete'}
                     </button>
                 </div>
             </div>
@@ -92,6 +120,16 @@ const SingleTradeInRequest = ({ request, onStatusUpdated }) => {
                     </div>
                 </div>
             )}
+
+            <AdminConfirmModal
+                open={isDeleteModalOpen}
+                title="Delete this trade-in request?"
+                description="This removes the trade-in request from the admin queue permanently. You cannot undo this action."
+                confirmLabel="Delete request"
+                isLoading={isDeleting}
+                onCancel={() => setIsDeleteModalOpen(false)}
+                onConfirm={handleDelete}
+            />
         </div>
     );
 };

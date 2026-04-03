@@ -7,6 +7,8 @@ import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import axiosInstance from '../../../utilities/axiosInstance';
+import { extractApiError, validateEmailAddress, validateRequiredText } from '../../../utilities/formValidation';
+import useFormAnalytics from '../../../utilities/useFormAnalytics';
 
 const faqs = [
     { q: 'How do I contact UpCell?', a: 'Email is the fastest path for order support, trade-ins, or return requests. Social channels are also monitored regularly and typically see responses within 24 hours.' },
@@ -22,13 +24,29 @@ const Contactus = () => {
     const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitMessage, setSubmitMessage] = useState('');
+    const { markInteraction, trackSuccess, trackFailure } = useFormAnalytics('contact_support');
 
     const handleChange = (field) => (event) => {
+        markInteraction();
         setFormData((prev) => ({ ...prev, [field]: event.target.value }));
     };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        if (isSubmitting) return;
+
+        const nameError = validateRequiredText('Name', formData.name, { min: 2, max: 120 });
+        const emailError = validateEmailAddress(formData.email);
+        const subjectError = validateRequiredText('Subject', formData.subject, { min: 4, max: 180 });
+        const messageError = validateRequiredText('Message', formData.message, { min: 10, max: 3000 });
+        const validationMessage = nameError || emailError || subjectError || messageError;
+
+        if (validationMessage) {
+            setSubmitMessage(validationMessage);
+            trackFailure(validationMessage, { source: 'contact-form', phase: 'validation' });
+            return;
+        }
+
         setIsSubmitting(true);
         setSubmitMessage('');
 
@@ -40,9 +58,12 @@ const Contactus = () => {
                 message: formData.message.trim(),
             });
             setSubmitMessage('Message sent successfully. Our team will get back to you soon.');
+            trackSuccess({ source: 'contact-form' });
             setFormData({ name: '', email: '', subject: '', message: '' });
         } catch (error) {
-            setSubmitMessage(error?.response?.data?.error || 'Unable to send your message right now.');
+            const failureMessage = extractApiError(error, 'Unable to send your message right now.');
+            setSubmitMessage(failureMessage);
+            trackFailure(failureMessage, { source: 'contact-form', phase: 'request' });
         } finally {
             setIsSubmitting(false);
         }

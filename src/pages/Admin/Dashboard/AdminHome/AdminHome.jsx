@@ -1,11 +1,14 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { userContext } from '../../../../utilities/UserContextProvider';
 import axiosInstance from '../../../../utilities/axiosInstance';
+import AdminPageHeader from '../../../../components/AdminPageHeader/AdminPageHeader';
+import AdminLoadingState from '../../../../components/AdminState/AdminLoadingState';
 
 const AdminHome = () => {
     const [ordersToday, setOrdersToday] = useState({ amount: 0, money: 0 });
     const [ordersWeek, setOrdersWeek] = useState({ amount: 0, money: 0 });
     const [ordersMonth, setOrdersMonth] = useState({ amount: 0, money: 0 });
+    const [isLoading, setIsLoading] = useState(true);
     const { user } = useContext(userContext);
 
     useEffect(() => {
@@ -26,7 +29,8 @@ const AdminHome = () => {
                 setOrdersWeek(sumOrders(totalOrders.thisWeek));
                 setOrdersMonth(sumOrders(totalOrders.thisMonth));
             })
-            .catch((error) => console.log('error in adminHome.jsx', error));
+            .catch((error) => console.log('error in adminHome.jsx', error))
+            .finally(() => setIsLoading(false));
     }, []);
 
     const stats = [
@@ -40,21 +44,25 @@ const AdminHome = () => {
 
     return (
         <section className="space-y-8">
-            <div className="admin-panel rounded-[36px] bg-[linear-gradient(180deg,#ffffff_0%,#f3f5f8_100%)] px-8 py-10 md:px-10 md:py-12">
-                <span className="eyebrow mb-5">Overview</span>
-                <h1 className="text-[clamp(2.3rem,4vw,4rem)] leading-[0.94]">Welcome back{user ? `, ${user.email}` : ''}.</h1>
-                <p className="mt-4 max-w-[620px] text-base leading-8 text-ink-soft">Track recent order volume and revenue at a glance before jumping into fulfillment, trade-ins, or catalog updates.</p>
-            </div>
+            <AdminPageHeader
+                eyebrow="Overview"
+                title={`Welcome back${user ? `, ${user.email}` : ''}.`}
+                description="Track recent order volume and revenue at a glance before jumping into fulfillment, trade-ins, or catalog updates."
+            />
 
-            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-                {stats.map((item) => (
-                    <div key={`${item.label}-${item.sub}`} className="admin-panel rounded-[30px] p-6">
-                        <div className="text-xs font-bold uppercase tracking-[0.18em] text-apple-gray">{item.label}</div>
-                        <div className="mt-4 text-[38px] font-extrabold leading-none text-apple-text">{item.value}</div>
-                        <div className="mt-2 text-sm text-ink-soft">{item.sub}</div>
-                    </div>
-                ))}
-            </div>
+            {isLoading ? (
+                <AdminLoadingState title="Loading overview" description="Crunching the latest order totals and revenue snapshots." />
+            ) : (
+                <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                    {stats.map((item) => (
+                        <div key={`${item.label}-${item.sub}`} className="admin-panel rounded-[30px] p-6">
+                            <div className="text-xs font-bold uppercase tracking-[0.18em] text-apple-gray">{item.label}</div>
+                            <div className="mt-4 text-[38px] font-extrabold leading-none text-apple-text">{item.value}</div>
+                            <div className="mt-2 text-sm text-ink-soft">{item.sub}</div>
+                        </div>
+                    ))}
+                </div>
+            )}
         </section>
     );
 };

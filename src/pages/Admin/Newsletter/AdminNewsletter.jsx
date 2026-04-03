@@ -1,36 +1,111 @@
 import React, { useEffect, useState } from 'react';
 import axiosInstance from '../../../utilities/axiosInstance';
 import SingleNewsletterSubscriber from './SingleNewsletterSubscriber';
+import { toast } from 'react-toastify';
+import AdminPagination from '../../../components/AdminPagination/AdminPagination';
+import AdminPageHeader from '../../../components/AdminPageHeader/AdminPageHeader';
+import AdminStatsGrid from '../../../components/AdminStatsGrid/AdminStatsGrid';
+import AdminLoadingState from '../../../components/AdminState/AdminLoadingState';
+import AdminEmptyState from '../../../components/AdminState/AdminEmptyState';
 
 const filters = ["all", "Active", "Unsubscribed"];
+const PAGE_LIMIT = 10;
+const defaultPagination = {
+    page: 1,
+    limit: PAGE_LIMIT,
+    totalItems: 0,
+    totalPages: 1,
+};
 
 const AdminNewsletter = () => {
     const [subscribers, setSubscribers] = useState([]);
     const [activeFilter, setActiveFilter] = useState('all');
     const [email, setEmail] = useState('');
+    const [page, setPage] = useState(1);
+    const [pagination, setPagination] = useState(defaultPagination);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const fetchSubscribers = async (filter = activeFilter, nextPage = page) => {
+        setIsLoading(true);
+        try {
+            const res = await axiosInstance.get(`admin-newsletter-subscribers/${filter}`, {
+                params: { page: nextPage, limit: PAGE_LIMIT },
+            });
+            setSubscribers(res.data.items || []);
+            setPagination(res.data.pagination || defaultPagination);
+        } catch (error) {
+            console.log(error);
+            toast.error('Failed to load subscribers');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     useEffect(() => {
-        axiosInstance.get(`admin-newsletter-subscribers/${activeFilter}`)
-            .then((res) => setSubscribers(res.data))
-            .catch((error) => console.log(error));
+        fetchSubscribers(activeFilter, page);
+    }, [activeFilter, page]);
+
+    useEffect(() => {
         setEmail('');
     }, [activeFilter]);
 
-    const handleSearch = (event) => {
-        event.preventDefault();
-        setActiveFilter(`byEmail:${email}`);
+    const applyFilter = (nextFilter) => {
+        if (nextFilter === activeFilter) {
+            if (page === 1) {
+                fetchSubscribers(nextFilter, 1);
+                return;
+            }
+
+            setPage(1);
+            return;
+        }
+
+        setActiveFilter(nextFilter);
+        setPage(1);
     };
 
-    const handleUpdated = (updatedSubscriber) => {
-        setSubscribers((prev) => prev.map((subscriber) => subscriber._id === updatedSubscriber._id ? updatedSubscriber : subscriber));
+    const handleSearch = (event) => {
+        event.preventDefault();
+        const nextFilter = `byEmail:${email}`;
+
+        if (nextFilter === activeFilter && page === 1) {
+            fetchSubscribers(nextFilter, 1);
+        } else {
+            setActiveFilter(nextFilter);
+            setPage(1);
+        }
+
     };
+
+    const handleUpdated = () => {
+        fetchSubscribers(activeFilter, page);
+    };
+
+    const handleDeleted = () => {
+        if (subscribers.length === 1 && page > 1) {
+            setPage((prev) => prev - 1);
+            return;
+        }
+
+        fetchSubscribers(activeFilter, page);
+    };
+
+    const stats = [
+        { label: 'Results', value: pagination.totalItems, sub: 'subscribers matching this view' },
+        { label: 'Showing', value: subscribers.length, sub: 'subscribers on this page' },
+        { label: 'Page', value: `${pagination.page}/${pagination.totalPages}`, sub: 'current pagination position' },
+        { label: 'View', value: activeFilter, sub: 'active subscriber filter' },
+    ];
 
     return (
         <section className="space-y-6">
-            <div className="admin-panel rounded-[36px] bg-[linear-gradient(180deg,#ffffff_0%,#f3f5f8_100%)] px-8 py-10">
-                <span className="eyebrow mb-5">Newsletter</span>
-                <h1 className="text-[clamp(2rem,3.8vw,3.6rem)] leading-[0.94]">Manage newsletter subscribers.</h1>
-            </div>
+            <AdminPageHeader
+                eyebrow="Newsletter"
+                title="Manage newsletter subscribers."
+                description="Track subscription status, search by email, and remove stale records cleanly."
+            />
+
+            <AdminStatsGrid items={stats} />
 
             <div className="admin-panel rounded-[36px] p-6 md:p-8">
                 <div className="flex flex-col gap-5">
@@ -39,7 +114,7 @@ const AdminNewsletter = () => {
                             <button
                                 key={filter}
                                 className={activeFilter === filter ? 'premium-button' : 'premium-button-secondary'}
-                                onClick={() => setActiveFilter(filter)}
+                                onClick={() => applyFilter(filter)}
                             >
                                 {filter}
                             </button>
@@ -56,17 +131,25 @@ const AdminNewsletter = () => {
                 </div>
             </div>
 
-            {subscribers.length ? (
+            {isLoading ? (
+                <AdminLoadingState title="Loading subscribers" description="Pulling the latest newsletter signup records for review." />
+            ) : subscribers.length ? (
                 <div className="space-y-5">
                     {subscribers.map((subscriber) => (
-                        <SingleNewsletterSubscriber key={subscriber._id} subscriber={subscriber} onUpdated={handleUpdated} />
+                        <SingleNewsletterSubscriber key={subscriber._id} subscriber={subscriber} onUpdated={handleUpdated} onDeleted={handleDeleted} />
                     ))}
+                    <AdminPagination
+                        page={pagination.page}
+                        limit={pagination.limit}
+                        totalItems={pagination.totalItems}
+                        totalPages={pagination.totalPages}
+                        currentCount={subscribers.length}
+                        itemLabel="subscribers"
+                        onPageChange={setPage}
+                    />
                 </div>
             ) : (
-                <div className="admin-panel rounded-[30px] p-12 text-center">
-                    <h2 className="text-[28px]">No subscribers found.</h2>
-                    <p className="mt-3 text-sm text-ink-soft">Try another filter or search email.</p>
-                </div>
+                <AdminEmptyState title="No subscribers found." description="Try another filter or search email." />
             )}
         </section>
     );

@@ -1,5 +1,6 @@
 import React from 'react';
 import axiosInstance from '../../../../utilities/axiosInstance';
+import { toast } from 'react-toastify';
 
 const AddCatagory = () => {
     const handleSubmit = (e) => {
@@ -9,9 +10,12 @@ const AddCatagory = () => {
         axiosInstance.post("shop-categories", { modelName })
             .then(() => {
                 e.target.categoryName.value = "";
-                alert("Category created successfully!");
+                toast.success("Category created successfully");
             })
-            .catch((error) => console.log("error ***: ", error));
+            .catch((error) => {
+                console.log("error ***: ", error);
+                toast.error("Failed to create category");
+            });
     };
 
     return (

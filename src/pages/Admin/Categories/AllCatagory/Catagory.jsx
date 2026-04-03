@@ -2,15 +2,20 @@ import axiosInstance from '../../../../utilities/axiosInstance.js';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import SingleCatagory from '../AdminSingleCatagory/SingleCatagory.jsx';
+import AdminStatsGrid from '../../../../components/AdminStatsGrid/AdminStatsGrid.jsx';
+import AdminLoadingState from '../../../../components/AdminState/AdminLoadingState.jsx';
+import AdminEmptyState from '../../../../components/AdminState/AdminEmptyState.jsx';
 
 const AllCatagories = () => {
     const [allCatagories, setAllCatagories] = useState([]);
     const [productGroups, setProductGroups] = useState([]);
     const [update, setUpdate] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const outletContext = useOutletContext() || {};
     const searchQuery = outletContext.categorySearchQuery || '';
 
     useEffect(() => {
+        setIsLoading(true);
         Promise.all([
             axiosInstance.get("shop-categories"),
             axiosInstance.get("catagory"),
@@ -30,7 +35,8 @@ const AllCatagories = () => {
             }));
 
             setProductGroups(grouped);
-        }).catch((error) => console.log("Error fetching categories/products:", error));
+        }).catch((error) => console.log("Error fetching categories/products:", error))
+            .finally(() => setIsLoading(false));
     }, [update]);
 
     const filteredCategories = useMemo(() => {
@@ -48,24 +54,32 @@ const AllCatagories = () => {
         });
     }, [allCatagories, productGroups, searchQuery]);
 
+    const stats = [
+        { label: 'Visible categories', value: filteredCategories.length, sub: 'matching the current search' },
+        { label: 'Total categories', value: allCatagories.length, sub: 'saved in the catalog' },
+        { label: 'Product families', value: productGroups.length, sub: 'linked across categories' },
+    ];
+
     return (
         <section className="space-y-6">
-            <div className="space-y-5">
-                {filteredCategories.map((catagory) => (
-                    <SingleCatagory 
-                        key={catagory._id} 
-                        catagory={catagory} 
-                        setUpdate={setUpdate} 
-                        productGroups={productGroups}
-                        setProductGroups={setProductGroups}
-                    />
-                ))}
-            </div>
+            <AdminStatsGrid items={stats} />
 
-            {filteredCategories.length === 0 && (
-                <div className="admin-panel rounded-[30px] p-12 text-center">
-                    <p className="text-xl font-medium text-ink-soft">No categories found.</p>
+            {isLoading ? (
+                <AdminLoadingState title="Loading categories" description="Pulling saved categories and linked product families." />
+            ) : filteredCategories.length ? (
+                <div className="space-y-5">
+                    {filteredCategories.map((catagory) => (
+                        <SingleCatagory
+                            key={catagory._id}
+                            catagory={catagory}
+                            setUpdate={setUpdate}
+                            productGroups={productGroups}
+                            setProductGroups={setProductGroups}
+                        />
+                    ))}
                 </div>
+            ) : (
+                <AdminEmptyState title="No categories found." description="Try a different search term or add a new category to start organizing products." />
             )}
         </section>
     );

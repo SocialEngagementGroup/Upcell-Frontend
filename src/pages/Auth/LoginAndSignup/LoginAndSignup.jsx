@@ -1,6 +1,8 @@
 import React, { useContext, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { userContext } from '../../../utilities/UserContextProvider';
+import { validateEmailAddress, validateRequiredText } from '../../../utilities/formValidation';
+import useFormAnalytics from '../../../utilities/useFormAnalytics';
 
 const LoginAndSignup = () => {
     const navigate = useNavigate()
@@ -8,6 +10,8 @@ const LoginAndSignup = () => {
     const { signIn, signUp } = useContext(userContext)
     const [signin, setSignin] = useState(true)
     const [errorMessage, setErrorMessage] = useState("")
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const { markInteraction, trackSuccess, trackFailure } = useFormAnalytics(signin ? 'auth_signin' : 'auth_signup');
 
     const isAdminLogin = location.search.includes("admin=true");
 
@@ -28,46 +32,92 @@ const LoginAndSignup = () => {
     const settingSingup = () => { setSignin(false); setErrorMessage(""); }
 
     const handleGoogleSignin = async () => {
-        await completeAuth({
-            email: isAdminLogin ? "admin@upcell.local" : "shopper@upcell.local",
-            name: isAdminLogin ? "Local Admin" : "Local Shopper",
-        });
+        if (isSubmitting) return;
+        setIsSubmitting(true);
+        markInteraction();
+        try {
+            const email = isAdminLogin ? "admin@upcell.local" : "shopper@upcell.local";
+            await completeAuth({
+                email,
+                name: isAdminLogin ? "Local Admin" : "Local Shopper",
+            });
+            trackSuccess({ provider: 'google', mode: signin ? 'signin' : 'signup', isAdminLogin });
+        } catch (error) {
+            const message = error?.message || 'Authentication failed.';
+            setErrorMessage(message);
+            trackFailure(message, { provider: 'google', mode: signin ? 'signin' : 'signup', isAdminLogin });
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const handleSinginWithEmail = async (e) => {
         e.preventDefault();
+        if (isSubmitting) return;
         setErrorMessage("");
 
         const email = e.target.email.value.trim();
         const password = e.target.password.value.trim();
 
-        if (!email || !password) {
-            setErrorMessage("Email and password are required.");
+        const emailError = validateEmailAddress(email);
+        const passwordError = validateRequiredText("Password", password, { min: 8, max: 128 });
+        if (emailError || passwordError) {
+            const message = emailError || passwordError;
+            setErrorMessage(message);
+            trackFailure(message, { mode: 'signin', phase: 'validation', isAdminLogin });
             return;
         }
 
-        await completeAuth({ email });
+        setIsSubmitting(true);
+        markInteraction();
+        try {
+            await completeAuth({ email });
+            trackSuccess({ mode: 'signin', isAdminLogin });
+        } catch (error) {
+            const message = error?.message || 'Unable to sign in right now.';
+            setErrorMessage(message);
+            trackFailure(message, { mode: 'signin', phase: 'request', isAdminLogin });
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const handleSingupWithEmail = async (e) => {
         e.preventDefault();
+        if (isSubmitting) return;
         setErrorMessage("");
 
         const email = e.target.email.value.trim();
         const password = e.target.password.value.trim();
         const rePassword = e.target.rePassword.value.trim();
 
-        if (password.length < 8) {
-            setErrorMessage("Password must be at least 8 characters.");
+        const emailError = validateEmailAddress(email);
+        const passwordError = validateRequiredText("Password", password, { min: 8, max: 128 });
+        if (emailError || passwordError) {
+            const message = emailError || passwordError;
+            setErrorMessage(message);
+            trackFailure(message, { mode: 'signup', phase: 'validation', isAdminLogin });
             return;
         }
 
         if (password !== rePassword) {
             setErrorMessage("Passwords do not match.");
+            trackFailure('Passwords do not match.', { mode: 'signup', phase: 'validation', isAdminLogin });
             return;
         }
 
-        await completeAuth({ email });
+        setIsSubmitting(true);
+        markInteraction();
+        try {
+            await completeAuth({ email });
+            trackSuccess({ mode: 'signup', isAdminLogin });
+        } catch (error) {
+            const message = error?.message || 'Unable to create your account right now.';
+            setErrorMessage(message);
+            trackFailure(message, { mode: 'signup', phase: 'request', isAdminLogin });
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -89,7 +139,7 @@ const LoginAndSignup = () => {
                 )}
 
                 {signin ? (
-                    <form className="flex flex-col gap-6" onSubmit={handleSinginWithEmail}>
+                    <form className="flex flex-col gap-6" onSubmit={handleSinginWithEmail} onChangeCapture={markInteraction}>
                         <div className="flex flex-col gap-2.5">
                             <label htmlFor="email" className="text-[13px] font-bold uppercase tracking-[0.1em] text-apple-gray">Email address</label>
                             <input 
@@ -112,10 +162,10 @@ const LoginAndSignup = () => {
                                 className="h-14 bg-[#f9f9fb] border border-black/[0.04] rounded-2xl px-5 text-[15px] outline-none transition-all focus:ring-2 focus:ring-black focus:bg-white" 
                             />
                         </div>
-                        <button type="submit" className="premium-button w-full mt-2">Sign in</button>
+                        <button type="submit" className="premium-button w-full mt-2" disabled={isSubmitting}>{isSubmitting ? 'Signing in...' : 'Sign in'}</button>
                     </form>
                 ) : (
-                    <form className="flex flex-col gap-6" onSubmit={handleSingupWithEmail}>
+                    <form className="flex flex-col gap-6" onSubmit={handleSingupWithEmail} onChangeCapture={markInteraction}>
                         <div className="flex flex-col gap-2.5">
                             <label htmlFor="email" className="text-[13px] font-bold uppercase tracking-[0.1em] text-apple-gray">Email address</label>
                             <input 
@@ -149,14 +199,14 @@ const LoginAndSignup = () => {
                                 className="h-14 bg-[#f9f9fb] border border-black/[0.04] rounded-2xl px-5 text-[15px] outline-none transition-all focus:ring-2 focus:ring-black focus:bg-white" 
                             />
                         </div>
-                        <button type="submit" className="premium-button w-full mt-2">Create account</button>
+                        <button type="submit" className="premium-button w-full mt-2" disabled={isSubmitting}>{isSubmitting ? 'Creating account...' : 'Create account'}</button>
                     </form>
                 )}
 
                 <div className="flex items-center gap-4 my-6 text-sm text-apple-gray before:flex-1 before:h-px before:bg-border-light after:flex-1 after:h-px after:bg-border-light">or</div>
 
                 <div className="flex flex-col gap-3 mt-6">
-                    <button onClick={handleGoogleSignin} className="premium-button-secondary w-full gap-3 border-[1.5px] border-black hover:border-black">
+                    <button onClick={handleGoogleSignin} disabled={isSubmitting} className="premium-button-secondary w-full gap-3 border-[1.5px] border-black hover:border-black">
                         <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" className="w-5 h-5" />
                         Continue with Google
                     </button>

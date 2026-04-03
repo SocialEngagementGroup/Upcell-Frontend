@@ -5,6 +5,8 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import { toast } from 'react-toastify';
+import AdminConfirmModal from '../../../../components/AdminConfirmModal/AdminConfirmModal';
 
 const currency = (value) => {
     if (value === '' || value === null || typeof value === 'undefined') return '-';
@@ -17,6 +19,7 @@ const SingleProductGroup = ({ productGroup, onDelete }) => {
     const [draftVariants, setDraftVariants] = useState(() => productGroup.variants);
     const [savingVariantId, setSavingVariantId] = useState('');
     const [editingVariantId, setEditingVariantId] = useState('');
+    const [confirmState, setConfirmState] = useState({ open: false, mode: '', variant: null });
 
     const updateDraftVariant = (variantId, patch) => {
         setDraftVariants((current) => current.map((variant) => (
@@ -33,13 +36,15 @@ const SingleProductGroup = ({ productGroup, onDelete }) => {
     ), [draftVariants]);
 
     const handleDelete = async () => {
-        if (!window.confirm('Delete this product and all of its variants permanently?')) return;
-
         try {
             await axiosInstance.delete(`product-family/${productGroup.parentId}`);
             onDelete(productGroup.parentId);
+            toast.success('Product family deleted');
         } catch (error) {
             console.log(error);
+            toast.error('Failed to delete product family');
+        } finally {
+            setConfirmState({ open: false, mode: '', variant: null });
         }
     };
 
@@ -61,19 +66,14 @@ const SingleProductGroup = ({ productGroup, onDelete }) => {
     };
 
     const handleVariantDelete = async (variant) => {
-        const isLastVariant = draftVariants.length === 1;
-        const confirmationText = isLastVariant
-            ? 'This is the last variant. Delete the whole product?'
-            : 'Delete this variant permanently?';
-
-        if (!window.confirm(confirmationText)) return;
-
         setSavingVariantId(variant._id);
 
         try {
+            const isLastVariant = draftVariants.length === 1;
             if (isLastVariant) {
                 await axiosInstance.delete(`product-family/${productGroup.parentId}`);
                 onDelete(productGroup.parentId);
+                toast.success('Last variant deleted with product family');
                 return;
             }
 
@@ -82,10 +82,13 @@ const SingleProductGroup = ({ productGroup, onDelete }) => {
             if (editingVariantId === variant._id) {
                 setEditingVariantId('');
             }
+            toast.success('Variant deleted');
         } catch (error) {
             console.log(error);
+            toast.error('Failed to delete variant');
         } finally {
             setSavingVariantId('');
+            setConfirmState({ open: false, mode: '', variant: null });
         }
     };
 
@@ -164,7 +167,7 @@ const SingleProductGroup = ({ productGroup, onDelete }) => {
                     >
                         Edit product
                     </button>
-                    <button className="premium-button-secondary" onClick={handleDelete}>
+                    <button className="premium-button-secondary" onClick={() => setConfirmState({ open: true, mode: 'family', variant: null })}>
                         Delete product
                     </button>
                 </div>
@@ -306,7 +309,7 @@ const SingleProductGroup = ({ productGroup, onDelete }) => {
                                                     </button>
                                                     <button
                                                         className="flex h-9 w-9 items-center justify-center rounded-full border border-red-100 bg-red-50 text-red-500 transition-all hover:bg-red-100 disabled:opacity-60"
-                                                        onClick={() => handleVariantDelete(variant)}
+                                                        onClick={() => setConfirmState({ open: true, mode: 'variant', variant })}
                                                         disabled={savingVariantId === variant._id}
                                                         title="Delete variant"
                                                         aria-label="Delete variant"
@@ -323,6 +326,29 @@ const SingleProductGroup = ({ productGroup, onDelete }) => {
                     </div>
                 </div>
             )}
+
+            <AdminConfirmModal
+                open={confirmState.open}
+                title={confirmState.mode === 'family' ? 'Delete this product family?' : draftVariants.length === 1 ? 'Delete the final variant and product family?' : 'Delete this variant?'}
+                description={confirmState.mode === 'family'
+                    ? 'This removes the product family and every variant attached to it from the admin catalog.'
+                    : draftVariants.length === 1
+                        ? 'This is the last remaining variant, so deleting it will also remove the whole product family.'
+                        : 'This removes only the selected variant from the product family.'}
+                confirmLabel={confirmState.mode === 'family' ? 'Delete product' : 'Delete variant'}
+                isLoading={Boolean(confirmState.variant && savingVariantId === confirmState.variant._id)}
+                onCancel={() => setConfirmState({ open: false, mode: '', variant: null })}
+                onConfirm={() => {
+                    if (confirmState.mode === 'family') {
+                        handleDelete();
+                        return;
+                    }
+
+                    if (confirmState.variant) {
+                        handleVariantDelete(confirmState.variant);
+                    }
+                }}
+            />
         </div>
     );
 };

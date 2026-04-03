@@ -1,192 +1,186 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
+import React, { Suspense, lazy } from 'react';
+import ReactDOM from 'react-dom/client';
 
-// styles and css 
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './index.css'
+import './index.css';
 
-
-import App from './App.jsx'
-
-import { createBrowserRouter, RouterProvider} from "react-router-dom"
-import Cart from './pages/Cart/Cart.jsx'
-import MyAccount from './pages/MyAccount/MyAccount.jsx'
-import TradeIn from './pages/TradeIn/TradeIn.jsx'
-
-
-import ShopPage from "./pages/Shop/ShopPage.jsx"
-
-import Resources from "./pages/Auxiliary/Resources/Resources.jsx"
-import Contactus from "./pages/Auxiliary/Contactus/Contactus.jsx"
-
-import Home from './pages/Home/Home.jsx'
-
-import Catagory from './pages/Admin/Categories/AllCatagory/Catagory.jsx';
-import AdminSecret from './pages/Admin/AdminSecret/AdminSecret.jsx';
-import AddCatagory from './pages/Admin/Categories/AddCatagory/AddCatagory.jsx';
-import AdminCatagory from './pages/Admin/Categories/AdminCatagory/AdminCatagory.jsx';
-import AdminHome from './pages/Admin/Dashboard/AdminHome/AdminHome.jsx';
-import AllProduct from './pages/Admin/Products/AllProduct/AllProduct.jsx';
-import AddProduct from './pages/Admin/Products/AddProduct/AddProduct.jsx';
-import EditProduct from './pages/Admin/Products/EditProduct/EditProduct.jsx';
-import Checkout from './pages/Checkout/Checkout.jsx';
-import AdminOrder from './pages/Admin/Orders/AdminOrder/AdminOrder.jsx';
-import LoginAndSignup from './pages/Auth/LoginAndSignup/LoginAndSignup.jsx';
+import App from './App.jsx';
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import PrivateRoute from './utilities/PrivateRoute.jsx';
 import UserContextProvider from './utilities/UserContextProvider.jsx';
-import ProductDetailPage from './pages/ProductDetail/ProductDetailPage/ProductDetailPage.jsx';
-import ReturnPolicy from './pages/Legal/ReturnPolicy/ReturnPolicy.jsx';
-import PrivacyPolicy from './pages/Legal/PrivacyPolicy/PrivacyPolicy.jsx';
-import AboutUs from './pages/Legal/AboutUs/AboutUs.jsx';
 import AdminPrivateRoute from './utilities/AdminPrivateRoute.jsx';
-import ThankYou from './pages/ThankYou/ThankYou.jsx';
-import JournalPost from './pages/Auxiliary/Resources/JournalPost.jsx';
-import NotFound from './pages/NotFound/NotFound.jsx';
 import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary.jsx';
-import AdminTradeIn from './pages/Admin/TradeIn/AdminTradeIn.jsx';
-import AdminNewsletter from './pages/Admin/Newsletter/AdminNewsletter.jsx';
-import AdminContact from './pages/Admin/Contact/AdminContact.jsx';
+import RouteLoadingScreen from './components/RouteLoadingScreen/RouteLoadingScreen.jsx';
 
+const Home = lazy(() => import('./pages/Home/Home.jsx'));
+const Cart = lazy(() => import('./pages/Cart/Cart.jsx'));
+const MyAccount = lazy(() => import('./pages/MyAccount/MyAccount.jsx'));
+const TradeIn = lazy(() => import('./pages/TradeIn/TradeIn.jsx'));
+const ShopPage = lazy(() => import('./pages/Shop/ShopPage.jsx'));
+const Resources = lazy(() => import('./pages/Auxiliary/Resources/Resources.jsx'));
+const Contactus = lazy(() => import('./pages/Auxiliary/Contactus/Contactus.jsx'));
+const Catagory = lazy(() => import('./pages/Admin/Categories/AllCatagory/Catagory.jsx'));
+const AdminSecret = lazy(() => import('./pages/Admin/AdminSecret/AdminSecret.jsx'));
+const AddCatagory = lazy(() => import('./pages/Admin/Categories/AddCatagory/AddCatagory.jsx'));
+const AdminCatagory = lazy(() => import('./pages/Admin/Categories/AdminCatagory/AdminCatagory.jsx'));
+const AdminHome = lazy(() => import('./pages/Admin/Dashboard/AdminHome/AdminHome.jsx'));
+const AllProduct = lazy(() => import('./pages/Admin/Products/AllProduct/AllProduct.jsx'));
+const AddProduct = lazy(() => import('./pages/Admin/Products/AddProduct/AddProduct.jsx'));
+const EditProduct = lazy(() => import('./pages/Admin/Products/EditProduct/EditProduct.jsx'));
+const Checkout = lazy(() => import('./pages/Checkout/Checkout.jsx'));
+const AdminOrder = lazy(() => import('./pages/Admin/Orders/AdminOrder/AdminOrder.jsx'));
+const LoginAndSignup = lazy(() => import('./pages/Auth/LoginAndSignup/LoginAndSignup.jsx'));
+const ProductDetailPage = lazy(() => import('./pages/ProductDetail/ProductDetailPage/ProductDetailPage.jsx'));
+const ReturnPolicy = lazy(() => import('./pages/Legal/ReturnPolicy/ReturnPolicy.jsx'));
+const PrivacyPolicy = lazy(() => import('./pages/Legal/PrivacyPolicy/PrivacyPolicy.jsx'));
+const AboutUs = lazy(() => import('./pages/Legal/AboutUs/AboutUs.jsx'));
+const ThankYou = lazy(() => import('./pages/ThankYou/ThankYou.jsx'));
+const JournalPost = lazy(() => import('./pages/Auxiliary/Resources/JournalPost.jsx'));
+const NotFound = lazy(() => import('./pages/NotFound/NotFound.jsx'));
+const AdminTradeIn = lazy(() => import('./pages/Admin/TradeIn/AdminTradeIn.jsx'));
+const AdminNewsletter = lazy(() => import('./pages/Admin/Newsletter/AdminNewsletter.jsx'));
+const AdminContact = lazy(() => import('./pages/Admin/Contact/AdminContact.jsx'));
+const AdminAnalytics = lazy(() => import('./pages/Admin/Analytics/AdminAnalytics.jsx'));
 
+const lazyElement = (element) => (
+  <Suspense fallback={<RouteLoadingScreen />}>
+    {element}
+  </Suspense>
+);
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App></App>,
+    element: <App />,
     children: [
       {
         path: "",
-        element: <Home></Home>
+        element: lazyElement(<Home />),
       },
       {
         path: "cart",
-        element: <Cart></Cart>
+        element: lazyElement(<Cart />),
       },
       {
         path: "iphone/:parentId/:productId",
-        element: <ProductDetailPage></ProductDetailPage>
+        element: lazyElement(<ProductDetailPage />),
       },
       {
         path: "checkout/:id",
-        element: <PrivateRoute><Checkout></Checkout></PrivateRoute>
+        element: lazyElement(<PrivateRoute><Checkout /></PrivateRoute>),
       },
       {
         path: "login",
-        element: <LoginAndSignup></LoginAndSignup>
+        element: lazyElement(<LoginAndSignup />),
       },
       {
         path: "myaccount",
-        element: <PrivateRoute><MyAccount></MyAccount></PrivateRoute>
+        element: lazyElement(<PrivateRoute><MyAccount /></PrivateRoute>),
       },
       {
         path: "shop",
-        element: <ShopPage></ShopPage>
+        element: lazyElement(<ShopPage />),
       },
-
-
       {
         path: "blogs",
-        element: <Resources></Resources>,
+        element: lazyElement(<Resources />),
       },
       {
         path: "blogs/:slug",
-        element: <JournalPost></JournalPost>
+        element: lazyElement(<JournalPost />),
       },
       {
         path: "support",
-        element: <Contactus></Contactus>
-      },
-
-      {
-        path:"return-policy",
-        element: <ReturnPolicy></ReturnPolicy>
+        element: lazyElement(<Contactus />),
       },
       {
-        path:"privacy-policy",
-        element:<PrivacyPolicy></PrivacyPolicy>
+        path: "return-policy",
+        element: lazyElement(<ReturnPolicy />),
+      },
+      {
+        path: "privacy-policy",
+        element: lazyElement(<PrivacyPolicy />),
       },
       {
         path: "about",
-        element:<AboutUs></AboutUs>
+        element: lazyElement(<AboutUs />),
       },
       {
         path: "trade-in",
-        element: <TradeIn></TradeIn>
+        element: lazyElement(<TradeIn />),
       },
       {
-        path:"succeed",
-        element: <ThankYou></ThankYou>
+        path: "succeed",
+        element: lazyElement(<ThankYou />),
       },
       {
         path: "admin-secret",
-        element: <AdminPrivateRoute><AdminSecret></AdminSecret></AdminPrivateRoute>,
+        element: lazyElement(<AdminPrivateRoute><AdminSecret /></AdminPrivateRoute>),
         children: [
           {
             path: "",
-            element: <AdminHome></AdminHome>
+            element: lazyElement(<AdminHome />),
           },
           {
             path: "orders",
-            element: <AdminOrder></AdminOrder>
+            element: lazyElement(<AdminOrder />),
           },
           {
             path: "trade-in",
-            element: <AdminTradeIn></AdminTradeIn>
+            element: lazyElement(<AdminTradeIn />),
           },
           {
             path: "newsletter",
-            element: <AdminNewsletter></AdminNewsletter>
+            element: lazyElement(<AdminNewsletter />),
           },
           {
             path: "contact",
-            element: <AdminContact></AdminContact>
+            element: lazyElement(<AdminContact />),
+          },
+          {
+            path: "analytics",
+            element: lazyElement(<AdminAnalytics />),
           },
           {
             path: "catagory",
-            element: <AdminCatagory></AdminCatagory>,
+            element: lazyElement(<AdminCatagory />),
             children: [
               {
                 path: "",
-                element: <Catagory></Catagory>,
+                element: lazyElement(<Catagory />),
               },
               {
                 path: "addcatagory",
-                element: <AddCatagory></AddCatagory>
-              }
-            ]
+                element: lazyElement(<AddCatagory />),
+              },
+            ],
           },
           {
             path: "products",
-            element: <AllProduct></AllProduct>,
+            element: lazyElement(<AllProduct />),
           },
           {
             path: "addproduct",
-            element: <AddProduct></AddProduct>
+            element: lazyElement(<AddProduct />),
           },
           {
             path: "editProduct/:id",
-            element: <EditProduct></EditProduct>
-          }
-        ]
+            element: lazyElement(<EditProduct />),
+          },
+        ],
       },
       {
         path: "*",
-        element: <NotFound></NotFound>
+        element: lazyElement(<NotFound />),
       },
-
-    ]
+    ],
   },
-
-])
+]);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  
-
-    <UserContextProvider>
-      <ErrorBoundary>
-        <RouterProvider router={router} />
-      </ErrorBoundary>
-    </UserContextProvider>
-
-  
-)
+  <UserContextProvider>
+    <ErrorBoundary>
+      <RouterProvider router={router} />
+    </ErrorBoundary>
+  </UserContextProvider>
+);

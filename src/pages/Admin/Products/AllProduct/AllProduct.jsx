@@ -3,6 +3,10 @@ import axiosInstance from '../../../../utilities/axiosInstance';
 import { useSearchParams } from 'react-router-dom';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import SingleProductGroup from '../AdminSingleProduct/SingleProductGroup';
+import AdminPageHeader from '../../../../components/AdminPageHeader/AdminPageHeader';
+import AdminStatsGrid from '../../../../components/AdminStatsGrid/AdminStatsGrid';
+import AdminLoadingState from '../../../../components/AdminState/AdminLoadingState';
+import AdminEmptyState from '../../../../components/AdminState/AdminEmptyState';
 
 const familyOrder = ['iPhone', 'iPad', 'MacBook'];
 
@@ -16,6 +20,7 @@ const inferFamily = (productName = '', categoryName = '') => {
 
 const AllProduct = () => {
     const [productGroups, setProductGroups] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchParams, setSearchParams] = useSearchParams();
     const categoryFilter = searchParams.get('category');
@@ -36,6 +41,7 @@ const AllProduct = () => {
     };
 
     useEffect(() => {
+        setIsLoading(true);
         Promise.all([
             axiosInstance.get('catagory'),
             axiosInstance.get('product'),
@@ -49,7 +55,8 @@ const AllProduct = () => {
             })).sort(sortByProductName);
 
             setProductGroups(grouped);
-        }).catch((error) => console.log(error));
+        }).catch((error) => console.log(error))
+            .finally(() => setIsLoading(false));
     }, []);
 
     const filteredProducts = useMemo(() => {
@@ -67,14 +74,22 @@ const AllProduct = () => {
             .sort(sortByProductName);
     }, [categoryFilter, productGroups, searchQuery]);
 
+    const totalVariants = filteredProducts.reduce((sum, product) => sum + product.variants.length, 0);
+    const stats = [
+        { label: 'Visible families', value: filteredProducts.length, sub: 'matching the current product view' },
+        { label: 'Saved families', value: productGroups.length, sub: 'total product groups in admin' },
+        { label: 'Visible variants', value: totalVariants, sub: 'items currently represented in this view' },
+        { label: 'Category scope', value: categoryFilter || 'All', sub: 'active inventory filter' },
+    ];
+
     return (
         <section className="space-y-6">
-            <div className="admin-panel rounded-[36px] bg-[linear-gradient(180deg,#ffffff_0%,#f3f5f8_100%)] px-8 py-10">
-                <span className="eyebrow mb-5">Products</span>
-                <h1 className="text-[clamp(2rem,3.8vw,3.6rem)] leading-[0.94]">
-                    {categoryFilter ? `${categoryFilter} inventory.` : "Manage product inventory."}
-                </h1>
-                <label className="relative mt-6 block w-full">
+            <AdminPageHeader
+                eyebrow="Products"
+                title={categoryFilter ? `${categoryFilter} inventory.` : "Manage product inventory."}
+                description="Search, adjust, and clean up product families without leaving the admin workspace."
+            >
+                <label className="relative block w-full">
                     <SearchRoundedIcon className="pointer-events-none absolute left-4 top-1/2 !text-[20px] -translate-y-1/2 text-apple-gray" />
                     <input
                         type="search"
@@ -92,22 +107,24 @@ const AllProduct = () => {
                         Clear filter
                     </button>
                 )}
-            </div>
+            </AdminPageHeader>
 
-            <div className="space-y-5">
-                {filteredProducts.map((product) => (
-                    <SingleProductGroup
-                        key={product.parentId}
-                        productGroup={product}
-                        onDelete={(parentId) => setProductGroups((current) => current.filter((item) => item.parentId !== parentId))}
-                    />
-                ))}
-            </div>
-            
-            {filteredProducts.length === 0 && (
-                <div className="admin-panel rounded-[30px] p-12 text-center">
-                    <p className="text-xl text-ink-soft font-medium">No products found.</p>
+            <AdminStatsGrid items={stats} />
+
+            {isLoading ? (
+                <AdminLoadingState title="Loading inventory" description="Gathering product families and variant data for the admin inventory view." />
+            ) : filteredProducts.length ? (
+                <div className="space-y-5">
+                    {filteredProducts.map((product) => (
+                        <SingleProductGroup
+                            key={product.parentId}
+                            productGroup={product}
+                            onDelete={(parentId) => setProductGroups((current) => current.filter((item) => item.parentId !== parentId))}
+                        />
+                    ))}
                 </div>
+            ) : (
+                <AdminEmptyState title="No products found." description="Try another search or clear the category filter to see more inventory." />
             )}
         </section>
     );

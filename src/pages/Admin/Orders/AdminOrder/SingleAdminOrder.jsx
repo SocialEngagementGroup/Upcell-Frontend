@@ -1,17 +1,27 @@
 import React, { useEffect, useRef, useState } from 'react';
 import axiosInstance from "../../../../utilities/axiosInstance";
 import JsBarcode from "jsbarcode";
+import { toast } from 'react-toastify';
 
-const SingleAdminOrder = ({ order }) => {
+const SingleAdminOrder = ({ order, onStatusChanged }) => {
     const { line_items, name, email, phone, city, postal, street, country, shipping, paid, status, createdAt, updatedAt } = order;
     const [shippingStatus, setShippingStatus] = useState(status);
     const [showDetails, setShowDetails] = useState(false);
     const barcodeRef = useRef(null);
 
-    const changeShippingStatus = (e) => {
+    const changeShippingStatus = async (e) => {
         if (window.confirm("Are you sure about the new changed Status ?!")) {
-            setShippingStatus(e.target.value);
-            axiosInstance.post("update-order-status", { orderId: order._id, status: e.target.value });
+            const nextStatus = e.target.value;
+            setShippingStatus(nextStatus);
+            try {
+                await axiosInstance.post("update-order-status", { orderId: order._id, status: nextStatus });
+                onStatusChanged?.();
+                toast.success(`Order marked as ${nextStatus}`);
+            } catch (error) {
+                console.log(error);
+                setShippingStatus(status);
+                toast.error('Order status update failed');
+            }
         }
     };
 

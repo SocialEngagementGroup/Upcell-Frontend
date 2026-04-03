@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
 import { useState } from 'react';
 import axiosInstance from '../../../utilities/axiosInstance';
+import { extractApiError, validateEmailAddress } from '../../../utilities/formValidation';
+import useFormAnalytics from '../../../utilities/useFormAnalytics';
 
 // Modern Icons
 const SocialIcons = {
@@ -13,10 +15,18 @@ const MyFooter = () => {
     const [newsletterEmail, setNewsletterEmail] = useState('');
     const [newsletterMessage, setNewsletterMessage] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const { markInteraction, trackSuccess, trackFailure } = useFormAnalytics('newsletter_footer');
 
     const handleNewsletterSubmit = async (event) => {
         event.preventDefault();
-        if (!newsletterEmail.trim()) return;
+        if (isSubmitting) return;
+
+        const emailError = validateEmailAddress(newsletterEmail);
+        if (emailError) {
+            setNewsletterMessage(emailError);
+            trackFailure(emailError, { source: 'footer', phase: 'validation' });
+            return;
+        }
 
         setIsSubmitting(true);
         setNewsletterMessage('');
@@ -27,9 +37,12 @@ const MyFooter = () => {
                 source: 'footer',
             });
             setNewsletterMessage('Subscribed successfully.');
+            trackSuccess({ source: 'footer' });
             setNewsletterEmail('');
         } catch (error) {
-            setNewsletterMessage(error?.response?.data?.error || 'Unable to subscribe right now.');
+            const failureMessage = extractApiError(error, 'Unable to subscribe right now.');
+            setNewsletterMessage(failureMessage);
+            trackFailure(failureMessage, { source: 'footer', phase: 'request' });
         } finally {
             setIsSubmitting(false);
         }
@@ -90,7 +103,10 @@ const MyFooter = () => {
                                     type="email"
                                     placeholder="your@email.com"
                                     value={newsletterEmail}
-                                    onChange={(event) => setNewsletterEmail(event.target.value)}
+                                    onChange={(event) => {
+                                        markInteraction();
+                                        setNewsletterEmail(event.target.value);
+                                    }}
                                     className="h-12 w-full rounded-2xl border border-black/[0.08] bg-white px-5 text-sm font-medium text-apple-text outline-none transition-all placeholder:text-apple-gray focus:border-apple-text/20 focus:shadow-[0_0_0_4px_rgba(29,29,31,0.05)]"
                                 />
                                 <button

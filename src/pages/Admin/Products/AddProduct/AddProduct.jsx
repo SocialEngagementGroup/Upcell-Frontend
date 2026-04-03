@@ -87,7 +87,7 @@ const AddProduct = () => {
             setSearchParams({});
         } catch (error) {
             console.log(error);
-            alert("error happened !!");
+            toast.error("Failed to save product");
         } finally {
             setSubmitting(false);
         }

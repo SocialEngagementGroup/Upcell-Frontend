@@ -11,6 +11,8 @@ import PhoneIphoneIcon from '@mui/icons-material/PhoneIphone';
 import TabletMacIcon from '@mui/icons-material/TabletMac';
 import LaptopMacIcon from '@mui/icons-material/LaptopMac';
 import axiosInstance from '../../utilities/axiosInstance';
+import { extractApiError, validateEmailAddress, validatePhoneNumber, validateRequiredText } from '../../utilities/formValidation';
+import useFormAnalytics from '../../utilities/useFormAnalytics';
 
 /* ───────────── STATIC DATA ───────────── */
 
@@ -194,6 +196,7 @@ const TradeIn = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState('');
     const [savedRequest, setSavedRequest] = useState(null);
+    const { markInteraction, trackSuccess, trackFailure } = useFormAnalytics('trade_in');
 
     const hasCarrier = carrierOptions[selection.device] !== null;
 
@@ -223,6 +226,7 @@ const TradeIn = () => {
     };
 
     const handleConditionAnswer = (questionId, value) => {
+        markInteraction();
         setSelection((prev) => ({
             ...prev,
             answers: { ...prev.answers, [questionId]: value },
@@ -249,13 +253,26 @@ const TradeIn = () => {
     const selectedCarrierTitle = (carrierOptions[selection.device] || []).find((carrier) => carrier.id === selection.carrier)?.title || '';
 
     const handleSubmitTradeInRequest = async () => {
-        if (!selection.name.trim() || !selection.email.trim() || !selection.phone.trim()) {
-            setSubmitError('Please fill in your name, email, and phone number before submitting.');
+        if (isSubmitting) return;
+
+        const nameError = validateRequiredText('Name', selection.name, { min: 2, max: 120 });
+        const emailError = validateEmailAddress(selection.email);
+        const phoneError = validatePhoneNumber(selection.phone);
+        const selectionError = !selection.device || !selection.model || !selection.storage
+            ? 'Please complete your device, model, and storage selections before submitting.'
+            : '';
+        const estimateError = typeof estimate !== 'number' ? 'We could not calculate your trade-in estimate. Please review your answers.' : '';
+        const validationMessage = nameError || emailError || phoneError || selectionError || estimateError;
+
+        if (validationMessage) {
+            setSubmitError(validationMessage);
+            trackFailure(validationMessage, { phase: 'validation', device: selection.device });
             return;
         }
 
         setIsSubmitting(true);
         setSubmitError('');
+        markInteraction();
 
         try {
             const response = await axiosInstance.post('trade-in-requests', {
@@ -273,9 +290,18 @@ const TradeIn = () => {
             });
 
             setSavedRequest(response.data);
+            trackSuccess({
+                phase: 'request',
+                device: selection.device,
+                model: selection.model,
+                storage: selection.storage,
+                estimate,
+            });
             setStep(stepMap['Confirmation']);
         } catch (error) {
-            setSubmitError(error?.response?.data?.error || 'Something went wrong while submitting your request. Please try again.');
+            const failureMessage = extractApiError(error, 'Something went wrong while submitting your request. Please try again.');
+            setSubmitError(failureMessage);
+            trackFailure(failureMessage, { phase: 'request', device: selection.device, model: selection.model });
         } finally {
             setIsSubmitting(false);
         }
@@ -339,6 +365,7 @@ const TradeIn = () => {
                                     key={device.id}
                                     className="premium-card rounded-[32px] p-8 text-left transition-all duration-300 hover:-translate-y-1.5 hover:shadow-medium"
                                     onClick={() => {
+                                        markInteraction();
                                         setSelection((prev) => ({ ...prev, device: device.id, model: '', carrier: '', storage: '', answers: {} }));
                                         setConditionStep(0);
                                         setStep(2);
@@ -365,6 +392,7 @@ const TradeIn = () => {
                                     key={model.id}
                                     className="premium-card rounded-[28px] p-6 text-left transition-all duration-300 hover:-translate-y-1 hover:shadow-medium"
                                     onClick={() => {
+                                        markInteraction();
                                         setSelection((prev) => ({ ...prev, model: model.id }));
                                         next();
                                     }}
@@ -391,6 +419,7 @@ const TradeIn = () => {
                                     key={carrier.id}
                                     className="premium-card rounded-[28px] p-6 text-left transition-all duration-300 hover:-translate-y-1 hover:shadow-medium"
                                     onClick={() => {
+                                        markInteraction();
                                         setSelection((prev) => ({ ...prev, carrier: carrier.id }));
                                         next();
                                     }}
@@ -413,6 +442,7 @@ const TradeIn = () => {
                                     key={storage}
                                     className="premium-card rounded-[28px] p-6 text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-medium"
                                     onClick={() => {
+                                        markInteraction();
                                         setSelection((prev) => ({ ...prev, storage }));
                                         next();
                                     }}
@@ -552,10 +582,19 @@ const TradeIn = () => {
                                 <h3 className="text-[28px] mb-6">Finalize your details</h3>
                                 <div className="grid gap-4 sm:grid-cols-2">
                                     <div className="sm:col-span-2">
-                                        <input className="premium-input w-full" placeholder="Full name" value={selection.name} onChange={(e) => setSelection((prev) => ({ ...prev, name: e.target.value }))} />
+                                        <input className="premium-input w-full" placeholder="Full name" value={selection.name} onChange={(e) => {
+                                            markInteraction();
+                                            setSelection((prev) => ({ ...prev, name: e.target.value }));
+                                        }} />
                                     </div>
-                                    <input className="premium-input" type="email" placeholder="Email address" value={selection.email} onChange={(e) => setSelection((prev) => ({ ...prev, email: e.target.value }))} />
-                                    <input className="premium-input" type="tel" placeholder="Phone number" value={selection.phone} onChange={(e) => setSelection((prev) => ({ ...prev, phone: e.target.value }))} />
+                                    <input className="premium-input" type="email" placeholder="Email address" value={selection.email} onChange={(e) => {
+                                        markInteraction();
+                                        setSelection((prev) => ({ ...prev, email: e.target.value }));
+                                    }} />
+                                    <input className="premium-input" type="tel" placeholder="Phone number" value={selection.phone} onChange={(e) => {
+                                        markInteraction();
+                                        setSelection((prev) => ({ ...prev, phone: e.target.value }));
+                                    }} />
                                 </div>
                                 {submitError && (
                                     <div className="mt-5 rounded-[20px] border border-red-500/15 bg-red-50 px-4 py-3 text-sm text-red-600">

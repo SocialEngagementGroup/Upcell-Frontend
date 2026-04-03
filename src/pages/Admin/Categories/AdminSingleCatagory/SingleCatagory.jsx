@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import axiosInstance from "../../../../utilities/axiosInstance";
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import AdminConfirmModal from '../../../../components/AdminConfirmModal/AdminConfirmModal';
 
 const SingleCatagory = ({ catagory, setUpdate, productGroups, setProductGroups }) => {
     const navigate = useNavigate();
     const [editClicked, setEditClicked] = useState(false);
     const [isProductsOpen, setIsProductsOpen] = useState(false);
+    const [pendingDeleteProduct, setPendingDeleteProduct] = useState(null);
+    const [isDeletingProduct, setIsDeletingProduct] = useState(false);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -14,15 +18,25 @@ const SingleCatagory = ({ catagory, setUpdate, productGroups, setProductGroups }
         }).then(() => {
             setUpdate((prev) => !prev);
             setEditClicked(false);
-        }).catch((error) => console.log(error));
+            toast.success('Category name updated');
+        }).catch((error) => {
+            console.log(error);
+            toast.error('Failed to update category');
+        });
     };
 
     const handleDeleteProduct = (parentId) => {
-        if (window.confirm('Delete this product and all of its variants permanently?')) {
-            axiosInstance.delete(`product-family/${parentId}`).then(() => {
+        setIsDeletingProduct(true);
+        axiosInstance.delete(`product-family/${parentId}`).then(() => {
                 setProductGroups((prev) => prev.filter((product) => product.parentId !== parentId));
-            }).catch((err) => console.log(err));
-        }
+                toast.success('Product family deleted');
+            }).catch((err) => {
+                console.log(err);
+                toast.error('Failed to delete product family');
+            }).finally(() => {
+                setIsDeletingProduct(false);
+                setPendingDeleteProduct(null);
+            });
     };
 
     const filteredProducts = productGroups.filter(
@@ -120,8 +134,8 @@ const SingleCatagory = ({ catagory, setUpdate, productGroups, setProductGroups }
                                                     >
                                                         Edit
                                                     </button>
-                                                    <button 
-                                                        onClick={() => handleDeleteProduct(product.parentId)}
+                                                    <button
+                                                        onClick={() => setPendingDeleteProduct(product)}
                                                         className="text-sm font-bold text-red-500 hover:underline"
                                                     >
                                                         Delete
@@ -142,6 +156,16 @@ const SingleCatagory = ({ catagory, setUpdate, productGroups, setProductGroups }
                     </div>
                 </div>
             )}
+
+            <AdminConfirmModal
+                open={Boolean(pendingDeleteProduct)}
+                title="Delete this product family?"
+                description={`This will remove ${pendingDeleteProduct?.productName || 'this product'} and all of its variants from the selected category view.`}
+                confirmLabel="Delete product"
+                isLoading={isDeletingProduct}
+                onCancel={() => setPendingDeleteProduct(null)}
+                onConfirm={() => pendingDeleteProduct && handleDeleteProduct(pendingDeleteProduct.parentId)}
+            />
         </div>
     );
 };

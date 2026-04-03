@@ -1,14 +1,24 @@
 import React, { useState } from 'react';
 import axiosInstance from '../../utilities/axiosInstance';
+import { extractApiError, validateEmailAddress } from '../../utilities/formValidation';
+import useFormAnalytics from '../../utilities/useFormAnalytics';
 
 const NewsletterSignup = () => {
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const { markInteraction, trackSuccess, trackFailure } = useFormAnalytics('newsletter_section');
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        if (!email.trim()) return;
+        if (isSubmitting) return;
+
+        const emailError = validateEmailAddress(email);
+        if (emailError) {
+            setMessage(emailError);
+            trackFailure(emailError, { source: 'newsletter-section', phase: 'validation' });
+            return;
+        }
 
         setIsSubmitting(true);
         setMessage('');
@@ -19,9 +29,12 @@ const NewsletterSignup = () => {
                 source: 'newsletter-section',
             });
             setMessage('Subscribed successfully.');
+            trackSuccess({ source: 'newsletter-section' });
             setEmail('');
         } catch (error) {
-            setMessage(error?.response?.data?.error || 'Unable to subscribe right now.');
+            const failureMessage = extractApiError(error, 'Unable to subscribe right now.');
+            setMessage(failureMessage);
+            trackFailure(failureMessage, { source: 'newsletter-section', phase: 'request' });
         } finally {
             setIsSubmitting(false);
         }
@@ -41,7 +54,10 @@ const NewsletterSignup = () => {
                             placeholder="Enter your email" 
                             className="premium-input flex-1"
                             value={email}
-                            onChange={(event) => setEmail(event.target.value)}
+                            onChange={(event) => {
+                                markInteraction();
+                                setEmail(event.target.value);
+                            }}
                             required
                         />
                         <button type="submit" className="premium-button max-sm:w-full" disabled={isSubmitting}>

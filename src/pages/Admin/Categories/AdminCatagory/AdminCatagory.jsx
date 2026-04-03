@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
+import AdminPageHeader from '../../../../components/AdminPageHeader/AdminPageHeader';
 
 const AdminCatagory = () => {
     const [categorySearchQuery, setCategorySearchQuery] = useState('');
 
     return (
         <section className="space-y-6">
-            <div className="admin-panel rounded-[36px] bg-[linear-gradient(180deg,#ffffff_0%,#f3f5f8_100%)] px-8 py-10">
-                <span className="eyebrow mb-5">Categories</span>
-                <h1 className="text-[clamp(2rem,3.8vw,3.6rem)] leading-[0.94]">Organize product families.</h1>
-            </div>
+            <AdminPageHeader
+                eyebrow="Categories"
+                title="Organize product families."
+                description="Keep storefront groupings clean, searchable, and ready for merchandising updates."
+            />
 
             <div className="admin-panel rounded-[32px] p-6">
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">

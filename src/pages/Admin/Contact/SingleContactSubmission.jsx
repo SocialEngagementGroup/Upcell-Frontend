@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import axiosInstance from '../../../utilities/axiosInstance';
+import { toast } from 'react-toastify';
+import AdminConfirmModal from '../../../components/AdminConfirmModal/AdminConfirmModal';
 
 const statuses = ["New", "Resolved"];
 
-const SingleContactSubmission = ({ submission, onUpdated }) => {
+const SingleContactSubmission = ({ submission, onUpdated, onDeleted }) => {
     const [status, setStatus] = useState(submission.status);
     const [showMessage, setShowMessage] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
     const handleStatusChange = async (event) => {
         const nextStatus = event.target.value;
@@ -14,9 +18,26 @@ const SingleContactSubmission = ({ submission, onUpdated }) => {
         try {
             const response = await axiosInstance.patch(`contact-submissions/${submission._id}/status`, { status: nextStatus });
             onUpdated?.(response.data);
+            toast.success(`Contact submission marked as ${nextStatus}`);
         } catch (error) {
             setStatus(submission.status);
             console.log(error);
+            toast.error('Contact status update failed');
+        }
+    };
+
+    const handleDelete = async () => {
+        setIsDeleting(true);
+        try {
+            await axiosInstance.delete(`contact-submissions/${submission._id}`);
+            onDeleted?.(submission._id);
+            toast.success('Contact submission deleted');
+        } catch (error) {
+            console.log(error);
+            toast.error('Failed to delete contact submission');
+        } finally {
+            setIsDeleting(false);
+            setIsDeleteModalOpen(false);
         }
     };
 
@@ -38,6 +59,13 @@ const SingleContactSubmission = ({ submission, onUpdated }) => {
                     <button className="premium-button-secondary w-full justify-center" onClick={() => setShowMessage((prev) => !prev)}>
                         {showMessage ? 'Hide message' : 'Show message'}
                     </button>
+                    <button
+                        className="w-full rounded-2xl border border-red-500/15 bg-red-50 px-4 py-3 text-sm font-bold text-red-600 transition-colors hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-70"
+                        onClick={() => setIsDeleteModalOpen(true)}
+                        disabled={isDeleting}
+                    >
+                        {isDeleting ? 'Deleting...' : 'Delete'}
+                    </button>
                 </div>
             </div>
 
@@ -49,6 +77,16 @@ const SingleContactSubmission = ({ submission, onUpdated }) => {
                     </div>
                 </div>
             )}
+
+            <AdminConfirmModal
+                open={isDeleteModalOpen}
+                title="Delete this contact submission?"
+                description="This support message will be removed from the admin inbox permanently."
+                confirmLabel="Delete submission"
+                isLoading={isDeleting}
+                onCancel={() => setIsDeleteModalOpen(false)}
+                onConfirm={handleDelete}
+            />
         </div>
     );
 };
