@@ -36,7 +36,12 @@ const Checkout = () => {
     ), [productIds, products]);
 
     const estTax = subtotal * 0.08;
-    const shippingCost = shipping === 'standard' ? 0 : 10.5;
+    const shippingCosts = {
+        standard: 0,
+        priority: 10.5,
+        express: 25.0
+    };
+    const shippingCost = shippingCosts[shipping] || 0;
     const total = subtotal + estTax + shippingCost;
 
     const handleSubmit = (event) => {
@@ -132,6 +137,7 @@ const Checkout = () => {
                                     {[
                                         { id: 'standard', title: 'Standard Shipping', sub: '5-7 business days', price: 'Free' },
                                         { id: 'priority', title: 'Priority Shipping', sub: '2-3 business days', price: '$10.50' },
+                                        { id: 'express', title: 'Express Shipping', sub: '1-2 business days', price: '$25.00' },
                                     ].map((option) => (
                                         <label key={option.id} className={`flex cursor-pointer items-center justify-between rounded-[24px] border p-5 ${shipping === option.id ? 'border-apple-text bg-surface-alt' : 'border-black/[0.08] bg-white'}`}>
                                             <div>

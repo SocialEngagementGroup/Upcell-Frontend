@@ -42,6 +42,7 @@ import AdminPrivateRoute from './utilities/AdminPrivateRoute.jsx';
 import ThankYou from './pages/ThankYou/ThankYou.jsx';
 import JournalPost from './pages/Auxiliary/Resources/JournalPost.jsx';
 import NotFound from './pages/NotFound/NotFound.jsx';
+import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary.jsx';
 
 
 
@@ -167,7 +168,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   
 
     <UserContextProvider>
-      <RouterProvider router={router} />
+      <ErrorBoundary>
+        <RouterProvider router={router} />
+      </ErrorBoundary>
     </UserContextProvider>
 
   

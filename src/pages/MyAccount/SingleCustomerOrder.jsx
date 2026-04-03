@@ -18,7 +18,7 @@ const SingleCustomerOrder = ({ order }) => {
         <div className="premium-card rounded-[30px] p-6">
             <div className="grid gap-5 lg:grid-cols-[1fr_1fr_220px]">
                 <div className="space-y-2 text-sm text-ink-soft">
-                    <p>Total amount: <strong className="text-apple-text">${total}</strong></p>
+                    <p>Total amount: <strong className="text-apple-text">${total.toFixed(2)}</strong></p>
                     <p>Order ID: <strong className="text-apple-text">{order._id}</strong></p>
                 </div>
                 <div className="space-y-2 text-sm text-ink-soft">
@@ -60,7 +60,7 @@ const SingleCustomerOrder = ({ order }) => {
                         </div>
                         <div className="mt-5 flex items-center justify-between">
                             <p className="text-base font-bold text-apple-text">Total</p>
-                            <p className="text-xl font-extrabold text-apple-text">$ {total}</p>
+                            <p className="text-xl font-extrabold text-apple-text">$ {total.toFixed(2)}</p>
                         </div>
                         <img className="mt-5 max-w-full" ref={barcodeRef} alt="order barcode" />
                     </div>
