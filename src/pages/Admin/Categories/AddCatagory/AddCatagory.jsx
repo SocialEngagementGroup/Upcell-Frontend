@@ -9,12 +9,12 @@ const AddCatagory = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        const modelName = e.target.productModel.value;
+        const modelName = e.target.categoryName.value.trim();
         const description = e.target.description.value;
 
-        axiosInstance.post("catagory", { modelName, description, images })
+        axiosInstance.post("shop-categories", { modelName, description, images })
             .then(() => {
-                e.target.productModel.value = "";
+                e.target.categoryName.value = "";
                 e.target.description.value = "";
                 setImages([]);
             })
@@ -47,7 +47,7 @@ const AddCatagory = () => {
             </div>
 
             <form className="mt-6 grid gap-4" onSubmit={handleSubmit}>
-                <input className="admin-input" name="productModel" type='text' placeholder='Product model name' required />
+                <input className="admin-input" name="categoryName" type='text' placeholder='Category name' required />
                 <input className="admin-input" name="description" type="text" placeholder='Short description (optional)' />
                 <button className="premium-button w-fit" type="submit">Create category</button>
             </form>

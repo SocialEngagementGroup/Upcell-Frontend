@@ -47,10 +47,31 @@ const modelGroupOrder = [
     'MacBook Pro'
 ];
 
+const getCategorySortValue = (name) => {
+    const index = modelGroupOrder.indexOf(name);
+    return index === -1 ? Number.MAX_SAFE_INTEGER : index;
+};
+
+const matchesShopCategory = (product, categoryName) => {
+    if (!categoryName) return false;
+
+    const normalizedCategory = categoryName.trim().toLowerCase();
+    const derivedGroup = getModelGroup(product.productName)?.toLowerCase();
+    const productName = product.productName?.toLowerCase();
+    const family = product.family?.toLowerCase();
+
+    return (
+        derivedGroup === normalizedCategory
+        || productName === normalizedCategory
+        || family === normalizedCategory
+    );
+};
+
 const ShopPage = () => {
     const location = useLocation();
     const { setCart } = useContext(CartContext);
     const [products, setProducts] = useState([]);
+    const [allCategories, setAllCategories] = useState([]);
     const [activeCategory, setActiveCategory] = useState('All Devices');
     const [priceRange, setPriceRange] = useState(3500);
     const [selectedModels, setSelectedModels] = useState([]);
@@ -61,9 +82,7 @@ const ShopPage = () => {
         const queryParams = new URLSearchParams(location.search);
         const categoryParam = queryParams.get('category');
         if (!categoryParam) return;
-        const matchedCategory = ['iPhone', 'iPad', 'MacBook'].find(
-            (cat) => cat.toLowerCase() === categoryParam.toLowerCase()
-        );
+        const matchedCategory = categories.find((cat) => cat.toLowerCase() === categoryParam.toLowerCase());
         if (matchedCategory) setActiveCategory(matchedCategory);
     }, [location.search]);
 
@@ -71,26 +90,31 @@ const ShopPage = () => {
         axiosInstance.get('product')
             .then((res) => setProducts(res.data.map(normalizeProduct)))
             .catch((error) => console.log(error));
+            
+        axiosInstance.get('shop-categories')
+            .then((res) => setAllCategories(res.data))
+            .catch((error) => console.log(error));
     }, []);
 
-    const availableModels = useMemo(() => {
-        const groups = new Set();
-        products.forEach((product) => {
-            if (activeCategory === 'All Devices' || product.family === activeCategory) {
-                const group = getModelGroup(product.productName);
-                if (group) groups.add(group);
-            }
-        });
-        return Array.from(groups).sort((left, right) => {
-            const leftIndex = modelGroupOrder.indexOf(left);
-            const rightIndex = modelGroupOrder.indexOf(right);
+    const availableCategories = useMemo(() => {
+        const categoryNames = allCategories
+            .map((category) => category.modelName?.trim())
+            .filter(Boolean)
+            .filter((name, index, array) => array.indexOf(name) === index);
 
-            if (leftIndex === -1 && rightIndex === -1) return left.localeCompare(right);
-            if (leftIndex === -1) return 1;
-            if (rightIndex === -1) return -1;
-            return leftIndex - rightIndex;
-        });
-    }, [products, activeCategory]);
+        return categoryNames
+            .filter((categoryName) => products.some((product) => (
+                (activeCategory === 'All Devices' || product.family === activeCategory)
+                && matchesShopCategory(product, categoryName)
+            )))
+            .sort((left, right) => {
+                const leftIndex = getCategorySortValue(left);
+                const rightIndex = getCategorySortValue(right);
+
+                if (leftIndex !== rightIndex) return leftIndex - rightIndex;
+                return left.localeCompare(right);
+            });
+    }, [allCategories, products, activeCategory]);
 
     const availableStorages = useMemo(() => (
         Array.from(new Set(
@@ -111,9 +135,9 @@ const ShopPage = () => {
     ), [products, activeCategory]);
 
     useEffect(() => {
-        setSelectedModels((current) => current.filter((model) => availableModels.includes(model)));
+        setSelectedModels((current) => current.filter((category) => availableCategories.includes(category)));
         setSelectedStorages((current) => current.filter((storage) => availableStorages.includes(storage)));
-    }, [availableModels, availableStorages]);
+    }, [availableCategories, availableStorages]);
 
     const toggleValue = (value, state, setState) => {
         setState((prev) => (
@@ -136,8 +160,7 @@ const ShopPage = () => {
             }
 
             if (selectedModels.length > 0) {
-                const productGroup = getModelGroup(product.productName);
-                if (!selectedModels.includes(productGroup)) {
+                if (!selectedModels.some((category) => matchesShopCategory(product, category))) {
                     return false;
                 }
             }
@@ -146,8 +169,7 @@ const ShopPage = () => {
                 return false;
             }
 
-            const isSupportedFamily = ['iPhone', 'iPad', 'MacBook'].includes(product.family);
-            return activeCategory === 'All Devices' ? true : isSupportedFamily;
+            return true;
         });
 
         const sorted = groupProductsByParent(matchingVariations);
@@ -229,17 +251,17 @@ const ShopPage = () => {
                         </div>
 
                         <div className="mt-8">
-                            <div className="text-xs font-bold uppercase tracking-[0.2em] text-apple-gray">Model</div>
+                            <div className="text-xs font-bold uppercase tracking-[0.2em] text-apple-gray">Category</div>
                             <div className="mt-4 flex flex-col gap-3">
-                                {availableModels.map((model) => (
-                                    <label key={model} className="flex items-center gap-3 text-sm text-ink-soft">
+                                {availableCategories.map((category) => (
+                                    <label key={category} className="flex items-center gap-3 text-sm text-ink-soft">
                                         <input
                                             type="checkbox"
                                             className="h-4 w-4 accent-apple-text"
-                                            checked={selectedModels.includes(model)}
-                                            onChange={() => toggleValue(model, selectedModels, setSelectedModels)}
+                                            checked={selectedModels.includes(category)}
+                                            onChange={() => toggleValue(category, selectedModels, setSelectedModels)}
                                         />
-                                        {model}
+                                        {category}
                                     </label>
                                 ))}
                             </div>

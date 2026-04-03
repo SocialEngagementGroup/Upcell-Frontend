@@ -1,22 +1,26 @@
 import SingleCatagory from '../AdminSingleCatagory/SingleCatagory.jsx';
 import axiosInstance from '../../../../utilities/axiosInstance.js';
 import React, { useEffect, useState } from 'react';
+import { SHOP_SIDEBAR_MODELS } from '../../../../constants/shopModels.js';
 
 const AllCatagories = () => {
     const [allCatagories, setAllCatagories] = useState([]);
     const [update, setUpdate] = useState(false);
 
     useEffect(() => {
-        axiosInstance.get("catagory").then((result) => setAllCatagories(result.data));
+        axiosInstance.get("shop-categories").then((result) => {
+            const filteredCategories = result.data.filter((category) =>
+                SHOP_SIDEBAR_MODELS.includes(category.modelName)
+            );
+            const orderedCategories = SHOP_SIDEBAR_MODELS
+                .map((modelName) => filteredCategories.find((category) => category.modelName === modelName))
+                .filter(Boolean);
+            setAllCatagories(orderedCategories);
+        });
     }, [update]);
 
     return (
         <section className="space-y-6">
-            <div className="admin-panel rounded-[36px] bg-[linear-gradient(180deg,#ffffff_0%,#f3f5f8_100%)] px-8 py-10">
-                <span className="eyebrow mb-5">Categories</span>
-                <h1 className="text-[clamp(2rem,3.8vw,3.6rem)] leading-[0.94]">Organize product families.</h1>
-                <p className="mt-4 text-base leading-8 text-ink-soft">Edit Apple product groupings, descriptions, and imagery that power the shopfront.</p>
-            </div>
 
             <div className="space-y-5">
                 {allCatagories.map((catagory) => (

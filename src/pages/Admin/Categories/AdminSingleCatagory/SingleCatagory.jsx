@@ -15,22 +15,14 @@ const SingleCatagory = ({ catagory, setUpdate }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        axiosInstance.patch(`catagory/${catagory._id}`, {
-            modelName: e.target.productModel.value,
+        axiosInstance.patch(`shop-categories/${catagory._id}`, {
+            modelName: e.target.categoryName.value.trim(),
             description: e.target.description.value,
             images,
         }).then(() => {
             setUpdate((prev) => !prev);
             setEditClicked(false);
         }).catch((error) => console.log(error));
-    };
-
-    const handleDelete = () => {
-        if (window.confirm("Are you sure you want to delete this category?")) {
-            axiosInstance.delete(`catagory/${catagory._id}`)
-                .then(() => setUpdate((prev) => !prev))
-                .catch((error) => console.log(error));
-        }
     };
 
     return (
@@ -44,7 +36,6 @@ const SingleCatagory = ({ catagory, setUpdate }) => {
                     <button className="premium-button-secondary" onClick={() => setEditClicked((prev) => !prev)}>
                         {editClicked ? 'Close editor' : 'Edit'}
                     </button>
-                    <button className="premium-button-secondary" onClick={handleDelete}>Delete</button>
                 </div>
             </div>
 
@@ -62,7 +53,7 @@ const SingleCatagory = ({ catagory, setUpdate }) => {
                     </div>
 
                     <form className="mt-5 grid gap-4" onSubmit={handleSubmit}>
-                        <input className="admin-input" name="productModel" type='text' placeholder='Updated model name' defaultValue={catagory?.modelName} required />
+                        <input className="admin-input" name="categoryName" type='text' placeholder='Updated category name' defaultValue={catagory?.modelName} required />
                         <input className="admin-input" name="description" type="text" placeholder='Updated description' defaultValue={catagory?.description} />
                         <button className="premium-button w-fit" type="submit">Save changes</button>
                     </form>
