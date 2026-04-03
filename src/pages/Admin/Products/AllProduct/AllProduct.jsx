@@ -1,12 +1,39 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import axiosInstance from '../../../../utilities/axiosInstance';
 import { useSearchParams } from 'react-router-dom';
+import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import SingleProductGroup from '../AdminSingleProduct/SingleProductGroup';
+
+const familyOrder = ['iPhone', 'iPad', 'MacBook'];
+
+const inferFamily = (productName = '', categoryName = '') => {
+    const text = `${productName} ${categoryName}`.toLowerCase();
+    if (text.includes('iphone')) return 'iPhone';
+    if (text.includes('ipad')) return 'iPad';
+    if (text.includes('macbook')) return 'MacBook';
+    return '';
+};
 
 const AllProduct = () => {
     const [productGroups, setProductGroups] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
     const [searchParams, setSearchParams] = useSearchParams();
     const categoryFilter = searchParams.get('category');
+
+    const sortByProductName = (left, right) => {
+        const leftFamily = inferFamily(left.productName, left.categoryName);
+        const rightFamily = inferFamily(right.productName, right.categoryName);
+        const leftFamilyIndex = familyOrder.indexOf(leftFamily);
+        const rightFamilyIndex = familyOrder.indexOf(rightFamily);
+
+        if (leftFamilyIndex !== rightFamilyIndex) {
+            if (leftFamilyIndex === -1) return 1;
+            if (rightFamilyIndex === -1) return -1;
+            return leftFamilyIndex - rightFamilyIndex;
+        }
+
+        return right.productName.localeCompare(left.productName, undefined, { numeric: true, sensitivity: 'base' });
+    };
 
     useEffect(() => {
         Promise.all([
@@ -19,15 +46,26 @@ const AllProduct = () => {
                 categoryName: parent.categoryName || '',
                 image: parent.images?.[0]?.url || '',
                 variants: productResult.data.filter((variant) => String(variant.parentCatagory) === String(parent._id)),
-            }));
+            })).sort(sortByProductName);
 
             setProductGroups(grouped);
         }).catch((error) => console.log(error));
     }, []);
 
-    const filteredProducts = categoryFilter
-        ? productGroups.filter((product) => product.categoryName === categoryFilter)
-        : productGroups;
+    const filteredProducts = useMemo(() => {
+        const normalizedSearch = searchQuery.trim().toLowerCase();
+        const categoryScoped = categoryFilter
+            ? productGroups.filter((product) => product.categoryName === categoryFilter)
+            : productGroups;
+
+        return categoryScoped
+            .filter((product) => {
+                if (!normalizedSearch) return true;
+                const searchableText = `${product.productName || ''} ${product.categoryName || ''}`.toLowerCase();
+                return searchableText.includes(normalizedSearch);
+            })
+            .sort(sortByProductName);
+    }, [categoryFilter, productGroups, searchQuery]);
 
     return (
         <section className="space-y-6">
@@ -42,6 +80,16 @@ const AllProduct = () => {
                         : "Review every listing, then edit or remove products without leaving the dashboard."
                     }
                 </p>
+                <label className="relative mt-6 block max-w-[380px]">
+                    <SearchRoundedIcon className="pointer-events-none absolute left-4 top-1/2 !text-[20px] -translate-y-1/2 text-apple-gray" />
+                    <input
+                        type="search"
+                        value={searchQuery}
+                        onChange={(event) => setSearchQuery(event.target.value)}
+                        placeholder="Search inventory"
+                        className="h-12 w-full rounded-full border border-black/[0.08] bg-white pl-12 pr-4 text-sm font-semibold text-apple-text outline-none transition-all placeholder:font-medium placeholder:text-apple-gray focus:border-apple-text/20 focus:shadow-[0_0_0_4px_rgba(29,29,31,0.05)]"
+                    />
+                </label>
                 {categoryFilter && (
                     <button 
                         onClick={() => setSearchParams({})}

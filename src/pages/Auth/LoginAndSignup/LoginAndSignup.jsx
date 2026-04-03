@@ -156,7 +156,7 @@ const LoginAndSignup = () => {
                 <div className="flex items-center gap-4 my-6 text-sm text-apple-gray before:flex-1 before:h-px before:bg-border-light after:flex-1 after:h-px after:bg-border-light">or</div>
 
                 <div className="flex flex-col gap-3 mt-6">
-                    <button onClick={handleGoogleSignin} className="premium-button-secondary w-full gap-3" style={{ border: '1.5px solid black' }}>
+                    <button onClick={handleGoogleSignin} className="premium-button-secondary w-full gap-3 border-[1.5px] border-black hover:border-black">
                         <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" className="w-5 h-5" />
                         Continue with Google
                     </button>

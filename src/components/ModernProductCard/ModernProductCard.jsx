@@ -12,8 +12,7 @@ const ModernProductCard = ({ product }) => {
     const family = product.family;
     const image = product.image;
     const price = product.price.toString().startsWith('$') ? product.price : `$${product.price}`;
-    const color = typeof product.color === 'string' ? product.color : (product.color?.name || '');
-    const storage = product.storage;
+    const availableColors = product.availableColors || [];
 
     return (
         <Link 
@@ -44,13 +43,28 @@ const ModernProductCard = ({ product }) => {
                         </>
                     ) : title}
                 </h3>
-                <p className="text-[13px] font-medium text-ink-soft opacity-60">
-                    {color}{color && storage ? ' • ' : ''}{storage}
-                </p>
+                {availableColors.length > 0 && (
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                        {availableColors.map((swatch) => (
+                            <span
+                                key={swatch.name}
+                                className="h-4 w-4 rounded-full border border-black/10 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.35)]"
+                                style={{ backgroundColor: swatch.value }}
+                                title={swatch.name}
+                                aria-label={swatch.name}
+                            />
+                        ))}
+                    </div>
+                )}
             </div>
 
             <div className="mt-8 flex items-end justify-between">
-                <span className="text-[32px] font-black leading-none text-apple-text">{price}</span>
+                <div>
+                    <div className="mb-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-apple-gray/65">
+                        From
+                    </div>
+                    <span className="text-[32px] font-black leading-none text-apple-text">{price}</span>
+                </div>
                 <div className="group/link flex items-center gap-2 text-[15px] font-bold text-apple-text">
                     View Product
                     <span className="transition-transform duration-300 group-hover/link:translate-x-1">→</span>

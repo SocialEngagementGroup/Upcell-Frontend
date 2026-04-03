@@ -4,6 +4,10 @@ import axiosInstance from '../../utilities/axiosInstance';
 import { groupProductsByParent, normalizeProduct } from '../../utilities/catalog';
 import ModernProductCard from '../ModernProductCard/ModernProductCard';
 
+const sortByLatestProductName = (left, right) => (
+    right.productName.localeCompare(left.productName, undefined, { numeric: true, sensitivity: 'base' })
+);
+
 const FeaturedUnits = () => {
     const [categories, setCategories] = useState({
         iPhone: [],
@@ -14,23 +18,24 @@ const FeaturedUnits = () => {
     useEffect(() => {
         axiosInstance.get('product')
             .then((res) => {
-                const normalized = groupProductsByParent(res.data.map(normalizeProduct)).map((p) => ({
-                    id: p._id,
-                    displayId: p._id.slice(-8),
-                    family: p.family,
-                    title: p.productName,
-                    price: `$${p.price}`,
-                    image: p.image,
-                    parentId: p.parentCatagory,
-                    productId: p._id,
-                    color: p.color?.name,
-                    storage: p.storage
-                }));
+                const normalized = groupProductsByParent(res.data.map(normalizeProduct));
+                const iphones = normalized
+                    .filter((p) => p.family === 'iPhone')
+                    .sort(sortByLatestProductName)
+                    .slice(0, 4);
+                const ipads = normalized
+                    .filter((p) => p.family === 'iPad')
+                    .sort(sortByLatestProductName)
+                    .slice(0, 4);
+                const macbooks = normalized
+                    .filter((p) => p.family === 'MacBook')
+                    .sort(sortByLatestProductName)
+                    .slice(0, 4);
 
                 setCategories({
-                    iPhone: normalized.filter(p => p.family === 'iPhone').slice(0, 4),
-                    iPad: normalized.filter(p => p.family === 'iPad').slice(0, 4),
-                    MacBook: normalized.filter(p => p.family === 'MacBook').slice(0, 4)
+                    iPhone: iphones,
+                    iPad: ipads,
+                    MacBook: macbooks
                 });
             })
             .catch((error) => console.log(error));
@@ -60,7 +65,7 @@ const FeaturedUnits = () => {
                             </div>
                             <div className="grid grid-cols-4 gap-6 max-xl:grid-cols-3 max-lg:grid-cols-2 max-sm:grid-cols-1">
                                 {categories[cat.key].map(product => (
-                                    <ModernProductCard key={product.id} product={product} />
+                                    <ModernProductCard key={product._id} product={product} />
                                 ))}
                             </div>
                         </div>

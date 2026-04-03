@@ -1,12 +1,14 @@
-import { Link } from 'react-router-dom';
 import axiosInstance from '../../../../utilities/axiosInstance.js';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import SingleCatagory from '../AdminSingleCatagory/SingleCatagory.jsx';
 
 const AllCatagories = () => {
     const [allCatagories, setAllCatagories] = useState([]);
     const [productGroups, setProductGroups] = useState([]);
     const [update, setUpdate] = useState(false);
+    const outletContext = useOutletContext() || {};
+    const searchQuery = outletContext.categorySearchQuery || '';
 
     useEffect(() => {
         Promise.all([
@@ -31,10 +33,25 @@ const AllCatagories = () => {
         }).catch((error) => console.log("Error fetching categories/products:", error));
     }, [update]);
 
+    const filteredCategories = useMemo(() => {
+        const normalizedSearch = searchQuery.trim().toLowerCase();
+
+        return allCatagories.filter((category) => {
+            if (!normalizedSearch) return true;
+
+            const productCount = productGroups.filter(
+                (product) => product.categoryName === category?.modelName
+            ).length;
+            const searchableText = `${category?.modelName || ''} ${category?.description || ''} ${productCount}`.toLowerCase();
+
+            return searchableText.includes(normalizedSearch);
+        });
+    }, [allCatagories, productGroups, searchQuery]);
+
     return (
         <section className="space-y-6">
             <div className="space-y-5">
-                {allCatagories.map((catagory) => (
+                {filteredCategories.map((catagory) => (
                     <SingleCatagory 
                         key={catagory._id} 
                         catagory={catagory} 
@@ -44,6 +61,12 @@ const AllCatagories = () => {
                     />
                 ))}
             </div>
+
+            {filteredCategories.length === 0 && (
+                <div className="admin-panel rounded-[30px] p-12 text-center">
+                    <p className="text-xl font-medium text-ink-soft">No categories found.</p>
+                </div>
+            )}
         </section>
     );
 };
