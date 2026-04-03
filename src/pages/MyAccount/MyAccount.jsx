@@ -1,8 +1,8 @@
 import { useContext, useEffect, useState } from "react";
 import { userContext } from "../../utilities/UserContextProvider";
 import { useNavigate } from "react-router-dom";
-import axiosInstance from "../../utilities/axiosInstance";
 import SingleCustomerOrder from "./SingleCustomerOrder";
+import { getFeaturedFallbackOrders, getStoredOrders } from "../../utilities/localStore";
 import "./MyAccount.css"
 
 const MyAccount = () => {
@@ -19,17 +19,16 @@ const MyAccount = () => {
     const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
-        if (!user?.email) return;
+        if (!user?.email) {
+            setIsLoading(false);
+            return;
+        }
+
         setIsLoading(true)
-        axiosInstance.get(`client-orders/${user?.email}`)
-            .then(res => {
-                setOrders(res.data)
-                setIsLoading(false)
-            })
-            .catch(error => {
-                console.log(error)
-                setIsLoading(false)
-            })
+
+        const localOrders = getStoredOrders().filter((order) => order.email === user.email);
+        setOrders(localOrders.length ? localOrders : getFeaturedFallbackOrders(user.email));
+        setIsLoading(false)
     }, [user?.email])
 
 

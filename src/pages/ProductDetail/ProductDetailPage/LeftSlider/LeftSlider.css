@@ -14,11 +14,11 @@
     justify-content: flex-end;
 
     transition: opacity .2s;
+}
 
-    &.hidden {
-        opacity: 0;
-        pointer-events: none;
-    }
+#left-slider.hidden {
+    opacity: 0;
+    pointer-events: none;
 }
 
 #hide-show-toggle {
@@ -29,11 +29,11 @@
     background-color: whitesmoke;
 
     transition: transform .5s;
+}
 
-    &.hidden {
-        position: relative;
-        transform: translateX(100%);
-    }
+#hide-show-toggle.hidden {
+    position: relative;
+    transform: translateX(100%);
 }
 
 .toggle-title {
@@ -47,77 +47,74 @@
     background-color: whitesmoke;
     border-bottom: 1px solid rgb(195, 197, 201);
     border-top-left-radius: 1rem;
+}
 
+.toggle-title h2 {
+    font-size: 1rem;
+    font-weight: 400;
+    width: 100%;
+    text-align: center;
+}
 
-    & h2 {
-        font-size: 1rem;
-        font-weight: 400;
-        width: 100%;
-        text-align: center;
-
-    }
-
-    & button {
-        background-color: transparent;
-    }
+.toggle-title button {
+    background-color: transparent;
 }
 
 .toggle-info {
     padding: 1rem;
     padding-left: 1.5rem;
     font-family: sans-serif;
+}
 
-    & .titleImg {
-        max-width: 250px;
-        margin: auto;
-        display: block;
-        margin-bottom: 2rem;
-    }
+.toggle-info .titleImg {
+    max-width: 250px;
+    margin: auto;
+    display: block;
+    margin-bottom: 2rem;
+}
 
-    & h1 {
-        font-size: 1.5rem;
-        text-align: center;
-        margin-bottom: 1rem;
-        font-weight: 500;
-    }
+.toggle-info h1 {
+    font-size: 1.5rem;
+    text-align: center;
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
 
-    & h2 {
-        font-size: 1.1rem;
-        margin-bottom: 1rem;
-    }
+.toggle-info h2 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
 
-    & h3 {
-        font-size: .85rem;
-        margin-bottom: .7rem;
-        margin-top: 1.5rem;
+.toggle-info h3 {
+    font-size: .85rem;
+    margin-bottom: .7rem;
+    margin-top: 1.5rem;
 
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
 
-    & h4{
-        font-size: .85rem;
-        padding: 1rem 0;
-        color: rgb(107, 106, 106);
-        border-bottom: .5px dotted rgb(107, 106, 106);
+.toggle-info h4{
+    font-size: .85rem;
+    padding: 1rem 0;
+    color: rgb(107, 106, 106);
+    border-bottom: .5px dotted rgb(107, 106, 106);
 
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
 
-    }
+.toggle-info p {
+    font-size: .75rem;
+    font-weight: 200;
+    margin-bottom: 1rem;
+    color: rgb(107, 106, 106);
+}
 
-    & p {
-        font-size: .75rem;
-        font-weight: 200;
-        margin-bottom: 1rem;
-        color: rgb(107, 106, 106);
-    }
-
-    & hr{
-        margin: 2rem 0;
-    }
+.toggle-info hr{
+    margin: 2rem 0;
 }
 
 @media screen and (max-width: 550px) {

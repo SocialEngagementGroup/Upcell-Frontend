@@ -8,7 +8,7 @@ const ModernHero = () => {
                 <div className="flex-[1.2] max-w-[650px] animate-[fadeInUp_0.8s_cubic-bezier(0.16,1,0.3,1)] max-lg:max-w-full max-lg:flex max-lg:flex-col max-lg:items-center">
                     <h1 className="text-[clamp(40px,6vw,72px)] leading-[1.05] font-extrabold text-white mb-7 tracking-[-0.04em]">
                         The Future of <br />
-                        IPhone. Today.
+                        iPhone. Today.
                     </h1>
                     <p className="text-xl leading-relaxed text-[#a1a1a1] mb-12 max-w-[520px] font-normal max-lg:mx-auto">
                         Experience the raw power of the titanium-forged iPhone 15 Pro. 

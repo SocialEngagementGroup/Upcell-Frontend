@@ -9,27 +9,25 @@
 #accountDetails{
     display: flex;
     justify-content: space-between;
+}
 
-    & button{
-        padding: 10px;
-        border: 1px solid;
-        border-radius: 5px;
-        background-color: transparent;
-        color: rgb(194, 51, 51);
-
-    }
+#accountDetails button{
+    padding: 10px;
+    border: 1px solid;
+    border-radius: 5px;
+    background-color: transparent;
+    color: rgb(194, 51, 51);
 }
 
 .orderButtons{
     display: flex;
     justify-content: space-around;
     margin-top: 1rem;
+}
 
-    & button{
-        padding: .5rem;
-        /* border: 1px solid; */
-        border-radius: .5rem;
-    }
+.orderButtons button{
+    padding: .5rem;
+    border-radius: .5rem;
 }
 
 @media screen and (max-width: 550px) {
@@ -38,10 +36,10 @@
         flex-direction: column-reverse;
         max-width: 100vw;
         overflow: hidden;
+    }
 
-        & h2{
-            font-size: 1rem;
-            margin: 1rem;
-        }
+    #accountDetails h2{
+        font-size: 1rem;
+        margin: 1rem;
     }
 }

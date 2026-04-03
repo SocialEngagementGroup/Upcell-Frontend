@@ -5,9 +5,9 @@
     justify-content: center;
     gap: 2rem;
     flex-wrap: wrap;
+}
 
-    & h2{
-        font-size: 1.3rem;
-        margin-bottom: 1.5rem;
-    }
+.offer-products h2{
+    font-size: 1.3rem;
+    margin-bottom: 1.5rem;
 }

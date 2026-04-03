@@ -3,19 +3,19 @@ import { Handshake } from "@mui/icons-material";
 const AboutUs = () => {
     return (
         <div className="bg-white min-h-screen">
-            <section className="bg-surface-alt py-24 text-center rounded-b-6xl mb-20">
+            <header className="bg-surface-alt py-24 text-center rounded-b-[60px] mb-20">
                 <div className="max-w-site mx-auto px-[100px] lg:px-10">
-                    <h1 className="text-5xl font-black mb-4">Tech with a <span className="text-brand-red">Conscience</span></h1>
-                    <p className="text-lg text-apple-gray max-w-[600px] mx-auto">We are a team of technicians and entrepreneurs specializing in sourcing quality electronics at competitive prices, with over 15 years of industry experience.</p>
+                    <h1 className="mb-4">Tech with a <span className="text-brand-red">Conscience</span></h1>
+                    <p className="max-w-[600px] mx-auto text-lg leading-normal">We are a team of technicians and entrepreneurs specializing in sourcing quality electronics at competitive prices, with over 15 years of industry experience.</p>
                 </div>
-            </section>
+            </header>
 
             <section className="py-20">
                 <div className="max-w-site mx-auto px-[100px] lg:px-10">
                     <div className="grid grid-cols-2 gap-20 items-center max-lg:grid-cols-1">
                         <div>
-                            <h2 className="text-4xl font-extrabold mb-6">Our Mission</h2>
-                            <p className="text-base text-apple-gray leading-relaxed">
+                            <h2 className="mb-6">Our Mission</h2>
+                            <p className="text-lg leading-relaxed text-apple-gray">
                                 Welcome to UpCell. We specialize in sourcing quality pre-owned products at competitive prices, aiming to make premium technology accessible to everyone.
                                 We pride ourselves on honesty, quality, and a commitment to longevity. Our products are fairly priced and accurately represented, because we believe in quality over quantity.
                             </p>
@@ -27,10 +27,10 @@ const AboutUs = () => {
                 </div>
             </section>
 
-            <section className="py-20 bg-surface-alt">
-                <div className="max-w-site mx-auto px-[100px] lg:px-10">
+            <section className="py-20 bg-white">
+                <div className="max-w-site mx-auto px-[100px] lg:px-10 border-t border-black/5 pt-20">
                     <div className="text-center mb-16">
-                        <h2 className="text-4xl font-extrabold">Our Core Values</h2>
+                        <h2 className="tracking-tight">Our Core Values</h2>
                     </div>
                     <div className="grid grid-cols-3 gap-8 max-lg:grid-cols-2 max-sm:grid-cols-1">
                         {[
@@ -41,10 +41,10 @@ const AboutUs = () => {
                             { icon: <Handshake />, title: "True Collaboration", desc: "We build positive culture and family spirit. Inclusive environments where all ideas are heard and valued." },
                             { icon: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>, title: "Do Good", desc: "Be kind and take care of your neighbor. Do what is right, do what is good, and find balance in all things." }
                         ].map((v, i) => (
-                            <div key={i} className="bg-white p-10 rounded-3xl shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
-                                <div className="w-12 h-12 bg-surface-alt rounded-xl flex items-center justify-center mb-5">{v.icon}</div>
-                                <h4 className="text-lg font-bold mb-3">{v.title}</h4>
-                                <p className="text-sm text-apple-gray leading-relaxed">{v.desc}</p>
+                            <div key={i} className="bg-surface-alt p-10 rounded-3xl shadow-soft transition-all duration-[400ms] hover:shadow-medium hover:-translate-y-1.5">
+                                <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-5 shadow-sm">{v.icon}</div>
+                                <h4 className="mb-3">{v.title}</h4>
+                                <p className="text-sm leading-relaxed">{v.desc}</p>
                             </div>
                         ))}
                     </div>

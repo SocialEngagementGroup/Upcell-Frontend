@@ -11,20 +11,20 @@
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
+}
 
-    & button{
-        display: block;
-        width: 100%;
-        border: 1px solid black;
-        border-radius: 5px;
-        padding: 5px;
-        color: #259EF6;
-        font-weight: bold;
+.order-summary button{
+    display: block;
+    width: 100%;
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 5px;
+    color: #259EF6;
+    font-weight: bold;
+}
 
-        &:hover{
-            background-color: white;
-        }
-    }
+.order-summary button:hover{
+    background-color: white;
 }
 
 .shippingStatus{
@@ -57,11 +57,10 @@
     
     border-radius: 5px;
     transition: all .5s;
+}
 
-    & div{
-        overflow: hidden;
-        
-    }
+.order-details div{
+    overflow: hidden;
 }
 
 .title{
@@ -87,20 +86,20 @@
     display: flex;
     align-items: flex-start;
     gap: 10px;
+}
 
-    & img {
-        max-width: 60px;
-        object-fit: contain;
-    }
+.product-details img {
+    max-width: 60px;
+    object-fit: contain;
+}
 
-    & div {
-        display: flex;
-        flex-direction: column;
+.product-details div {
+    display: flex;
+    flex-direction: column;
+}
 
-        & h3 {
-            font-size: 1rem;
-        }
-    }
+.product-details div h3 {
+    font-size: 1rem;
 }
 
 .unit{

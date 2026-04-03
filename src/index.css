@@ -1,13 +1,26 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 @layer base {
     body {
         @apply bg-white text-apple-text font-sans m-0 p-0 overflow-x-hidden antialiased;
         box-sizing: border-box;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        @apply text-apple-text font-extrabold tracking-tight;
+    }
+
+    h1 { @apply text-5xl lg:text-6xl; }
+    h2 { @apply text-4xl lg:text-5xl; }
+    h3 { @apply text-2xl lg:text-3xl; }
+    h4 { @apply text-xl lg:text-2xl; }
+
+    p {
+        @apply text-apple-gray leading-relaxed;
     }
 
     a {

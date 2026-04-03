@@ -8,8 +8,8 @@
     align-items: center;
 
     background-color: transparent;
-    & h3{
-        margin: 0;
-    }
 }
 
+.accordion-button h3{
+    margin: 0;
+}

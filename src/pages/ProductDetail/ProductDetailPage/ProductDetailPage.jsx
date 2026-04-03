@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
-import { Link } from 'react-router-dom';
-import axiosInstance from '../../../utilities/axiosInstance';
+import { Link, useNavigate } from 'react-router-dom';
 import ScrollToTop from '../../../utilities/ScrollToTop';
 import { CartContext } from '../../../App';
 import { toast } from 'react-toastify';
@@ -14,6 +13,7 @@ import allDummyProducts, { getProductsByParentId } from '../../../utilities/dumm
 
 const ProductDetailPage = () => {
     const { parentId, productId } = useParams()
+    const navigate = useNavigate()
     const [allProducts, setAllProducts] = useState([])
     const [product, setProduct] = useState()
     const [selectedColor, setSelectedColor] = useState()
@@ -42,20 +42,8 @@ const ProductDetailPage = () => {
     }
 
     useEffect(() => {
-        axiosInstance.get(`/allSameParentProducts/${parentId}`)
-            .then(res => {
-                const products = res.data
-                if (products && products.length > 0) processProductData(products)
-                else {
-                    const fallbackData = getProductsByParentId(parentId)
-                    if (fallbackData.length > 0) processProductData(fallbackData)
-                }
-            })
-            .catch(err => {
-                console.log("API Error, using dummy data:", err)
-                const fallbackData = getProductsByParentId(parentId)
-                if (fallbackData.length > 0) processProductData(fallbackData)
-            })
+        const fallbackData = getProductsByParentId(parentId)
+        if (fallbackData.length > 0) processProductData(fallbackData)
     }, [productId, parentId])
 
     const handleFilterButtonClick = (option, value) => {
@@ -74,16 +62,20 @@ const ProductDetailPage = () => {
         }
     }
 
+    const handleBuyNow = () => {
+        if (product?._id) navigate(`/checkout/${product._id}`)
+    }
+
     return (
         <div className="bg-white text-apple-text pt-10 font-sans">
             <ScrollToTop />
             
             <div className="max-w-site mx-auto px-[100px] lg:px-10">
                 {/* Breadcrumbs */}
-                <nav className="flex items-center gap-2 text-[11px] font-bold text-apple-gray mb-12 tracking-[0.05em]">
-                    <Link to="/" className="text-apple-gray hover:text-apple-text">HOME</Link>
+                <nav className="flex items-center gap-2 text-[11px] font-extrabold text-apple-gray mb-12 tracking-[0.05em] uppercase">
+                    <Link to="/" className="text-apple-gray hover:text-apple-text transition-colors">HOME</Link>
                     <KeyboardArrowRightIcon className="!text-sm" />
-                    <Link to="/shop" className="text-apple-gray hover:text-apple-text">SHOP</Link>
+                    <Link to="/shop" className="text-apple-gray hover:text-apple-text transition-colors">SHOP</Link>
                     <KeyboardArrowRightIcon className="!text-sm" />
                     <span>{product?.productName}</span>
                 </nav>
@@ -104,7 +96,7 @@ const ProductDetailPage = () => {
                     <div className="flex flex-col gap-12 pt-5">
                         <div>
                             <span className="inline-block text-brand-red text-[11px] font-extrabold tracking-[0.12em] mb-3 uppercase">NEW TITANIUM RENDERING</span>
-                            <h1 className="text-[56px] font-extrabold mb-5 tracking-[-0.025em] leading-[1.1] text-apple-text max-lg:text-4xl">{product?.productName}</h1>
+                            <h1 className="mb-5">{product?.productName}</h1>
                             <div className="flex flex-col gap-1">
                                 <span className="text-4xl font-bold tracking-[-0.01em]">${product?.price}</span>
                                 <span className="text-base text-apple-gray font-medium">From $45.79/mo. with 0% APR</span>
@@ -143,13 +135,13 @@ const ProductDetailPage = () => {
 
                         <div className="flex gap-4 mt-3">
                             <div className="flex items-center gap-5 bg-surface-alt px-6 rounded-2xl h-16 text-lg font-bold">
-                                <span className="cursor-pointer text-2xl text-apple-gray select-none hover:text-apple-text">−</span>
+                                <span className="cursor-pointer text-2xl text-apple-gray select-none hover:text-apple-text transition-colors">−</span>
                                 <strong>1</strong>
-                                <span className="cursor-pointer text-2xl text-apple-gray select-none hover:text-apple-text">+</span>
+                                <span className="cursor-pointer text-2xl text-apple-gray select-none hover:text-apple-text transition-colors">+</span>
                             </div>
-                            <button className="flex-1 bg-brand-red text-white h-16 rounded-2xl font-extrabold text-[17px] transition-all duration-300 ease-smooth hover:bg-brand-red-hover hover:scale-[1.02]" onClick={handleAddToCart}>Add to Cart</button>
+                            <button className="flex-1 bg-brand-red !text-white h-16 rounded-2xl font-extrabold text-[17px] transition-all duration-300 ease-smooth hover:bg-brand-red-hover hover:scale-[1.02]" onClick={handleAddToCart}>Add to Cart</button>
                         </div>
-                        <button className="bg-apple-text text-white h-16 rounded-2xl font-extrabold text-[17px] transition-all duration-300 ease-smooth hover:bg-black hover:scale-[1.02] -mt-8">Buy Now</button>
+                        <button className="bg-apple-text text-white h-16 rounded-2xl font-extrabold text-[17px] transition-all duration-300 ease-smooth hover:bg-black hover:scale-[1.02] -mt-8" onClick={handleBuyNow}>Buy Now</button>
 
                         <div className="flex flex-col gap-4 bg-[#FAFAFA] p-6 rounded-[20px] border border-[#F2F2F2]">
                             <div className="flex items-start gap-4 text-[13px] font-medium text-apple-text leading-[1.4]">
@@ -181,7 +173,7 @@ const ProductDetailPage = () => {
                 {/* Highlights Section */}
                 <section className="py-[140px] bg-black -mx-[100px] px-[100px] text-white lg:-mx-10 lg:px-10">
                     <div className="max-w-[1400px] mx-auto">
-                        <h2 className="text-5xl font-extrabold mb-20 text-center text-white">Product Highlights</h2>
+                        <h2 className="mb-20 text-center text-white">Product Highlights</h2>
                         <div className="grid grid-cols-[1.5fr_1fr] gap-10 max-lg:grid-cols-1">
                             <div className="bg-[#1C1C1E] rounded-5xl overflow-hidden p-16 relative border border-white/5 flex flex-col justify-between bg-gradient-to-br from-[#1C1C1E] to-black">
                                 <div className="max-w-[500px]">
@@ -214,7 +206,7 @@ const ProductDetailPage = () => {
 
                 {/* Detailed Specs */}
                 <section className="py-[140px]">
-                    <h2 className="text-5xl font-extrabold mb-20">Detailed Specifications</h2>
+                    <h2 className="mb-20">Detailed Specifications</h2>
                     <div className="grid grid-cols-2 gap-x-[120px] gap-y-20 max-lg:grid-cols-1">
                         {[
                             { label: "DISPLAY", title: '6.1" Super Retina XDR', detail: "ProMotion technology with adaptive refresh rates up to 120Hz." },
@@ -231,23 +223,22 @@ const ProductDetailPage = () => {
                     </div>
                 </section>
 
-                {/* You Might Also Like */}
-                <section className="py-[140px] bg-surface -mx-[100px] px-[100px] lg:-mx-10 lg:px-10">
+                <section className="py-[140px] bg-surface-alt -mx-[100px] px-[100px] lg:-mx-10 lg:px-10">
                     <div className="max-w-site mx-auto">
-                        <h2 className="text-5xl font-extrabold mb-20">You might also like</h2>
+                        <h2 className="mb-20">You might also like</h2>
                         <div className="grid grid-cols-3 gap-10 max-lg:grid-cols-1">
                             {[
-                                { name: "iPhone 15 Pro Max", price: "$1,199", desc: "Large display, even extra optical zoom.", img: "https://via.placeholder.com/300x300?text=iPhone+15+Pro+Max" },
-                                { name: "iPhone 14 Pro", price: "$999", desc: "Dynamic Island. Exceptional performance at a lower price.", img: "https://via.placeholder.com/300x300?text=iPhone+14+Pro" },
-                                { name: "iPhone 15", price: "$799", desc: "Colorful, durable, breakthrough camera.", img: "https://via.placeholder.com/300x300?text=iPhone+15" }
+                                { name: "iPhone 15 Pro Max", price: "$1,199", desc: "Large display, even extra optical zoom.", img: "/staticImages/hero-iphone15.png" },
+                                { name: "iPhone 14 Pro", price: "$999", desc: "Dynamic Island. Exceptional performance at a lower price.", img: "/staticImages/hero-iphone15.png" },
+                                { name: "iPhone 15", price: "$799", desc: "Colorful, durable, breakthrough camera.", img: "/staticImages/hero-iphone15.png" }
                             ].map((item, i) => (
-                                <div key={i} className="bg-white rounded-4xl p-12 flex flex-col transition-all duration-[400ms] ease-bounce-out shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:-translate-y-2.5 hover:shadow-[0_30px_60px_rgba(0,0,0,0.08)]">
+                                <div key={i} className="bg-white rounded-3xl p-12 flex flex-col transition-all duration-[400ms] ease-bounce-out shadow-soft hover:-translate-y-2.5 hover:shadow-medium">
                                     <div className="h-[300px] flex justify-center items-center mb-8"><img src={item.img} alt={item.name} className="max-h-full object-contain" /></div>
-                                    <h3 className="text-2xl font-extrabold mb-3">{item.name}</h3>
-                                    <p className="text-[15px] text-apple-gray leading-relaxed mb-8">{item.desc}</p>
+                                    <h3 className="mb-3">{item.name}</h3>
+                                    <p className="text-[15px] leading-relaxed mb-8">{item.desc}</p>
                                     <div className="mt-auto flex justify-between items-baseline">
                                         <span className="text-base">From <strong>{item.price}</strong></span>
-                                        <Link to="/shop" className="text-brand-red font-bold text-sm no-underline">View Detail</Link>
+                                        <Link to="/shop" className="text-brand-red font-bold text-sm no-underline hover:opacity-70 transition-opacity">View Detail</Link>
                                     </div>
                                 </div>
                             ))}
@@ -259,11 +250,11 @@ const ProductDetailPage = () => {
             <section className="bg-surface-alt py-[140px] rounded-6xl mx-10 mb-[120px]">
                 <div className="max-w-site mx-auto px-[100px] lg:px-10">
                     <div className="text-center">
-                        <h2 className="text-[64px] font-extrabold tracking-[-0.04em] mb-4">Stay ahead of the curve.</h2>
-                        <p className="text-apple-gray mb-10">Get early access to exclusive drops and cinematic hardware insights.</p>
-                        <div className="flex justify-center gap-3">
-                            <input type="email" placeholder="Enter your email" className="h-[72px] bg-white border border-border-light rounded-xl px-8 w-[400px] text-base outline-none" />
-                            <button className="h-[72px] bg-apple-text text-white px-12 rounded-xl font-bold">Join UpCell</button>
+                        <h2 className="text-[clamp(40px,5vw,64px)] mb-4">Stay ahead of the curve.</h2>
+                        <p className="max-w-[500px] mx-auto text-lg mb-10">Get early access to exclusive drops and cinematic hardware insights.</p>
+                        <div className="flex justify-center gap-3 max-md:flex-col items-center">
+                            <input type="email" placeholder="Enter your email" className="h-[72px] bg-white border border-black/10 rounded-xl px-8 w-full max-w-[400px] text-base outline-none focus:border-brand-red transition-colors" />
+                            <button className="h-[72px] bg-apple-text text-white px-12 rounded-xl font-bold min-w-[200px] hover:bg-black transition-colors">Join UpCell</button>
                         </div>
                     </div>
                 </div>

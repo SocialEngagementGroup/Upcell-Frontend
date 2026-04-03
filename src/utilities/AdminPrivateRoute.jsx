@@ -12,10 +12,12 @@ const AdminPrivateRoute = ({ children }) => {
     }
 
     if(user){
-        // console.log("user in adminPrivate: ", user)
-        const admins = import.meta.env.VITE_ADMINS.split(",")
+        const admins = (import.meta.env.VITE_ADMINS || "")
+            .split(",")
+            .map((email) => email.trim())
+            .filter(Boolean)
 
-        if(admins.includes(user?.email)){
+        if(user?.isAdmin || admins.includes(user?.email)){
 
             return <>{children}</>
         }

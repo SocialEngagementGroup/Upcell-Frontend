@@ -1,15 +1,15 @@
 const ReturnPolicy = () => {
     return (
         <div className="bg-white min-h-screen">
-            <section className="bg-surface-alt py-24 text-center rounded-b-6xl mb-20">
+            <header className="bg-surface-alt py-24 text-center rounded-b-[60px] mb-20">
                 <div className="max-w-site mx-auto px-[100px] lg:px-10">
-                    <h1 className="text-5xl font-black mb-4">Returns & Refund Policy</h1>
+                    <h1 className="mb-4">Returns & Refund Policy</h1>
                     <p className="text-lg text-apple-gray">Hassle-free 30-day return window</p>
                 </div>
-            </section>
+            </header>
 
             <main className="max-w-site mx-auto px-[100px] lg:px-10 pb-24">
-                <article className="max-w-[800px] mx-auto [&_p]:text-base [&_p]:text-apple-gray [&_p]:leading-relaxed [&_p]:mb-4 [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:mb-6 [&_ol]:text-apple-gray [&_ol_li]:mb-4 [&_ol_li]:leading-relaxed [&_ul]:list-disc [&_ul]:pl-6 [&_ul_li]:mb-2 [&_ul_li]:text-apple-gray">
+                <article className="max-w-[800px] mx-auto [&_p]:text-apple-gray [&_p]:leading-relaxed [&_p]:mb-4 [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:mb-6 [&_ol]:text-apple-gray [&_ol_li]:mb-4 [&_ol_li]:leading-relaxed [&_ul]:list-disc [&_ul]:pl-6 [&_ul_li]:mb-2 [&_ul_li]:text-apple-gray">
                     <p>At UpCell, we believe in that good ol' saying: when life gives you lemons (or buyer's remorse), get a return or a refund.</p>
                     <p className="!font-bold !text-apple-text !text-lg">30 days to change your mind</p>
                     <p>Once you receive your order you have 30 days to return the item to your seller. All you have to do is reach out.</p>

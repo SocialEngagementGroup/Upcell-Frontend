@@ -1,9 +1,15 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { CartContext } from '../../App';
-import axiosInstance from '../../utilities/axiosInstance';
 import ScrollToTop from '../../utilities/ScrollToTop';
 import './Checkout.css';
+import { createLocalOrder, getLocalCartProducts } from '../../utilities/localStore';
+import visa from '../../assets/visa.svg';
+import mastercard from '../../assets/master.svg';
+import americanExpress from '../../assets/americanExpress.svg';
+import discover from '../../assets/discover.svg';
+import paypal from '../../assets/paypal.svg';
+import applePay from '../../assets/applePay.svg';
 
 // Material Icons
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
@@ -21,9 +27,7 @@ const Checkout = () => {
     useEffect(() => {
         const productIds = params.id === "cart" ? cart : [params.id];
         if (productIds.length > 0) {
-            axiosInstance.post("cart", { ids: productIds })
-                .then(res => setProducts(res.data))
-                .catch(err => console.log(err));
+            setProducts(getLocalCartProducts(productIds));
         }
     }, [params.id, cart]);
 
@@ -56,21 +60,24 @@ const Checkout = () => {
             shipping: shipping,
         };
 
-        const endpoint = paymentMethod === "stripe" ? "checkout-stripe" : "checkout-customer";
-
-        axiosInstance.post(endpoint, data)
-            .then(res => {
-                if (paymentMethod === "stripe" && res.data.url) {
-                    window.location = res.data.url;
-                } else {
-                    window.location = res.data;
-                }
-            })
-            .catch(error => {
-                console.log(error);
-                setIsLoading(false);
-                alert("Something went wrong. Please check your information and try again.");
+        try {
+            const order = createLocalOrder({
+                customer: data,
+                productIds: data.orders,
+                shipping,
+                paymentMethod,
             });
+
+            if (params.id === "cart") {
+                localStorage.setItem("cart", JSON.stringify([]));
+            }
+
+            window.location = `/succeed?order_id=${order._id}`;
+        } catch (error) {
+            console.log(error);
+            setIsLoading(false);
+            alert("Something went wrong. Please check your information and try again.");
+        }
     };
 
     return (
@@ -204,7 +211,11 @@ const Checkout = () => {
                         </div>
 
                         <div className="payment-icons">
-                            <img src="/staticImages/payment-icons.png" alt="Accepted Payments" style={{width: '100%', marginTop: '32px'}} />
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginTop: '32px' }}>
+                                {[visa, mastercard, americanExpress, discover, paypal, applePay].map((icon, index) => (
+                                    <img key={index} src={icon} alt="Accepted payment method" style={{ width: '100%', height: '36px', objectFit: 'contain' }} />
+                                ))}
+                            </div>
                         </div>
                     </aside>
                 </div>

@@ -1,16 +1,16 @@
 const PrivacyPolicy = () => {
     return (
         <div className="bg-white min-h-screen">
-            <section className="bg-surface-alt py-24 text-center rounded-b-6xl mb-20">
+            <header className="bg-surface-alt py-24 text-center rounded-b-[60px] mb-20">
                 <div className="max-w-site mx-auto px-[100px] lg:px-10">
-                    <h1 className="text-5xl font-black mb-4">Privacy Policy</h1>
+                    <h1 className="mb-4">Privacy Policy</h1>
                     <p className="text-lg text-apple-gray">Last updated: March 2024</p>
                 </div>
-            </section>
+            </header>
 
             <main className="max-w-site mx-auto px-[100px] lg:px-10 pb-24">
-                <article className="max-w-[800px] mx-auto [&_h2]:text-2xl [&_h2]:font-extrabold [&_h2]:mt-12 [&_h2]:mb-4 [&_p]:text-base [&_p]:text-apple-gray [&_p]:leading-relaxed [&_p]:mb-4">
-                    <h2>INTRODUCTION</h2>
+                <article className="max-w-[800px] mx-auto [&_h2]:mt-12 [&_h2]:mb-4 [&_p]:text-apple-gray [&_p]:leading-relaxed [&_p]:mb-4">
+                    <h2 className="text-sm font-extrabold tracking-widest text-apple-text">INTRODUCTION</h2>
                     <p>UpCell, LLC ("UpCell," "us" or "we") is committed to protecting the privacy of our customers and end users. This Privacy and Cookie Policy ("Policy") explains how we collect, share and use personal information collected through our corporate websites and any related UpCell application, marketplace service or tool (collectively, the "Services").</p>
 
                     <h2>ABOUT US</h2>

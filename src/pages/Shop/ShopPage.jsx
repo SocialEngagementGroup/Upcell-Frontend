@@ -89,7 +89,7 @@ const ShopPage = () => {
                         <KeyboardArrowRightIcon className="!text-sm" />
                         <span>SHOP</span>
                     </nav>
-                    <h1 className="text-[56px] font-extrabold mb-12 tracking-[-0.03em] text-black">Shop</h1>
+                    <h1 className="mb-12">Shop</h1>
                     
                     <div className="flex gap-10 border-b border-surface-alt">
                         {categories.map(cat => (
@@ -110,7 +110,7 @@ const ShopPage = () => {
                             <h4 className="text-xs font-extrabold text-apple-text mb-6 tracking-[0.1em] uppercase">MODEL</h4>
                             <div className="flex flex-col gap-4">
                                 {["iPhone 15 Series", "iPhone 14 Series", "iPad Pro M2", "MacBook Pro M3"].map(model => (
-                                    <label key={model} className="flex items-center gap-3 text-[15px] font-medium text-zinc-text cursor-pointer hover:text-black">
+                                    <label key={model} className="flex items-center gap-3 text-[15px] font-medium text-apple-gray cursor-pointer hover:text-apple-text transition-colors">
                                         <input 
                                             type="checkbox" 
                                             className="w-5 h-5 accent-brand-red cursor-pointer"
@@ -128,7 +128,7 @@ const ShopPage = () => {
                                 {["128GB", "256GB", "512GB", "1TB"].map(size => (
                                     <button 
                                         key={size}
-                                        className={`py-4 border rounded-xl text-sm font-bold transition-all duration-200 ease-smooth cursor-pointer ${selectedStorages.includes(size) ? 'bg-apple-text text-white border-apple-text' : 'bg-white text-apple-text border-border-light hover:border-apple-gray'}`}
+                                        className={`py-4 border rounded-xl text-sm font-bold transition-all duration-200 ease-smooth cursor-pointer ${selectedStorages.includes(size) ? 'bg-apple-text text-white border-apple-text' : 'bg-white text-apple-text border-black/10 hover:border-apple-gray'}`}
                                         onClick={() => toggleFilter(selectedStorages, setSelectedStorages, size)}
                                     >
                                         {size}
@@ -176,16 +176,16 @@ const ShopPage = () => {
                                 <Link 
                                     to={`/iphone/${product.parentId}/${product.productId}`} 
                                     key={product.id} 
-                                    className="block no-underline text-inherit bg-white p-8 rounded-4xl transition-all duration-[400ms] ease-bounce-out shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:-translate-y-2 hover:shadow-[0_30px_60px_rgba(0,0,0,0.08)]"
+                                    className="group block no-underline text-inherit bg-white p-8 rounded-4xl transition-all duration-[400ms] ease-bounce-out shadow-soft hover:-translate-y-2 hover:shadow-medium"
                                 >
-                                    <div className="bg-surface rounded-[20px] h-[360px] flex justify-center items-center mb-8 relative overflow-hidden">
+                                    <div className="bg-surface-alt rounded-[20px] h-[360px] flex justify-center items-center mb-8 relative overflow-hidden">
                                         {product.badge && <span className={`absolute top-6 right-6 text-[10px] font-extrabold px-3 py-1.5 rounded-md z-[2] tracking-[0.05em] uppercase ${product.badge.includes('SAVE') ? 'bg-brand-red text-white' : 'bg-apple-text text-white'}`}>{product.badge}</span>}
                                         <img src={product.image} alt={product.name} className="h-3/4 w-auto object-contain drop-shadow-[0_15px_30px_rgba(0,0,0,0.05)] transition-transform duration-[400ms] ease-smooth group-hover:scale-105" />
                                     </div>
                                     <div className="flex flex-col">
                                         <span className="text-xs font-bold text-apple-gray mb-3 tracking-[0.05em] uppercase">{product.category}</span>
-                                        <h3 className="text-2xl font-extrabold text-apple-text mb-2 tracking-[-0.02em] leading-[1.2]">{product.name}</h3>
-                                        <p className="text-base text-apple-gray mb-6 font-medium">Starting from <strong className="text-apple-text font-bold text-lg">{product.price}</strong></p>
+                                        <h3 className="mb-2 leading-[1.2]">{product.name}</h3>
+                                        <p className="text-base text-apple-gray mb-6 font-medium leading-normal">Starting from <strong className="text-apple-text font-bold text-lg">{product.price}</strong></p>
                                         <button className="w-full bg-brand-red text-white py-5 rounded-[14px] text-sm font-extrabold tracking-[0.05em] transition-all duration-300 hover:bg-brand-red-hover" onClick={(e) => handleAddToCart(e, product.productId)}>ADD TO CART</button>
                                     </div>
                                 </Link>
@@ -212,11 +212,11 @@ const ShopPage = () => {
                     <div className="bg-white rounded-6xl p-[100px] flex justify-between items-center gap-20 shadow-[0_40px_100px_rgba(0,0,0,0.05)] max-lg:flex-col max-lg:p-10">
                         <div className="flex-[1.2]">
                             <span className="text-[11px] font-extrabold text-brand-red block mb-6 tracking-[0.05em]">EXCLUSIVE TRADE-IN PROGRAM</span>
-                            <h2 className="text-[64px] font-extrabold leading-[1.1] mb-6 text-apple-text tracking-[-0.04em] max-lg:text-4xl">Save up to $800 <br />on trade-ins.</h2>
+                            <h2 className="text-[64px] leading-[1.1] mb-6 tracking-[-0.04em] max-lg:text-4xl">Save up to $800 <br />on trade-ins.</h2>
                             <p className="text-lg leading-relaxed text-apple-gray mb-10 max-w-[500px]">Upgrade to the latest iPhone 15 Pro and get credit for your current device. Fast, simple, and cinematic.</p>
                             <div className="flex gap-4">
-                                <button className="bg-brand-red text-white h-16 px-10 rounded-2xl text-base font-bold">GET YOUR QUOTE</button>
-                                <button className="border-2 border-apple-text h-16 px-10 rounded-2xl text-base font-bold bg-transparent">LEARN MORE</button>
+                                <button className="bg-brand-red text-white h-16 px-10 rounded-2xl text-base font-bold transition-all duration-300 hover:bg-brand-red-hover">GET YOUR QUOTE</button>
+                                <button className="border-2 border-apple-text h-16 px-10 rounded-2xl text-base font-bold bg-transparent transition-all duration-300 hover:bg-apple-text hover:text-white">LEARN MORE</button>
                             </div>
                         </div>
                         <div className="flex-1">

@@ -1,31 +1,87 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { userContext } from '../../../utilities/UserContextProvider';
 
 const LoginAndSignup = () => {
     const navigate = useNavigate()
     const location = useLocation()
+    const { signIn, signUp } = useContext(userContext)
     const [signin, setSignin] = useState(true)
     const [errorMessage, setErrorMessage] = useState("")
 
-    const handleSigninUp = () => {
-        const admin = location.search
-        if (admin) navigate("/admin-secret")
-        else navigate("/myaccount")
-    }
+    const isAdminLogin = location.search.includes("admin=true");
+
+    const completeAuth = async ({ email, name }) => {
+        const payload = {
+            email,
+            name,
+            isAdmin: isAdminLogin,
+        };
+
+        if (signin) await signIn(payload);
+        else await signUp(payload);
+
+        navigate(isAdminLogin ? "/admin-secret" : "/myaccount");
+    };
 
     const settingSingin = () => { setSignin(true); setErrorMessage(""); }
     const settingSingup = () => { setSignin(false); setErrorMessage(""); }
 
-    const handleGoogleSignin = () => alert("Authentication logic has been removed. Please implement your new auth provider.");
-    const handleSinginWithEmail = (e) => { e.preventDefault(); alert("Authentication logic has been removed. Please implement your new auth provider."); }
-    const handleSingupWithEmail = (e) => { e.preventDefault(); alert("Authentication logic has been removed. Please implement your new auth provider."); }
+    const handleGoogleSignin = async () => {
+        await completeAuth({
+            email: isAdminLogin ? "admin@upcell.local" : "shopper@upcell.local",
+            name: isAdminLogin ? "Local Admin" : "Local Shopper",
+        });
+    };
+
+    const handleSinginWithEmail = async (e) => {
+        e.preventDefault();
+        setErrorMessage("");
+
+        const email = e.target.email.value.trim();
+        const password = e.target.password.value.trim();
+
+        if (!email || !password) {
+            setErrorMessage("Email and password are required.");
+            return;
+        }
+
+        await completeAuth({ email });
+    };
+
+    const handleSingupWithEmail = async (e) => {
+        e.preventDefault();
+        setErrorMessage("");
+
+        const email = e.target.email.value.trim();
+        const password = e.target.password.value.trim();
+        const rePassword = e.target.rePassword.value.trim();
+
+        if (password.length < 8) {
+            setErrorMessage("Password must be at least 8 characters.");
+            return;
+        }
+
+        if (password !== rePassword) {
+            setErrorMessage("Passwords do not match.");
+            return;
+        }
+
+        await completeAuth({ email });
+    };
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-surface-alt py-20 px-5">
             <div className="w-full max-w-[480px] bg-white rounded-4xl p-12 shadow-[0_20px_60px_rgba(0,0,0,0.06)]">
                 <header className="text-center mb-10">
                     <h1 className="text-3xl font-extrabold mb-2">{signin ? "Welcome Back" : "Join UpCell"}</h1>
-                    <p className="text-apple-gray text-base">{signin ? "Sign in to manage your orders" : "Create an account to start shopping"}</p>
+                    <p className="text-apple-gray text-base">
+                        {isAdminLogin
+                            ? "Use a local admin session to manage the store on this machine."
+                            : signin
+                                ? "Sign in to manage your orders"
+                                : "Create an account to start shopping"}
+                    </p>
                 </header>
 
                 {errorMessage && (

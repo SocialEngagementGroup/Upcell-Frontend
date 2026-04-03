@@ -1,21 +1,45 @@
 import { createContext, useEffect, useState } from "react";
+import { getStoredUser, setStoredUser } from "./localStore";
 
 export const userContext = createContext()
 
 const UserContextProvider = ({ children }) => {
-    // Firebase Auth has been removed. 
-    // Re-implement your new authentication provider here.
     const [user, setUser] = useState(null)
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(true)
 
-    const logOut = () => {
-        setUser(null)
-    }
+    useEffect(() => {
+        setUser(getStoredUser());
+        setLoading(false);
+    }, []);
+
+    const persistUser = (nextUser) => {
+        setUser(nextUser);
+        setStoredUser(nextUser);
+        return nextUser;
+    };
+
+    const signIn = async ({ email, name, isAdmin = false }) => {
+        const nextUser = {
+            email,
+            displayName: name || email.split("@")[0],
+            isAdmin,
+        };
+
+        return persistUser(nextUser);
+    };
+
+    const signUp = async ({ email, name, isAdmin = false }) => signIn({ email, name, isAdmin });
+
+    const logOut = async () => {
+        persistUser(null);
+    };
 
     const credencials = {
         user,
         loading,
-        logOut
+        logOut,
+        signIn,
+        signUp,
     }
 
     return (

@@ -10,20 +10,20 @@
     display: flex;
     align-items: flex-start;
     gap: 10px;
+}
 
-    & img {
-        max-width: 60px;
-        object-fit: contain;
-    }
+.product-details img {
+    max-width: 60px;
+    object-fit: contain;
+}
 
-    & div {
-        display: flex;
-        flex-direction: column;
+.product-details div {
+    display: flex;
+    flex-direction: column;
+}
 
-        & h3 {
-            font-size: 1rem;
-        }
-    }
+.product-details div h3 {
+    font-size: 1rem;
 }
 
 .unit{

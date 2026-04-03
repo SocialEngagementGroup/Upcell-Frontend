@@ -20,7 +20,7 @@ const HeaderComponent = () => {
   }
 
   return (
-    <header className="fixed top-0 left-0 w-full h-20 bg-white/[0.98] backdrop-blur-[20px] border-b border-black/5 shadow-[0_4px_30px_rgba(0,0,0,0.05)] z-[1000] transition-all duration-300 ease-smooth">
+    <header className="fixed top-0 left-0 w-full h-20 bg-white border-b border-black/5 shadow-[0_4px_30px_rgba(0,0,0,0.05)] z-[1000] transition-all duration-300 ease-smooth">
       <div className='h-full flex justify-between items-center max-w-site mx-auto px-[100px] lg:px-10'>
         {/* Left Side (Brand) */}
         <div className='header-left'>
@@ -30,33 +30,43 @@ const HeaderComponent = () => {
         </div>
 
         {/* Center (Primary Navigation) */}
-        <nav className={`${navOn ? 'mobile-visible' : ''}`} ref={navEle}>
-          <div className='flex gap-8 items-center'>
+        <nav 
+          className={`fixed top-20 left-0 w-full bg-white border-b border-black/5 px-10 py-8 flex-col gap-6 shadow-xl transition-all duration-300 ease-smooth z-[999] lg:static lg:flex lg:flex-row lg:h-full lg:w-auto lg:p-0 lg:bg-transparent lg:border-none lg:shadow-none lg:opacity-100 lg:visible ${navOn ? 'flex opacity-100 visible' : 'hidden lg:flex'}`}
+          ref={navEle}
+        >
+          <div className='flex flex-col gap-6 lg:flex-row lg:gap-8 lg:items-center lg:h-full'>
             {/* Shop Dropdown */}
-            <div className='group relative py-5 text-[13px] font-bold text-apple-text cursor-pointer flex items-center gap-1'>
-              <span className='flex items-center gap-1'>Shop <KeyboardArrowDownIcon className='!text-sm opacity-50' /></span>
-              <div className='absolute top-full left-1/2 -translate-x-1/2 translate-y-[10px] bg-white border border-black/5 rounded-xl w-[200px] p-4 flex flex-col gap-3 shadow-[0_10px_40px_rgba(0,0,0,0.1)] opacity-0 invisible transition-all duration-300 ease-smooth group-hover:opacity-100 group-hover:visible group-hover:translate-y-0'>
-                <Link to="/shop?category=iPhone" onClick={() => setNavOn(false)} className='text-sm font-medium text-apple-text px-3 py-2 rounded-md hover:bg-black/[0.03]'>iPhone</Link>
-                <Link to="/shop?category=iPad" onClick={() => setNavOn(false)} className='text-sm font-medium text-apple-text px-3 py-2 rounded-md hover:bg-black/[0.03]'>iPad</Link>
-                <Link to="/shop?category=MacBook" onClick={() => setNavOn(false)} className='text-sm font-medium text-apple-text px-3 py-2 rounded-md hover:bg-black/[0.03]'>MacBook</Link>
-                <hr className='border-0 border-t border-black/5 my-1' />
+            <div className='group relative flex flex-col items-start lg:h-full lg:flex-row lg:items-center cursor-pointer'>
+              <span className='flex items-center gap-1 py-2 text-[13px] font-bold text-apple-text hover:text-brand-red transition-colors'>Shop <KeyboardArrowDownIcon className='!text-sm opacity-50' /></span>
+              
+              {/* Dropdown Menu */}
+              <div className='flex flex-col gap-3 pl-4 mt-2 lg:absolute lg:top-full lg:left-1/2 lg:-translate-x-1/2 lg:translate-y-[10px] lg:bg-white lg:border lg:border-black/5 lg:rounded-xl lg:w-[200px] lg:p-4 lg:shadow-[0_10px_40px_rgba(0,0,0,0.1)] lg:opacity-0 lg:invisible lg:transition-all lg:duration-300 lg:ease-smooth lg:group-hover:opacity-100 lg:group-hover:visible lg:group-hover:translate-y-0 lg:mt-0 lg:pl-0'>
+                <Link to="/shop?category=iPhone" onClick={() => setNavOn(false)} className='text-sm font-medium text-apple-text px-3 py-2 rounded-md hover:bg-black/[0.03] transition-colors'>iPhone</Link>
+                <Link to="/shop?category=iPad" onClick={() => setNavOn(false)} className='text-sm font-medium text-apple-text px-3 py-2 rounded-md hover:bg-black/[0.03] transition-colors'>iPad</Link>
+                <Link to="/shop?category=MacBook" onClick={() => setNavOn(false)} className='text-sm font-medium text-apple-text px-3 py-2 rounded-md hover:bg-black/[0.03] transition-colors'>MacBook</Link>
+                <hr className='hidden lg:block border-0 border-t border-black/5 my-1' />
                 <Link to="/shop" className='text-sm !font-bold text-apple-text px-3 py-2 rounded-md hover:bg-black/[0.03]' onClick={() => setNavOn(false)}>Shop All</Link>
               </div>
             </div>
 
-            {/* Sell Device - High Vis */}
-            <Link to="/sell-device" className='text-[13px] font-bold text-apple-text flex items-center gap-1' onClick={() => setNavOn(false)}>
-              Sell Device <span className='bg-brand-red text-white text-[9px] font-black px-1.5 py-0.5 rounded uppercase'>Get Paid</span>
+            {/* Sell Device - Reordered (Original Look) */}
+            <Link 
+              to="/sell-device" 
+              className='flex items-center gap-1 py-2 text-[13px] font-bold text-apple-text lg:h-full transition-colors hover:text-brand-red' 
+              onClick={() => setNavOn(false)}
+            >
+              Sell Device
+              <span className='bg-brand-red text-white text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter'>Get Paid</span>
             </Link>
 
-            {/* New links */}
-            <NavLink to="/about-us" className='text-[13px] font-bold text-apple-text flex items-center gap-1' onClick={() => setNavOn(false)}>About us</NavLink>
-            <NavLink to="/resources" className='text-[13px] font-bold text-apple-text flex items-center gap-1' onClick={() => setNavOn(false)}>Blogs</NavLink>
+            {/* Other links */}
+            <NavLink to="/about-us" className='flex items-center py-2 text-[13px] font-bold text-apple-text hover:text-brand-red transition-colors lg:h-full' onClick={() => setNavOn(false)}>About us</NavLink>
+            <NavLink to="/resources" className='flex items-center py-2 text-[13px] font-bold text-apple-text hover:text-brand-red transition-colors lg:h-full' onClick={() => setNavOn(false)}>Blogs</NavLink>
 
             {/* Support Dropdown */}
-            <div className='group relative py-5 text-[13px] font-bold text-apple-text cursor-pointer flex items-center gap-1'>
-              <span className='flex items-center gap-1'>Support <KeyboardArrowDownIcon className='!text-sm opacity-50' /></span>
-              <div className='absolute top-full left-1/2 -translate-x-1/2 translate-y-[10px] bg-white border border-black/5 rounded-xl w-[200px] p-4 flex flex-col gap-3 shadow-[0_10px_40px_rgba(0,0,0,0.1)] opacity-0 invisible transition-all duration-300 ease-smooth group-hover:opacity-100 group-hover:visible group-hover:translate-y-0'>
+            <div className='group relative flex flex-col items-start lg:h-full lg:flex-row lg:items-center cursor-pointer'>
+              <span className='flex items-center gap-1 py-2 text-[13px] font-bold text-apple-text hover:text-brand-red transition-colors'>Support <KeyboardArrowDownIcon className='!text-sm opacity-50' /></span>
+              <div className='flex flex-col gap-3 pl-4 mt-2 lg:absolute lg:top-full lg:left-1/2 lg:-translate-x-1/2 lg:translate-y-[10px] lg:bg-white lg:border lg:border-black/5 lg:rounded-xl lg:w-[200px] lg:p-4 lg:shadow-[0_10px_40px_rgba(0,0,0,0.1)] lg:opacity-0 lg:invisible lg:transition-all lg:duration-300 lg:ease-smooth lg:group-hover:opacity-100 lg:group-hover:visible lg:group-hover:translate-y-0 lg:mt-0 lg:pl-0'>
                 <Link to="/contactus" onClick={() => setNavOn(false)} className='text-sm font-medium text-apple-text px-3 py-2 rounded-md hover:bg-black/[0.03]'>Contact Us</Link>
                 <Link to="/resources" onClick={() => setNavOn(false)} className='text-sm font-medium text-apple-text px-3 py-2 rounded-md hover:bg-black/[0.03]'>FAQs</Link>
                 <Link to="/return-policy" onClick={() => setNavOn(false)} className='text-sm font-medium text-apple-text px-3 py-2 rounded-md hover:bg-black/[0.03]'>Warranty & Returns</Link>
@@ -76,7 +86,7 @@ const HeaderComponent = () => {
             {cart?.length > 0 && <span className='absolute -top-0.5 -right-0.5 w-2 h-2 bg-brand-red rounded-full border-2 border-white'></span>}
           </Link>
 
-          <button className='hidden lg:block bg-transparent border-none cursor-pointer' onClick={handleNav}>
+          <button className='block lg:hidden bg-transparent border-none cursor-pointer ml-4' onClick={handleNav}>
             {navOn ? <CloseIcon /> : <MenuIcon />}
           </button>
         </div>
