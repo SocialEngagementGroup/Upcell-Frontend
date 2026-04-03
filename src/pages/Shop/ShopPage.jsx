@@ -325,27 +325,17 @@ const ShopPage = () => {
 
                         <div className="mt-8">
                             <div className="text-xs font-bold uppercase tracking-[0.2em] text-apple-gray">Category</div>
-                            <div className="mt-4 flex flex-col gap-2.5">
+                            <div className="mt-4 flex flex-col gap-3">
                                 {availableCategories.map((category) => (
-                                    <button
-                                        key={category}
-                                        type="button"
-                                        onClick={() => toggleValue(category, selectedModels, setSelectedModels)}
-                                        className={`flex items-center justify-between rounded-[20px] border px-4 py-3 text-left text-sm font-semibold transition-all ${
-                                            selectedModels.includes(category)
-                                                ? 'border-apple-text bg-apple-text text-white shadow-[0_14px_28px_rgba(29,29,31,0.18)]'
-                                                : 'border-black/[0.06] bg-white text-apple-text hover:border-black/12 hover:bg-surface-alt'
-                                        }`}
-                                    >
+                                    <label key={category} className="flex items-center gap-3 text-sm text-ink-soft">
+                                        <input
+                                            type="checkbox"
+                                            className="h-4 w-4 rounded-[4px] border border-black/20 accent-apple-text"
+                                            checked={selectedModels.includes(category)}
+                                            onChange={() => toggleValue(category, selectedModels, setSelectedModels)}
+                                        />
                                         <span>{category}</span>
-                                        <span className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] ${
-                                            selectedModels.includes(category)
-                                                ? 'bg-white/15 text-white'
-                                                : 'bg-surface-alt text-apple-gray'
-                                        }`}>
-                                            {selectedModels.includes(category) ? 'On' : 'Add'}
-                                        </span>
-                                    </button>
+                                    </label>
                                 ))}
                             </div>
                         </div>
