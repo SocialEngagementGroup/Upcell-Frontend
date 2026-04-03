@@ -1,127 +1,75 @@
-import React, { useState } from 'react'
-import { styled } from 'styled-components'
-
-import axiosInstance from "../../../../utilities/axiosInstance"
-import ImagesForCatagory from './ImagesForCatagory'
-
-const StyeldDiv = styled.div`
-  border-bottom: 1px solid black;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  padding: 1rem;
-  max-width: 700px;
-  margin: auto;
-
-  span button{
-    background: black;
-    color: white;
-    padding: 5px;
-    border-radius: 5px;
-    margin: 5px;
-  }
-
-  div{
-    grid-column: 1/ span 2;
-  }
-
-`
-
-const StyledForm = styled.form`
-  width: 100%;
-  grid-column: span 2;
-  margin:3rem 0;
-  display: block;
-
-  input{
-    border: 1px solid;
-    border-radius: 5px;
-    padding: 5px;
-    padding-left: 1rem;
-    margin-right: 1rem;
-  }
-
-  button {
-    background: black;
-    color: white;
-    padding: 5px;
-  }
-`
-
-const StyledBtn = styled.button`
-  color: black;
-  background: #7CFFBB;
-  padding: 5px;
-  border-radius: 5px;
-  display: block;
-`
+import React, { useState } from 'react';
+import axiosInstance from "../../../../utilities/axiosInstance";
+import ImagesForCatagory from './ImagesForCatagory';
 
 const SingleCatagory = ({ catagory, setUpdate }) => {
-  const [editClicked, setEditClicked] = useState(false)
-  const [porgressPercent, setProgressPercent] = useState(0)
-  const [images, setImages] = useState(catagory.images || [])
+    const [editClicked, setEditClicked] = useState(false);
+    const [images, setImages] = useState(catagory.images || []);
+    const [imageUrl, setImageUrl] = useState("");
 
+    const handleAddImage = () => {
+        if (!imageUrl.trim()) return;
+        setImages((prev) => [...prev, { url: imageUrl.trim() }]);
+        setImageUrl("");
+    };
 
-  const handleAddImage = (e) => {
-    // Firebase Storage has been removed.
-    // Implement your new storage provider logic here.
-    alert("Image upload logic has been removed. Please implement your new storage provider.");
-  }
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        axiosInstance.patch(`catagory/${catagory._id}`, {
+            modelName: e.target.productModel.value,
+            description: e.target.description.value,
+            images,
+        }).then(() => {
+            setUpdate((prev) => !prev);
+            setEditClicked(false);
+        }).catch((error) => console.log(error));
+    };
 
+    const handleDelete = () => {
+        if (window.confirm("Are you sure you want to delete this category?")) {
+            axiosInstance.delete(`catagory/${catagory._id}`)
+                .then(() => setUpdate((prev) => !prev))
+                .catch((error) => console.log(error));
+        }
+    };
 
-  function clicked() {
-    setEditClicked(prev => !prev)
-  }
+    return (
+        <div className="admin-panel rounded-[30px] p-6">
+            <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                <div>
+                    <h3 className="text-[28px]">{catagory?.modelName}</h3>
+                    <p className="mt-2 text-sm leading-7 text-ink-soft">{catagory?.description || 'No description added yet.'}</p>
+                </div>
+                <div className="flex gap-3">
+                    <button className="premium-button-secondary" onClick={() => setEditClicked((prev) => !prev)}>
+                        {editClicked ? 'Close editor' : 'Edit'}
+                    </button>
+                    <button className="premium-button-secondary" onClick={handleDelete}>Delete</button>
+                </div>
+            </div>
 
-  function handleSubmit(e) {
-    e.preventDefault()
+            {editClicked && (
+                <div className="mt-6 border-t border-black/[0.06] pt-6">
+                    <div className="mb-5 flex flex-wrap gap-3">
+                        {images.map((image, index) => (
+                            <ImagesForCatagory image={image} setImages={setImages} key={index} />
+                        ))}
+                    </div>
 
-    axiosInstance.patch(`catagory/${catagory._id}`, {
-      modelName: e.target.productModel.value,
-      description: e.target.description.value,
-      images
+                    <div className="mb-5 flex gap-3">
+                        <input className="admin-input" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="Paste image URL" />
+                        <button className="premium-button-secondary" type="button" onClick={handleAddImage}>Add image</button>
+                    </div>
 
-    }).then(res => {
-      setUpdate(prev => !prev)
-      clicked()
-    }).catch(error => console.log(error))
-  }
-
-  function handleDelete() {
-    let confirmaiton = confirm("are you sure, want to delete this catagory ?")
-    if (confirmaiton) {
-      axiosInstance.delete(`catagory/${catagory._id}`)
-        .then(res => setUpdate(prev => !prev))
-        .catch(error => console.log(error))
-    }
-  }
-  return (
-    <StyeldDiv>
-      <big>{catagory?.modelName}</big>
-
-      <span>
-        <button onClick={clicked}>{editClicked ? "close" : "edit"}  </button>
-        <button onClick={handleDelete}> delete</button>
-      </span>
-
-      {!editClicked ? "" :
-        <div>
-          {images.map((image, ind) =>
-            <ImagesForCatagory image={image} setImages={setImages} key={ind}></ImagesForCatagory>
-          )}
-
-          <StyledBtn onClick={handleAddImage}> Add image</StyledBtn>
-
-          <StyledForm onSubmit={handleSubmit}>
-            <input name="productModel" type='text' placeholder='updated model name' required />
-            <input name="description" type="text" placeholder='updatedd description' />
-            <button type="submit"> submit </button>
-          </StyledForm>
+                    <form className="mt-5 grid gap-4" onSubmit={handleSubmit}>
+                        <input className="admin-input" name="productModel" type='text' placeholder='Updated model name' defaultValue={catagory?.modelName} required />
+                        <input className="admin-input" name="description" type="text" placeholder='Updated description' defaultValue={catagory?.description} />
+                        <button className="premium-button w-fit" type="submit">Save changes</button>
+                    </form>
+                </div>
+            )}
         </div>
+    );
+};
 
-      }
-
-    </StyeldDiv>
-  )
-}
-
-export default SingleCatagory
+export default SingleCatagory;

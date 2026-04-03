@@ -10,7 +10,7 @@ import ScrollToTop from "../../utilities/ScrollToTop";
 
 const Home = () => {
     return (
-        <div className="bg-white w-full overflow-x-hidden">
+        <div className="page-shell w-full overflow-x-hidden">
             <ScrollToTop />
             <ModernHero />
             <CategoryShelf />

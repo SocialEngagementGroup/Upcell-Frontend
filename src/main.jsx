@@ -40,6 +40,7 @@ import PrivacyPolicy from './pages/Legal/PrivacyPolicy/PrivacyPolicy.jsx';
 import AboutUs from './pages/Legal/AboutUs/AboutUs.jsx';
 import AdminPrivateRoute from './utilities/AdminPrivateRoute.jsx';
 import ThankYou from './pages/ThankYou/ThankYou.jsx';
+import NotFound from './pages/NotFound/NotFound.jsx';
 
 
 
@@ -146,6 +147,10 @@ const router = createBrowserRouter([
             element: <EditProduct></EditProduct>
           }
         ]
+      },
+      {
+        path: "*",
+        element: <NotFound></NotFound>
       },
 
     ]

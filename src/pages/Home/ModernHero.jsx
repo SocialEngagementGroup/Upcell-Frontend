@@ -3,24 +3,62 @@ import { Link } from 'react-router-dom';
 
 const ModernHero = () => {
     return (
-        <section className="bg-[radial-gradient(circle_at_top_right,#111_0%,#000_100%)] py-24 overflow-hidden text-white">
-            <div className="max-w-site mx-auto px-[100px] lg:px-10 flex items-center justify-between gap-[60px] max-lg:flex-col max-lg:text-center">
-                <div className="flex-[1.2] max-w-[650px] animate-[fadeInUp_0.8s_cubic-bezier(0.16,1,0.3,1)] max-lg:max-w-full max-lg:flex max-lg:flex-col max-lg:items-center">
-                    <h1 className="text-[clamp(40px,6vw,72px)] leading-[1.05] font-extrabold text-white mb-7 tracking-[-0.04em]">
-                        The Future of <br />
-                        iPhone. Today.
-                    </h1>
-                    <p className="text-xl leading-relaxed text-[#a1a1a1] mb-12 max-w-[520px] font-normal max-lg:mx-auto">
-                        Experience the raw power of the titanium-forged iPhone 15 Pro. 
-                        Trade in your old device and step into the next era of mobile technology.
-                    </p>
-                    <div className="flex gap-4">
-                        <Link to="/shop" className="bg-brand-red !text-white px-10 py-[18px] rounded-xl text-base font-bold transition-all duration-300 ease-smooth hover:bg-brand-red-hover hover:-translate-y-0.5 hover:shadow-[0_10px_20px_rgba(214,0,28,0.2)]">Shop Now</Link>
-                        <Link to="/sell-your-device" className="bg-apple-text border border-[#333] !text-white px-10 py-[18px] rounded-xl text-base font-bold transition-all duration-300 ease-smooth hover:bg-[#2a2a2c] hover:border-[#555] hover:-translate-y-0.5">Sell Your Device</Link>
+        <section className="relative overflow-hidden px-4 pb-12 pt-6 md:px-6 md:pb-16">
+            <div className="page-container premium-card relative overflow-hidden rounded-[44px] border-white/70 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.92),_rgba(245,246,248,0.82)_42%,_rgba(233,236,240,0.9)_100%)] px-8 py-12 md:px-14 md:py-16">
+                <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-white to-transparent" />
+                <div className="grid items-center gap-12 lg:grid-cols-[1fr_0.92fr]">
+                    <div className="animate-[fadeInUp_0.8s_cubic-bezier(0.16,1,0.3,1)]">
+                        <span className="eyebrow mb-6">Curated Apple Collection</span>
+                        <h1 className="section-heading max-w-[720px]">
+                            Premium Apple devices,
+                            <span className="block text-black/50">restored to feel timeless.</span>
+                        </h1>
+                        <p className="mt-6 max-w-[560px] text-lg leading-8 text-ink-soft">
+                            Discover certified iPhone, iPad, and MacBook models presented with quiet luxury, transparent condition grading, and a smoother path to upgrade.
+                        </p>
+                        <div className="mt-10 flex flex-wrap gap-4">
+                            <Link to="/shop" className="premium-button">
+                                Explore the Store
+                            </Link>
+                            <Link to="/sell-device" className="premium-button-secondary">
+                                Start a Trade-In
+                            </Link>
+                        </div>
+                        <div className="mt-12 grid gap-4 sm:grid-cols-3">
+                            {[
+                                { value: '100+', label: 'Checks before dispatch' },
+                                { value: '1 Year', label: 'Warranty included' },
+                                { value: 'Fast', label: 'Insured delivery' },
+                            ].map((item) => (
+                                <div key={item.label} className="rounded-[28px] border border-white/70 bg-white/70 px-5 py-5 shadow-[0_10px_35px_rgba(15,23,42,0.05)]">
+                                    <div className="text-2xl font-extrabold text-apple-text">{item.value}</div>
+                                    <div className="mt-1 text-sm text-apple-gray">{item.label}</div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                </div>
-                <div className="flex-1 relative flex justify-center items-center animate-[fadeInRight_1s_cubic-bezier(0.16,1,0.3,1)] max-lg:mt-10">
-                    <img src="/staticImages/hero-iphone15.png" alt="iPhone 15 Pro Titanium" className="w-full max-w-[550px] h-auto object-contain z-[2] drop-shadow-[0_0_40px_rgba(255,255,255,0.05)] [transform:perspective(1000px)_rotateY(-5deg)]" />
+
+                    <div className="relative flex min-h-[520px] items-center justify-center animate-[fadeInRight_1s_cubic-bezier(0.16,1,0.3,1)]">
+                        <div className="absolute inset-x-[8%] top-[10%] h-[76%] rounded-full bg-[radial-gradient(circle,_rgba(255,255,255,0.95),_rgba(213,216,221,0.3)_55%,_transparent_75%)] blur-2xl" />
+                        <div className="glass-panel relative flex w-full max-w-[560px] items-center justify-center overflow-hidden rounded-[38px] px-8 py-10">
+                            <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.75),rgba(255,255,255,0.18))]" />
+                            <img
+                                src="/staticImages/hero-iphone15.png"
+                                alt="Featured Apple device"
+                                className="relative z-[2] w-full max-w-[420px] animate-[floatSoft_5.5s_ease-in-out_infinite] object-contain drop-shadow-[0_35px_80px_rgba(15,23,42,0.18)]"
+                            />
+                        </div>
+                        <div className="absolute left-0 top-8 hidden max-w-[180px] rounded-[28px] border border-white/80 bg-white/80 p-5 shadow-soft md:block">
+                            <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-apple-gray">Condition</div>
+                            <div className="mt-2 text-2xl font-extrabold text-apple-text">Excellent</div>
+                            <p className="mt-1 text-sm text-ink-soft">Precision inspected exterior and battery health checked.</p>
+                        </div>
+                        <div className="absolute bottom-8 right-0 hidden max-w-[190px] rounded-[28px] bg-apple-text p-5 text-white shadow-[0_24px_80px_rgba(29,29,31,0.24)] md:block">
+                            <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/60">UpCell Care</div>
+                            <div className="mt-2 text-2xl font-extrabold">365 days</div>
+                            <p className="mt-1 text-sm leading-6 text-white/72">Warranty coverage and priority support included.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>

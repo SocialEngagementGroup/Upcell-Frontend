@@ -1,232 +1,219 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { CartContext } from '../../App';
 import ScrollToTop from '../../utilities/ScrollToTop';
-import './Checkout.css';
-import { createLocalOrder, getLocalCartProducts } from '../../utilities/localStore';
+import axiosInstance from '../../utilities/axiosInstance';
 import visa from '../../assets/visa.svg';
 import mastercard from '../../assets/master.svg';
 import americanExpress from '../../assets/americanExpress.svg';
 import discover from '../../assets/discover.svg';
 import paypal from '../../assets/paypal.svg';
 import applePay from '../../assets/applePay.svg';
-
-// Material Icons
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-import LocalShippingOutlinedIcon from '@mui/icons-material/LocalShippingOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
 const Checkout = () => {
     const params = useParams();
     const { cart } = useContext(CartContext);
     const [products, setProducts] = useState([]);
-    const [shipping, setShipping] = useState("standard");
+    const [shipping, setShipping] = useState('standard');
     const [isLoading, setIsLoading] = useState(false);
-    const [paymentMethod, setPaymentMethod] = useState("stripe");
+    const [paymentMethod, setPaymentMethod] = useState('stripe');
+
+    const productIds = params.id === 'cart' ? cart : [params.id];
 
     useEffect(() => {
-        const productIds = params.id === "cart" ? cart : [params.id];
         if (productIds.length > 0) {
-            setProducts(getLocalCartProducts(productIds));
+            axiosInstance.post('cart', { ids: [...new Set(productIds)] })
+                .then((res) => setProducts(res.data))
+                .catch((error) => console.log(error));
         }
     }, [params.id, cart]);
 
-    const calculateSubtotal = () => {
-        const productIds = params.id === "cart" ? cart : [params.id];
-        return productIds.reduce((acc, id) => {
-            const prod = products.find(p => p._id === id);
-            return acc + (prod?.price || 0);
-        }, 0);
-    };
+    const subtotal = useMemo(() => (
+        productIds.reduce((acc, id) => acc + (products.find((product) => product._id === id)?.price || 0), 0)
+    ), [productIds, products]);
 
-    const subtotal = calculateSubtotal();
-    const estTax = subtotal * 0.08; // Mock 8% tax
-    const shippingCost = shipping === "standard" ? 0 : (shipping === "priority" ? 10.50 : 30.00);
+    const estTax = subtotal * 0.08;
+    const shippingCost = shipping === 'standard' ? 0 : 10.5;
     const total = subtotal + estTax + shippingCost;
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    const handleSubmit = (event) => {
+        event.preventDefault();
         setIsLoading(true);
 
         const data = {
-            name: e.target.name.value,
-            email: e.target.email.value,
-            phone: e.target.phone.value,
-            city: e.target.city.value,
-            postal: e.target.postalCode.value,
-            street: e.target.street.value,
-            country: e.target.country.value,
-            orders: params.id === "cart" ? cart : [params.id],
-            shipping: shipping,
+            name: event.target.name.value,
+            email: event.target.email.value,
+            phone: event.target.phone.value,
+            city: event.target.city.value,
+            postal: event.target.postalCode.value,
+            street: event.target.street.value,
+            country: event.target.country.value,
+            orders: productIds,
         };
 
         try {
-            const order = createLocalOrder({
-                customer: data,
-                productIds: data.orders,
+            axiosInstance.post('orders', {
+                ...data,
+                orders: data.orders,
                 shipping,
                 paymentMethod,
+                paidWith: paymentMethod === 'paypal' ? 'Paypal' : 'Card',
+            }).then((res) => {
+                if (params.id === 'cart') {
+                    localStorage.setItem('cart', JSON.stringify([]));
+                }
+                window.location = `/succeed?order_id=${res.data._id}`;
+            }).catch((error) => {
+                console.log(error);
+                setIsLoading(false);
+                alert('Something went wrong. Please check your information and try again.');
             });
-
-            if (params.id === "cart") {
-                localStorage.setItem("cart", JSON.stringify([]));
-            }
-
-            window.location = `/succeed?order_id=${order._id}`;
         } catch (error) {
             console.log(error);
             setIsLoading(false);
-            alert("Something went wrong. Please check your information and try again.");
+            alert('Something went wrong. Please check your information and try again.');
         }
     };
 
     return (
-        <div className="checkout-page">
+        <div className="page-shell">
             <ScrollToTop />
-            
-            <div className="container-max">
-                <header className="checkout-header">
-                    <Link to="/cart" className="back-link">
-                        <ArrowBackIosNewIcon />
-                        <span>Return to cart</span>
-                    </Link>
-                    <h1>Checkout</h1>
-                </header>
 
-                <div className="checkout-layout">
-                    {/* Left: Customer Form */}
-                    <main className="checkout-form-section">
-                        <form onSubmit={handleSubmit} className="modern-form">
-                            <section className="form-group">
-                                <h3>Contact Information</h3>
-                                <div className="input-row">
-                                    <input type="email" name="email" placeholder="Email address" required />
-                                    <input type="tel" name="phone" placeholder="Phone number" required />
+            <section className="page-container pb-10 pt-6">
+                <Link to="/cart" className="kicker-link inline-flex items-center gap-2">
+                    <ArrowBackIosNewIcon className="!text-sm" />
+                    Return to bag
+                </Link>
+
+                <div className="mt-6 premium-card rounded-[40px] bg-[linear-gradient(180deg,#ffffff_0%,#f3f5f8_100%)] px-8 py-10 md:px-12 md:py-14">
+                    <span className="eyebrow mb-5">Checkout</span>
+                    <h1 className="text-[clamp(2.6rem,4.8vw,4.9rem)] leading-[0.94]">Secure your order with a calmer checkout.</h1>
+                    <p className="mt-5 max-w-[620px] text-lg leading-8 text-ink-soft">
+                        Your details, delivery choices, and payment methods are arranged to feel simple, quiet, and premium.
+                    </p>
+                </div>
+            </section>
+
+            <section className="page-container pb-16">
+                <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
+                    <main className="premium-card rounded-[36px] p-8 md:p-10">
+                        <form onSubmit={handleSubmit} className="space-y-10">
+                            <section>
+                                <h3 className="text-[28px]">Contact information</h3>
+                                <div className="mt-5 grid gap-4 md:grid-cols-2">
+                                    <input className="premium-input" type="email" name="email" placeholder="Email address" required />
+                                    <input className="premium-input" type="tel" name="phone" placeholder="Phone number" required />
                                 </div>
                             </section>
 
-                            <section className="form-group">
-                                <h3>Shipping Address</h3>
-                                <input type="text" name="name" placeholder="Full name" required />
-                                <input type="text" name="street" placeholder="Street address" required />
-                                <div className="input-row">
-                                    <input type="text" name="city" placeholder="City" required />
-                                    <input type="text" name="postalCode" placeholder="Postal code" required />
-                                </div>
-                                <input type="text" name="country" placeholder="Country" required />
-                            </section>
-
-                            <section className="form-group">
-                                <h3>Shipping Method</h3>
-                                <div className="shipping-options">
-                                    <label className={`shipping-card ${shipping === 'standard' ? 'active' : ''}`}>
-                                        <input type="radio" name="shipping" value="standard" checked={shipping === 'standard'} onChange={() => setShipping('standard')} />
-                                        <div className="card-info">
-                                            <span>Standard Shipping</span>
-                                            <small>5-7 business days</small>
-                                        </div>
-                                        <strong>Free</strong>
-                                    </label>
-                                    <label className={`shipping-card ${shipping === 'priority' ? 'active' : ''}`}>
-                                        <input type="radio" name="shipping" value="priority" checked={shipping === 'priority'} onChange={() => setShipping('priority')} />
-                                        <div className="card-info">
-                                            <span>Priority Shipping</span>
-                                            <small>2-3 business days</small>
-                                        </div>
-                                        <strong>$10.50</strong>
-                                    </label>
+                            <section>
+                                <h3 className="text-[28px]">Shipping address</h3>
+                                <div className="mt-5 grid gap-4">
+                                    <input className="premium-input" type="text" name="name" placeholder="Full name" required />
+                                    <input className="premium-input" type="text" name="street" placeholder="Street address" required />
+                                    <div className="grid gap-4 md:grid-cols-2">
+                                        <input className="premium-input" type="text" name="city" placeholder="City" required />
+                                        <input className="premium-input" type="text" name="postalCode" placeholder="Postal code" required />
+                                    </div>
+                                    <input className="premium-input" type="text" name="country" placeholder="Country" required />
                                 </div>
                             </section>
 
-                            <section className="form-group">
-                                <h3>Payment Method</h3>
-                                <div className="payment-options">
-                                    <label className={`shipping-card ${paymentMethod === 'stripe' ? 'active' : ''}`}>
-                                        <input type="radio" name="payment" value="stripe" checked={paymentMethod === 'stripe'} onChange={() => setPaymentMethod('stripe')} />
-                                        <div className="card-info">
-                                            <span>Card / Apple Pay / Google Pay</span>
-                                            <small>Secure checkout via Stripe</small>
-                                        </div>
-                                    </label>
-                                    <label className={`shipping-card ${paymentMethod === 'paypal' ? 'active' : ''}`}>
-                                        <input type="radio" name="payment" value="paypal" checked={paymentMethod === 'paypal'} onChange={() => setPaymentMethod('paypal')} />
-                                        <div className="card-info">
-                                            <span>PayPal</span>
-                                            <small>Pay with your PayPal account</small>
-                                        </div>
-                                    </label>
+                            <section>
+                                <h3 className="text-[28px]">Delivery</h3>
+                                <div className="mt-5 grid gap-4">
+                                    {[
+                                        { id: 'standard', title: 'Standard Shipping', sub: '5-7 business days', price: 'Free' },
+                                        { id: 'priority', title: 'Priority Shipping', sub: '2-3 business days', price: '$10.50' },
+                                    ].map((option) => (
+                                        <label key={option.id} className={`flex cursor-pointer items-center justify-between rounded-[24px] border p-5 ${shipping === option.id ? 'border-apple-text bg-surface-alt' : 'border-black/[0.08] bg-white'}`}>
+                                            <div>
+                                                <div className="font-bold text-apple-text">{option.title}</div>
+                                                <div className="mt-1 text-sm text-ink-soft">{option.sub}</div>
+                                            </div>
+                                            <div className="flex items-center gap-4">
+                                                <div className="font-bold text-apple-text">{option.price}</div>
+                                                <input type="radio" checked={shipping === option.id} onChange={() => setShipping(option.id)} />
+                                            </div>
+                                        </label>
+                                    ))}
                                 </div>
                             </section>
 
-                            <div className="form-footer">
-                                <p className="secure-text"><LockOutlinedIcon /> All transactions are secure and encrypted.</p>
-                                <button type="submit" className="btn-continue-payment" disabled={isLoading}>
+                            <section>
+                                <h3 className="text-[28px]">Payment</h3>
+                                <div className="mt-5 grid gap-4">
+                                    {[
+                                        { id: 'stripe', title: 'Card / Apple Pay / Google Pay', sub: 'Secure checkout via Stripe' },
+                                        { id: 'paypal', title: 'PayPal', sub: 'Pay using your PayPal account' },
+                                    ].map((option) => (
+                                        <label key={option.id} className={`flex cursor-pointer items-center justify-between rounded-[24px] border p-5 ${paymentMethod === option.id ? 'border-apple-text bg-surface-alt' : 'border-black/[0.08] bg-white'}`}>
+                                            <div>
+                                                <div className="font-bold text-apple-text">{option.title}</div>
+                                                <div className="mt-1 text-sm text-ink-soft">{option.sub}</div>
+                                            </div>
+                                            <input type="radio" checked={paymentMethod === option.id} onChange={() => setPaymentMethod(option.id)} />
+                                        </label>
+                                    ))}
+                                </div>
+                            </section>
+
+                            <div className="flex flex-col gap-4 border-t border-black/[0.06] pt-6 md:flex-row md:items-center md:justify-between">
+                                <p className="flex items-center gap-2 text-sm text-ink-soft">
+                                    <LockOutlinedIcon className="!text-[18px]" />
+                                    Encrypted checkout and secure order processing.
+                                </p>
+                                <button type="submit" className="premium-button min-w-[220px]" disabled={isLoading}>
                                     {isLoading ? 'Processing...' : 'Complete Purchase'}
                                 </button>
                             </div>
                         </form>
                     </main>
 
-                    {/* Right: Order Summary Sidebar */}
-                    <aside className="checkout-summary-sidebar">
-                        <div className="summary-card-header">
-                            <h2>Order Summary</h2>
-                            <span>({(params.id === "cart" ? cart : [params.id]).length}) Items</span>
+                    <aside className="premium-card h-fit rounded-[32px] p-6 lg:sticky lg:top-28">
+                        <div className="flex items-center justify-between">
+                            <h2 className="text-2xl">Order summary</h2>
+                            <span className="text-sm text-apple-gray">{productIds.length} items</span>
                         </div>
-                        
-                        <div className="checkout-items-list">
-                            {(params.id === "cart" ? cart : [params.id]).map((id) => {
-                                const prod = products.find(p => p._id === id);
-                                if (!prod) return null;
+
+                        <div className="mt-6 space-y-4">
+                            {productIds.map((id, index) => {
+                                const product = products.find((item) => item._id === id);
+                                if (!product) return null;
                                 return (
-                                    <div key={id} className="checkout-summary-item">
-                                        <div className="img-box"><img src={prod.image} alt={prod.productName} /></div>
-                                        <div className="details">
-                                            <h4>{prod.productName}</h4>
-                                            <span>{prod.color?.name}, {prod.storage}</span>
+                                    <div key={`${id}-${index}`} className="flex gap-4 rounded-[24px] bg-surface-alt p-4">
+                                        <div className="flex h-16 w-16 items-center justify-center rounded-[18px] bg-white">
+                                            <img src={product.image} alt={product.productName} className="max-h-[80%] w-auto object-contain" />
                                         </div>
-                                        <div className="price">${prod.price}</div>
+                                        <div className="flex-1">
+                                            <div className="font-bold text-apple-text">{product.productName}</div>
+                                            <div className="mt-1 text-sm text-ink-soft">{product.color?.name}, {product.storage}</div>
+                                        </div>
+                                        <div className="font-bold text-apple-text">${product.price}</div>
                                     </div>
                                 );
                             })}
                         </div>
 
-                        <div className="financial-rows">
-                            <div className="fin-row">
-                                <span>Subtotal</span>
-                                <strong>${subtotal.toFixed(2)}</strong>
-                            </div>
-                            <div className="fin-row">
-                                <span>Tax (Estimated)</span>
-                                <strong>${estTax.toFixed(2)}</strong>
-                            </div>
-                            <div className="fin-row">
-                                <span>Shipping</span>
-                                <strong className={shippingCost === 0 ? 'free' : ''}>{shippingCost === 0 ? 'Free' : `$${shippingCost.toFixed(2)}`}</strong>
-                            </div>
-                            <div className="fin-row total">
-                                <span>Total</span>
-                                <strong>${total.toFixed(2)}</strong>
-                            </div>
+                        <div className="mt-6 space-y-4 border-t border-black/[0.06] pt-6 text-sm text-ink-soft">
+                            <div className="flex justify-between"><span>Subtotal</span><strong className="text-apple-text">${subtotal.toFixed(2)}</strong></div>
+                            <div className="flex justify-between"><span>Estimated tax</span><strong className="text-apple-text">${estTax.toFixed(2)}</strong></div>
+                            <div className="flex justify-between"><span>Shipping</span><strong className="text-apple-text">{shippingCost === 0 ? 'Free' : `$${shippingCost.toFixed(2)}`}</strong></div>
+                            <div className="flex justify-between border-t border-black/[0.06] pt-4 text-base"><span className="font-bold text-apple-text">Total</span><strong className="text-2xl text-apple-text">${total.toFixed(2)}</strong></div>
                         </div>
 
-                        <div className="payment-icons">
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginTop: '32px' }}>
-                                {[visa, mastercard, americanExpress, discover, paypal, applePay].map((icon, index) => (
-                                    <img key={index} src={icon} alt="Accepted payment method" style={{ width: '100%', height: '36px', objectFit: 'contain' }} />
-                                ))}
-                            </div>
+                        <div className="mt-6 grid grid-cols-3 gap-3">
+                            {[visa, mastercard, americanExpress, discover, paypal, applePay].map((icon, index) => (
+                                <div key={index} className="flex h-12 items-center justify-center rounded-[16px] border border-black/[0.06] bg-white">
+                                    <img src={icon} alt="Payment method" className="max-h-7 w-auto object-contain" />
+                                </div>
+                            ))}
                         </div>
                     </aside>
                 </div>
-            </div>
-
-            {isLoading && (
-                <div className="checkout-loading-overlay">
-                    <div className="spinner-premium"></div>
-                    <p>Securing your checkout session...</p>
-                </div>
-            )}
+            </section>
         </div>
     );
 };

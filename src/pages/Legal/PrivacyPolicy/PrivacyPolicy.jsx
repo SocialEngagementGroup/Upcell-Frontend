@@ -1,43 +1,34 @@
 const PrivacyPolicy = () => {
     return (
-        <div className="bg-white min-h-screen">
-            <header className="bg-surface-alt py-24 text-center rounded-b-[60px] mb-20">
-                <div className="max-w-site mx-auto px-[100px] lg:px-10">
-                    <h1 className="mb-4">Privacy Policy</h1>
-                    <p className="text-lg text-apple-gray">Last updated: March 2024</p>
+        <div className="page-shell">
+            <section className="page-container pb-10 pt-6">
+                <div className="premium-card rounded-[40px] bg-[linear-gradient(180deg,#ffffff_0%,#f3f5f8_100%)] px-8 py-10 md:px-12 md:py-14">
+                    <span className="eyebrow mb-5">Privacy</span>
+                    <h1 className="text-[clamp(2.8rem,5vw,5rem)] leading-[0.92]">Privacy policy</h1>
+                    <p className="mt-5 max-w-[620px] text-lg leading-8 text-ink-soft">
+                        Last updated: March 2024. We collect and use information only as needed to operate the UpCell experience and support our customers.
+                    </p>
                 </div>
-            </header>
+            </section>
 
-            <main className="max-w-site mx-auto px-[100px] lg:px-10 pb-24">
-                <article className="max-w-[800px] mx-auto [&_h2]:mt-12 [&_h2]:mb-4 [&_p]:text-apple-gray [&_p]:leading-relaxed [&_p]:mb-4">
-                    <h2 className="text-sm font-extrabold tracking-widest text-apple-text">INTRODUCTION</h2>
-                    <p>UpCell, LLC ("UpCell," "us" or "we") is committed to protecting the privacy of our customers and end users. This Privacy and Cookie Policy ("Policy") explains how we collect, share and use personal information collected through our corporate websites and any related UpCell application, marketplace service or tool (collectively, the "Services").</p>
-
-                    <h2>ABOUT US</h2>
-                    <p>UpCell is headquartered in the United States. We provide B2B online marketplace solutions and related services that enable our customers to buy and sell bulk lot liquidation inventory.</p>
-
-                    <h2>INFORMATION THAT WE COLLECT</h2>
-                    <p>The personal information that we may collect about you broadly falls into the following categories: Information you provide us. We may collect the personal information you provide to us voluntarily.</p>
-
-                    <h2>HOW WE USE YOUR INFORMATION</h2>
-                    <p>We use personal information collected via our Sites for a variety of business purposes. We normally collect personal information from you where the processing is in our legitimate business interests.</p>
-
-                    <h2>HOW WE RETAIN YOUR INFORMATION</h2>
-                    <p>We retain your personal information for as long as it is necessary and relevant for the purposes outlined in the section above.</p>
-
-                    <h2>HOW WE SHARE YOUR INFORMATION</h2>
-                    <p>We may disclose your personal information to the following categories of recipients for the following purposes.</p>
-
-                    <h2>YOUR DATA PROTECTION RIGHTS</h2>
-                    <p>You have the following data protection rights: If you wish to access, correct, update or request the deletion of your personal information, you can do so at any time by contacting us.</p>
-
-                    <h2>SECURITY</h2>
-                    <p>Your personal information may be transferred to and processed in, countries other than the country in which you are resident.</p>
-
-                    <h2>COOKIES AND SIMILAR TECHNOLOGIES</h2>
-                    <p>We use cookies and other similar tracking technologies to collect information about the pages you view, the links you click, and other actions you take through our Services.</p>
+            <section className="page-container pb-16">
+                <article className="legal-prose premium-card rounded-[36px] px-8 py-10 md:px-12 md:py-14">
+                    <h2>Introduction</h2>
+                    <p>UpCell is committed to protecting the privacy of our customers and site visitors. This policy explains how we collect, use, retain, and share information connected to our services.</p>
+                    <h2>About us</h2>
+                    <p>UpCell operates in the United States and provides online commerce and device resale services focused on premium technology products.</p>
+                    <h2>Information we collect</h2>
+                    <p>We may collect information you provide directly, along with technical and usage information that helps us operate the site, process purchases, and improve the customer experience.</p>
+                    <h2>How we use your information</h2>
+                    <p>Information is used to fulfill orders, communicate with customers, support transactions, improve service quality, and meet legal or operational obligations.</p>
+                    <h2>How we retain and share information</h2>
+                    <p>We retain information only as long as necessary for the purposes above and may share it with service providers or partners involved in payments, logistics, fraud prevention, and required compliance work.</p>
+                    <h2>Your rights</h2>
+                    <p>You may contact us to request access, correction, updates, or deletion of personal information where applicable.</p>
+                    <h2>Cookies and related technologies</h2>
+                    <p>We use cookies and similar technologies to understand usage patterns, improve the website, and support essential functionality.</p>
                 </article>
-            </main>
+            </section>
         </div>
     );
 };

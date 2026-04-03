@@ -21,9 +21,11 @@ function App() {
   return (
     <CartContext.Provider value={{ cart, setCart }}>
       <ScrollRestoration />
-      <div className="flex flex-col min-h-screen">
+      <div className="flex min-h-screen flex-col bg-transparent">
         <HeaderComponent />
-        <Outlet />
+        <main className="flex-1">
+          <Outlet />
+        </main>
         <MyFooter />
         <ToastContainer position="top-center" autoClose={1000} />
       </div>

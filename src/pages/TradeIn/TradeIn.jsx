@@ -1,284 +1,149 @@
-import React, { useState } from 'react';
-import './TradeIn.css';
+import React, { useMemo, useState } from 'react';
 import ScrollToTop from '../../utilities/ScrollToTop';
-
-// Material Icons
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import SecurityIcon from '@mui/icons-material/Security';
-import VerifiedIcon from '@mui/icons-material/Verified';
-import TravelExploreIcon from '@mui/icons-material/TravelExplore';
 import LocalShippingOutlinedIcon from '@mui/icons-material/LocalShippingOutlined';
-import PublicIcon from '@mui/icons-material/Public';
-import StarsIcon from '@mui/icons-material/Stars';
-import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
-import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import BoltIcon from '@mui/icons-material/Bolt';
-import CloseIcon from '@mui/icons-material/Close';
+
+const deviceOptions = [
+    { id: 'iPhone', title: 'iPhone', desc: 'From iPhone 11 through the latest Pro models.' },
+    { id: 'iPad', title: 'iPad', desc: 'Air, mini, and Pro models accepted.' },
+    { id: 'MacBook', title: 'MacBook', desc: 'Portable Macs with strong resale value.' },
+];
+
+const conditionOptions = [
+    { id: 'Mint', title: 'Mint', desc: 'Looks almost new with minimal visible wear.' },
+    { id: 'Excellent', title: 'Excellent', desc: 'Light use, clean body, and fully functional.' },
+    { id: 'Good', title: 'Good', desc: 'Visible wear but still dependable and complete.' },
+    { id: 'Fair', title: 'Fair', desc: 'Heavier signs of use with reduced cosmetic value.' },
+];
 
 const TradeIn = () => {
-    const [currentStep, setCurrentStep] = useState(1);
+    const [step, setStep] = useState(1);
     const [selection, setSelection] = useState({
         device: '',
-        model: '',
         condition: '',
-        info: { name: '', email: '', phone: '' }
+        name: '',
+        email: '',
+        phone: '',
     });
 
-    const steps = [
-        { id: 1, label: 'Device' },
-        { id: 2, label: 'Model' },
-        { id: 3, label: 'Specs' },
-        { id: 4, label: 'Condition' },
-        { id: 5, label: 'Estimate' },
-        { id: 6, label: 'Submit' }
-    ];
+    const estimate = useMemo(() => {
+        if (selection.device === 'iPhone' && selection.condition === 'Mint') return '$750';
+        if (selection.device === 'iPhone') return '$520';
+        if (selection.device === 'MacBook') return '$840';
+        if (selection.device === 'iPad') return '$430';
+        return '$0';
+    }, [selection]);
 
-    const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, 6));
-    const handleDeviceSelect = (type) => {
-        setSelection({ ...selection, device: type });
-        nextStep();
-    };
-
-    const handleConditionSelect = (cond) => {
-        setSelection({ ...selection, condition: cond });
-        nextStep();
-    };
-
-    const renderStep = () => {
-        switch (currentStep) {
-            case 1:
-                return (
-                    <div className="step-content device-selection">
-                        <header className="step-header">
-                            <h1>Sell Your Device</h1>
-                            <p>Get an instant valuation for your tech. Our cinematic trade-in process ensures you receive the highest market value with surgical precision.</p>
-                        </header>
-                        
-                        <div className="selection-grid">
-                            <div className="selection-card" onClick={() => handleDeviceSelect('iPhone')}>
-                                <div className="img-box"><img src="https://via.placeholder.com/200x250?text=iPhone" alt="iPhone" /></div>
-                                <h2>iPhone</h2>
-                                <p>Sell your iPhone 11 to iPhone 15 Pro Max</p>
-                            </div>
-                            <div className="selection-card" onClick={() => handleDeviceSelect('iPad')}>
-                                <div className="img-box black"><img src="https://via.placeholder.com/200x200?text=iPad" alt="iPad" /></div>
-                                <h2>iPad</h2>
-                                <p>Trade in any iPad Pro, Air, or Mini</p>
-                            </div>
-                            <div className="selection-card" onClick={() => handleDeviceSelect('MacBook')}>
-                                <div className="img-box black"><img src="https://via.placeholder.com/200x200?text=MacBook" alt="MacBook" /></div>
-                                <h2>MacBook</h2>
-                                <p>Laptops featuring M1, M2, and M3 chips</p>
-                            </div>
-                        </div>
-
-                        <div className="trust-footer-bar">
-                            <div className="trust-item">
-                                <SecurityIcon />
-                                <div>
-                                    <strong>Secure Process</strong>
-                                    <span>Bank-grade data encryption and wipe</span>
-                                </div>
-                            </div>
-                            <div className="trust-item">
-                                <VerifiedIcon />
-                                <div>
-                                    <strong>Fair Market Value</strong>
-                                    <span>Real-time pricing data for best offers</span>
-                                </div>
-                            </div>
-                            <div className="trust-item">
-                                <LocalShippingOutlinedIcon />
-                                <div>
-                                    <strong>Free Shipping</strong>
-                                    <span>Pre-paid labels and insurance included</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                );
-            case 4:
-                return (
-                    <div className="step-content condition-selection">
-                        <header className="step-header centered">
-                            <h1>What's the condition of your <span className="red-text">iPhone 15 Pro</span>?</h1>
-                            <p>Be as accurate as possible to ensure your estimate remains the same upon inspection. Honesty helps us process your payment faster.</p>
-                        </header>
-
-                        <div className="condition-grid">
-                            <div className="condition-card" onClick={() => handleConditionSelect('Mint')}>
-                                <StarsIcon className="icon" />
-                                <h3>Mint</h3>
-                                <p>Like new, no scratches. Looks like it just came out of the box.</p>
-                            </div>
-                            <div className="condition-card" onClick={() => handleConditionSelect('Excellent')}>
-                                <CheckCircleIcon className="icon" />
-                                <h3>Excellent</h3>
-                                <p>Light signs of use. Minor micro-scratches barely visible to the naked eye.</p>
-                            </div>
-                            <div className="condition-card" onClick={() => handleConditionSelect('Good')}>
-                                <ThumbUpAltIcon className="icon" />
-                                <h3>Good</h3>
-                                <p>Visible scratches, but no cracks or deep gouges. Fully functional.</p>
-                            </div>
-                            <div className="condition-card" onClick={() => handleConditionSelect('Poor')}>
-                                <WarningAmberIcon className="icon" />
-                                <h3>Poor</h3>
-                                <p>Cracked glass or damaged chassis. Significant wear and tear.</p>
-                            </div>
-                        </div>
-
-                        <div className="live-valuation-banner">
-                            <div className="valuation-text">
-                                <span className="label">LIVE VALUATION</span>
-                                <h2>Your Estimated Offer: <span className="offer-price">up to $750</span></h2>
-                            </div>
-                            <button className="btn-get-estimate" onClick={nextStep}>Get Final Estimate</button>
-                        </div>
-
-                        <div className="inspection-guarantee">
-                            <img src="https://via.placeholder.com/400x300?text=Inspection" alt="Inspection" />
-                            <div className="guarantee-text">
-                                <h3>Our Inspection Guarantee</h3>
-                                <p>Once your device arrives at our facility, a technician will verify its condition within 24 hours. If it matches your assessment, we release payment immediately via your preferred method.</p>
-                                <div className="flash-payment">
-                                    <BoltIcon /> <span>Next-day payments</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                );
-            case 5:
-                return (
-                    <div className="step-content finalize-step">
-                        <header className="valuation-hero">
-                            <div className="offer-block">
-                                <span className="label">YOUR GUARANTEED OFFER</span>
-                                <h1 className="guaranteed-price">$750.00</h1>
-                                <p>Based on your device condition report, we are ready to pay you immediately upon inspection. No hidden fees, no shipping costs.</p>
-                            </div>
-                            <div className="trust-mini-cards">
-                                <div className="mini-card">
-                                    <CheckCircleIcon />
-                                    <div>
-                                        <strong>Secure Data Wipe</strong>
-                                        <span>Military-grade sanitation of all your personal information.</span>
-                                    </div>
-                                </div>
-                                <div className="mini-card">
-                                    <BoltIcon />
-                                    <div>
-                                        <strong>Instant Payment</strong>
-                                        <span>Funds released within 24 hours of device verification.</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </header>
-
-                        <div className="finalize-grid">
-                            <div className="finalize-product-preview">
-                                <img src="https://via.placeholder.com/300x400?text=iPhone+15+Pro+Max" alt="Product" />
-                                <div className="p-label">IPHONE 15 PRO MAX</div>
-                            </div>
-
-                            <form className="details-form">
-                                <h2>Finalize Your Details</h2>
-                                <p>Where should we send your shipping kit and payment updates?</p>
-                                
-                                <div className="form-row">
-                                    <div className="input-group">
-                                        <label>FULL NAME</label>
-                                        <input type="text" placeholder="Enter your full name" />
-                                    </div>
-                                    <div className="input-group">
-                                        <label>EMAIL ADDRESS</label>
-                                        <input type="email" placeholder="name@example.com" />
-                                    </div>
-                                </div>
-                                <div className="input-group">
-                                    <label>PHONE NUMBER</label>
-                                    <input type="tel" placeholder="+1 (555) 000-0000" />
-                                </div>
-
-                                <div className="terms-check">
-                                    <input type="checkbox" id="terms" />
-                                    <label htmlFor="terms">I agree to the <u>terms and conditions</u> and confirm that the device condition stated is accurate to the best of my knowledge.</label>
-                                </div>
-
-                                <button className="btn-submit-trade" onClick={nextStep}>Complete Submission</button>
-                                <span className="encrypted-msg"><SecurityIcon /> Encrypted 256-bit secure checkout</span>
-                            </form>
-                        </div>
-
-                        <div className="service-highlights">
-                            <div className="service-card">
-                                <LocalShippingOutlinedIcon />
-                                <h3>Free Shipping Kit</h3>
-                                <p>We send you a prepaid box with protective padding for your device.</p>
-                            </div>
-                            <div className="service-card">
-                                <PublicIcon />
-                                <h3>Flexible Payments</h3>
-                                <p>Get paid via Direct Deposit, PayPal, or UpCell Store Credit (+10%).</p>
-                            </div>
-                            <div className="service-card">
-                                <StarsIcon />
-                                <h3>24/7 Concierge</h3>
-                                <p>Real humans ready to help you at every stage of your trade-in.</p>
-                            </div>
-                        </div>
-                    </div>
-                );
-            case 6:
-                return (
-                    <div className="step-content success-step">
-                         <header className="step-header centered">
-                            <CheckCircleIcon className="success-icon" />
-                            <h1>Submission Received</h1>
-                            <p>Check your email for the next steps and your prepaid shipping label.</p>
-                            <button className="btn-hero-primary" onClick={() => setCurrentStep(1)}>Go Back Home</button>
-                        </header>
-                    </div>
-                );
-            default:
-                // For Step 2 & 3 (Model/Specs), skipping for MVP/Demonstration as per common logic
-                return (
-                    <div className="step-content">
-                        <h1>Step {currentStep}</h1>
-                        <button onClick={nextStep}>Continue</button>
-                    </div>
-                );
-        }
-    };
+    const next = () => setStep((prev) => Math.min(prev + 1, 4));
 
     return (
-        <div className="trade-in-page">
+        <div className="page-shell">
             <ScrollToTop />
-            <div className="container-max">
-                {/* Stepper Header */}
-                <div className="stepper-header">
-                   {currentStep < 5 ? (
-                     <div className="modern-stepper">
-                        {steps.map(step => (
-                            <div key={step.id} className={`step-node ${currentStep >= step.id ? 'active' : ''}`}>
-                                <div className="step-indicator">
-                                    {step.id}
-                                </div>
-                                <span className="step-label">{step.label}</span>
-                            </div>
-                        ))}
-                     </div>
-                   ) : (
-                     <div className="progress-top-bar">
-                        <div className="left">IPHONE 15 PRO</div>
-                        <div className="center">Step {currentStep} of 6 <div className="bar"><div className="fill" style={{width: `${(currentStep/6)*100}%`}}></div></div></div>
-                        <div className="right"><CloseIcon /></div>
-                     </div>
-                   )}
+
+            <section className="page-container pb-10 pt-6">
+                <div className="rounded-[40px] bg-[linear-gradient(135deg,#0f1012_0%,#1b1e24_55%,#2b3138_100%)] px-8 py-10 text-white shadow-medium md:px-12 md:py-14">
+                    <span className="inline-flex rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.24em] text-white/60">Trade In</span>
+                    <h1 className="mt-6 text-[clamp(2.8rem,5vw,5rem)] leading-[0.92] text-white">Upgrade the Apple way, starting with your current device.</h1>
+                    <p className="mt-5 max-w-[680px] text-lg leading-8 text-white/72">
+                        Get a fast valuation, prepaid shipping, and a quieter premium trade-in experience from start to finish.
+                    </p>
+                </div>
+            </section>
+
+            <section className="page-container pb-16">
+                <div className="mb-8 flex flex-wrap gap-3">
+                    {['Choose device', 'Condition', 'Your details', 'Confirmation'].map((label, index) => (
+                        <div key={label} className={`rounded-full px-5 py-3 text-sm font-bold ${step === index + 1 ? 'bg-apple-text text-white' : 'border border-black/[0.08] bg-white text-apple-gray'}`}>
+                            {index + 1}. {label}
+                        </div>
+                    ))}
                 </div>
 
-                {renderStep()}
-            </div>
+                {step === 1 && (
+                    <div className="grid gap-6 lg:grid-cols-3">
+                        {deviceOptions.map((device) => (
+                            <button
+                                key={device.id}
+                                className="premium-card rounded-[32px] p-8 text-left transition-all duration-300 hover:-translate-y-1.5 hover:shadow-medium"
+                                onClick={() => {
+                                    setSelection((prev) => ({ ...prev, device: device.id }));
+                                    next();
+                                }}
+                            >
+                                <div className="eyebrow mb-5">Device type</div>
+                                <h2 className="text-[34px]">{device.title}</h2>
+                                <p className="mt-3 text-base leading-8 text-ink-soft">{device.desc}</p>
+                            </button>
+                        ))}
+                    </div>
+                )}
+
+                {step === 2 && (
+                    <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+                        <div className="grid gap-6 md:grid-cols-2">
+                            {conditionOptions.map((condition) => (
+                                <button
+                                    key={condition.id}
+                                    className="premium-card rounded-[32px] p-8 text-left transition-all duration-300 hover:-translate-y-1.5 hover:shadow-medium"
+                                    onClick={() => {
+                                        setSelection((prev) => ({ ...prev, condition: condition.id }));
+                                        next();
+                                    }}
+                                >
+                                    <div className="eyebrow mb-5">{selection.device || 'Apple device'}</div>
+                                    <h2 className="text-[30px]">{condition.title}</h2>
+                                    <p className="mt-3 text-base leading-8 text-ink-soft">{condition.desc}</p>
+                                </button>
+                            ))}
+                        </div>
+                        <aside className="premium-card h-fit rounded-[32px] p-6">
+                            <h3 className="text-[28px]">Estimated value</h3>
+                            <div className="mt-4 text-5xl font-extrabold text-apple-text">{estimate}</div>
+                            <p className="mt-3 text-sm leading-7 text-ink-soft">Your final offer is confirmed after inspection, but this gives you a realistic premium-range estimate.</p>
+                        </aside>
+                    </div>
+                )}
+
+                {step === 3 && (
+                    <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
+                        <div className="premium-card rounded-[36px] p-8 md:p-10">
+                            <h2 className="text-[36px]">Finalize your details</h2>
+                            <p className="mt-3 text-base leading-8 text-ink-soft">We’ll use this to send your shipping kit and confirm your offer.</p>
+                            <div className="mt-6 grid gap-4">
+                                <input className="premium-input" placeholder="Full name" value={selection.name} onChange={(e) => setSelection((prev) => ({ ...prev, name: e.target.value }))} />
+                                <input className="premium-input" placeholder="Email address" value={selection.email} onChange={(e) => setSelection((prev) => ({ ...prev, email: e.target.value }))} />
+                                <input className="premium-input" placeholder="Phone number" value={selection.phone} onChange={(e) => setSelection((prev) => ({ ...prev, phone: e.target.value }))} />
+                            </div>
+                            <button className="premium-button mt-8" onClick={next}>Submit Trade-In Request</button>
+                        </div>
+
+                        <aside className="premium-card rounded-[32px] p-6">
+                            <h3 className="text-[28px]">What’s included</h3>
+                            <div className="mt-6 space-y-5">
+                                <div className="flex gap-3"><SecurityIcon className="!text-[20px]" /><p className="text-sm leading-7 text-ink-soft">Secure device handling and guidance for wiping your data.</p></div>
+                                <div className="flex gap-3"><LocalShippingOutlinedIcon className="!text-[20px]" /><p className="text-sm leading-7 text-ink-soft">Prepaid shipping materials and insured transit.</p></div>
+                                <div className="flex gap-3"><BoltIcon className="!text-[20px]" /><p className="text-sm leading-7 text-ink-soft">Fast payouts once the condition is verified.</p></div>
+                            </div>
+                        </aside>
+                    </div>
+                )}
+
+                {step === 4 && (
+                    <div className="premium-card rounded-[36px] px-8 py-16 text-center">
+                        <CheckCircleIcon className="!text-[72px] text-apple-text" />
+                        <h2 className="mt-6 text-[42px]">Trade-in request received.</h2>
+                        <p className="mx-auto mt-4 max-w-[560px] text-lg leading-8 text-ink-soft">
+                            We’ll email the next steps, shipping instructions, and your inspection guidance shortly.
+                        </p>
+                        <div className="mt-8 flex justify-center gap-4">
+                            <a href="/shop" className="premium-button">Continue shopping</a>
+                            <button className="premium-button-secondary" onClick={() => setStep(1)}>Start again</button>
+                        </div>
+                    </div>
+                )}
+            </section>
         </div>
     );
 };

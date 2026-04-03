@@ -35,14 +35,18 @@ const HomeTrustFeatures = () => {
     ];
 
     return (
-        <section className="py-24 bg-white">
-            <div className="max-w-site mx-auto px-[100px] lg:px-10">
-                <div className="grid grid-cols-3 gap-10 max-md:grid-cols-1 max-md:gap-[60px]">
+        <section className="px-4 py-12 md:px-6 md:py-16">
+            <div className="page-container">
+                <div className="mb-10 text-center">
+                    <span className="eyebrow mb-4">Why UpCell</span>
+                    <h2>Confidence built into every order.</h2>
+                </div>
+                <div className="grid grid-cols-3 gap-6 max-md:grid-cols-1">
                     {features.map((feature, index) => (
-                        <div key={index} className="text-center flex flex-col items-center">
+                        <div key={index} className="premium-card flex flex-col items-center rounded-[32px] p-8 text-center">
                             <div className="mb-6 flex justify-center items-center">{feature.icon}</div>
                             <h3 className="text-xl font-bold text-apple-text mb-3">{feature.title}</h3>
-                            <p className="text-[15px] leading-relaxed text-apple-gray max-w-[280px]">{feature.description}</p>
+                            <p className="max-w-[280px] text-[15px] leading-7 text-ink-soft">{feature.description}</p>
                         </div>
                     ))}
                 </div>

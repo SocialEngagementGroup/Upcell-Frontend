@@ -2,20 +2,21 @@ import React from 'react';
 
 const NewsletterSignup = () => {
     return (
-        <section className="py-[120px] bg-white">
-            <div className="max-w-site mx-auto px-[100px] lg:px-10">
-                <div className="text-center max-w-[600px] mx-auto">
-                    <h2 className="text-4xl font-extrabold text-apple-text mb-4 tracking-[-0.02em]">Stay ahead of the curve.</h2>
-                    <p className="text-base leading-relaxed text-apple-gray mb-8">Get the latest Apple updates, device drops, and exclusive offers delivered to your inbox.</p>
+        <section className="px-4 py-14 md:px-6 md:py-20">
+            <div className="page-container">
+                <div className="premium-card mx-auto max-w-[760px] rounded-[40px] bg-white/80 px-8 py-10 text-center md:px-12 md:py-14">
+                    <span className="eyebrow mb-5">Newsletter</span>
+                    <h2 className="mb-4 text-4xl font-extrabold tracking-[-0.02em] text-apple-text">Be first to see new Apple arrivals.</h2>
+                    <p className="mx-auto mb-8 max-w-[540px] text-base leading-8 text-ink-soft">Get carefully timed updates on fresh inventory, trade-in boosts, and limited-condition finds.</p>
                     
                     <form className="flex gap-3 mb-6 max-sm:flex-col" onSubmit={(e) => e.preventDefault()}>
                         <input 
                             type="email" 
                             placeholder="Enter your email" 
-                            className="flex-1 bg-surface-alt border-none rounded-xl px-6 py-[18px] text-base text-apple-text outline-none transition-colors duration-200 focus:bg-border-faint"
+                            className="premium-input flex-1"
                             required
                         />
-                        <button type="submit" className="bg-apple-text text-white px-8 py-[18px] rounded-xl text-base font-bold transition-all duration-200 hover:bg-black max-sm:w-full">Subscribe</button>
+                        <button type="submit" className="premium-button max-sm:w-full">Subscribe</button>
                     </form>
                     
                     <p className="!text-[13px] opacity-80 text-apple-gray">We respect your privacy. Unsubscribe at any time.</p>

@@ -1,23 +1,37 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+    :root {
+        color-scheme: light;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
     body {
         @apply bg-white text-apple-text font-sans m-0 p-0 overflow-x-hidden antialiased;
-        box-sizing: border-box;
+        background:
+            radial-gradient(circle at top center, rgba(244, 245, 248, 0.95), rgba(255, 255, 255, 0) 36%),
+            linear-gradient(180deg, #fbfbfd 0%, #ffffff 28%, #f7f7f9 100%);
     }
 
     h1, h2, h3, h4, h5, h6 {
         @apply text-apple-text font-extrabold tracking-tight;
     }
 
-    h1 { @apply text-5xl lg:text-6xl; }
-    h2 { @apply text-4xl lg:text-5xl; }
-    h3 { @apply text-2xl lg:text-3xl; }
-    h4 { @apply text-xl lg:text-2xl; }
+    h1 { @apply text-5xl lg:text-6xl; letter-spacing: -0.06em; }
+    h2 { @apply text-4xl lg:text-5xl; letter-spacing: -0.05em; }
+    h3 { @apply text-2xl lg:text-3xl; letter-spacing: -0.04em; }
+    h4 { @apply text-xl lg:text-2xl; letter-spacing: -0.03em; }
 
     p {
         @apply text-apple-gray leading-relaxed;
@@ -30,11 +44,115 @@
     button {
         @apply border-none cursor-pointer font-sans font-bold transition-all duration-300 ease-smooth;
     }
+
+    input, textarea, select {
+        @apply font-sans;
+    }
 }
 
 /* Global Navigation Resets */
 .active, .nav-link.active, a.active {
     background-color: transparent !important;
+}
+
+@layer components {
+    .page-shell {
+        @apply min-h-screen pt-24 md:pt-28;
+    }
+
+    .page-container {
+        @apply max-w-site mx-auto px-6 md:px-10 xl:px-16;
+    }
+
+    .glass-panel {
+        @apply border border-white/60 bg-white/70 backdrop-blur-2xl;
+        box-shadow: 0 20px 80px rgba(15, 23, 42, 0.10);
+    }
+
+    .surface-panel {
+        @apply border border-black/[0.06] bg-white;
+        box-shadow: 0 18px 60px rgba(15, 23, 42, 0.06);
+    }
+
+    .eyebrow {
+        @apply inline-flex items-center rounded-full border border-black/[0.08] bg-white/80 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.24em] text-apple-gray;
+    }
+
+    .section-heading {
+        @apply text-[clamp(2.4rem,4vw,4.8rem)] leading-[0.95];
+    }
+
+    .kicker-link {
+        @apply text-sm font-bold tracking-[0.02em] text-apple-text hover:text-brand-red;
+    }
+
+    .premium-button {
+        @apply inline-flex items-center justify-center rounded-full bg-apple-text px-7 py-4 text-sm font-bold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-black;
+    }
+
+    .premium-button-secondary {
+        @apply inline-flex items-center justify-center rounded-full border border-black/[0.08] bg-white/75 px-7 py-4 text-sm font-bold text-apple-text backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:bg-white;
+    }
+
+    .premium-button-secondary:hover {
+        border-color: rgba(0, 0, 0, 0.15);
+    }
+
+    .premium-input {
+        @apply h-14 w-full rounded-[20px] border border-black/[0.08] bg-white px-5 text-[15px] text-apple-text outline-none transition-all duration-200 placeholder:text-apple-gray/80 focus:border-apple-text/25 focus:shadow-[0_0_0_4px_rgba(29,29,31,0.05)];
+    }
+
+    .premium-card {
+        @apply rounded-[32px] border border-black/[0.06] bg-white;
+        box-shadow: 0 18px 60px rgba(15, 23, 42, 0.06);
+    }
+
+    .legal-prose {
+        @apply max-w-[860px] mx-auto text-[15px] leading-8;
+        color: #515154;
+    }
+
+    .legal-prose h2 {
+        @apply mt-12 mb-4 text-2xl text-apple-text;
+    }
+
+    .legal-prose p {
+        @apply mb-4;
+        color: #515154;
+    }
+
+    .legal-prose ul, .legal-prose ol {
+        @apply mb-6 pl-6;
+    }
+
+    .legal-prose li {
+        @apply mb-3;
+    }
+
+    .admin-shell {
+        @apply min-h-screen bg-[linear-gradient(180deg,#f6f7fa_0%,#eef1f5_100%)] pt-24 md:pt-28;
+    }
+
+    .admin-container {
+        @apply mx-auto max-w-site px-6 md:px-10 xl:px-16;
+    }
+
+    .admin-panel {
+        @apply rounded-[32px] border border-black/[0.06] bg-white;
+        box-shadow: 0 18px 60px rgba(15, 23, 42, 0.06);
+    }
+
+    .admin-input {
+        @apply h-12 w-full rounded-2xl border border-black/[0.08] bg-white px-4 text-sm text-apple-text outline-none transition-all duration-200 placeholder:text-apple-gray;
+    }
+
+    .admin-select {
+        @apply h-12 w-full rounded-2xl border border-black/[0.08] bg-white px-4 text-sm text-apple-text outline-none;
+    }
+
+    .admin-textarea {
+        @apply w-full rounded-2xl border border-black/[0.08] bg-white px-4 py-3 text-sm text-apple-text outline-none;
+    }
 }
 
 /* Keyframe Animations */
@@ -46,4 +164,9 @@
 @keyframes fadeInRight {
     from { opacity: 0; transform: translateX(40px); }
     to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes floatSoft {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
 }
