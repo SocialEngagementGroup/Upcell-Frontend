@@ -43,6 +43,9 @@ import ThankYou from './pages/ThankYou/ThankYou.jsx';
 import JournalPost from './pages/Auxiliary/Resources/JournalPost.jsx';
 import NotFound from './pages/NotFound/NotFound.jsx';
 import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary.jsx';
+import AdminTradeIn from './pages/Admin/TradeIn/AdminTradeIn.jsx';
+import AdminNewsletter from './pages/Admin/Newsletter/AdminNewsletter.jsx';
+import AdminContact from './pages/Admin/Contact/AdminContact.jsx';
 
 
 
@@ -125,6 +128,18 @@ const router = createBrowserRouter([
           {
             path: "orders",
             element: <AdminOrder></AdminOrder>
+          },
+          {
+            path: "trade-in",
+            element: <AdminTradeIn></AdminTradeIn>
+          },
+          {
+            path: "newsletter",
+            element: <AdminNewsletter></AdminNewsletter>
+          },
+          {
+            path: "contact",
+            element: <AdminContact></AdminContact>
           },
           {
             path: "catagory",

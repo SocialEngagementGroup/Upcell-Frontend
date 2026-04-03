@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom'
+import { useState } from 'react';
+import axiosInstance from '../../../utilities/axiosInstance';
 
 // Modern Icons
 const SocialIcons = {
@@ -8,6 +10,31 @@ const SocialIcons = {
 };
 
 const MyFooter = () => {
+    const [newsletterEmail, setNewsletterEmail] = useState('');
+    const [newsletterMessage, setNewsletterMessage] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const handleNewsletterSubmit = async (event) => {
+        event.preventDefault();
+        if (!newsletterEmail.trim()) return;
+
+        setIsSubmitting(true);
+        setNewsletterMessage('');
+
+        try {
+            await axiosInstance.post('newsletter-subscribers', {
+                email: newsletterEmail.trim(),
+                source: 'footer',
+            });
+            setNewsletterMessage('Subscribed successfully.');
+            setNewsletterEmail('');
+        } catch (error) {
+            setNewsletterMessage(error?.response?.data?.error || 'Unable to subscribe right now.');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
     return (
         <footer className="bg-black">
             <div className="page-container py-10">
@@ -58,19 +85,25 @@ const MyFooter = () => {
                         <div className="space-y-6 lg:pt-8">
                             <h4 className="text-sm font-extrabold uppercase tracking-[0.14em] text-apple-text">Stay Updated</h4>
                             <p className="text-[13px] leading-6 text-apple-gray">Get notified about new certified refurbished products and exclusive trade-in offers.</p>
-                            <form className="flex flex-col gap-3">
+                            <form className="flex flex-col gap-3" onSubmit={handleNewsletterSubmit}>
                                 <input
                                     type="email"
                                     placeholder="your@email.com"
+                                    value={newsletterEmail}
+                                    onChange={(event) => setNewsletterEmail(event.target.value)}
                                     className="h-12 w-full rounded-2xl border border-black/[0.08] bg-white px-5 text-sm font-medium text-apple-text outline-none transition-all placeholder:text-apple-gray focus:border-apple-text/20 focus:shadow-[0_0_0_4px_rgba(29,29,31,0.05)]"
                                 />
                                 <button
                                     type="submit"
+                                    disabled={isSubmitting}
                                     className="inline-flex h-12 w-full items-center justify-center rounded-2xl bg-apple-text px-6 text-sm font-bold text-white shadow-none ring-0 transition-all duration-300 hover:bg-black"
                                 >
-                                    Subscribe
+                                    {isSubmitting ? 'Subscribing...' : 'Subscribe'}
                                 </button>
                             </form>
+                            {newsletterMessage && (
+                                <p className="text-[12px] text-apple-gray">{newsletterMessage}</p>
+                            )}
                         </div>
 
                     </div>

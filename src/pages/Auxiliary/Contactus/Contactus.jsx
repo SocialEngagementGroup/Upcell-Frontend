@@ -6,6 +6,7 @@ import FacebookOutlinedIcon from '@mui/icons-material/FacebookOutlined';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
+import axiosInstance from '../../../utilities/axiosInstance';
 
 const faqs = [
     { q: 'How do I contact UpCell?', a: 'Email is the fastest path for order support, trade-ins, or return requests. Social channels are also monitored regularly and typically see responses within 24 hours.' },
@@ -18,6 +19,34 @@ const faqs = [
 
 const Contactus = () => {
     const [openIndex, setOpenIndex] = useState(0);
+    const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitMessage, setSubmitMessage] = useState('');
+
+    const handleChange = (field) => (event) => {
+        setFormData((prev) => ({ ...prev, [field]: event.target.value }));
+    };
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        setIsSubmitting(true);
+        setSubmitMessage('');
+
+        try {
+            await axiosInstance.post('contact-submissions', {
+                name: formData.name.trim(),
+                email: formData.email.trim(),
+                subject: formData.subject.trim(),
+                message: formData.message.trim(),
+            });
+            setSubmitMessage('Message sent successfully. Our team will get back to you soon.');
+            setFormData({ name: '', email: '', subject: '', message: '' });
+        } catch (error) {
+            setSubmitMessage(error?.response?.data?.error || 'Unable to send your message right now.');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     return (
         <div className="page-shell">
@@ -68,15 +97,18 @@ const Contactus = () => {
                             <h3 className="text-3xl font-black">Send us a message</h3>
                             <p className="mt-3 text-apple-gray">Direct inquiries are monitored 6 days a week.</p>
                         </div>
-                        <form className="grid gap-6" onSubmit={(e) => e.preventDefault()}>
+                        <form className="grid gap-6" onSubmit={handleSubmit}>
                             <div className="grid gap-6 md:grid-cols-2">
-                                <input className="premium-input bg-apple-gray/5 border-transparent focus:bg-white" placeholder="Full name" required />
-                                <input className="premium-input bg-apple-gray/5 border-transparent focus:bg-white" type="email" placeholder="Email address" required />
+                                <input className="premium-input bg-apple-gray/5 border-transparent focus:bg-white" placeholder="Full name" value={formData.name} onChange={handleChange('name')} required />
+                                <input className="premium-input bg-apple-gray/5 border-transparent focus:bg-white" type="email" placeholder="Email address" value={formData.email} onChange={handleChange('email')} required />
                             </div>
-                            <input className="premium-input bg-apple-gray/5 border-transparent focus:bg-white" placeholder="Subject" required />
-                            <textarea className="premium-input min-h-[220px] resize-none py-4 bg-apple-gray/5 border-transparent focus:bg-white" placeholder="Tell us how we can help." required />
-                            <button className="h-[56px] px-10 rounded-full bg-apple-text text-white font-black text-lg transition-all hover:scale-[1.02] hover:shadow-lg active:scale-[0.98]">
-                                Send Message
+                            <input className="premium-input bg-apple-gray/5 border-transparent focus:bg-white" placeholder="Subject" value={formData.subject} onChange={handleChange('subject')} required />
+                            <textarea className="premium-input min-h-[220px] resize-none py-4 bg-apple-gray/5 border-transparent focus:bg-white" placeholder="Tell us how we can help." value={formData.message} onChange={handleChange('message')} required />
+                            {submitMessage && (
+                                <p className="text-sm text-apple-gray">{submitMessage}</p>
+                            )}
+                            <button type="submit" disabled={isSubmitting} className="h-[56px] px-10 rounded-full bg-apple-text text-white font-black text-lg transition-all hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70">
+                                {isSubmitting ? 'Sending...' : 'Send Message'}
                             </button>
                         </form>
                     </div>
@@ -122,4 +154,3 @@ const Contactus = () => {
 };
 
 export default Contactus;
-

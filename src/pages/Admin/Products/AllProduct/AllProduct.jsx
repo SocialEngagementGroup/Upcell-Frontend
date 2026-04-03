@@ -74,7 +74,7 @@ const AllProduct = () => {
                 <h1 className="text-[clamp(2rem,3.8vw,3.6rem)] leading-[0.94]">
                     {categoryFilter ? `${categoryFilter} inventory.` : "Manage product inventory."}
                 </h1>
-                <label className="relative mt-6 block max-w-[380px]">
+                <label className="relative mt-6 block w-full">
                     <SearchRoundedIcon className="pointer-events-none absolute left-4 top-1/2 !text-[20px] -translate-y-1/2 text-apple-gray" />
                     <input
                         type="search"

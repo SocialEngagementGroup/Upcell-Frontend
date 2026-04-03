@@ -10,6 +10,7 @@ import BoltIcon from '@mui/icons-material/Bolt';
 import PhoneIphoneIcon from '@mui/icons-material/PhoneIphone';
 import TabletMacIcon from '@mui/icons-material/TabletMac';
 import LaptopMacIcon from '@mui/icons-material/LaptopMac';
+import axiosInstance from '../../utilities/axiosInstance';
 
 /* ───────────── STATIC DATA ───────────── */
 
@@ -190,6 +191,9 @@ const TradeIn = () => {
         phone: '',
     });
     const [conditionStep, setConditionStep] = useState(0);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState('');
+    const [savedRequest, setSavedRequest] = useState(null);
 
     const hasCarrier = carrierOptions[selection.device] !== null;
 
@@ -235,9 +239,47 @@ const TradeIn = () => {
         setStep(1);
         setConditionStep(0);
         setSelection({ device: '', model: '', carrier: '', storage: '', answers: {}, name: '', email: '', phone: '' });
+        setIsSubmitting(false);
+        setSubmitError('');
+        setSavedRequest(null);
     };
 
     const stepLabels = getStepLabels(selection.device || 'iPhone');
+    const selectedModelTitle = (modelOptions[selection.device] || []).find((model) => model.id === selection.model)?.title || '';
+    const selectedCarrierTitle = (carrierOptions[selection.device] || []).find((carrier) => carrier.id === selection.carrier)?.title || '';
+
+    const handleSubmitTradeInRequest = async () => {
+        if (!selection.name.trim() || !selection.email.trim() || !selection.phone.trim()) {
+            setSubmitError('Please fill in your name, email, and phone number before submitting.');
+            return;
+        }
+
+        setIsSubmitting(true);
+        setSubmitError('');
+
+        try {
+            const response = await axiosInstance.post('trade-in-requests', {
+                device: selection.device,
+                model: selection.model,
+                modelTitle: selectedModelTitle,
+                carrier: selection.carrier || undefined,
+                carrierTitle: selectedCarrierTitle || undefined,
+                storage: selection.storage,
+                estimate: estimate || 0,
+                answers: selection.answers,
+                name: selection.name.trim(),
+                email: selection.email.trim(),
+                phone: selection.phone.trim(),
+            });
+
+            setSavedRequest(response.data);
+            setStep(stepMap['Confirmation']);
+        } catch (error) {
+            setSubmitError(error?.response?.data?.error || 'Something went wrong while submitting your request. Please try again.');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     return (
         <div className="page-shell">
@@ -515,7 +557,18 @@ const TradeIn = () => {
                                     <input className="premium-input" type="email" placeholder="Email address" value={selection.email} onChange={(e) => setSelection((prev) => ({ ...prev, email: e.target.value }))} />
                                     <input className="premium-input" type="tel" placeholder="Phone number" value={selection.phone} onChange={(e) => setSelection((prev) => ({ ...prev, phone: e.target.value }))} />
                                 </div>
-                                <button className="premium-button mt-8 w-full sm:w-auto" onClick={next}>Submit Trade-In Request</button>
+                                {submitError && (
+                                    <div className="mt-5 rounded-[20px] border border-red-500/15 bg-red-50 px-4 py-3 text-sm text-red-600">
+                                        {submitError}
+                                    </div>
+                                )}
+                                <button
+                                    className="premium-button mt-8 w-full sm:w-auto disabled:cursor-not-allowed disabled:opacity-70"
+                                    onClick={handleSubmitTradeInRequest}
+                                    disabled={isSubmitting}
+                                >
+                                    {isSubmitting ? 'Submitting...' : 'Submit Trade-In Request'}
+                                </button>
                             </div>
                         </div>
 
@@ -568,6 +621,13 @@ const TradeIn = () => {
                             <div className="text-sm text-ink-soft">Estimated payout</div>
                             <div className="mt-1 text-3xl font-extrabold text-apple-text">${estimate || 0}</div>
                         </div>
+                        {savedRequest?._id && (
+                            <div className="mx-auto mt-4 max-w-[400px] rounded-[24px] border border-black/[0.06] bg-white p-5 text-left">
+                                <div className="text-xs font-bold uppercase tracking-[0.18em] text-apple-gray">Request ID</div>
+                                <div className="mt-2 break-all text-sm font-bold text-apple-text">{savedRequest._id}</div>
+                                <div className="mt-3 text-xs text-ink-soft">Status: {savedRequest.status}</div>
+                            </div>
+                        )}
                         <div className="mt-10 flex justify-center gap-4">
                             <Link to="/shop" className="premium-button min-w-[200px]">Continue shopping</Link>
                             <button className="premium-button-secondary min-w-[200px]" onClick={resetFlow}>Start again</button>

@@ -1,59 +1,63 @@
-import axiosInstance from "../../../../utilities/axiosInstance";
 import React, { useEffect, useState } from 'react';
-import SingleAdminOrder from "./SingleAdminOrder";
+import axiosInstance from '../../../utilities/axiosInstance';
+import SingleTradeInRequest from './SingleTradeInRequest';
 
-const statuses = ["Processing", "Shipped", "Delivered", "Returned", "Refunded", "payment failed"];
+const tradeInStatuses = ["New", "Contacted", "Received", "Quoted", "Paid", "Closed"];
 
-const AdminOrder = () => {
-    const [orders, setOrders] = useState([]);
-    const [orderStatus, setOrderStatus] = useState("Processing");
-    const [email, setEmail] = useState("");
-    const [orderId, setOrderId] = useState("");
+const AdminTradeIn = () => {
+    const [requests, setRequests] = useState([]);
+    const [activeFilter, setActiveFilter] = useState('New');
+    const [email, setEmail] = useState('');
+    const [requestId, setRequestId] = useState('');
 
     useEffect(() => {
-        axiosInstance.get(`admin-orders/${orderStatus}`)
-            .then((res) => setOrders(res.data))
+        axiosInstance.get(`admin-trade-in-requests/${activeFilter}`)
+            .then((res) => setRequests(res.data))
             .catch((error) => console.log(error));
-        setEmail("");
-        setOrderId("");
-    }, [orderStatus]);
+        setEmail('');
+        setRequestId('');
+    }, [activeFilter]);
 
-    const handleOrderIdSearch = (event) => {
+    const handleRequestIdSearch = (event) => {
         event.preventDefault();
-        setOrderStatus(`byOrderId:${orderId}`);
+        setActiveFilter(`byRequestId:${requestId}`);
     };
 
     const handleEmailSearch = (event) => {
         event.preventDefault();
-        setOrderStatus(`byEmail:${email}`);
+        setActiveFilter(`byEmail:${email}`);
+    };
+
+    const handleRequestUpdated = (updatedRequest) => {
+        setRequests((prev) => prev.map((request) => request._id === updatedRequest._id ? updatedRequest : request));
     };
 
     return (
         <section className="space-y-6">
             <div className="admin-panel rounded-[36px] bg-[linear-gradient(180deg,#ffffff_0%,#f3f5f8_100%)] px-8 py-10">
-                <span className="eyebrow mb-5">Orders</span>
-                <h1 className="text-[clamp(2rem,3.8vw,3.6rem)] leading-[0.94]">Manage customer orders.</h1>
+                <span className="eyebrow mb-5">Trade In</span>
+                <h1 className="text-[clamp(2rem,3.8vw,3.6rem)] leading-[0.94]">Manage trade-in requests.</h1>
             </div>
 
             <div className="admin-panel rounded-[36px] p-6 md:p-8">
                 <div className="flex flex-col gap-5">
                     <div className="flex flex-wrap gap-3">
-                        {statuses.map((status) => (
+                        {tradeInStatuses.map((status) => (
                             <button
                                 key={status}
-                                className={orderStatus === status ? 'premium-button' : 'premium-button-secondary'}
-                                onClick={() => setOrderStatus(status)}
+                                className={activeFilter === status ? 'premium-button' : 'premium-button-secondary'}
+                                onClick={() => setActiveFilter(status)}
                             >
-                                {status === 'Processing' ? 'Paid' : status}
+                                {status}
                             </button>
                         ))}
                     </div>
 
                     <div className="grid gap-4 md:grid-cols-2">
                         <div className="rounded-[28px] bg-surface-alt p-4">
-                            <div className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-apple-gray">Search by order ID</div>
-                            <form className="flex gap-3" onSubmit={handleOrderIdSearch}>
-                                <input className="admin-input" type="text" placeholder="Order ID" value={orderId} onChange={(e) => setOrderId(e.target.value)} />
+                            <div className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-apple-gray">Search by request ID</div>
+                            <form className="flex gap-3" onSubmit={handleRequestIdSearch}>
+                                <input className="admin-input" type="text" placeholder="Trade-in request ID" value={requestId} onChange={(e) => setRequestId(e.target.value)} />
                                 <button className="premium-button px-5" type="submit">Search</button>
                             </form>
                         </div>
@@ -68,13 +72,15 @@ const AdminOrder = () => {
                 </div>
             </div>
 
-            {orders.length ? (
+            {requests.length ? (
                 <div className="space-y-5">
-                    {orders.map((order) => <SingleAdminOrder key={order._id} order={order} />)}
+                    {requests.map((request) => (
+                        <SingleTradeInRequest key={request._id} request={request} onStatusUpdated={handleRequestUpdated} />
+                    ))}
                 </div>
             ) : (
                 <div className="admin-panel rounded-[30px] p-12 text-center">
-                    <h2 className="text-[28px]">No orders found.</h2>
+                    <h2 className="text-[28px]">No trade-in requests found.</h2>
                     <p className="mt-3 text-sm text-ink-soft">Try another status or search filter.</p>
                 </div>
             )}
@@ -82,4 +88,4 @@ const AdminOrder = () => {
     );
 };
 
-export default AdminOrder;
+export default AdminTradeIn;
