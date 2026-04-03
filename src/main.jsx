@@ -82,11 +82,11 @@ const router = createBrowserRouter([
 
 
       {
-        path: "journal",
+        path: "blogs",
         element: <Resources></Resources>,
       },
       {
-        path: "journal/:slug",
+        path: "blogs/:slug",
         element: <JournalPost></JournalPost>
       },
       {

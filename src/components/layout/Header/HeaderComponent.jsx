@@ -18,7 +18,7 @@ const HeaderComponent = () => {
     { label: 'Shop', to: '/shop' },
     { label: 'Trade In', to: '/trade-in' },
     { label: 'About', to: '/about' },
-    { label: 'Journal', to: '/journal' },
+    { label: 'Blogs', to: '/blogs' },
     { label: 'Support', to: '/support' },
   ]
 

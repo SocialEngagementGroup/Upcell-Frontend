@@ -14,7 +14,7 @@ const JournalInsights = () => {
                 <div className="mb-14 flex items-center justify-between border-b border-apple-gray/5 pb-6">
                     <h2 className="text-[clamp(2rem,3.2vw,3.2rem)] leading-none tracking-tight font-black">Latest from the blog</h2>
                     <Link 
-                        to="/journal" 
+                        to="/blogs" 
                         className="group flex items-center gap-2 text-sm font-bold text-apple-gray hover:text-apple-text transition-colors"
                     >
                         View All Blogs

@@ -12,7 +12,7 @@ const JournalPost = () => {
 
     useEffect(() => {
         if (!article) {
-            navigate('/journal');
+            navigate('/blogs');
         }
     }, [article, navigate]);
 
@@ -26,7 +26,7 @@ const JournalPost = () => {
                 <nav className="mb-8 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-apple-gray">
                     <Link to="/" className="hover:text-apple-text transition-colors">Home</Link>
                     <KeyboardArrowRightIcon className="!text-sm" />
-                    <Link to="/journal" className="hover:text-apple-text transition-colors">Journal</Link>
+                    <Link to="/blogs" className="hover:text-apple-text transition-colors">Blogs</Link>
                     <KeyboardArrowRightIcon className="!text-sm" />
                     <span className="text-apple-text truncate max-w-[200px] md:max-w-none">{article.title}</span>
                 </nav>
@@ -60,11 +60,11 @@ const JournalPost = () => {
 
                     <div className="mt-20 border-t border-apple-gray/5 pt-12">
                         <Link 
-                            to="/journal" 
+                            to="/blogs" 
                             className="group flex items-center gap-3 text-lg font-bold text-apple-text"
                         >
                             <ArrowBackIcon className="transition-transform group-hover:-translate-x-1" />
-                            Back to Journal
+                            Back to Blogs
                         </Link>
                     </div>
                 </div>

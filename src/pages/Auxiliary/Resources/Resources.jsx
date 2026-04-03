@@ -12,7 +12,7 @@ const Resources = () => {
                     <nav className="mb-8 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-apple-gray">
                         <Link to="/" className="hover:text-apple-text transition-colors">Home</Link>
                         <KeyboardArrowRightIcon className="!text-sm" />
-                        <span className="text-apple-text">Journal</span>
+                        <span className="text-apple-text">Blogs</span>
                     </nav>
                     <h1 className="text-[clamp(2.8rem,5vw,5rem)] leading-[0.92]">Refurbished Apple Buying Guides, Trade-In Tips & Device Care Resources</h1>
                     <p className="mt-5 max-w-[700px] text-lg leading-8 text-ink-soft">

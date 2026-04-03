@@ -10,24 +10,24 @@ const SocialIcons = {
 const MyFooter = () => {
     return (
         <footer className="bg-black">
-            <div className="page-container py-14">
-                <div className="overflow-hidden rounded-[36px] bg-white p-8 shadow-[0_20px_50px_rgba(0,0,0,0.15)] md:p-12">
-                    <div className="grid gap-10 lg:grid-cols-[1.5fr_1fr_1fr_1.2fr]">
+            <div className="page-container py-10">
+                <div className="overflow-hidden rounded-[36px] bg-white p-8 shadow-[0_20px_50px_rgba(0,0,0,0.15)] md:px-12 md:py-10">
+                    <div className="grid gap-12 lg:grid-cols-[1.4fr_0.8fr_0.8fr_0.8fr_1.6fr]">
                         <div className="space-y-5">
                             <Link to="/" className="flex items-center">
-                                <img src="/staticImages/upcellLogo.png" alt="Upcell Logo" className="h-[110px] w-auto object-contain" />
+                                <img src="/staticImages/upcellLogo.png" alt="Upcell Logo" className="h-[138px] w-auto object-contain" />
                             </Link>
                             <p className="max-w-[320px] text-sm leading-7 text-ink-soft">
                                 Certified refurbished iPhones, iPads, and MacBooks — professionally inspected, honestly graded, and backed by a 12-month warranty. Save up to 40% vs. new.
                             </p>
-                            <div className="flex gap-3">
+                            <div className="flex gap-3 pt-2">
                                 <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram" className="flex h-11 w-11 items-center justify-center rounded-full border border-black/[0.06] text-apple-gray hover:-translate-y-0.5 hover:bg-surface-alt hover:text-apple-text"><SocialIcons.Instagram /></a>
                                 <a href="https://facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook" className="flex h-11 w-11 items-center justify-center rounded-full border border-black/[0.06] text-apple-gray hover:-translate-y-0.5 hover:bg-surface-alt hover:text-apple-text"><SocialIcons.Facebook /></a>
                                 <a href="https://twitter.com" target="_blank" rel="noreferrer" aria-label="Twitter" className="flex h-11 w-11 items-center justify-center rounded-full border border-black/[0.06] text-apple-gray hover:-translate-y-0.5 hover:bg-surface-alt hover:text-apple-text"><SocialIcons.Twitter /></a>
                             </div>
                         </div>
 
-                        <div className="space-y-4">
+                        <div className="space-y-4 lg:pt-8">
                             <h4 className="text-sm font-extrabold uppercase tracking-[0.14em] text-apple-text">Shop</h4>
                             <div className="flex flex-col gap-3 text-[15px] text-ink-soft">
                                 <Link to="/shop">All Products</Link>
@@ -38,16 +38,16 @@ const MyFooter = () => {
                             </div>
                         </div>
 
-                        <div className="space-y-4">
+                        <div className="space-y-4 lg:pt-8">
                             <h4 className="text-sm font-extrabold uppercase tracking-[0.14em] text-apple-text">Company</h4>
                             <div className="flex flex-col gap-3 text-[15px] text-ink-soft">
                                 <Link to="/about">About Us</Link>
-                                <Link to="/journal">Journal</Link>
+                                <Link to="/blogs">Blogs</Link>
                                 <Link to="/myaccount">My Account</Link>
                             </div>
                         </div>
 
-                        <div className="space-y-4">
+                        <div className="space-y-4 lg:pt-8">
                             <h4 className="text-sm font-extrabold uppercase tracking-[0.14em] text-apple-text">Assistance</h4>
                             <div className="flex flex-col gap-3 text-[15px] text-ink-soft">
                                 <Link to="/return-policy">Warranty & Returns</Link>
@@ -55,9 +55,27 @@ const MyFooter = () => {
                                 <Link to="/support">Support</Link>
                             </div>
                         </div>
+                        <div className="space-y-6 lg:pt-8">
+                            <h4 className="text-sm font-extrabold uppercase tracking-[0.14em] text-apple-text">Stay Updated</h4>
+                            <p className="text-[13px] leading-6 text-apple-gray">Get notified about new certified refurbished products and exclusive trade-in offers.</p>
+                            <form className="flex flex-col gap-3">
+                                <input
+                                    type="email"
+                                    placeholder="your@email.com"
+                                    className="h-12 w-full rounded-2xl border border-black/[0.08] bg-white px-5 text-sm font-medium text-apple-text outline-none transition-all placeholder:text-apple-gray focus:border-apple-text/20 focus:shadow-[0_0_0_4px_rgba(29,29,31,0.05)]"
+                                />
+                                <button
+                                    type="submit"
+                                    className="inline-flex h-12 w-full items-center justify-center rounded-2xl bg-apple-text px-6 text-sm font-bold text-white shadow-none ring-0 transition-all duration-300 hover:bg-black"
+                                >
+                                    Subscribe
+                                </button>
+                            </form>
+                        </div>
+
                     </div>
 
-                    <div className="mt-10 flex flex-col gap-3 border-t border-black/[0.06] pt-6 text-[13px] text-apple-gray md:flex-row md:items-center md:justify-between">
+                    <div className="mt-8 flex flex-col gap-3 border-t border-black/[0.06] pt-6 text-[13px] text-apple-gray md:flex-row md:items-center md:justify-between">
                         <p>&copy; {new Date().getFullYear()} UpCell. All rights reserved.</p>
                         <p>Certified refurbished Apple devices. Trusted trade-ins. Transparent pricing.</p>
                     </div>
