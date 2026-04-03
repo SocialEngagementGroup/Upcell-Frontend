@@ -219,15 +219,18 @@ const ProductDetailPage = () => {
                                         <button
                                             key={storage}
                                             disabled={!isAvailable}
-                                            className={`flex h-20 min-w-[110px] flex-1 basis-[120px] flex-col items-center justify-center rounded-none border-2 px-6 py-4 transition-all duration-200 ${
+                                            className={`relative flex h-20 min-w-[110px] flex-1 basis-[120px] flex-col items-center justify-center rounded-[18px] border px-6 py-4 transition-all duration-200 ${
                                                 selectedStorage === storage
-                                                    ? 'border-black bg-white text-black'
+                                                    ? 'border-[#eb0000] bg-white text-black shadow-[0_0_0_3px_rgba(235,0,0,0.08)]'
                                                     : isAvailable
-                                                        ? 'border-transparent bg-white/50 text-apple-gray hover:border-black/10'
-                                                        : 'cursor-not-allowed border-transparent bg-apple-text/[0.03] text-apple-text/20 opacity-40'
+                                                        ? 'border-black/[0.06] bg-white/50 text-apple-gray hover:border-black/10'
+                                                        : 'cursor-not-allowed border-black/[0.04] bg-apple-text/[0.03] text-apple-text/20 opacity-40'
                                             }`}
                                             onClick={() => handleStorageSelect(storage)}
                                         >
+                                            {selectedStorage === storage && (
+                                                <div className="pointer-events-none absolute -inset-1 rounded-[22px] border-2 border-[#eb0000]" />
+                                            )}
                                             <div className="text-base font-black">{storage}</div>
                                             {variantPrice && (
                                                 <div className={`mt-1 text-[11px] font-bold ${selectedStorage === storage ? 'text-apple-text/60' : 'text-apple-gray'}`}>

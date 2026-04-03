@@ -93,7 +93,7 @@ const ThankYou = () => {
 
                         <div className="mt-8 flex flex-wrap gap-4">
                             <Link to="/shop" className="premium-button">Continue shopping</Link>
-                            <Link to="/contactus" className="premium-button-secondary">Contact support</Link>
+                            <Link to="/support" className="premium-button-secondary">Contact support</Link>
                         </div>
                     </main>
 

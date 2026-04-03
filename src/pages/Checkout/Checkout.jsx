@@ -21,7 +21,8 @@ const Checkout = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState('stripe');
 
-    const productIds = params.id === 'cart' ? cart : [params.id];
+    const isObjectId = (id) => /^[0-9a-fA-F]{24}$/.test(id);
+    const productIds = (params.id === 'cart' ? cart : [params.id]).filter(isObjectId);
 
     useEffect(() => {
         if (productIds.length > 0) {

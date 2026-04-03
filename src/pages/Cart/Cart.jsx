@@ -19,7 +19,8 @@ const Cart = () => {
         }
 
         let isCancelled = false;
-        const uniqueIds = [...new Set(cart)];
+        const isObjectId = (id) => /^[0-9a-fA-F]{24}$/.test(id);
+        const uniqueIds = [...new Set(cart)].filter(isObjectId);
 
         const syncCartProducts = (fetchedProducts = []) => {
             if (isCancelled) return;
