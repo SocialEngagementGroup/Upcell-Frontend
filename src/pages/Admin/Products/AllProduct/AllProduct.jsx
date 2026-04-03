@@ -74,12 +74,6 @@ const AllProduct = () => {
                 <h1 className="text-[clamp(2rem,3.8vw,3.6rem)] leading-[0.94]">
                     {categoryFilter ? `${categoryFilter} inventory.` : "Manage product inventory."}
                 </h1>
-                <p className="mt-4 text-base leading-8 text-ink-soft">
-                    {categoryFilter 
-                        ? `Viewing all listings for ${categoryFilter}.` 
-                        : "Review every listing, then edit or remove products without leaving the dashboard."
-                    }
-                </p>
                 <label className="relative mt-6 block max-w-[380px]">
                     <SearchRoundedIcon className="pointer-events-none absolute left-4 top-1/2 !text-[20px] -translate-y-1/2 text-apple-gray" />
                     <input

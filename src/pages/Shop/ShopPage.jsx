@@ -243,9 +243,9 @@ const ShopPage = () => {
                         <KeyboardArrowRightIcon className="!text-sm" />
                         <span>Shop</span>
                     </nav>
-                    <h1 className="max-w-[1100px] text-[clamp(2.6rem,5vw,5rem)] leading-[0.94]">A calmer, more premium way <br className='hidden md:block' /> to shop Apple products.</h1>
+                    <h1 className="max-w-[1100px] text-[clamp(2.6rem,5vw,5rem)] leading-[0.94]">Shop Certified Refurbished <br className='hidden md:block' /> iPhones, iPads & MacBooks</h1>
                     <p className="mt-5 max-w-[640px] text-lg leading-8 text-ink-soft">
-                        Every device is arranged around condition clarity, honest pricing, and a more editorial shopping experience.
+                        Every certified pre-owned Apple device is graded for condition, priced honestly, and backed by a 12-month warranty. Save up to 40% vs. buying new.
                     </p>
                 </div>
             </section>
@@ -389,8 +389,8 @@ const ShopPage = () => {
 
                         {filteredProducts.length === 0 && (
                             <div className="premium-card mt-6 rounded-[32px] px-8 py-12 text-center">
-                                <h3>No devices match those filters.</h3>
-                                <p className="mt-3 text-base text-ink-soft">Reset the filters to bring the full collection back.</p>
+                                <h3>No refurbished devices match those filters.</h3>
+                                <p className="mt-3 text-base text-ink-soft">Reset the filters to browse the full certified pre-owned Apple collection.</p>
                                 <button className="premium-button mt-6" onClick={resetFilters}>
                                     Reset filters
                                 </button>

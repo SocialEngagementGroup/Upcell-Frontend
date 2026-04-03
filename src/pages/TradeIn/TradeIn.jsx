@@ -14,9 +14,9 @@ import LaptopMacIcon from '@mui/icons-material/LaptopMac';
 /* ───────────── STATIC DATA ───────────── */
 
 const deviceOptions = [
-    { id: 'iPhone', title: 'iPhone', desc: 'From iPhone 11 through the latest Pro models.', icon: PhoneIphoneIcon },
-    { id: 'iPad', title: 'iPad', desc: 'Air, mini, and Pro models accepted.', icon: TabletMacIcon },
-    { id: 'MacBook', title: 'MacBook', desc: 'Portable Macs with strong resale value.', icon: LaptopMacIcon },
+    { id: 'iPhone', title: 'iPhone', desc: 'Trade in any iPhone 11 through iPhone 16 Pro Max — unlocked or carrier models accepted.', icon: PhoneIphoneIcon },
+    { id: 'iPad', title: 'iPad', desc: 'iPad Air, iPad mini, and iPad Pro accepted — Wi-Fi and cellular models welcome.', icon: TabletMacIcon },
+    { id: 'MacBook', title: 'MacBook', desc: 'MacBook Air and MacBook Pro — M1, M2, and M3 chips all eligible for trade-in.', icon: LaptopMacIcon },
 ];
 
 const modelOptions = {
@@ -251,9 +251,9 @@ const TradeIn = () => {
                         <KeyboardArrowRightIcon className="!text-sm" />
                         <span className="text-white">Trade In</span>
                     </nav>
-                    <h1 className="mt-6 text-[clamp(2.8rem,5vw,5rem)] leading-[0.92] text-white">Upgrade the Apple way, starting with your current device.</h1>
+                    <h1 className="mt-6 text-[clamp(2.8rem,5vw,5rem)] leading-[0.92] text-white">Trade In Your iPhone, iPad or MacBook — Get Paid Fast</h1>
                     <p className="mt-5 max-w-[680px] text-lg leading-8 text-white/72">
-                        Get a fast valuation, prepaid shipping, and a quieter premium trade-in experience from start to finish.
+                        Get an instant trade-in estimate for your used Apple device. Free insured shipping, 24-hour payout after inspection, and a transparent process from start to finish.
                     </p>
                 </div>
             </section>
@@ -562,7 +562,7 @@ const TradeIn = () => {
                         <CheckCircleIcon className="!text-[72px] text-apple-text" />
                         <h2 className="mt-6 text-[42px]">Trade-in request received.</h2>
                         <p className="mx-auto mt-4 max-w-[560px] text-lg leading-8 text-ink-soft">
-                            We'll email the next steps, shipping instructions, and your inspection guidance shortly.
+                            We'll email your prepaid shipping label, inspection guidance, and next steps within 1 business day. Payout is issued within 24 hours of device inspection.
                         </p>
                         <div className="mx-auto mt-6 max-w-[400px] rounded-[24px] border border-black/[0.06] bg-surface-alt/50 p-5">
                             <div className="text-sm text-ink-soft">Estimated payout</div>

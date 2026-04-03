@@ -9,8 +9,8 @@ const HomeTrustFeatures = () => {
                     <path d="M24 16L26.45 21.45L32 22.27L28 26.12L28.94 31.73L24 29.13L19.06 31.73L20 26.12L16 22.27L21.55 21.45L24 16Z" fill="#1D1D1F" stroke="#1D1D1F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
             ),
-            title: "100-Point Quality Check",
-            description: "Every device is inspected by our certified technicians for peak performance."
+            title: "40-Point Certified Inspection",
+            description: "Every refurbished iPhone, iPad, and MacBook passes our certified technician inspection covering hardware, battery health, and cosmetics."
         },
         {
             icon: (
@@ -19,8 +19,8 @@ const HomeTrustFeatures = () => {
                     <path d="M16 20H28L32 24V32H28M16 20V32H20M16 20H12V28H16M20 32C20 33.1 20.9 34 22 34C23.1 34 24 33.1 24 32M20 32H24M28 32C28 33.1 28.9 34 30 34C31.1 34 32 33.1 32 32M28 32H32M32 24H36V28H32" stroke="#1D1D1F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
             ),
-            title: "Fast, Secure Shipping",
-            description: "Fully insured next-day delivery on all orders placed before 3 PM."
+            title: "Fast, Insured Shipping",
+            description: "All certified pre-owned Apple orders ship fully insured. Next-day delivery available on orders placed before 3 PM."
         },
         {
             icon: (
@@ -29,8 +29,8 @@ const HomeTrustFeatures = () => {
                     <path d="M18 18L30 30M18 30L30 18M24 12V36M12 24H36" stroke="#1D1D1F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
             ),
-            title: "Competitive Pricing",
-            description: "We offer the best value in the secondary market, guaranteed."
+            title: "Save Up to 40% vs. New",
+            description: "Certified pre-owned Apple devices at a fraction of retail — same performance, 12-month warranty, better value."
         }
     ];
 
@@ -38,7 +38,7 @@ const HomeTrustFeatures = () => {
         <section className="px-4 py-14 md:px-6 md:py-24">
             <div className="page-container">
                 <div className="mb-10 text-center">
-                    <h2>Confidence built into every order.</h2>
+                    <h2>Why Buy Refurbished Apple From UpCell?</h2>
                 </div>
                 <div className="grid grid-cols-3 gap-6 max-md:grid-cols-1">
                     {features.map((feature, index) => (

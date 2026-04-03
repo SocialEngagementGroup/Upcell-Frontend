@@ -6,8 +6,8 @@ const NewsletterSignup = () => {
             <div className="page-container">
                 <div className="premium-card mx-auto max-w-[760px] rounded-[40px] bg-white/80 px-8 py-10 text-center md:px-12 md:py-14">
                     <span className="eyebrow mb-5">Newsletter</span>
-                    <h2 className="mb-4 text-4xl font-extrabold tracking-[-0.02em] text-apple-text">Be first to see new Apple arrivals.</h2>
-                    <p className="mx-auto mb-8 max-w-[540px] text-base leading-8 text-ink-soft">Get carefully timed updates on fresh inventory, trade-in boosts, and limited-condition finds.</p>
+                    <h2 className="mb-4 text-4xl font-extrabold tracking-[-0.02em] text-apple-text">Get Notified When New Refurbished Apple Devices Arrive</h2>
+                    <p className="mx-auto mb-8 max-w-[540px] text-base leading-8 text-ink-soft">Be first to know about fresh certified refurbished iPhone, iPad, and MacBook inventory, trade-in value boosts, and limited-stock finds.</p>
                     
                     <form className="flex gap-3 mb-6 max-sm:flex-col" onSubmit={(e) => e.preventDefault()}>
                         <input 

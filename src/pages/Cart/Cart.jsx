@@ -92,9 +92,9 @@ const Cart = () => {
                         <KeyboardArrowRightIcon className="!text-sm" />
                         <span className="text-apple-text">Cart</span>
                     </nav>
-                    <h1 className="text-[clamp(2.6rem,4.6vw,4.8rem)] leading-[0.94]">Your premium Apple lineup.</h1>
+                    <h1 className="text-[clamp(2.6rem,4.6vw,4.8rem)] leading-[0.94]">Your Cart — Certified Refurbished Apple Devices</h1>
                     <p className="mt-5 max-w-[640px] text-lg leading-8 text-ink-soft">
-                        Review your selection, adjust quantities, and continue into a cleaner checkout flow.
+                        Review your selected refurbished iPhones, iPads, or MacBooks, confirm quantities, and proceed to secure checkout.
                     </p>
 
                 </div>
@@ -144,7 +144,7 @@ const Cart = () => {
                 ) : (
                     <div className="premium-card rounded-[36px] px-8 py-16 text-center">
                         <h2>Your cart is empty.</h2>
-                        <p className="mt-4 text-lg text-ink-soft">Start with a curated iPhone, iPad, or MacBook from the shop.</p>
+                        <p className="mt-4 text-lg text-ink-soft">Browse certified refurbished iPhones, iPads, and MacBooks — all inspected, graded, and backed by a 12-month warranty.</p>
                         <Link to="/shop" className="premium-button mt-6">Explore the shop</Link>
                     </div>
                 )}

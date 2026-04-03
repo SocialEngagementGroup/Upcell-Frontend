@@ -32,6 +32,15 @@ const ESSENTIAL_ADDONS = [
     { id: 'addon_protector', name: 'Ultra-Glass Protector', price: 19, description: 'Edge-to-edge scratch and impact defense.' },
 ];
 
+const getStorageSortValue = (storageLabel = '') => {
+    const match = storageLabel.trim().match(/^(\d+(?:\.\d+)?)\s*(TB|GB)$/i);
+    if (!match) return Number.MAX_SAFE_INTEGER;
+
+    const value = Number(match[1]);
+    const unit = match[2].toUpperCase();
+    return unit === 'TB' ? value * 1024 : value;
+};
+
 const ProductDetailPage = () => {
     const { parentId, productId } = useParams();
     const navigate = useNavigate();
@@ -69,6 +78,7 @@ const ProductDetailPage = () => {
 
     const availableStorages = useMemo(() => (
         Array.from(new Set(allProducts.map((item) => item.storage).filter(Boolean)))
+            .sort((left, right) => getStorageSortValue(left) - getStorageSortValue(right) || left.localeCompare(right, undefined, { numeric: true }))
     ), [allProducts]);
 
     useEffect(() => {

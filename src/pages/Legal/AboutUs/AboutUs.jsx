@@ -21,9 +21,9 @@ const AboutUs = () => {
                         <KeyboardArrowRightIcon className="!text-sm" />
                         <span className="text-apple-text">About</span>
                     </nav>
-                    <h1 className="text-[clamp(2.8rem,5vw,5rem)] leading-[0.92]">Premium Apple products, presented with more care.</h1>
+                    <h1 className="text-[clamp(2.8rem,5vw,5rem)] leading-[0.92]">About UpCell — Certified Refurbished Apple Devices You Can Trust</h1>
                     <p className="mt-5 max-w-[700px] text-lg leading-8 text-ink-soft">
-                        UpCell exists to make high-end Apple hardware feel attainable, trustworthy, and beautifully presented without the noise of a typical reseller experience.
+                        UpCell is a certified reseller of pre-owned Apple hardware — sourcing, inspecting, and presenting every refurbished iPhone, iPad, and MacBook to a higher standard than a typical secondhand marketplace.
                     </p>
                 </div>
             </section>
@@ -33,10 +33,10 @@ const AboutUs = () => {
                     <div className="premium-card rounded-[36px] p-8 md:p-10">
                         <h2>Our mission</h2>
                         <p className="mt-5 text-lg leading-8 text-ink-soft">
-                            We source and prepare premium pre-owned Apple devices with a sharper standard for presentation, inspection, and clarity. Every product should feel considered, not merely listed.
+                            We source and certify pre-owned Apple devices against a rigorous 40-point inspection standard covering hardware performance, battery health, and cosmetic condition. Every refurbished iPhone, iPad, and MacBook is graded honestly — so you know exactly what you're getting.
                         </p>
                         <p className="mt-5 text-lg leading-8 text-ink-soft">
-                            That means fewer distractions, more transparency, and an experience that respects both the product and the customer choosing it.
+                            That means transparent pricing, accurate condition grades, a 12-month warranty on every device, and an experience that respects both the product and the customer choosing it.
                         </p>
                     </div>
                     <div className="premium-card overflow-hidden rounded-[36px] p-3">
@@ -47,7 +47,7 @@ const AboutUs = () => {
 
             <section className="page-container pb-24 pt-8">
                 <div className="mb-12">
-                    <h2>What guides the brand.</h2>
+                    <h2>What guides UpCell.</h2>
                 </div>
                 <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
                     {values.map((value, index) => (

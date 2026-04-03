@@ -15,10 +15,10 @@ const MyFooter = () => {
                     <div className="grid gap-10 lg:grid-cols-[1.5fr_1fr_1fr_1.2fr]">
                         <div className="space-y-5">
                             <Link to="/" className="flex items-center">
-                                <img src="/staticImages/upcellLogo.png" alt="Upcell Logo" className="h-[80px] w-auto object-contain" />
+                                <img src="/staticImages/upcellLogo.png" alt="Upcell Logo" className="h-[110px] w-auto object-contain" />
                             </Link>
                             <p className="max-w-[320px] text-sm leading-7 text-ink-soft">
-                                Refined Apple hardware, professionally inspected and presented with the same calm confidence as the products themselves.
+                                Certified refurbished iPhones, iPads, and MacBooks — professionally inspected, honestly graded, and backed by a 12-month warranty. Save up to 40% vs. new.
                             </p>
                             <div className="flex gap-3">
                                 <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram" className="flex h-11 w-11 items-center justify-center rounded-full border border-black/[0.06] text-apple-gray hover:-translate-y-0.5 hover:bg-surface-alt hover:text-apple-text"><SocialIcons.Instagram /></a>
@@ -43,9 +43,7 @@ const MyFooter = () => {
                             <div className="flex flex-col gap-3 text-[15px] text-ink-soft">
                                 <Link to="/about">About Us</Link>
                                 <Link to="/journal">Journal</Link>
-                                <Link to="/support">Support</Link>
                                 <Link to="/myaccount">My Account</Link>
-                                <Link to="/login">Sign In</Link>
                             </div>
                         </div>
 
@@ -55,14 +53,13 @@ const MyFooter = () => {
                                 <Link to="/return-policy">Warranty & Returns</Link>
                                 <Link to="/privacy-policy">Privacy Policy</Link>
                                 <Link to="/support">Support</Link>
-                                <span>Mon-Sat, 9am-7pm</span>
                             </div>
                         </div>
                     </div>
 
                     <div className="mt-10 flex flex-col gap-3 border-t border-black/[0.06] pt-6 text-[13px] text-apple-gray md:flex-row md:items-center md:justify-between">
                         <p>&copy; {new Date().getFullYear()} UpCell. All rights reserved.</p>
-                        <p>Curated Apple products. Trusted trade-ins. Cleaner technology lifecycle.</p>
+                        <p>Certified refurbished Apple devices. Trusted trade-ins. Transparent pricing.</p>
                     </div>
                 </div>
             </div>

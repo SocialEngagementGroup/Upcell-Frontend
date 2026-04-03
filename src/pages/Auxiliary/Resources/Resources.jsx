@@ -14,9 +14,9 @@ const Resources = () => {
                         <KeyboardArrowRightIcon className="!text-sm" />
                         <span className="text-apple-text">Journal</span>
                     </nav>
-                    <h1 className="text-[clamp(2.8rem,5vw,5rem)] leading-[0.92]">Guidance for buying, caring for, and trading premium Apple devices.</h1>
+                    <h1 className="text-[clamp(2.8rem,5vw,5rem)] leading-[0.92]">Refurbished Apple Buying Guides, Trade-In Tips & Device Care Resources</h1>
                     <p className="mt-5 max-w-[700px] text-lg leading-8 text-ink-soft">
-                        A cleaner editorial space for practical device advice, support answers, and lifecycle thinking.
+                        Practical guides on buying certified refurbished iPhones, iPads, and MacBooks — plus trade-in advice, condition grading explained, and tips to get the most from your pre-owned Apple device.
                     </p>
                 </div>
             </section>
