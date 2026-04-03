@@ -30,7 +30,7 @@ const AddCatagory = () => {
     return (
         <section className="admin-panel rounded-[36px] p-8 md:p-10">
             <h2 className="text-[34px]">Add category</h2>
-            <p className="mt-3 text-base leading-8 text-ink-soft">Create a new product family and attach storefront imagery once your storage provider is ready.</p>
+            <p className="mt-3 text-base leading-8 text-ink-soft">Create a new product family and attach shopfront imagery once your storage provider is ready.</p>
 
             <div className="mt-6 flex flex-wrap gap-3">
                 {images.map((image, index) => (

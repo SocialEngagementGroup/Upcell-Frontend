@@ -35,10 +35,9 @@ const HomeTrustFeatures = () => {
     ];
 
     return (
-        <section className="px-4 py-12 md:px-6 md:py-16">
+        <section className="px-4 py-14 md:px-6 md:py-24">
             <div className="page-container">
                 <div className="mb-10 text-center">
-                    <span className="eyebrow mb-4">Why UpCell</span>
                     <h2>Confidence built into every order.</h2>
                 </div>
                 <div className="grid grid-cols-3 gap-6 max-md:grid-cols-1">

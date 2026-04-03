@@ -17,9 +17,9 @@ const ModernHero = () => {
                         </p>
                         <div className="mt-10 flex flex-wrap gap-4">
                             <Link to="/shop" className="inline-flex h-[56px] items-center justify-center rounded-full bg-white px-10 text-[15px] font-black text-black transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(255,255,255,0.15)] min-w-[220px]">
-                                Explore the Store
+                                Explore the Shop
                             </Link>
-                            <Link to="/sell-device" className="inline-flex h-[56px] items-center justify-center rounded-full border border-white/20 bg-white/5 px-10 text-[15px] font-black text-white backdrop-blur transition-all duration-300 hover:-translate-y-1 hover:bg-white/10 min-w-[220px]">
+                            <Link to="/trade-in" className="inline-flex h-[56px] items-center justify-center rounded-full border border-white/20 bg-white/5 px-10 text-[15px] font-black text-white backdrop-blur transition-all duration-300 hover:-translate-y-1 hover:bg-white/10 min-w-[220px]">
                                 Start a Trade-In
                             </Link>
                         </div>

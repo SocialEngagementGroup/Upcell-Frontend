@@ -85,7 +85,7 @@ const Checkout = () => {
             <section className="page-container pb-10 pt-6">
                 <Link to="/cart" className="kicker-link inline-flex items-center gap-2">
                     <ArrowBackIosNewIcon className="!text-sm" />
-                    Return to bag
+                    Return to cart
                 </Link>
 
                 <div className="mt-6 premium-card rounded-[40px] bg-[linear-gradient(180deg,#ffffff_0%,#f3f5f8_100%)] px-8 py-10 md:px-12 md:py-14">

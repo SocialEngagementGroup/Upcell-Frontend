@@ -5,10 +5,47 @@ import ScrollToTop from '../../utilities/ScrollToTop';
 import { toast } from 'react-toastify';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import axiosInstance from '../../utilities/axiosInstance';
+import ModernProductCard from '../../components/ModernProductCard/ModernProductCard';
 import { groupProductsByParent, normalizeProduct } from '../../utilities/catalog';
 
 const categories = ['All Devices', 'iPhone', 'iPad', 'MacBook'];
-const storageOrder = ['128GB', '256GB', '512GB', '1TB', '2TB', '4TB', '8TB'];
+const storageOrder = ['128GB', '256GB', '512GB', '1TB', '2TB', '4TB'];
+
+const getModelGroup = (name) => {
+    if (!name) return '';
+    const low = name.toLowerCase();
+    
+    // iPhone grouping
+    if (low.includes('pro max')) return 'iPhone Pro Max';
+    if (low.includes('plus')) return 'iPhone Plus';
+    if (low.includes('pro') && low.includes('iphone')) return 'iPhone Pro';
+    if (low.includes('iphone')) return 'iPhone';
+
+    // iPad grouping
+    if (low.includes('ipad pro')) return 'iPad Pro';
+    if (low.includes('ipad air')) return 'iPad Air';
+    if (low.includes('ipad mini')) return 'iPad mini';
+    if (low.includes('ipad')) return 'iPad';
+
+    // MacBook grouping
+    if (low.includes('macbook air')) return 'MacBook Air';
+    if (low.includes('macbook pro')) return 'MacBook Pro';
+
+    return name;
+};
+
+const modelGroupOrder = [
+    'iPhone',
+    'iPhone Plus',
+    'iPhone Pro',
+    'iPhone Pro Max',
+    'iPad',
+    'iPad mini',
+    'iPad Air',
+    'iPad Pro',
+    'MacBook Air',
+    'MacBook Pro'
+];
 
 const ShopPage = () => {
     const location = useLocation();
@@ -36,22 +73,31 @@ const ShopPage = () => {
             .catch((error) => console.log(error));
     }, []);
 
-    const availableModels = useMemo(() => (
-        Array.from(new Set(
-            products
-                .filter((product) => activeCategory === 'All Devices' || product.family === activeCategory)
-                .map((product) => product.productName)
-                .filter(Boolean)
-        ))
-            .sort((left, right) => left.localeCompare(right))
-    ), [products, activeCategory]);
+    const availableModels = useMemo(() => {
+        const groups = new Set();
+        products.forEach((product) => {
+            if (activeCategory === 'All Devices' || product.family === activeCategory) {
+                const group = getModelGroup(product.productName);
+                if (group) groups.add(group);
+            }
+        });
+        return Array.from(groups).sort((left, right) => {
+            const leftIndex = modelGroupOrder.indexOf(left);
+            const rightIndex = modelGroupOrder.indexOf(right);
+
+            if (leftIndex === -1 && rightIndex === -1) return left.localeCompare(right);
+            if (leftIndex === -1) return 1;
+            if (rightIndex === -1) return -1;
+            return leftIndex - rightIndex;
+        });
+    }, [products, activeCategory]);
 
     const availableStorages = useMemo(() => (
         Array.from(new Set(
             products
                 .filter((product) => activeCategory === 'All Devices' || product.family === activeCategory)
                 .map((product) => product.storage)
-                .filter(Boolean)
+                .filter((storage) => storage && storageOrder.includes(storage))
         ))
             .sort((left, right) => {
                 const leftIndex = storageOrder.indexOf(left);
@@ -89,8 +135,11 @@ const ShopPage = () => {
                 return false;
             }
 
-            if (selectedModels.length > 0 && !selectedModels.includes(product.productName)) {
-                return false;
+            if (selectedModels.length > 0) {
+                const productGroup = getModelGroup(product.productName);
+                if (!selectedModels.includes(productGroup)) {
+                    return false;
+                }
             }
 
             if (selectedStorages.length > 0 && !selectedStorages.includes(product.storage)) {
@@ -134,7 +183,7 @@ const ShopPage = () => {
                     <nav className="mb-8 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-apple-gray">
                         <Link to="/">Home</Link>
                         <KeyboardArrowRightIcon className="!text-sm" />
-                        <span>Store</span>
+                        <span>Shop</span>
                     </nav>
                     <h1 className="max-w-[1100px] text-[clamp(2.6rem,5vw,5rem)] leading-[0.94]">A calmer, more premium way <br className='hidden md:block' /> to shop Apple products.</h1>
                     <p className="mt-5 max-w-[640px] text-lg leading-8 text-ink-soft">
@@ -198,13 +247,13 @@ const ShopPage = () => {
 
                         <div className="mt-8">
                             <div className="text-xs font-bold uppercase tracking-[0.2em] text-apple-gray">Storage</div>
-                            <div className="mt-4 grid grid-cols-2 gap-3">
+                            <div className="mt-4 grid grid-cols-3 gap-3">
                                 {availableStorages.map((storage) => (
                                     <button
                                         key={storage}
                                         className={selectedStorages.includes(storage)
-                                            ? 'rounded-[18px] bg-apple-text px-4 py-3 text-sm font-bold text-white'
-                                            : 'rounded-[18px] border border-black/[0.08] bg-white px-4 py-3 text-sm font-bold text-apple-text'}
+                                            ? 'flex items-center justify-center rounded-[18px] bg-apple-text px-1 py-3 text-[13px] font-bold text-white'
+                                            : 'flex items-center justify-center rounded-[18px] border border-black/[0.08] bg-white px-1 py-3 text-[13px] font-bold text-apple-text'}
                                         onClick={() => toggleValue(storage, selectedStorages, setSelectedStorages)}
                                     >
                                         {storage}
@@ -237,40 +286,9 @@ const ShopPage = () => {
                     <main>
 
 
-                        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                             {filteredProducts.map((product) => (
-                                <Link
-                                    to={`/iphone/${product.parentCatagory}/${product._id}`}
-                                    key={product._id}
-                                    className="premium-card group overflow-hidden rounded-[32px] p-6 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_30px_90px_rgba(15,23,42,0.12)]"
-                                >
-                                    <div className="flex h-[290px] items-center justify-center rounded-[26px] bg-[linear-gradient(180deg,#f8f8fa_0%,#edf0f5_100%)]">
-                                        <img
-                                            src={product.image}
-                                            alt={product.productName}
-                                            className="h-[82%] w-auto object-contain drop-shadow-[0_25px_45px_rgba(15,23,42,0.12)] transition-transform duration-300 group-hover:scale-[1.03]"
-                                        />
-                                    </div>
-                                    <div className="mt-6">
-                                        <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-apple-gray">{product.family}</div>
-                                        <h3 className="mt-2 text-[28px] leading-[1.05]">{product.productName}</h3>
-                                        <p className="mt-3 text-sm leading-7 text-ink-soft">
-                                            {product.color?.name || 'Apple finish'} • {product.storage}
-                                        </p>
-                                        <div className="mt-6 flex items-center justify-between gap-3">
-                                            <div>
-                                                <div className="text-sm text-apple-gray">From</div>
-                                                <div className="text-2xl font-extrabold text-apple-text">${product.price}</div>
-                                            </div>
-                                            <button 
-                                                className="premium-button w-full text-xs" 
-                                                onClick={(event) => handleAddToCart(event, product._id)}
-                                            >
-                                                Add to cart
-                                            </button>
-                                        </div>
-                                    </div>
-                                </Link>
+                                <ModernProductCard key={product._id} product={product} />
                             ))}
                         </div>
 

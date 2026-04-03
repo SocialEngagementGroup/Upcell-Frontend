@@ -40,6 +40,7 @@ import PrivacyPolicy from './pages/Legal/PrivacyPolicy/PrivacyPolicy.jsx';
 import AboutUs from './pages/Legal/AboutUs/AboutUs.jsx';
 import AdminPrivateRoute from './utilities/AdminPrivateRoute.jsx';
 import ThankYou from './pages/ThankYou/ThankYou.jsx';
+import JournalPost from './pages/Auxiliary/Resources/JournalPost.jsx';
 import NotFound from './pages/NotFound/NotFound.jsx';
 
 
@@ -63,7 +64,7 @@ const router = createBrowserRouter([
       },
       {
         path: "checkout/:id",
-        element: <Checkout></Checkout>
+        element: <PrivateRoute><Checkout></Checkout></PrivateRoute>
       },
       {
         path: "login",
@@ -80,11 +81,15 @@ const router = createBrowserRouter([
 
 
       {
-        path: "resources",
-        element: <Resources></Resources>
+        path: "journal",
+        element: <Resources></Resources>,
       },
       {
-        path: "contactus",
+        path: "journal/:slug",
+        element: <JournalPost></JournalPost>
+      },
+      {
+        path: "support",
         element: <Contactus></Contactus>
       },
 
@@ -97,11 +102,11 @@ const router = createBrowserRouter([
         element:<PrivacyPolicy></PrivacyPolicy>
       },
       {
-        path: "about-us",
+        path: "about",
         element:<AboutUs></AboutUs>
       },
       {
-        path: "sell-device",
+        path: "trade-in",
         element: <TradeIn></TradeIn>
       },
       {

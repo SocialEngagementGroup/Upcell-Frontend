@@ -77,7 +77,7 @@ const LoginAndSignup = () => {
                     <h1 className="text-3xl font-extrabold mb-2">{signin ? "Welcome Back" : "Join UpCell"}</h1>
                     <p className="text-apple-gray text-base">
                         {isAdminLogin
-                            ? "Use a local admin session to manage the store on this machine."
+                            ? "Use a local admin session to manage the shop on this machine."
                             : signin
                                 ? "Sign in to manage your orders"
                                 : "Create an account to start shopping"}

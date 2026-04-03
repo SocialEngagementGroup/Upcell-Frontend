@@ -4,7 +4,7 @@ import { CartContext } from '../../../App'
 
 // Material Icons
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
-import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
+import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -15,11 +15,11 @@ const HeaderComponent = () => {
   const { cart } = useContext(CartContext)
 
   const primaryLinks = [
-    { label: 'Store', to: '/shop' },
-    { label: 'Trade In', to: '/sell-device' },
-    { label: 'About', to: '/about-us' },
-    { label: 'Journal', to: '/resources' },
-    { label: 'Support', to: '/contactus' },
+    { label: 'Shop', to: '/shop' },
+    { label: 'Trade In', to: '/trade-in' },
+    { label: 'About', to: '/about' },
+    { label: 'Journal', to: '/journal' },
+    { label: 'Support', to: '/support' },
   ]
 
   function handleNav() {
@@ -73,7 +73,7 @@ const HeaderComponent = () => {
           </Link>
 
           <Link to="/cart" className='relative flex h-11 w-11 items-center justify-center rounded-full text-apple-text transition-colors hover:bg-black/[0.04] [&_svg]:!text-[21px]'>
-            <ShoppingBagOutlinedIcon />
+            <ShoppingCartOutlinedIcon />
             {cart?.length > 0 && (
               <span className='absolute -right-0.5 -top-0.5 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-apple-text px-1 text-[10px] font-extrabold text-white'>
                 {cart.length}

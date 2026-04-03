@@ -34,27 +34,27 @@ const MyFooter = () => {
                                 <Link to="/shop?category=iPhone">iPhone</Link>
                                 <Link to="/shop?category=iPad">iPad</Link>
                                 <Link to="/shop?category=MacBook">MacBook</Link>
-                                <Link to="/sell-device">Trade In</Link>
+                                <Link to="/trade-in">Trade In</Link>
                             </div>
                         </div>
 
                         <div className="space-y-4">
                             <h4 className="text-sm font-extrabold uppercase tracking-[0.14em] text-apple-text">Company</h4>
                             <div className="flex flex-col gap-3 text-[15px] text-ink-soft">
-                                <Link to="/about-us">About Us</Link>
-                                <Link to="/resources">Journal</Link>
-                                <Link to="/contactus">Contact Us</Link>
+                                <Link to="/about">About Us</Link>
+                                <Link to="/journal">Journal</Link>
+                                <Link to="/support">Support</Link>
                                 <Link to="/myaccount">My Account</Link>
                                 <Link to="/login">Sign In</Link>
                             </div>
                         </div>
 
                         <div className="space-y-4">
-                            <h4 className="text-sm font-extrabold uppercase tracking-[0.14em] text-apple-text">Support</h4>
+                            <h4 className="text-sm font-extrabold uppercase tracking-[0.14em] text-apple-text">Assistance</h4>
                             <div className="flex flex-col gap-3 text-[15px] text-ink-soft">
                                 <Link to="/return-policy">Warranty & Returns</Link>
                                 <Link to="/privacy-policy">Privacy Policy</Link>
-                                <Link to="/contactus">Help Center</Link>
+                                <Link to="/support">Support</Link>
                                 <span>Mon-Sat, 9am-7pm</span>
                             </div>
                         </div>

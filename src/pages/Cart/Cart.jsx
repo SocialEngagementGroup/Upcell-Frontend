@@ -89,20 +89,20 @@ const Cart = () => {
                     <nav className="mb-8 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-apple-gray">
                         <Link to="/" className="hover:text-apple-text transition-colors">Home</Link>
                         <KeyboardArrowRightIcon className="!text-sm" />
-                        <span className="text-apple-text">Bag</span>
+                        <span className="text-apple-text">Cart</span>
                     </nav>
                     <h1 className="text-[clamp(2.6rem,4.6vw,4.8rem)] leading-[0.94]">Your premium Apple lineup.</h1>
                     <p className="mt-5 max-w-[640px] text-lg leading-8 text-ink-soft">
                         Review your selection, adjust quantities, and continue into a cleaner checkout flow.
                     </p>
-                    <Link to="/shop" className="kicker-link mt-6 inline-flex">Continue shopping</Link>
+
                 </div>
             </section>
 
             <section className="page-container pb-16">
                 {isLoading ? (
                     <div className="premium-card rounded-[36px] px-8 py-16 text-center">
-                        <h2>Loading your bag.</h2>
+                        <h2>Loading your cart.</h2>
                         <p className="mt-4 text-lg text-ink-soft">We are pulling in the latest product details for your saved items.</p>
                     </div>
                 ) : hasDisplayableProducts ? (
@@ -142,9 +142,9 @@ const Cart = () => {
                     </div>
                 ) : (
                     <div className="premium-card rounded-[36px] px-8 py-16 text-center">
-                        <h2>Your bag is empty.</h2>
-                        <p className="mt-4 text-lg text-ink-soft">Start with a curated iPhone, iPad, or MacBook from the store.</p>
-                        <Link to="/shop" className="premium-button mt-6">Explore the store</Link>
+                        <h2>Your cart is empty.</h2>
+                        <p className="mt-4 text-lg text-ink-soft">Start with a curated iPhone, iPad, or MacBook from the shop.</p>
+                        <Link to="/shop" className="premium-button mt-6">Explore the shop</Link>
                     </div>
                 )}
             </section>

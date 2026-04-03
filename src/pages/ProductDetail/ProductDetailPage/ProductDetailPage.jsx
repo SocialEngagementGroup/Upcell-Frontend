@@ -5,17 +5,13 @@ import ScrollToTop from '../../../utilities/ScrollToTop';
 import { CartContext } from '../../../App';
 import { toast } from 'react-toastify';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
-import LocalShippingOutlinedIcon from '@mui/icons-material/LocalShippingOutlined';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+
 import axiosInstance from '../../../utilities/axiosInstance';
+import ModernProductCard from '../../../components/ModernProductCard/ModernProductCard';
 import { groupProductsByParent, normalizeProduct } from '../../../utilities/catalog';
 
-const specHighlights = [
-    { main: 'Refined', sub: 'Condition grading' },
-    { main: 'Battery', sub: 'Health checked' },
-    { main: 'Secure', sub: 'Reset and inspected' },
-    { main: 'Fast', sub: 'Insured delivery' },
-];
+
 
 const featureCards = [
     {
@@ -31,6 +27,10 @@ const featureCards = [
         body: 'Every order is backed by UpCell support and practical coverage designed for peace of mind.',
     },
 ];
+const ESSENTIAL_ADDONS = [
+    { id: 'addon_case', name: 'Clear Case (MagSafe)', price: 39, description: 'Crystal clear, yellowing-resistant protection.' },
+    { id: 'addon_protector', name: 'Ultra-Glass Protector', price: 19, description: 'Edge-to-edge scratch and impact defense.' },
+];
 
 const ProductDetailPage = () => {
     const { parentId, productId } = useParams();
@@ -40,6 +40,7 @@ const ProductDetailPage = () => {
     const [selectedColor, setSelectedColor] = useState();
     const [selectedStorage, setSelectedStorage] = useState();
     const [quantity, setQuantity] = useState(1);
+    const [addonQtys, setAddonQtys] = useState({});
     const [recommendedProducts, setRecommendedProducts] = useState([]);
     const { setCart } = useContext(CartContext);
 
@@ -75,7 +76,7 @@ const ProductDetailPage = () => {
             .then((res) => {
                 const related = groupProductsByParent(res.data.map(normalizeProduct))
                     .filter((item) => item.parentCatagory !== parentId && ['iPhone', 'iPad', 'MacBook'].includes(item.family))
-                    .slice(0, 3);
+                    .slice(0, 4);
                 setRecommendedProducts(related);
             })
             .catch((error) => console.log(error));
@@ -101,16 +102,25 @@ const ProductDetailPage = () => {
         syncSelection(selectedColor, storage);
     };
 
+    const addonTotal = ESSENTIAL_ADDONS.reduce((sum, a) => sum + (addonQtys[a.id] || 0) * a.price, 0);
+    const grandTotal = product ? product.price * quantity + addonTotal : 0;
+
     const handleAddToCart = () => {
         if (!product?._id) return;
-        setCart((prev) => [...prev, ...Array.from({ length: quantity }, () => product._id)]);
-        toast.success('Product added to cart');
+        const itemsToAdd = Array.from({ length: quantity }, () => product._id);
+        ESSENTIAL_ADDONS.forEach(addon => {
+            const qty = addonQtys[addon.id] || 0;
+            for (let i = 0; i < qty; i++) itemsToAdd.push(addon.id);
+        });
+        setCart((prev) => [...prev, ...itemsToAdd]);
+        toast.success(addonTotal > 0 ? 'Product and accessories added' : 'Product added to cart');
     };
 
-    const handleBuyNow = () => {
-        if (!product?._id) return;
-        navigate(`/checkout/${product._id}`);
+    const setAddonQty = (id, delta) => {
+        setAddonQtys(prev => ({ ...prev, [id]: Math.max(0, (prev[id] || 0) + delta) }));
     };
+
+
 
     if (!product) {
         return (
@@ -119,7 +129,7 @@ const ProductDetailPage = () => {
                     <div className="premium-card rounded-[36px] px-8 py-16 text-center">
                         <h2>Product not found</h2>
                         <p className="mt-4 text-ink-soft">This product variation is no longer available.</p>
-                        <Link to="/shop" className="premium-button mt-6">Back to store</Link>
+                        <Link to="/shop" className="premium-button mt-6">Back to shop</Link>
                     </div>
                 </div>
             </div>
@@ -134,7 +144,7 @@ const ProductDetailPage = () => {
                 <nav className="mb-8 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-apple-gray">
                     <Link to="/">Home</Link>
                     <KeyboardArrowRightIcon className="!text-sm" />
-                    <Link to="/shop">Store</Link>
+                    <Link to="/shop">Shop</Link>
                     <KeyboardArrowRightIcon className="!text-sm" />
                     <span>{product.productName}</span>
                 </nav>
@@ -164,10 +174,7 @@ const ProductDetailPage = () => {
                     <div className="premium-card rounded-[40px] p-8 md:p-10">
                     <div className="md:mt-0">
                         <h1 className="text-[clamp(2.4rem,4vw,4.3rem)] leading-[0.95]">{product.productName}</h1>
-                        <div className="mt-5 text-4xl font-extrabold text-apple-text">${product.price}</div>
-                        <p className="mt-3 max-w-[560px] text-base leading-8 text-ink-soft">
-                            Thoughtfully sourced Apple hardware with verified cosmetic grading, battery inspection, and a simpler purchase flow.
-                        </p>
+                        <div className="mt-3 text-4xl font-extrabold text-apple-text">${product.price}</div>
 
                         {/* ─── Color Selection ─── */}
                         <div className="mt-10">
@@ -236,41 +243,47 @@ const ProductDetailPage = () => {
                             </div>
                         </div>
 
-                        <div className="mt-6 flex flex-wrap gap-4">
-                            <div className="flex items-center rounded-full border border-black/[0.08] bg-white px-3 py-2">
-                                <button className="h-10 w-10 rounded-full text-xl text-apple-gray hover:bg-surface-alt" onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}>-</button>
-                                <span className="min-w-[40px] text-center text-sm font-bold text-apple-text">{quantity}</span>
-                                <button className="h-10 w-10 rounded-full text-xl text-apple-gray hover:bg-surface-alt" onClick={() => setQuantity((prev) => prev + 1)}>+</button>
+                        {/* ─── Quantity & Protection ─── */}
+                        <div className="mt-10 rounded-[24px] border border-black/[0.06] bg-white/60 p-5">
+                            <div className="flex items-center justify-between">
+                                <div className="text-[13px] font-extrabold uppercase tracking-[0.1em] text-apple-text">Quantity</div>
+                                <div className="flex h-11 items-center gap-1 rounded-full border border-black/[0.08] bg-white px-2">
+                                    <button className="flex h-8 w-8 items-center justify-center rounded-full text-lg text-apple-gray transition-colors hover:text-black" onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}>−</button>
+                                    <span className="min-w-[28px] text-center text-sm font-bold text-apple-text">{quantity}</span>
+                                    <button className="flex h-8 w-8 items-center justify-center rounded-full text-lg text-apple-gray transition-colors hover:text-black" onClick={() => setQuantity((prev) => prev + 1)}>+</button>
+                                </div>
                             </div>
-                            <button className="premium-button flex-1" onClick={handleAddToCart}>Add to cart</button>
-                            <button className="premium-button-secondary flex-1" onClick={handleBuyNow}>Buy now</button>
+
+                            <div className="my-4 border-t border-black/[0.06]" />
+
+                            <div className="text-[13px] font-extrabold uppercase tracking-[0.1em] text-apple-text">Add protection</div>
+                            <div className="mt-3 space-y-2">
+                                {ESSENTIAL_ADDONS.map((addon) => {
+                                    const qty = addonQtys[addon.id] || 0;
+                                    return (
+                                        <div key={addon.id} className={`flex items-center justify-between rounded-[16px] px-4 py-3 transition-all duration-200 ${qty > 0 ? 'bg-black/[0.04]' : 'bg-transparent hover:bg-black/[0.02]'}`}>
+                                            <div className="mr-4 flex-1">
+                                                <div className="text-[14px] font-bold text-apple-text">{addon.name} <span className="font-extrabold text-apple-gray">· ${addon.price}</span></div>
+                                                <div className="text-[11px] font-medium text-apple-gray">{addon.description}</div>
+                                            </div>
+                                            <div className="flex h-9 items-center gap-1 rounded-full border border-black/[0.08] bg-white px-1.5">
+                                                <button className="flex h-6 w-6 items-center justify-center rounded-full text-sm text-apple-gray transition-colors hover:text-black" onClick={() => setAddonQty(addon.id, -1)}>−</button>
+                                                <span className="min-w-[20px] text-center text-xs font-bold text-apple-text">{qty}</span>
+                                                <button className="flex h-6 w-6 items-center justify-center rounded-full text-sm text-apple-gray transition-colors hover:text-black" onClick={() => setAddonQty(addon.id, 1)}>+</button>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
                         </div>
 
-                        <div className="mt-8 grid gap-4">
-                            <div className="flex items-start gap-4 rounded-[24px] border border-black/[0.06] bg-white/80 p-5">
-                                <LocalShippingOutlinedIcon className="!text-[22px] text-apple-text" />
-                                <div>
-                                    <div className="font-bold text-apple-text">Free insured delivery</div>
-                                    <p className="mt-1 text-sm leading-7 text-ink-soft">Fast dispatch, protected transit, and clear delivery updates.</p>
-                                </div>
-                            </div>
-                            <div className="flex items-start gap-4 rounded-[24px] border border-black/[0.06] bg-white/80 p-5">
-                                <VerifiedUserOutlinedIcon className="!text-[22px] text-apple-text" />
-                                <div>
-                                    <div className="font-bold text-apple-text">1-year UpCell warranty</div>
-                                    <p className="mt-1 text-sm leading-7 text-ink-soft">Support, verification, and practical coverage built in.</p>
-                                </div>
-                            </div>
-                        </div>
+                        <button
+                            className="premium-button mt-5 h-[56px] w-full text-base shadow-[0_16px_32px_rgba(0,0,0,0.10)] active:scale-[0.98]"
+                            onClick={handleAddToCart}
+                        >
+                            Add to cart — ${grandTotal}
+                        </button>
 
-                        <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
-                            {specHighlights.map((item) => (
-                                <div key={item.sub} className="rounded-[24px] bg-surface-alt px-4 py-5 text-center">
-                                    <div className="text-lg font-extrabold text-apple-text">{item.main}</div>
-                                    <div className="mt-1 text-[11px] font-bold uppercase tracking-[0.18em] text-apple-gray">{item.sub}</div>
-                                </div>
-                            ))}
-                        </div>
                         </div>
                     </div>
                 </div>
@@ -289,26 +302,19 @@ const ProductDetailPage = () => {
                 </div>
             </section>
 
-            <section className="page-container pb-16">
-                <div className="mb-8">
-                    <span className="eyebrow mb-4">You might also like</span>
-                    <h2>Continue the collection.</h2>
+            <section className="page-container pb-16 pt-20">
+                <div className="mb-10 text-center md:text-left">
+                    <h2 className="text-[clamp(2rem,3vw,3.2rem)]">Continue the collection.</h2>
                 </div>
-                <div className="grid gap-6 lg:grid-cols-3">
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
                     {recommendedProducts.map((item) => (
-                        <Link
-                            key={item._id}
-                            to={`/iphone/${item.parentCatagory}/${item._id}`}
-                            className="premium-card overflow-hidden rounded-[32px] p-6 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-medium"
-                        >
-                            <div className="flex h-[260px] items-center justify-center rounded-[26px] bg-[linear-gradient(180deg,#f8f8fa_0%,#edf0f5_100%)]">
-                                <img src={item.image} alt={item.productName} className="h-[78%] w-auto object-contain" />
-                            </div>
-                            <h3 className="mt-6 text-[28px]">{item.productName}</h3>
-                            <p className="mt-2 text-sm leading-7 text-ink-soft">{item.color?.name || 'Apple finish'} • {item.storage}</p>
-                            <div className="mt-5 text-xl font-extrabold text-apple-text">${item.price}</div>
-                        </Link>
+                        <ModernProductCard key={item._id} product={item} />
                     ))}
+                </div>
+                <div className="mt-14 flex justify-center">
+                    <Link to="/shop" className="premium-button h-14 min-w-[220px] shadow-sm">
+                        View more
+                    </Link>
                 </div>
             </section>
         </div>

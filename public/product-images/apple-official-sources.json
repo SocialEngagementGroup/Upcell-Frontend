@@ -1,0 +1,62 @@
+{
+  "generatedAt": "2026-04-03",
+  "notes": [
+    "These are official Apple-hosted source images gathered from Apple product overview pages and Apple Newsroom pages.",
+    "Some models currently share the same official family image because Apple publishes family-level imagery more consistently than per-SKU isolated renders.",
+    "Several assets are JPGs with white or black backgrounds rather than true transparent PNGs."
+  ],
+  "products": {
+    "iPad (A16)": {
+      "sourcePage": "https://www.apple.com/ipad-11/",
+      "imageUrl": "https://www.apple.com/v/ipad-11/d/images/overview/design/fan__vnl85mt3xzm6_large.jpg"
+    },
+    "iPad mini (A17 Pro)": {
+      "sourcePage": "https://www.apple.com/ipad-mini/",
+      "imageUrl": "https://www.apple.com/v/ipad-mini/v/images/overview/hero/fan__mub6p4ua0t2y_large.jpg"
+    },
+    "iPad Air 11-inch (M4)": {
+      "sourcePage": "https://www.apple.com/ipad-air/",
+      "imageUrl": "https://www.apple.com/v/ipad-air/ah/images/overview/closer-look/all-colors/slide_1A__u8zw91uc6iaq_large.jpg"
+    },
+    "iPad Air 13-inch (M4)": {
+      "sourcePage": "https://www.apple.com/ipad-air/",
+      "imageUrl": "https://www.apple.com/v/ipad-air/ah/images/overview/closer-look/all-colors/slide_1A__u8zw91uc6iaq_large.jpg"
+    },
+    "iPad Pro 11-inch (M5)": {
+      "sourcePage": "https://www.apple.com/newsroom/2025/10/apple-introduces-the-powerful-new-ipad-pro-with-the-m5-chip/",
+      "imageUrl": "https://www.apple.com/newsroom/images/2025/10/apple-introduces-the-powerful-new-ipad-pro-with-the-m5-chip/article/Apple-iPad-Pro-color-lineups-251015_inline.jpg.large.jpg"
+    },
+    "iPad Pro 13-inch (M5)": {
+      "sourcePage": "https://www.apple.com/newsroom/2025/10/apple-introduces-the-powerful-new-ipad-pro-with-the-m5-chip/",
+      "imageUrl": "https://www.apple.com/newsroom/images/2025/10/apple-introduces-the-powerful-new-ipad-pro-with-the-m5-chip/article/Apple-iPad-Pro-color-lineups-251015_inline.jpg.large.jpg"
+    },
+    "MacBook Air 13-inch (M5)": {
+      "sourcePage": "https://www.apple.com/newsroom/2026/03/apple-introduces-the-new-macbook-air-with-m5/",
+      "imageUrl": "https://www.apple.com/newsroom/images/2026/03/apple-introduces-the-new-macbook-air-with-m5/article/Apple-MacBook-Air-13-inch-and-15-inch-260303_big.jpg.large.jpg"
+    },
+    "MacBook Air 15-inch (M5)": {
+      "sourcePage": "https://www.apple.com/newsroom/2026/03/apple-introduces-the-new-macbook-air-with-m5/",
+      "imageUrl": "https://www.apple.com/newsroom/images/2026/03/apple-introduces-the-new-macbook-air-with-m5/article/Apple-MacBook-Air-13-inch-and-15-inch-260303_big.jpg.large.jpg"
+    },
+    "MacBook Pro 14-inch (M5)": {
+      "sourcePage": "https://www.apple.com/newsroom/2025/10/apple-unveils-new-14-inch-macbook-pro-powered-by-the-m5-chip/",
+      "imageUrl": "https://www.apple.com/newsroom/images/2025/10/apple-unveils-new-14-inch-macbook-pro-powered-by-the-m5-chip/article/Apple-MacBook-Pro-14-in-front-251015_big.jpg.large.jpg"
+    },
+    "MacBook Pro 14-inch (M5 Pro)": {
+      "sourcePage": "https://www.apple.com/newsroom/2026/03/apple-introduces-macbook-pro-with-all-new-m5-pro-and-m5-max/",
+      "imageUrl": "https://www.apple.com/newsroom/images/2026/03/apple-introduces-macbook-pro-with-all-new-m5-pro-and-m5-max/article/Apple-MacBook-Pro-M5-Pro-and-M5-Max-Capture-One-260303_big.jpg.large.jpg"
+    },
+    "MacBook Pro 14-inch (M5 Max)": {
+      "sourcePage": "https://www.apple.com/newsroom/2026/03/apple-introduces-macbook-pro-with-all-new-m5-pro-and-m5-max/",
+      "imageUrl": "https://www.apple.com/newsroom/images/2026/03/apple-introduces-macbook-pro-with-all-new-m5-pro-and-m5-max/article/Apple-MacBook-Pro-M5-Pro-and-M5-Max-Capture-One-260303_big.jpg.large.jpg"
+    },
+    "MacBook Pro 16-inch (M5 Pro)": {
+      "sourcePage": "https://www.apple.com/newsroom/2026/03/apple-introduces-macbook-pro-with-all-new-m5-pro-and-m5-max/",
+      "imageUrl": "https://www.apple.com/newsroom/images/2026/03/apple-introduces-macbook-pro-with-all-new-m5-pro-and-m5-max/article/Apple-MacBook-Pro-M5-Pro-and-M5-Max-Capture-One-260303_big.jpg.large.jpg"
+    },
+    "MacBook Pro 16-inch (M5 Max)": {
+      "sourcePage": "https://www.apple.com/newsroom/2026/03/apple-introduces-macbook-pro-with-all-new-m5-pro-and-m5-max/",
+      "imageUrl": "https://www.apple.com/newsroom/images/2026/03/apple-introduces-macbook-pro-with-all-new-m5-pro-and-m5-max/article/Apple-MacBook-Pro-M5-Pro-and-M5-Max-Capture-One-260303_big.jpg.large.jpg"
+    }
+  }
+}
