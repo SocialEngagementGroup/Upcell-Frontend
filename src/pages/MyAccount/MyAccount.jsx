@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { userContext } from "../../utilities/UserContextProvider";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import SingleCustomerOrder from "./SingleCustomerOrder";
 import axiosInstance from "../../utilities/axiosInstance";
 
@@ -37,7 +38,11 @@ const MyAccount = () => {
         <div className="page-shell">
             <section className="page-container pb-10 pt-6">
                 <div className="premium-card rounded-[40px] bg-[linear-gradient(180deg,#ffffff_0%,#f3f5f8_100%)] px-8 py-10 md:px-12 md:py-14">
-                    <span className="eyebrow mb-5">My Account</span>
+                    <nav className="mb-8 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-apple-gray">
+                        <Link to="/" className="hover:text-apple-text transition-colors">Home</Link>
+                        <KeyboardArrowRightIcon className="!text-sm" />
+                        <span className="text-apple-text">Account</span>
+                    </nav>
                     <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
                         <div>
                             <h1 className="text-[clamp(2.6rem,4.8vw,4.8rem)] leading-[0.94]">Your orders and account details.</h1>

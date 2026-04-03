@@ -57,7 +57,7 @@
 
 @layer components {
     .page-shell {
-        @apply min-h-screen pt-24 md:pt-28;
+        @apply min-h-screen pt-[72px];
     }
 
     .page-container {
@@ -87,11 +87,11 @@
     }
 
     .premium-button {
-        @apply inline-flex items-center justify-center rounded-full bg-apple-text px-7 py-4 text-sm font-bold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-black;
+        @apply inline-flex h-[56px] items-center justify-center rounded-full bg-apple-text px-8 text-sm font-bold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-black active:scale-[0.98];
     }
 
     .premium-button-secondary {
-        @apply inline-flex items-center justify-center rounded-full border border-black/[0.08] bg-white/75 px-7 py-4 text-sm font-bold text-apple-text backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:bg-white;
+        @apply inline-flex h-[56px] items-center justify-center rounded-full border border-black/[0.08] bg-white/75 px-8 text-sm font-bold text-apple-text backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:bg-white active:scale-[0.98];
     }
 
     .premium-button-secondary:hover {

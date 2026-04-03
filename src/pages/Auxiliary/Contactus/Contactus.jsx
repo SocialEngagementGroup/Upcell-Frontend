@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import FacebookOutlinedIcon from '@mui/icons-material/FacebookOutlined';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
@@ -13,7 +15,11 @@ const Contactus = () => {
         <div className="page-shell">
             <section className="page-container pb-10 pt-6">
                 <div className="premium-card rounded-[40px] bg-[linear-gradient(180deg,#ffffff_0%,#f3f5f8_100%)] px-8 py-10 md:px-12 md:py-14">
-                    <span className="eyebrow mb-5">Support</span>
+                    <nav className="mb-8 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-apple-gray">
+                        <Link to="/" className="hover:text-apple-text transition-colors">Home</Link>
+                        <KeyboardArrowRightIcon className="!text-sm" />
+                        <span className="text-apple-text">Contact</span>
+                    </nav>
                     <h1 className="text-[clamp(2.8rem,5vw,5rem)] leading-[0.92]">A support experience that feels as considered as the products.</h1>
                     <p className="mt-5 max-w-[680px] text-lg leading-8 text-ink-soft">
                         Reach out for product questions, order updates, trade-in guidance, or returns. We keep communication direct and practical.

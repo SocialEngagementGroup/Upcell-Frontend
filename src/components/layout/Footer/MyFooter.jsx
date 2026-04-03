@@ -9,9 +9,9 @@ const SocialIcons = {
 
 const MyFooter = () => {
     return (
-        <footer className="mt-20 border-t border-black/[0.06] bg-[#f5f5f7]/80">
+        <footer className="mt-20 bg-black">
             <div className="page-container py-14">
-                <div className="premium-card overflow-hidden rounded-[36px] border-white/60 bg-white/80 p-8 md:p-12">
+                <div className="overflow-hidden rounded-[36px] bg-white p-8 shadow-[0_20px_50px_rgba(0,0,0,0.15)] md:p-12">
                     <div className="grid gap-10 lg:grid-cols-[1.5fr_1fr_1fr_1.2fr]">
                         <div className="space-y-5">
                             <Link to="/" className="flex items-center">

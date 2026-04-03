@@ -8,8 +8,7 @@ import axiosInstance from '../../utilities/axiosInstance';
 import { groupProductsByParent, normalizeProduct } from '../../utilities/catalog';
 
 const categories = ['All Devices', 'iPhone', 'iPad', 'MacBook'];
-const models = ['iPhone 15', 'iPhone 14', 'iPad Pro', 'iPad Air', 'MacBook Pro', 'MacBook Air'];
-const storages = ['64GB', '128GB', '256GB', '512GB', '1TB'];
+const storageOrder = ['128GB', '256GB', '512GB', '1TB', '2TB', '4TB', '8TB'];
 
 const ShopPage = () => {
     const location = useLocation();
@@ -37,6 +36,39 @@ const ShopPage = () => {
             .catch((error) => console.log(error));
     }, []);
 
+    const availableModels = useMemo(() => (
+        Array.from(new Set(
+            products
+                .filter((product) => activeCategory === 'All Devices' || product.family === activeCategory)
+                .map((product) => product.productName)
+                .filter(Boolean)
+        ))
+            .sort((left, right) => left.localeCompare(right))
+    ), [products, activeCategory]);
+
+    const availableStorages = useMemo(() => (
+        Array.from(new Set(
+            products
+                .filter((product) => activeCategory === 'All Devices' || product.family === activeCategory)
+                .map((product) => product.storage)
+                .filter(Boolean)
+        ))
+            .sort((left, right) => {
+                const leftIndex = storageOrder.indexOf(left);
+                const rightIndex = storageOrder.indexOf(right);
+
+                if (leftIndex === -1 && rightIndex === -1) return left.localeCompare(right);
+                if (leftIndex === -1) return 1;
+                if (rightIndex === -1) return -1;
+                return leftIndex - rightIndex;
+            })
+    ), [products, activeCategory]);
+
+    useEffect(() => {
+        setSelectedModels((current) => current.filter((model) => availableModels.includes(model)));
+        setSelectedStorages((current) => current.filter((storage) => availableStorages.includes(storage)));
+    }, [availableModels, availableStorages]);
+
     const toggleValue = (value, state, setState) => {
         setState((prev) => (
             prev.includes(value)
@@ -46,7 +78,7 @@ const ShopPage = () => {
     };
 
     const filteredProducts = useMemo(() => {
-        const normalized = groupProductsByParent(products).filter((product) => {
+        const matchingVariations = products.filter((product) => {
             const categoryLabel = product.family;
 
             if (activeCategory !== 'All Devices' && categoryLabel !== activeCategory) {
@@ -57,7 +89,7 @@ const ShopPage = () => {
                 return false;
             }
 
-            if (selectedModels.length > 0 && !selectedModels.some((item) => product.productName.includes(item))) {
+            if (selectedModels.length > 0 && !selectedModels.includes(product.productName)) {
                 return false;
             }
 
@@ -65,15 +97,16 @@ const ShopPage = () => {
                 return false;
             }
 
-            return ['iPhone', 'iPad', 'MacBook'].includes(product.family);
+            const isSupportedFamily = ['iPhone', 'iPad', 'MacBook'].includes(product.family);
+            return activeCategory === 'All Devices' ? true : isSupportedFamily;
         });
 
-        const sorted = [...normalized];
+        const sorted = groupProductsByParent(matchingVariations);
         if (sortBy === 'price-low') sorted.sort((a, b) => a.price - b.price);
         if (sortBy === 'price-high') sorted.sort((a, b) => b.price - a.price);
         if (sortBy === 'name') sorted.sort((a, b) => a.productName.localeCompare(b.productName));
         return sorted;
-    }, [activeCategory, priceRange, selectedModels, selectedStorages, sortBy]);
+    }, [products, activeCategory, priceRange, selectedModels, selectedStorages, sortBy]);
 
     const sliderPercentage = (priceRange / 3500) * 100;
 
@@ -103,8 +136,7 @@ const ShopPage = () => {
                         <KeyboardArrowRightIcon className="!text-sm" />
                         <span>Store</span>
                     </nav>
-                    <span className="eyebrow mb-5">Apple Store</span>
-                    <h1 className="max-w-[760px] text-[clamp(2.6rem,5vw,5rem)] leading-[0.94]">A calmer, more premium way to shop Apple products.</h1>
+                    <h1 className="max-w-[1100px] text-[clamp(2.6rem,5vw,5rem)] leading-[0.94]">A calmer, more premium way <br className='hidden md:block' /> to shop Apple products.</h1>
                     <p className="mt-5 max-w-[640px] text-lg leading-8 text-ink-soft">
                         Every device is arranged around condition clarity, honest pricing, and a more editorial shopping experience.
                     </p>
@@ -112,16 +144,30 @@ const ShopPage = () => {
             </section>
 
             <section className="page-container pb-16">
-                <div className="mb-8 flex flex-wrap gap-3">
-                    {categories.map((category) => (
-                        <button
-                            key={category}
-                            className={activeCategory === category ? 'premium-button' : 'premium-button-secondary'}
-                            onClick={() => setActiveCategory(category)}
+                <div className="mb-10 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+                    <div className="flex flex-wrap gap-2 md:gap-3">
+                        {categories.map((category) => (
+                            <button
+                                key={category}
+                                className={activeCategory === category ? 'premium-button' : 'premium-button-secondary'}
+                                onClick={() => setActiveCategory(category)}
+                            >
+                                {category}
+                            </button>
+                        ))}
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <select
+                            className="h-12 rounded-full border border-black/[0.08] bg-white px-6 text-sm font-bold text-apple-text outline-none transition-all focus:border-apple-text/20 focus:shadow-[0_0_0_4px_rgba(29,29,31,0.05)]"
+                            value={sortBy}
+                            onChange={(event) => setSortBy(event.target.value)}
                         >
-                            {category}
-                        </button>
-                    ))}
+                            <option value="featured">Featured</option>
+                            <option value="price-low">Price: Low to High</option>
+                            <option value="price-high">Price: High to Low</option>
+                            <option value="name">Name</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div className="grid gap-8 lg:grid-cols-[300px_1fr]">
@@ -136,7 +182,7 @@ const ShopPage = () => {
                         <div className="mt-8">
                             <div className="text-xs font-bold uppercase tracking-[0.2em] text-apple-gray">Model</div>
                             <div className="mt-4 flex flex-col gap-3">
-                                {models.map((model) => (
+                                {availableModels.map((model) => (
                                     <label key={model} className="flex items-center gap-3 text-sm text-ink-soft">
                                         <input
                                             type="checkbox"
@@ -153,7 +199,7 @@ const ShopPage = () => {
                         <div className="mt-8">
                             <div className="text-xs font-bold uppercase tracking-[0.2em] text-apple-gray">Storage</div>
                             <div className="mt-4 grid grid-cols-2 gap-3">
-                                {storages.map((storage) => (
+                                {availableStorages.map((storage) => (
                                     <button
                                         key={storage}
                                         className={selectedStorages.includes(storage)
@@ -189,21 +235,7 @@ const ShopPage = () => {
                     </aside>
 
                     <main>
-                        <div className="mb-8 flex flex-col gap-4 rounded-[28px] border border-black/[0.06] bg-white/70 p-5 backdrop-blur md:flex-row md:items-center md:justify-between">
-                            <p className="text-sm text-ink-soft">
-                                Showing <span className="font-bold text-apple-text">{filteredProducts.length}</span> premium devices
-                            </p>
-                            <select
-                                className="rounded-full border border-black/[0.08] bg-white px-4 py-3 text-sm font-bold text-apple-text outline-none"
-                                value={sortBy}
-                                onChange={(event) => setSortBy(event.target.value)}
-                            >
-                                <option value="featured">Featured</option>
-                                <option value="price-low">Price: Low to High</option>
-                                <option value="price-high">Price: High to Low</option>
-                                <option value="name">Name</option>
-                            </select>
-                        </div>
+
 
                         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
                             {filteredProducts.map((product) => (
@@ -230,8 +262,8 @@ const ShopPage = () => {
                                                 <div className="text-sm text-apple-gray">From</div>
                                                 <div className="text-2xl font-extrabold text-apple-text">${product.price}</div>
                                             </div>
-                                            <button
-                                                className="premium-button px-5 py-3 text-xs"
+                                            <button 
+                                                className="premium-button w-full text-xs" 
                                                 onClick={(event) => handleAddToCart(event, product._id)}
                                             >
                                                 Add to cart

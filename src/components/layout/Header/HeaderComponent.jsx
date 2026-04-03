@@ -28,8 +28,8 @@ const HeaderComponent = () => {
   }
 
   return (
-    <header className="fixed left-0 top-0 z-[1000] w-full px-4 pt-3 md:px-6">
-      <div className="surface-panel mx-auto flex h-[72px] max-w-site items-center justify-between rounded-full px-5 md:px-8">
+    <header className="fixed left-0 top-0 z-[1000] w-full bg-black">
+      <div className="surface-panel flex h-[72px] w-full items-center justify-between px-8 md:px-16 lg:px-24">
         <div>
           <Link to="/" className="flex items-center">
             <img src="/staticImages/upcellLogo.png" alt="Upcell Logo" className="h-[90px] w-auto object-contain" />
@@ -37,7 +37,7 @@ const HeaderComponent = () => {
         </div>
 
         <nav 
-          className={`surface-panel absolute left-4 right-4 top-[84px] flex-col gap-3 rounded-[28px] p-5 md:left-6 md:right-6 lg:static lg:flex lg:w-auto lg:flex-row lg:items-center lg:gap-2 lg:border-none lg:bg-transparent lg:p-0 lg:shadow-none lg:backdrop-blur-none ${navOn ? 'flex' : 'hidden lg:flex'}`}
+          className={`surface-panel absolute left-0 right-0 top-[72px] flex-col gap-3 rounded-b-3xl border-t border-black/[0.04] p-5 md:left-0 md:right-0 lg:static lg:flex lg:w-auto lg:flex-row lg:items-center lg:gap-2 lg:border-none lg:bg-transparent lg:p-0 lg:shadow-none lg:backdrop-blur-none ${navOn ? 'flex' : 'hidden lg:flex'}`}
           ref={navEle}
         >
 

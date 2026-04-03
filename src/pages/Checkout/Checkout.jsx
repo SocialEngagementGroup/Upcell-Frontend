@@ -11,6 +11,7 @@ import paypal from '../../assets/paypal.svg';
 import applePay from '../../assets/applePay.svg';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 
 const Checkout = () => {
     const params = useParams();
@@ -88,7 +89,11 @@ const Checkout = () => {
                 </Link>
 
                 <div className="mt-6 premium-card rounded-[40px] bg-[linear-gradient(180deg,#ffffff_0%,#f3f5f8_100%)] px-8 py-10 md:px-12 md:py-14">
-                    <span className="eyebrow mb-5">Checkout</span>
+                    <nav className="mb-8 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-apple-gray">
+                        <Link to="/" className="hover:text-apple-text transition-colors">Home</Link>
+                        <KeyboardArrowRightIcon className="!text-sm" />
+                        <span className="text-apple-text">Checkout</span>
+                    </nav>
                     <h1 className="text-[clamp(2.6rem,4.8vw,4.9rem)] leading-[0.94]">Secure your order with a calmer checkout.</h1>
                     <p className="mt-5 max-w-[620px] text-lg leading-8 text-ink-soft">
                         Your details, delivery choices, and payment methods are arranged to feel simple, quiet, and premium.

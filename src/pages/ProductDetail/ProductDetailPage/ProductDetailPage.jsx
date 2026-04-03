@@ -162,47 +162,77 @@ const ProductDetailPage = () => {
                     </div>
 
                     <div className="premium-card rounded-[40px] p-8 md:p-10">
-                        <span className="eyebrow mb-5">Premium Apple Selection</span>
+                    <div className="md:mt-0">
                         <h1 className="text-[clamp(2.4rem,4vw,4.3rem)] leading-[0.95]">{product.productName}</h1>
                         <div className="mt-5 text-4xl font-extrabold text-apple-text">${product.price}</div>
                         <p className="mt-3 max-w-[560px] text-base leading-8 text-ink-soft">
                             Thoughtfully sourced Apple hardware with verified cosmetic grading, battery inspection, and a simpler purchase flow.
                         </p>
 
-                        <div className="mt-8 rounded-[28px] border border-black/[0.06] bg-surface-alt/70 p-5">
-                            <div className="text-xs font-bold uppercase tracking-[0.18em] text-apple-gray">Finish</div>
-                            <div className="mt-4 flex flex-wrap gap-3">
+                        {/* ─── Color Selection ─── */}
+                        <div className="mt-10">
+                            <div className="text-[13px] font-extrabold uppercase tracking-[0.1em] text-apple-text">
+                                Color: <span className="font-black">{selectedColor?.name || 'Default'}</span>
+                            </div>
+                            <div className="mt-4 flex flex-wrap gap-4">
                                 {availableColors.map((color) => (
                                     <button
                                         key={color.name}
-                                        className={`flex items-center gap-3 rounded-full border px-4 py-3 text-sm font-bold ${
-                                            selectedColor?.name === color.name
-                                                ? 'border-apple-text bg-white text-apple-text'
-                                                : 'border-black/[0.08] bg-white/70 text-apple-gray'
-                                        }`}
+                                        className={`group relative flex h-14 w-14 items-center justify-center transition-all duration-200`}
                                         onClick={() => handleColorSelect(color)}
                                     >
-                                        <span className="h-4 w-4 rounded-full border border-black/10" style={{ backgroundColor: color.value }} />
-                                        {color.name}
+                                        {/* Selection Ring */}
+                                        <div className={`absolute -inset-1 rounded-[18px] border-2 transition-opacity duration-200 ${
+                                            selectedColor?.name === color.name ? 'border-[#eb0000] opacity-100' : 'border-transparent opacity-0 group-hover:opacity-30 group-hover:border-black/20'
+                                        }`} />
+                                        
+                                        {/* The Swatch */}
+                                        <div 
+                                            className="h-11 w-11 rounded-[12px] shadow-sm ring-1 ring-inset ring-black/5" 
+                                            style={{ backgroundColor: color.value }}
+                                        />
                                     </button>
                                 ))}
                             </div>
                         </div>
 
-                        <div className="mt-6 rounded-[28px] border border-black/[0.06] bg-surface-alt/70 p-5">
-                            <div className="text-xs font-bold uppercase tracking-[0.18em] text-apple-gray">Storage</div>
-                            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                                {availableStorages.map((storage) => (
-                                    <button
-                                        key={storage}
-                                        className={selectedStorage === storage
-                                            ? 'rounded-[20px] bg-apple-text px-5 py-4 text-sm font-bold text-white'
-                                            : 'rounded-[20px] border border-black/[0.08] bg-white px-5 py-4 text-sm font-bold text-apple-text'}
-                                        onClick={() => handleStorageSelect(storage)}
-                                    >
-                                        {storage}
-                                    </button>
-                                ))}
+                        {/* ─── Storage Selection ─── */}
+                        <div className="mt-10">
+                            <div className="text-[13px] font-extrabold uppercase tracking-[0.1em] text-apple-text">Storage</div>
+                            <div className="mt-4 flex flex-wrap gap-3">
+                                {availableStorages.map((storage) => {
+                                    // Find product for this storage in current color to get the price
+                                    const variantForStorage = allProducts.find(
+                                        (p) => p.color?.name === selectedColor?.name && p.storage === storage
+                                    );
+                                    const variantPrice = variantForStorage?.price;
+                                    const isAvailable = !!variantForStorage;
+
+                                    return (
+                                        <button
+                                            key={storage}
+                                            disabled={!isAvailable}
+                                            className={`flex h-20 min-w-[110px] flex-1 basis-[120px] flex-col items-center justify-center rounded-none border-2 px-6 py-4 transition-all duration-200 ${
+                                                selectedStorage === storage
+                                                    ? 'border-black bg-white text-black'
+                                                    : isAvailable
+                                                        ? 'border-transparent bg-white/50 text-apple-gray hover:border-black/10'
+                                                        : 'cursor-not-allowed border-transparent bg-apple-text/[0.03] text-apple-text/20 opacity-40'
+                                            }`}
+                                            onClick={() => handleStorageSelect(storage)}
+                                        >
+                                            <div className="text-base font-black">{storage}</div>
+                                            {variantPrice && (
+                                                <div className={`mt-1 text-[11px] font-bold ${selectedStorage === storage ? 'text-apple-text/60' : 'text-apple-gray'}`}>
+                                                    ${variantPrice}
+                                                </div>
+                                            )}
+                                            {!isAvailable && (
+                                                <div className="mt-1 text-[10px] font-bold uppercase tracking-wider">Out of stock</div>
+                                            )}
+                                        </button>
+                                    );
+                                })}
                             </div>
                         </div>
 
@@ -241,14 +271,14 @@ const ProductDetailPage = () => {
                                 </div>
                             ))}
                         </div>
+                        </div>
                     </div>
                 </div>
             </section>
 
             <section className="page-container pb-10">
                 <div className="rounded-[40px] bg-[linear-gradient(135deg,#0f1012_0%,#1b1d22_55%,#2c3138_100%)] px-8 py-10 text-white shadow-medium md:px-12 md:py-14">
-                    <span className="inline-flex rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.24em] text-white/60">Why it feels premium</span>
-                    <div className="mt-8 grid gap-6 lg:grid-cols-3">
+                    <div className="mt-2 grid gap-6 lg:grid-cols-3">
                         {featureCards.map((card) => (
                             <div key={card.title} className="rounded-[28px] border border-white/10 bg-white/5 p-6 backdrop-blur">
                                 <h3 className="text-2xl text-white">{card.title}</h3>

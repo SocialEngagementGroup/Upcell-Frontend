@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import unlockedPhoneImg from "../../../assets/notificationInfoImages/americanExpress.svg";
 import phoneconditon from "../../../assets/notificationInfoImages/phoneCondition.svg";
 import warranty from "../../../assets/notificationInfoImages/warranty-modal.svg";
@@ -24,7 +26,11 @@ const Resources = () => {
         <div className="page-shell">
             <section className="page-container pb-10 pt-6">
                 <div className="premium-card rounded-[40px] bg-[linear-gradient(180deg,#ffffff_0%,#f3f5f8_100%)] px-8 py-10 md:px-12 md:py-14">
-                    <span className="eyebrow mb-5">Journal</span>
+                    <nav className="mb-8 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-apple-gray">
+                        <Link to="/" className="hover:text-apple-text transition-colors">Home</Link>
+                        <KeyboardArrowRightIcon className="!text-sm" />
+                        <span className="text-apple-text">Journal</span>
+                    </nav>
                     <h1 className="text-[clamp(2.8rem,5vw,5rem)] leading-[0.92]">Guidance for buying, caring for, and trading premium Apple devices.</h1>
                     <p className="mt-5 max-w-[700px] text-lg leading-8 text-ink-soft">
                         A cleaner editorial space for practical device advice, support answers, and lifecycle thinking.
@@ -33,11 +39,8 @@ const Resources = () => {
             </section>
 
             <section className="page-container pb-10">
-                <div className="mb-8">
-                    <span className="eyebrow mb-4">Latest articles</span>
-                    <h2>Fresh reads from UpCell.</h2>
-                </div>
-                <div className="grid gap-6 md:grid-cols-2">
+
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
                     {articles.map((article) => (
                         <div key={article.title} className="premium-card overflow-hidden rounded-[32px] p-5">
                             <div className="flex h-[220px] items-center justify-center rounded-[24px] bg-surface-alt p-6">

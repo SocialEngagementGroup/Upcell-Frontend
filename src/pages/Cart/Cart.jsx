@@ -4,25 +4,81 @@ import { Link } from "react-router-dom";
 import ScrollToTop from "../../utilities/ScrollToTop";
 import CartProduct from "./CartProduct";
 import axiosInstance from "../../utilities/axiosInstance";
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 
 const Cart = () => {
     const [products, setProducts] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
     const { cart, setCart } = useContext(CartContext);
 
     useEffect(() => {
         if (!cart?.length) {
             setProducts([]);
+            setIsLoading(false);
             return;
         }
 
-        axiosInstance.post('cart', { ids: [...new Set(cart)] })
-            .then((res) => setProducts(res.data))
-            .catch((error) => console.log(error));
-    }, [cart]);
+        let isCancelled = false;
+        const uniqueIds = [...new Set(cart)];
+
+        const syncCartProducts = (fetchedProducts = []) => {
+            if (isCancelled) return;
+
+            setProducts(fetchedProducts);
+
+            const validIds = new Set(fetchedProducts.map((product) => product._id));
+            const hasStaleIds = cart.some((id) => !validIds.has(id));
+
+            if (hasStaleIds) {
+                setCart((current) => current.filter((id) => validIds.has(id)));
+            }
+        };
+
+        setIsLoading(true);
+
+        axiosInstance.post('cart', { ids: uniqueIds })
+            .then(async (res) => {
+                const fetchedProducts = res.data || [];
+
+                if (fetchedProducts.length > 0) {
+                    syncCartProducts(fetchedProducts);
+                    return;
+                }
+
+                const fallbackResponse = await axiosInstance.get('product');
+                const fallbackProducts = (fallbackResponse.data || []).filter((product) => uniqueIds.includes(product._id));
+                syncCartProducts(fallbackProducts);
+            })
+            .catch(async (error) => {
+                console.log(error);
+
+                try {
+                    const fallbackResponse = await axiosInstance.get('product');
+                    const fallbackProducts = (fallbackResponse.data || []).filter((product) => uniqueIds.includes(product._id));
+                    syncCartProducts(fallbackProducts);
+                } catch (fallbackError) {
+                    console.log(fallbackError);
+                    if (!isCancelled) {
+                        setProducts([]);
+                    }
+                }
+            })
+            .finally(() => {
+                if (!isCancelled) {
+                    setIsLoading(false);
+                }
+            });
+
+        return () => {
+            isCancelled = true;
+        };
+    }, [cart, setCart]);
 
     const total = useMemo(() => (
         cart.reduce((sum, id) => sum + (products.find((item) => item._id === id)?.price || 0), 0)
     ), [cart, products]);
+
+    const hasDisplayableProducts = products.length > 0;
 
     return (
         <div className="page-shell">
@@ -30,7 +86,11 @@ const Cart = () => {
 
             <section className="page-container pb-10 pt-6">
                 <div className="premium-card rounded-[40px] bg-[linear-gradient(180deg,#ffffff_0%,#f3f5f8_100%)] px-8 py-10 md:px-12 md:py-14">
-                    <span className="eyebrow mb-5">Bag</span>
+                    <nav className="mb-8 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-apple-gray">
+                        <Link to="/" className="hover:text-apple-text transition-colors">Home</Link>
+                        <KeyboardArrowRightIcon className="!text-sm" />
+                        <span className="text-apple-text">Bag</span>
+                    </nav>
                     <h1 className="text-[clamp(2.6rem,4.6vw,4.8rem)] leading-[0.94]">Your premium Apple lineup.</h1>
                     <p className="mt-5 max-w-[640px] text-lg leading-8 text-ink-soft">
                         Review your selection, adjust quantities, and continue into a cleaner checkout flow.
@@ -40,7 +100,12 @@ const Cart = () => {
             </section>
 
             <section className="page-container pb-16">
-                {cart?.length > 0 ? (
+                {isLoading ? (
+                    <div className="premium-card rounded-[36px] px-8 py-16 text-center">
+                        <h2>Loading your bag.</h2>
+                        <p className="mt-4 text-lg text-ink-soft">We are pulling in the latest product details for your saved items.</p>
+                    </div>
+                ) : hasDisplayableProducts ? (
                     <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
                         <div className="space-y-5">
                             {products.map((product) => (

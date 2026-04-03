@@ -1,9 +1,16 @@
+import { Link } from 'react-router-dom';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+
 const ReturnPolicy = () => {
     return (
         <div className="page-shell">
             <section className="page-container pb-10 pt-6">
                 <div className="premium-card rounded-[40px] bg-[linear-gradient(180deg,#ffffff_0%,#f3f5f8_100%)] px-8 py-10 md:px-12 md:py-14">
-                    <span className="eyebrow mb-5">Returns</span>
+                    <nav className="mb-8 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-apple-gray">
+                        <Link to="/" className="hover:text-apple-text transition-colors">Home</Link>
+                        <KeyboardArrowRightIcon className="!text-sm" />
+                        <span className="text-apple-text">Returns</span>
+                    </nav>
                     <h1 className="text-[clamp(2.8rem,5vw,5rem)] leading-[0.92]">Returns and refunds with a simple 30-day window.</h1>
                     <p className="mt-5 max-w-[640px] text-lg leading-8 text-ink-soft">
                         If something is not right, reach out and we’ll guide the next steps clearly.
