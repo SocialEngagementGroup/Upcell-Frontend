@@ -10,7 +10,7 @@ const HomeTrustFeatures = () => {
                 </svg>
             ),
             title: "40-Point Certified Inspection",
-            description: "Every refurbished iPhone, iPad, and MacBook passes our certified technician inspection covering hardware, battery health, and cosmetics."
+            description: "Every premium iPhone, iPad, and MacBook passes our certified technician inspection covering hardware, battery health, and cosmetics."
         },
         {
             icon: (
@@ -20,7 +20,7 @@ const HomeTrustFeatures = () => {
                 </svg>
             ),
             title: "Fast, Insured Shipping",
-            description: "All certified pre-owned Apple orders ship fully insured. Next-day delivery available on orders placed before 3 PM."
+            description: "All certified premium Apple orders ship fully insured. Next-day delivery available on orders placed before 3 PM."
         },
         {
             icon: (
@@ -30,7 +30,7 @@ const HomeTrustFeatures = () => {
                 </svg>
             ),
             title: "Save Up to 40% vs. New",
-            description: "Certified pre-owned Apple devices at a fraction of retail — same performance, 12-month warranty, better value."
+            description: "Certified premium Apple devices at a fraction of retail — same performance, 12-month warranty, better value."
         }
     ];
 
@@ -38,7 +38,7 @@ const HomeTrustFeatures = () => {
         <section className="px-4 py-14 md:px-6 md:py-24">
             <div className="page-container">
                 <div className="mb-10 text-center">
-                    <h2>Why Buy Refurbished Apple From UpCell?</h2>
+                    <h2>Why Buy Premium Apple From UpCell?</h2>
                 </div>
                 <div className="grid grid-cols-3 gap-6 max-md:grid-cols-1">
                     {features.map((feature, index) => (

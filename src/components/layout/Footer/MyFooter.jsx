@@ -58,7 +58,7 @@ const MyFooter = () => {
                                 <img src="/staticImages/upcellLogo.png" alt="Upcell Logo" className="h-[138px] w-auto object-contain" />
                             </Link>
                             <p className="max-w-[320px] text-sm leading-7 text-ink-soft">
-                                Certified refurbished iPhones, iPads, and MacBooks — professionally inspected, honestly graded, and backed by a 12-month warranty. Save up to 40% vs. new.
+                                Certified premium iPhones, iPads, and MacBooks — professionally inspected, honestly graded, and backed by a 12-month warranty. Save up to 40% vs. new.
                             </p>
                             <div className="flex gap-3 pt-2">
                                 <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram" className="flex h-11 w-11 items-center justify-center rounded-full border border-black/[0.06] text-apple-gray hover:-translate-y-0.5 hover:bg-surface-alt hover:text-apple-text"><SocialIcons.Instagram /></a>
@@ -97,7 +97,7 @@ const MyFooter = () => {
                         </div>
                         <div className="space-y-6 lg:pt-8">
                             <h4 className="text-sm font-extrabold uppercase tracking-[0.14em] text-apple-text">Stay Updated</h4>
-                            <p className="text-[13px] leading-6 text-apple-gray">Get notified about new certified refurbished products and exclusive trade-in offers.</p>
+                            <p className="text-[13px] leading-6 text-apple-gray">Get notified about new certified premium products and exclusive trade-in offers.</p>
                             <form className="flex flex-col gap-3" onSubmit={handleNewsletterSubmit}>
                                 <input
                                     type="email"
@@ -126,7 +126,7 @@ const MyFooter = () => {
 
                     <div className="mt-8 flex flex-col gap-3 border-t border-black/[0.06] pt-6 text-[13px] text-apple-gray md:flex-row md:items-center md:justify-between">
                         <p>&copy; {new Date().getFullYear()} UpCell. All rights reserved.</p>
-                        <p>Certified refurbished Apple devices. Trusted trade-ins. Transparent pricing.</p>
+                        <p>Certified premium Apple devices. Trusted trade-ins. Transparent pricing.</p>
                     </div>
                 </div>
             </div>

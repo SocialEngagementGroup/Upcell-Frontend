@@ -25,7 +25,7 @@ const TradeInAction = () => {
                             Get Your Trade-In Quote
                         </Link>
                         <Link to="/shop" className="inline-flex h-[56px] items-center justify-center rounded-full border border-white/20 bg-white/5 px-10 text-[15px] font-black text-white backdrop-blur transition-all duration-300 hover:-translate-y-1 hover:bg-white/10 min-w-[220px]">
-                            Shop Refurbished Apple
+                            Shop Premium Apple
                         </Link>
                     </div>
                 </div>

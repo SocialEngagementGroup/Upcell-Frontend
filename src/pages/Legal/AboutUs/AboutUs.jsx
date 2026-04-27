@@ -21,9 +21,9 @@ const AboutUs = () => {
                         <KeyboardArrowRightIcon className="!text-sm" />
                         <span className="text-apple-text">About</span>
                     </nav>
-                    <h1 className="text-[clamp(2.8rem,5vw,5rem)] leading-[0.92]">About UpCell — Certified Refurbished Apple Devices You Can Trust</h1>
+                    <h1 className="text-[clamp(2.8rem,5vw,5rem)] leading-[0.92]">About UpCell — Certified Premium Apple Devices You Can Trust</h1>
                     <p className="mt-5 max-w-[700px] text-lg leading-8 text-ink-soft">
-                        UpCell is a certified reseller of pre-owned Apple hardware — sourcing, inspecting, and presenting every refurbished iPhone, iPad, and MacBook to a higher standard than a typical secondhand marketplace.
+                        UpCell is a certified reseller of premium Apple hardware — sourcing, inspecting, and presenting every premium iPhone, iPad, and MacBook to a higher standard than a typical secondhand marketplace.
                     </p>
                 </div>
             </section>
@@ -33,7 +33,7 @@ const AboutUs = () => {
                     <div className="premium-card rounded-[36px] p-8 md:p-10">
                         <h2>Our mission</h2>
                         <p className="mt-5 text-lg leading-8 text-ink-soft">
-                            We source and certify pre-owned Apple devices against a rigorous 40-point inspection standard covering hardware performance, battery health, and cosmetic condition. Every refurbished iPhone, iPad, and MacBook is graded honestly — so you know exactly what you're getting.
+                            We source and certify premium Apple devices against a rigorous 40-point inspection standard covering hardware performance, battery health, and cosmetic condition. Every premium iPhone, iPad, and MacBook is graded honestly — so you know exactly what you're getting.
                         </p>
                         <p className="mt-5 text-lg leading-8 text-ink-soft">
                             That means transparent pricing, accurate condition grades, a 12-month warranty on every device, and an experience that respects both the product and the customer choosing it.

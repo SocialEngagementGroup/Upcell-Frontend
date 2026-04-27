@@ -18,7 +18,7 @@ The frontend client for the Upcell (Global Traders) platform, a modern e-commerc
 - `public/`: Static assets.
 
 ## Key Features
-- **Product Catalog**: Browsing by category (Pre-owned, Refurbished, Wholesale).
+- **Product Catalog**: Browsing by category (Premium, Wholesale).
 - **Search**: Dynamic product searching functionality.
 - **Shopping Cart**: Local and account-based cart management.
 - **Admin Dashboard**: Product management, order tracking, and sales analytics.

@@ -6,9 +6,9 @@ const FrequestlyAsked = () => {
     return (
         <Accordion>
             <Accordion.Item eventKey="0" className='mb-2'>
-                <Accordion.Header><h3>What are refurbished devices ?</h3></Accordion.Header>
+                <Accordion.Header><h3>What are certified premium devices ?</h3></Accordion.Header>
                 <Accordion.Body>
-                    <p>Refurbished is not the same thing as used or secondhand. The sellers we partner with are held to rigorous quality guidelines that ensure every item we sell runs like new. The refurbishment process they adhere to includes meticulously cleaning, testing, and assessing every item, as well as replacing aging parts with high-quality new components. Meanwhile, with secondhand or used items, you’re left to the private seller’s good word as to their true condition, and with no guarantee or warranty.</p>
+                    <p>Certified premium is not the same thing as used or secondhand. The sellers we partner with are held to rigorous quality guidelines that ensure every item we sell runs like new. The certification process they adhere to includes meticulously cleaning, testing, and assessing every item, as well as replacing aging parts with high-quality new components. Meanwhile, with secondhand or used items, you’re left to the private seller’s good word as to their true condition, and with no guarantee or warranty.</p>
                 </Accordion.Body>
             </Accordion.Item>
 

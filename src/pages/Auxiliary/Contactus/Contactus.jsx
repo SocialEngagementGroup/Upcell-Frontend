@@ -78,9 +78,9 @@ const Contactus = () => {
                         <KeyboardArrowRightIcon className="!text-sm" />
                         <span className="text-apple-text">Support</span>
                     </nav>
-                    <h1 className="text-[clamp(2.8rem,5vw,5rem)] leading-[0.92]">Contact UpCell — Refurbished Apple Device Support</h1>
+                    <h1 className="text-[clamp(2.8rem,5vw,5rem)] leading-[0.92]">Contact UpCell — Premium Apple Device Support</h1>
                     <p className="mt-5 max-w-[680px] text-lg leading-8 text-ink-soft">
-                        Questions about a certified refurbished iPhone, iPad, or MacBook? Need help with a trade-in quote, order update, or return? Our team responds within 24 hours — reach us by email, Facebook, or Instagram.
+                        Questions about a certified premium iPhone, iPad, or MacBook? Need help with a trade-in quote, order update, or return? Our team responds within 24 hours — reach us by email, Facebook, or Instagram.
                     </p>
                 </div>
             </section>

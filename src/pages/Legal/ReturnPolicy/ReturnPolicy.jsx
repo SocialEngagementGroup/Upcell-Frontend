@@ -11,9 +11,9 @@ const ReturnPolicy = () => {
                         <KeyboardArrowRightIcon className="!text-sm" />
                         <span className="text-apple-text">Returns</span>
                     </nav>
-                    <h1 className="text-[clamp(2.8rem,5vw,5rem)] leading-[0.92]">30-Day Return Policy on All Certified Refurbished Apple Devices</h1>
+                    <h1 className="text-[clamp(2.8rem,5vw,5rem)] leading-[0.92]">30-Day Return Policy on All Certified Premium Apple Devices</h1>
                     <p className="mt-5 max-w-[640px] text-lg leading-8 text-ink-soft">
-                        Every certified refurbished iPhone, iPad, and MacBook purchased from UpCell is covered by a 30-day return window and a 12-month limited warranty. If something isn’t right, we’ll guide you through the process clearly.
+                        Every certified premium iPhone, iPad, and MacBook purchased from UpCell is covered by a 30-day return window and a 12-month limited warranty. If something isn’t right, we’ll guide you through the process clearly.
                     </p>
                 </div>
             </section>

@@ -5,7 +5,7 @@ const Technical = ({product}) => {
         <>
         <h2>{product?.productName} - {product?.storage} - {product?.color?.name} - {product?.description}</h2>
         
-        <h3>Verified refurbished</h3>
+        <h3>Certified premium</h3>
         <p>Reborn electronics are like new — just better for the planet and your pocket. Our sellers are electronics experts who test and verify that every device is clean and 100% functional before it goes out for delivery. You get what it says on the box or your money back.</p>
 
         <h4><span>Model</span> <span>{product?.productName}</span></h4>
