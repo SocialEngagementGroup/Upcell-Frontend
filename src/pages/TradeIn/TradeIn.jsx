@@ -10,6 +10,7 @@ import BoltIcon from '@mui/icons-material/Bolt';
 import PhoneIphoneIcon from '@mui/icons-material/PhoneIphone';
 import TabletMacIcon from '@mui/icons-material/TabletMac';
 import LaptopMacIcon from '@mui/icons-material/LaptopMac';
+import AndroidIcon from '@mui/icons-material/Android';
 import axiosInstance from '../../utilities/axiosInstance';
 import { extractApiError, validateEmailAddress, validatePhoneNumber, validateRequiredText } from '../../utilities/formValidation';
 import useFormAnalytics from '../../utilities/useFormAnalytics';
@@ -20,6 +21,13 @@ const deviceOptions = [
     { id: 'iPhone', title: 'iPhone', desc: 'Trade in any iPhone 11 through iPhone 16 Pro Max — unlocked or carrier models accepted.', icon: PhoneIphoneIcon },
     { id: 'iPad', title: 'iPad', desc: 'iPad Air, iPad mini, and iPad Pro accepted — Wi-Fi and cellular models welcome.', icon: TabletMacIcon },
     { id: 'MacBook', title: 'MacBook', desc: 'MacBook Air and MacBook Pro — M1, M2, and M3 chips all eligible for trade-in.', icon: LaptopMacIcon },
+    { id: 'Android', title: 'Android', desc: 'Trade in your Samsung Galaxy S, Google Pixel, or other Android device.', icon: AndroidIcon },
+];
+
+const androidBrandOptions = [
+    { id: 'Samsung', title: 'Samsung Galaxy', desc: 'Galaxy S series — S22 Ultra and newer flagships accepted.', icon: AndroidIcon },
+    { id: 'Google', title: 'Google Pixel', desc: 'Pixel 8 and newer Pixel devices accepted.', icon: AndroidIcon },
+    { id: 'AndroidOther', title: 'Other Brand', desc: "Different brand or model? Tell us about it and our team will reach out with an offer.", icon: AndroidIcon },
 ];
 
 const modelOptions = {
@@ -61,6 +69,27 @@ const modelOptions = {
         { id: 'mba15m2', title: 'MacBook Air 15" M2' },
         { id: 'mba13m2', title: 'MacBook Air 13" M2' },
     ],
+    'Samsung': [
+        { id: 's25ultra', title: 'Galaxy S25 Ultra' },
+        { id: 's25plus', title: 'Galaxy S25+' },
+        { id: 's25', title: 'Galaxy S25' },
+        { id: 's24ultra', title: 'Galaxy S24 Ultra' },
+        { id: 's24plus', title: 'Galaxy S24+' },
+        { id: 's24', title: 'Galaxy S24' },
+        { id: 's23ultra', title: 'Galaxy S23 Ultra' },
+        { id: 's23plus', title: 'Galaxy S23+' },
+        { id: 's23', title: 'Galaxy S23' },
+        { id: 's22ultra', title: 'Galaxy S22 Ultra' },
+    ],
+    'Google': [
+        { id: 'pixel9proxl', title: 'Pixel 9 Pro XL' },
+        { id: 'pixel9pro', title: 'Pixel 9 Pro' },
+        { id: 'pixel9', title: 'Pixel 9' },
+        { id: 'pixel9a', title: 'Pixel 9a' },
+        { id: 'pixel8pro', title: 'Pixel 8 Pro' },
+        { id: 'pixel8', title: 'Pixel 8' },
+        { id: 'pixel8a', title: 'Pixel 8a' },
+    ],
 };
 
 const carrierOptions = {
@@ -75,12 +104,26 @@ const carrierOptions = {
         { id: 'wifi_cellular', title: 'Wi-Fi + Cellular' },
     ],
     'MacBook': null, // MacBooks skip this step
+    'Samsung': [
+        { id: 'unlocked', title: 'Unlocked' },
+        { id: 'att', title: 'AT&T' },
+        { id: 'tmobile', title: 'T-Mobile' },
+        { id: 'verizon', title: 'Verizon' },
+    ],
+    'Google': [
+        { id: 'unlocked', title: 'Unlocked' },
+        { id: 'att', title: 'AT&T' },
+        { id: 'tmobile', title: 'T-Mobile' },
+        { id: 'verizon', title: 'Verizon' },
+    ],
 };
 
 const storageOptions = {
     'iPhone': ['64GB', '128GB', '256GB', '512GB', '1TB'],
     'iPad': ['64GB', '128GB', '256GB', '512GB', '1TB'],
     'MacBook': ['256GB', '512GB', '1TB', '2TB'],
+    'Samsung': ['128GB', '256GB', '512GB', '1TB'],
+    'Google': ['128GB', '256GB', '512GB', '1TB'],
 };
 
 const conditionQuestions = {
@@ -118,6 +161,36 @@ const conditionQuestions = {
             { id: 'fair', title: 'Fair', desc: 'Visible wear, small dents, or noticeable scratches.' },
         ]},
     ],
+    'Samsung': [
+        { id: 'powersOn', question: 'Does the device power on and hold a charge?', yes: 'Yes, it powers on normally', no: 'No, it won\'t turn on' },
+        { id: 'functional', question: 'Is the device fully functional?', subtitle: 'All buttons, touch, fingerprint/face unlock, cameras, and speakers work normally.', yes: 'Yes, everything works', no: 'No, something is broken' },
+        { id: 'cracked', question: 'Are the front and back glass free of cracks?', yes: 'Yes, no cracks', no: 'No, there are cracks' },
+        { id: 'screenCondition', question: 'What best describes the screen condition?', options: [
+            { id: 'flawless', title: 'Flawless', desc: 'No visible scratches or marks on the display.' },
+            { id: 'good', title: 'Good', desc: 'Minor scratches only visible when screen is off.' },
+            { id: 'fair', title: 'Fair', desc: 'Noticeable scratches visible during regular use.' },
+        ]},
+        { id: 'bodyCondition', question: 'What best describes the body condition?', options: [
+            { id: 'flawless', title: 'Like New', desc: 'No visible wear on the frame or back glass.' },
+            { id: 'good', title: 'Good', desc: 'Minor cosmetic marks that don\'t affect function.' },
+            { id: 'fair', title: 'Fair', desc: 'Noticeable dents, scratches, or marks on the body.' },
+        ]},
+    ],
+    'Google': [
+        { id: 'powersOn', question: 'Does the device power on and hold a charge?', yes: 'Yes, it powers on normally', no: 'No, it won\'t turn on' },
+        { id: 'functional', question: 'Is the device fully functional?', subtitle: 'All buttons, touch, fingerprint/face unlock, cameras, and speakers work normally.', yes: 'Yes, everything works', no: 'No, something is broken' },
+        { id: 'cracked', question: 'Are the front and back glass free of cracks?', yes: 'Yes, no cracks', no: 'No, there are cracks' },
+        { id: 'screenCondition', question: 'What best describes the screen condition?', options: [
+            { id: 'flawless', title: 'Flawless', desc: 'No visible scratches or marks on the display.' },
+            { id: 'good', title: 'Good', desc: 'Minor scratches only visible when screen is off.' },
+            { id: 'fair', title: 'Fair', desc: 'Noticeable scratches visible during regular use.' },
+        ]},
+        { id: 'bodyCondition', question: 'What best describes the body condition?', options: [
+            { id: 'flawless', title: 'Like New', desc: 'No visible wear on the frame or back glass.' },
+            { id: 'good', title: 'Good', desc: 'Minor cosmetic marks that don\'t affect function.' },
+            { id: 'fair', title: 'Fair', desc: 'Noticeable dents, scratches, or marks on the body.' },
+        ]},
+    ],
 };
 
 /* ───────────── PRICING LOGIC ───────────── */
@@ -131,6 +204,12 @@ const basePrices = {
     'ipadair5': 320, 'ipadmini6': 260, 'ipad10': 210, 'ipad9': 140,
     'mbp16m3': 1250, 'mbp14m3': 1050, 'mbp16m2': 980, 'mbp14m2': 820,
     'mba15m3': 780, 'mba13m3': 650, 'mba15m2': 620, 'mba13m2': 520,
+    's25ultra': 850, 's25plus': 620, 's25': 520,
+    's24ultra': 700, 's24plus': 520, 's24': 440,
+    's23ultra': 540, 's23plus': 380, 's23': 320,
+    's22ultra': 360,
+    'pixel9proxl': 720, 'pixel9pro': 620, 'pixel9': 480, 'pixel9a': 340,
+    'pixel8pro': 480, 'pixel8': 360, 'pixel8a': 280,
 };
 
 const storageMultiplier = { '64GB': 0.85, '128GB': 1.0, '256GB': 1.12, '512GB': 1.25, '1TB': 1.45, '2TB': 1.65 };
@@ -167,8 +246,11 @@ function calculateEstimate(selection) {
 /* ───────────── STEP LABELS ───────────── */
 
 function getStepLabels(device) {
-    const hasCarrier = carrierOptions[device] !== null;
-    const baseSteps = hasCarrier 
+    if (device === 'AndroidOther') {
+        return ['Device', 'Your details', 'Confirmation'];
+    }
+    const hasCarrier = carrierOptions[device] !== null && carrierOptions[device] !== undefined;
+    const baseSteps = hasCarrier
         ? ['Device', 'Model', 'Carrier', 'Storage', 'Condition', 'Your details']
         : ['Device', 'Model', 'Storage', 'Condition', 'Your details'];
     return [...baseSteps, 'Confirmation'];
@@ -191,7 +273,10 @@ const TradeIn = () => {
         name: '',
         email: '',
         phone: '',
+        customBrand: '',
+        customModel: '',
     });
+    const [showAndroidBrands, setShowAndroidBrands] = useState(false);
     const [conditionStep, setConditionStep] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState('');
@@ -220,9 +305,16 @@ const TradeIn = () => {
     const back = () => {
         if (step === stepMap['Condition'] && conditionStep > 0) {
             setConditionStep((prev) => prev - 1);
-        } else {
-            setStep((prev) => Math.max(1, prev - 1));
+            return;
         }
+        if (step === 2 && (selection.device === 'Samsung' || selection.device === 'Google' || selection.device === 'AndroidOther')) {
+            // Going back from inside an Android sub-flow returns to the brand picker
+            setSelection((prev) => ({ ...prev, device: '', model: '', carrier: '', storage: '', answers: {}, customBrand: '', customModel: '' }));
+            setShowAndroidBrands(true);
+            setStep(1);
+            return;
+        }
+        setStep((prev) => Math.max(1, prev - 1));
     };
 
     const handleConditionAnswer = (questionId, value) => {
@@ -242,7 +334,8 @@ const TradeIn = () => {
     const resetFlow = () => {
         setStep(1);
         setConditionStep(0);
-        setSelection({ device: '', model: '', carrier: '', storage: '', answers: {}, name: '', email: '', phone: '' });
+        setShowAndroidBrands(false);
+        setSelection({ device: '', model: '', carrier: '', storage: '', answers: {}, name: '', email: '', phone: '', customBrand: '', customModel: '' });
         setIsSubmitting(false);
         setSubmitError('');
         setSavedRequest(null);
@@ -255,13 +348,25 @@ const TradeIn = () => {
     const handleSubmitTradeInRequest = async () => {
         if (isSubmitting) return;
 
+        const isAndroidOther = selection.device === 'AndroidOther';
+
         const nameError = validateRequiredText('Name', selection.name, { min: 2, max: 120 });
         const emailError = validateEmailAddress(selection.email);
         const phoneError = validatePhoneNumber(selection.phone);
-        const selectionError = !selection.device || !selection.model || !selection.storage
-            ? 'Please complete your device, model, and storage selections before submitting.'
-            : '';
-        const estimateError = typeof estimate !== 'number' ? 'We could not calculate your trade-in estimate. Please review your answers.' : '';
+
+        let selectionError = '';
+        let estimateError = '';
+        if (isAndroidOther) {
+            const brandError = validateRequiredText('Phone brand', selection.customBrand, { min: 2, max: 60 });
+            const modelError = validateRequiredText('Phone model', selection.customModel, { min: 1, max: 80 });
+            selectionError = brandError || modelError;
+        } else {
+            selectionError = !selection.device || !selection.model || !selection.storage
+                ? 'Please complete your device, model, and storage selections before submitting.'
+                : '';
+            estimateError = typeof estimate !== 'number' ? 'We could not calculate your trade-in estimate. Please review your answers.' : '';
+        }
+
         const validationMessage = nameError || emailError || phoneError || selectionError || estimateError;
 
         if (validationMessage) {
@@ -275,19 +380,37 @@ const TradeIn = () => {
         markInteraction();
 
         try {
-            const response = await axiosInstance.post('trade-in-requests', {
-                device: selection.device,
-                model: selection.model,
-                modelTitle: selectedModelTitle,
-                carrier: selection.carrier || undefined,
-                carrierTitle: selectedCarrierTitle || undefined,
-                storage: selection.storage,
-                estimate: estimate || 0,
-                answers: selection.answers,
-                name: selection.name.trim(),
-                email: selection.email.trim(),
-                phone: selection.phone.trim(),
-            });
+            const payload = isAndroidOther
+                ? {
+                    device: 'Android',
+                    model: 'other',
+                    modelTitle: `${selection.customBrand.trim()} ${selection.customModel.trim()}`.trim(),
+                    storage: 'N/A',
+                    estimate: 0,
+                    answers: {
+                        type: 'android_other',
+                        brand: selection.customBrand.trim(),
+                        model: selection.customModel.trim(),
+                    },
+                    name: selection.name.trim(),
+                    email: selection.email.trim(),
+                    phone: selection.phone.trim(),
+                }
+                : {
+                    device: selection.device,
+                    model: selection.model,
+                    modelTitle: selectedModelTitle,
+                    carrier: selection.carrier || undefined,
+                    carrierTitle: selectedCarrierTitle || undefined,
+                    storage: selection.storage,
+                    estimate: estimate || 0,
+                    answers: selection.answers,
+                    name: selection.name.trim(),
+                    email: selection.email.trim(),
+                    phone: selection.phone.trim(),
+                };
+
+            const response = await axiosInstance.post('trade-in-requests', payload);
 
             setSavedRequest(response.data);
             trackSuccess({
@@ -319,9 +442,9 @@ const TradeIn = () => {
                         <KeyboardArrowRightIcon className="!text-sm" />
                         <span className="text-white">Trade In</span>
                     </nav>
-                    <h1 className="mt-6 text-[clamp(2.8rem,5vw,5rem)] leading-[0.92] text-white">Trade In Your iPhone, iPad or MacBook — Get Paid Fast</h1>
+                    <h1 className="mt-6 text-[clamp(2.8rem,5vw,5rem)] leading-[0.92] text-white">Trade In Your iPhone, iPad, MacBook or Android — Get Paid Fast</h1>
                     <p className="mt-5 max-w-[680px] text-lg leading-8 text-white/72">
-                        Get an instant trade-in estimate for your used Apple device. Free insured shipping, 24-hour payout after inspection, and a transparent process from start to finish.
+                        Get an instant trade-in estimate for your used Apple or Android device. Free insured shipping, 24-hour payout after inspection, and a transparent process from start to finish.
                     </p>
                 </div>
             </section>
@@ -345,10 +468,16 @@ const TradeIn = () => {
                             </div>
                         ))}
                     </div>
-                    {step > 1 && (
+                    {(step > 1 || showAndroidBrands) && (
                         <button
                             className="flex h-[56px] items-center gap-2 rounded-full border border-black/[0.08] bg-white px-6 text-[15px] font-bold text-apple-text transition-all duration-300 hover:bg-surface-alt active:scale-[0.98]"
-                            onClick={back}
+                            onClick={() => {
+                                if (showAndroidBrands && step === 1) {
+                                    setShowAndroidBrands(false);
+                                    return;
+                                }
+                                back();
+                            }}
                         >
                             <KeyboardArrowLeftIcon className="!text-[20px]" /> Back
                         </button>
@@ -356,8 +485,8 @@ const TradeIn = () => {
                 </div>
 
                 {/* ─── Step 1: Choose Device ─── */}
-                {step === 1 && (
-                    <div className="grid gap-6 lg:grid-cols-3">
+                {step === 1 && !showAndroidBrands && (
+                    <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-4">
                         {deviceOptions.map((device) => {
                             const Icon = device.icon;
                             return (
@@ -366,7 +495,11 @@ const TradeIn = () => {
                                     className="premium-card rounded-[32px] p-8 text-left transition-all duration-300 hover:-translate-y-1.5 hover:shadow-medium"
                                     onClick={() => {
                                         markInteraction();
-                                        setSelection((prev) => ({ ...prev, device: device.id, model: '', carrier: '', storage: '', answers: {} }));
+                                        if (device.id === 'Android') {
+                                            setShowAndroidBrands(true);
+                                            return;
+                                        }
+                                        setSelection((prev) => ({ ...prev, device: device.id, model: '', carrier: '', storage: '', answers: {}, customBrand: '', customModel: '' }));
                                         setConditionStep(0);
                                         setStep(2);
                                     }}
@@ -379,6 +512,38 @@ const TradeIn = () => {
                                 </button>
                             );
                         })}
+                    </div>
+                )}
+
+                {/* ─── Step 1 (Android): Choose Brand ─── */}
+                {step === 1 && showAndroidBrands && (
+                    <div>
+                        <h2 className="mb-2 text-[32px]">Choose your Android brand</h2>
+                        <p className="mb-6 text-base text-ink-soft">Pick the brand that matches your phone. Don't see it? Choose "Other Brand" and we'll follow up directly.</p>
+                        <div className="grid gap-6 lg:grid-cols-3">
+                            {androidBrandOptions.map((brand) => {
+                                const Icon = brand.icon;
+                                return (
+                                    <button
+                                        key={brand.id}
+                                        className="premium-card rounded-[32px] p-8 text-left transition-all duration-300 hover:-translate-y-1.5 hover:shadow-medium"
+                                        onClick={() => {
+                                            markInteraction();
+                                            setSelection((prev) => ({ ...prev, device: brand.id, model: '', carrier: '', storage: '', answers: {}, customBrand: '', customModel: '' }));
+                                            setConditionStep(0);
+                                            setShowAndroidBrands(false);
+                                            setStep(2);
+                                        }}
+                                    >
+                                        <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-surface-alt">
+                                            <Icon className="!text-[24px] text-apple-text" />
+                                        </div>
+                                        <h2 className="text-[28px]">{brand.title}</h2>
+                                        <p className="mt-3 text-base leading-8 text-ink-soft">{brand.desc}</p>
+                                    </button>
+                                );
+                            })}
+                        </div>
                     </div>
                 )}
 
@@ -538,7 +703,7 @@ const TradeIn = () => {
 
 
                 {/* ─── Step: Your Details (Form + Valuation) ─── */}
-                {step === stepMap['Your details'] && (
+                {step === stepMap['Your details'] && selection.device !== 'AndroidOther' && (
                     <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
                         <div className="space-y-8">
                             {/* Valuation Summary Card */}
@@ -648,18 +813,100 @@ const TradeIn = () => {
                     </div>
                 )}
 
+                {/* ─── Step: AndroidOther — Custom Phone Request ─── */}
+                {step === stepMap['Your details'] && selection.device === 'AndroidOther' && (
+                    <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
+                        <div className="space-y-8">
+                            <div className="premium-card rounded-[36px] p-8 md:p-10">
+                                <h2 className="text-[32px] font-bold">Tell us about your phone</h2>
+                                <p className="mt-3 text-base leading-8 text-ink-soft max-w-[560px]">
+                                    We don't have a fixed price list for this device, so our team will review your details and reach out within 1 business day with a personalised offer.
+                                </p>
+
+                                <div className="mt-8 grid gap-4 sm:grid-cols-2">
+                                    <input
+                                        className="premium-input"
+                                        placeholder="Phone brand (e.g. OnePlus, Xiaomi)"
+                                        value={selection.customBrand}
+                                        onChange={(e) => {
+                                            markInteraction();
+                                            setSelection((prev) => ({ ...prev, customBrand: e.target.value }));
+                                        }}
+                                    />
+                                    <input
+                                        className="premium-input"
+                                        placeholder="Phone model (e.g. 12 Pro, Mi 14)"
+                                        value={selection.customModel}
+                                        onChange={(e) => {
+                                            markInteraction();
+                                            setSelection((prev) => ({ ...prev, customModel: e.target.value }));
+                                        }}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="premium-card rounded-[36px] p-8 md:p-10">
+                                <h3 className="text-[28px] mb-6">Your contact details</h3>
+                                <div className="grid gap-4 sm:grid-cols-2">
+                                    <div className="sm:col-span-2">
+                                        <input className="premium-input w-full" placeholder="Full name" value={selection.name} onChange={(e) => {
+                                            markInteraction();
+                                            setSelection((prev) => ({ ...prev, name: e.target.value }));
+                                        }} />
+                                    </div>
+                                    <input className="premium-input" type="email" placeholder="Email address" value={selection.email} onChange={(e) => {
+                                        markInteraction();
+                                        setSelection((prev) => ({ ...prev, email: e.target.value }));
+                                    }} />
+                                    <input className="premium-input" type="tel" placeholder="Phone number" value={selection.phone} onChange={(e) => {
+                                        markInteraction();
+                                        setSelection((prev) => ({ ...prev, phone: e.target.value }));
+                                    }} />
+                                </div>
+                                {submitError && (
+                                    <div className="mt-5 rounded-[20px] border border-red-500/15 bg-red-50 px-4 py-3 text-sm text-red-600">
+                                        {submitError}
+                                    </div>
+                                )}
+                                <button
+                                    className="premium-button mt-8 w-full sm:w-auto disabled:cursor-not-allowed disabled:opacity-70"
+                                    onClick={handleSubmitTradeInRequest}
+                                    disabled={isSubmitting}
+                                >
+                                    {isSubmitting ? 'Submitting...' : 'Request a quote'}
+                                </button>
+                            </div>
+                        </div>
+
+                        <aside className="space-y-6">
+                            <div className="premium-card rounded-[32px] p-6 lg:sticky lg:top-28">
+                                <h3 className="text-[22px] mb-6">What happens next</h3>
+                                <div className="space-y-5 text-sm leading-7 text-ink-soft">
+                                    <p><span className="font-bold text-apple-text">1. We review your phone details.</span> Our team checks current market value for your make and model.</p>
+                                    <p><span className="font-bold text-apple-text">2. We reach out within 1 business day</span> with a personalised offer by email or phone.</p>
+                                    <p><span className="font-bold text-apple-text">3. You decide.</span> Accept the offer and we'll send a prepaid, insured shipping kit. No obligation.</p>
+                                </div>
+                            </div>
+                        </aside>
+                    </div>
+                )}
+
                 {/* ─── Step: Confirmation ─── */}
                 {step === stepMap['Confirmation'] && (
                     <div className="premium-card rounded-[36px] px-8 py-16 text-center">
                         <CheckCircleIcon className="!text-[72px] text-apple-text" />
-                        <h2 className="mt-6 text-[42px]">Trade-in request received.</h2>
+                        <h2 className="mt-6 text-[42px]">{selection.device === 'AndroidOther' ? 'Request received.' : 'Trade-in request received.'}</h2>
                         <p className="mx-auto mt-4 max-w-[560px] text-lg leading-8 text-ink-soft">
-                            We'll email your prepaid shipping label, inspection guidance, and next steps within 1 business day. Payout is issued within 24 hours of device inspection.
+                            {selection.device === 'AndroidOther'
+                                ? "Thanks — our team will review your phone details and reach out within 1 business day with a personalised offer."
+                                : "We'll email your prepaid shipping label, inspection guidance, and next steps within 1 business day. Payout is issued within 24 hours of device inspection."}
                         </p>
-                        <div className="mx-auto mt-6 max-w-[400px] rounded-[24px] border border-black/[0.06] bg-surface-alt/50 p-5">
-                            <div className="text-sm text-ink-soft">Estimated payout</div>
-                            <div className="mt-1 text-3xl font-extrabold text-apple-text">${estimate || 0}</div>
-                        </div>
+                        {selection.device !== 'AndroidOther' && (
+                            <div className="mx-auto mt-6 max-w-[400px] rounded-[24px] border border-black/[0.06] bg-surface-alt/50 p-5">
+                                <div className="text-sm text-ink-soft">Estimated payout</div>
+                                <div className="mt-1 text-3xl font-extrabold text-apple-text">${estimate || 0}</div>
+                            </div>
+                        )}
                         {savedRequest?._id && (
                             <div className="mx-auto mt-4 max-w-[400px] rounded-[24px] border border-black/[0.06] bg-white p-5 text-left">
                                 <div className="text-xs font-bold uppercase tracking-[0.18em] text-apple-gray">Request ID</div>
