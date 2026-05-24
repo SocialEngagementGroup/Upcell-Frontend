@@ -53,11 +53,11 @@ const MyFooter = () => {
             <div className="page-container py-10">
                 <div className="overflow-hidden rounded-[36px] bg-white p-8 shadow-[0_20px_50px_rgba(0,0,0,0.15)] md:px-12 md:py-10">
                     <div className="grid gap-12 lg:grid-cols-[1.4fr_0.8fr_0.8fr_0.8fr_1.6fr]">
-                        <div className="space-y-5">
+                        <div className="space-y-5 lg:pt-8">
                             <Link to="/" className="flex items-center">
-                                <img src="/staticImages/upcellLogo.png" alt="Upcell Logo" className="h-[138px] w-auto object-contain" />
+                                <img src="/staticImages/upcellLogoFooter.png" alt="Upcell Logo" className="h-12 w-auto" />
                             </Link>
-                            <p className="max-w-[320px] text-sm leading-7 text-ink-soft">
+                            <p className="max-w-[320px] text-[13px] leading-6 text-ink-soft">
                                 Certified premium iPhones, iPads, and MacBooks — professionally inspected, honestly graded, and backed by a 12-month warranty. Save up to 40% vs. new.
                             </p>
                             <div className="flex gap-3 pt-2">
@@ -112,7 +112,7 @@ const MyFooter = () => {
                                 <button
                                     type="submit"
                                     disabled={isSubmitting}
-                                    className="inline-flex h-12 w-full items-center justify-center rounded-2xl bg-apple-text px-6 text-sm font-bold text-white shadow-none ring-0 transition-all duration-300 hover:bg-black"
+                                    className="inline-flex h-12 w-full items-center justify-center rounded-2xl bg-brand-red px-6 text-sm font-bold text-white shadow-none ring-0 transition-all duration-300 hover:bg-[#b00a0d]"
                                 >
                                     {isSubmitting ? 'Subscribing...' : 'Subscribe'}
                                 </button>

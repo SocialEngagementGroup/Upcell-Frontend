@@ -6,12 +6,17 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Roboto', 'ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
+      },
       colors: {
-        'apple-text': '#1d1d1f',
+        'apple-text': '#0c0c0c',
         'apple-gray': '#86868b',
-        'apple-bg': '#f5f5f7',
-        'brand-red': '#FF3B30',
-        'brand-blue': '#0071e3',
+        'apple-bg': '#ededed',
+        'ink-soft': '#302f2f',
+        'surface': '#f7f7f7',
+        'surface-alt': '#ededed',
+        'brand-red': '#d90b0f',
       },
       maxWidth: {
         'site': '1440px',

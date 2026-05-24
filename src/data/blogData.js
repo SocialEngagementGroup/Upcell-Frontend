@@ -2,7 +2,7 @@ export const blogData = [
     { 
         id: '1',
         slug: 'apple-purchase-smarter',
-        image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=2670&auto=format&fit=crop', 
+        image: '/staticImages/blog/apple-purchase-smarter.jpg',
         title: 'Make your Apple purchase smarter', 
         excerpt: 'What to look for in a premium pre-owned device, from storage choices to condition grading.',
         date: 'April 01, 2026',
@@ -20,7 +20,7 @@ In this deep dive, we explore how UpCell's 40-point inspection process ensures t
     { 
         id: '2',
         slug: 'creative-work-hardware',
-        image: 'https://images.unsplash.com/photo-1454165833767-027ffea70288?q=80&w=2670&auto=format&fit=crop', 
+        image: '/staticImages/blog/creative-work-hardware.jpg',
         title: 'Creative work on Apple hardware', 
         excerpt: 'How to choose the right iPhone, iPad, or MacBook for content, study, and everyday workflows.',
         date: 'March 28, 2026',
@@ -38,7 +38,7 @@ At the core of this discussion is reliability. A creative professional cannot af
     { 
         id: '3',
         slug: 'battery-health-guide',
-        image: 'https://images.unsplash.com/photo-1503387762-592dee5814e5?q=80&w=2670&auto=format&fit=crop', 
+        image: '/staticImages/blog/battery-health-guide.jpg',
         title: 'Battery health and long-term value', 
         excerpt: 'A quick guide to preserving performance and understanding what battery condition means in real life.',
         date: 'March 24, 2026',
@@ -56,7 +56,7 @@ This article also touches on the environmental impact of battery longevity. By t
     { 
         id: '4',
         slug: 'trade-in-timing',
-        image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2426&auto=format&fit=crop', 
+        image: '/staticImages/blog/trade-in-timing.jpg',
         title: 'When to trade in your current device', 
         excerpt: 'Timing, condition, and model demand can all shape the value you receive back.',
         date: 'March 15, 2026',

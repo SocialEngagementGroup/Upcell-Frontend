@@ -38,7 +38,7 @@ const HomeTrustFeatures = () => {
         <section className="px-4 py-14 md:px-6 md:py-24">
             <div className="page-container">
                 <div className="mb-10 text-center">
-                    <h2>Why Buy Premium Apple From UpCell?</h2>
+                    <h2>Premium devices, better prices</h2>
                 </div>
                 <div className="grid grid-cols-3 gap-6 max-md:grid-cols-1">
                     {features.map((feature, index) => (

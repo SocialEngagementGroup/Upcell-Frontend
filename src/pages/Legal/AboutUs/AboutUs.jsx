@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import { Handshake } from "@mui/icons-material";
 
 const values = [
     { title: "Customer First", desc: "We design every experience around clarity, support, and long-term satisfaction." },
@@ -53,7 +52,7 @@ const AboutUs = () => {
                     {values.map((value, index) => (
                         <div key={index} className="premium-card rounded-[32px] p-8">
                             <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-surface-alt">
-                                {index === 4 ? <Handshake /> : <span className="text-lg font-extrabold text-apple-text">{index + 1}</span>}
+                                <span className="text-lg font-extrabold text-apple-text">{index + 1}</span>
                             </div>
                             <h3 className="text-[28px]">{value.title}</h3>
                             <p className="mt-3 text-base leading-8 text-ink-soft">{value.desc}</p>

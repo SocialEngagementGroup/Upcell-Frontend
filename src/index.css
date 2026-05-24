@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -87,7 +87,7 @@
     }
 
     .premium-button {
-        @apply inline-flex h-[56px] items-center justify-center rounded-full bg-apple-text px-8 text-sm font-bold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-black active:scale-[0.98];
+        @apply inline-flex h-[56px] items-center justify-center rounded-full bg-brand-red px-8 text-sm font-bold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#b00a0d] active:scale-[0.98];
     }
 
     .premium-button-secondary {

@@ -368,7 +368,8 @@ const ShopPage = () => {
                                 onChange={(event) => setPriceRange(Number(event.target.value))}
                                 className="mt-4 h-1 w-full appearance-none rounded-full"
                                 style={{
-                                    background: `linear-gradient(to right, #1d1d1f 0%, #1d1d1f ${sliderPercentage}%, #d7dbe1 ${sliderPercentage}%, #d7dbe1 100%)`,
+                                    accentColor: '#d90b0f',
+                                    background: `linear-gradient(to right, #d90b0f 0%, #d90b0f ${sliderPercentage}%, #d7dbe1 ${sliderPercentage}%, #d7dbe1 100%)`,
                                 }}
                             />
                             <div className="mt-3 flex justify-between text-sm text-apple-gray">

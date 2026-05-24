@@ -16,7 +16,7 @@ const ModernHero = () => {
                             Shop certified premium Apple devices with transparent condition grading, a 12-month warranty, and save up to 40% vs. new. Plus, get an instant trade-in quote for your current device.
                         </p>
                         <div className="mt-10 flex flex-wrap gap-4">
-                            <Link to="/shop" className="inline-flex h-[56px] items-center justify-center rounded-full bg-white px-10 text-[15px] font-black text-black transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(255,255,255,0.15)] min-w-[220px]">
+                            <Link to="/shop" className="inline-flex h-[56px] items-center justify-center rounded-full bg-brand-red px-10 text-[15px] font-black text-white transition-all duration-300 hover:-translate-y-1 hover:bg-[#b00a0d] hover:shadow-[0_20px_40px_rgba(217,11,15,0.35)] min-w-[220px]">
                                 Shop Premium Apple
                             </Link>
                             <Link to="/trade-in" className="inline-flex h-[56px] items-center justify-center rounded-full border border-white/20 bg-white/5 px-10 text-[15px] font-black text-white backdrop-blur transition-all duration-300 hover:-translate-y-1 hover:bg-white/10 min-w-[220px]">

@@ -142,10 +142,10 @@ const SingleProductGroup = ({ productGroup, onDelete }) => {
                     </div>
                     <div>
                         <div className="flex items-center gap-3">
-                            <h3 className={`text-[28px] font-medium transition-colors ${isOpen ? 'text-apple-blue' : 'group-hover:text-apple-blue'}`}>
+                            <h3 className={`text-[28px] font-medium transition-colors ${isOpen ? 'text-brand-red' : 'group-hover:text-brand-red'}`}>
                                 {productGroup.productName}
                             </h3>
-                            <span className={`text-xl transition-transform duration-300 ${isOpen ? 'rotate-180 text-apple-blue' : 'text-ink-soft'}`}>
+                            <span className={`text-xl transition-transform duration-300 ${isOpen ? 'rotate-180 text-brand-red' : 'text-ink-soft'}`}>
                                 ⌄
                             </span>
                         </div>

@@ -50,10 +50,10 @@ const SingleCatagory = ({ catagory, setUpdate, productGroups, setProductGroups }
                     onClick={() => setIsProductsOpen(!isProductsOpen)}
                     className="group flex cursor-pointer items-center gap-3"
                 >
-                    <h3 className={`text-[28px] font-medium transition-colors ${isProductsOpen ? 'text-apple-blue' : 'group-hover:text-apple-blue'}`}>
+                    <h3 className={`text-[28px] font-medium transition-colors ${isProductsOpen ? 'text-brand-red' : 'group-hover:text-brand-red'}`}>
                         {catagory?.modelName}
                     </h3>
-                    <span className={`text-xl transition-transform duration-300 ${isProductsOpen ? 'rotate-180 text-apple-blue' : 'text-ink-soft'}`}>
+                    <span className={`text-xl transition-transform duration-300 ${isProductsOpen ? 'rotate-180 text-brand-red' : 'text-ink-soft'}`}>
                         ⌄
                     </span>
                     <span className="rounded-full bg-surface-alt px-3 py-1 text-xs font-bold text-ink-soft">
@@ -130,7 +130,7 @@ const SingleCatagory = ({ catagory, setUpdate, productGroups, setProductGroups }
                                                 <div className="flex justify-end gap-3">
                                                     <button 
                                                         onClick={() => navigate(`/admin-secret/addproduct?product=${encodeURIComponent(product.productName)}`)}
-                                                        className="text-sm font-bold text-apple-blue hover:underline"
+                                                        className="text-sm font-bold text-brand-red hover:underline"
                                                     >
                                                         Edit
                                                     </button>
