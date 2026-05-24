@@ -64,7 +64,7 @@ This article also touches on the environmental impact of battery longevity. By t
 
 We analyze the seasonal trends and the 'Model Lifecycle' curve to find the optimal moment for a trade-in:
 - The Keynote Effect: How new product announcements impact the value of older generations.
-- Condition Critical: Small scratches can have a disproportionate impact on trade-in value—why protectors pay for themselves.
+- Condition Critical: Small scratches can have a disproportionate impact on trade-in value, which is exactly why screen protectors pay for themselves.
 - The 3-Year Sweet Spot: Why three generations is often the ideal upgrade interval for maximum value retention.
 
 UpCell's trade-in process is designed to be straightforward and rewarding. We provide a transparent bridge between your old gear and your next premium upgrade, removing the anxiety of private marketplace listings.

@@ -18,14 +18,14 @@ import useFormAnalytics from '../../utilities/useFormAnalytics';
 /* ───────────── STATIC DATA ───────────── */
 
 const deviceOptions = [
-    { id: 'iPhone', title: 'iPhone', desc: 'Trade in any iPhone 11 through iPhone 16 Pro Max — unlocked or carrier models accepted.', icon: PhoneIphoneIcon },
-    { id: 'iPad', title: 'iPad', desc: 'iPad Air, iPad mini, and iPad Pro accepted — Wi-Fi and cellular models welcome.', icon: TabletMacIcon },
-    { id: 'MacBook', title: 'MacBook', desc: 'MacBook Air and MacBook Pro — M1, M2, and M3 chips all eligible for trade-in.', icon: LaptopMacIcon },
+    { id: 'iPhone', title: 'iPhone', desc: 'Trade in any iPhone from the iPhone 11 to the iPhone 16 Pro Max. We accept unlocked and carrier models.', icon: PhoneIphoneIcon },
+    { id: 'iPad', title: 'iPad', desc: 'We accept iPad Air, iPad mini, and iPad Pro. Both Wi-Fi and cellular models are welcome.', icon: TabletMacIcon },
+    { id: 'MacBook', title: 'MacBook', desc: 'Trade in MacBook Air and MacBook Pro models. M1, M2, and M3 chips are all eligible.', icon: LaptopMacIcon },
     { id: 'Android', title: 'Android', desc: 'Trade in your Samsung Galaxy S, Google Pixel, or other Android device.', icon: AndroidIcon },
 ];
 
 const androidBrandOptions = [
-    { id: 'Samsung', title: 'Samsung Galaxy', desc: 'Galaxy S series — S22 Ultra and newer flagships accepted.', icon: AndroidIcon },
+    { id: 'Samsung', title: 'Samsung Galaxy', desc: 'Galaxy S series accepted, including the S22 Ultra and newer flagships.', icon: AndroidIcon },
     { id: 'Google', title: 'Google Pixel', desc: 'Pixel 8 and newer Pixel devices accepted.', icon: AndroidIcon },
     { id: 'AndroidOther', title: 'Other Brand', desc: "Different brand or model? Tell us about it and our team will reach out with an offer.", icon: AndroidIcon },
 ];
@@ -442,7 +442,7 @@ const TradeIn = () => {
                         <KeyboardArrowRightIcon className="!text-sm" />
                         <span className="text-white">Trade In</span>
                     </nav>
-                    <h1 className="mt-6 text-[clamp(2.8rem,5vw,5rem)] leading-[0.92] text-white">Trade In Your iPhone, iPad, MacBook or Android — Get Paid Fast</h1>
+                    <h1 className="mt-6 text-[clamp(2.8rem,5vw,5rem)] leading-[0.92] text-white">Trade In Your iPhone, iPad, MacBook or Android and Get Paid Fast</h1>
                     <p className="mt-5 max-w-[680px] text-lg leading-8 text-white/72">
                         Get an instant trade-in estimate for your used Apple or Android device. Free insured shipping, 24-hour payout after inspection, and a transparent process from start to finish.
                     </p>
@@ -692,7 +692,7 @@ const TradeIn = () => {
                             <div className="mt-6 border-t border-black/[0.06] pt-6">
                                 <div className="text-xs font-bold uppercase tracking-[0.18em] text-apple-gray">Estimated value</div>
                                 <div className="mt-2 text-4xl font-extrabold text-apple-text">
-                                    {estimate ? `$${estimate}` : '—'}
+                                    {estimate ? `$${estimate}` : '--'}
                                 </div>
                                 <p className="mt-2 text-xs leading-5 text-ink-soft">Final value confirmed after inspection.</p>
                             </div>
@@ -813,7 +813,7 @@ const TradeIn = () => {
                     </div>
                 )}
 
-                {/* ─── Step: AndroidOther — Custom Phone Request ─── */}
+                {/* Step: AndroidOther - Custom Phone Request */}
                 {step === stepMap['Your details'] && selection.device === 'AndroidOther' && (
                     <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
                         <div className="space-y-8">
@@ -898,7 +898,7 @@ const TradeIn = () => {
                         <h2 className="mt-6 text-[42px]">{selection.device === 'AndroidOther' ? 'Request received.' : 'Trade-in request received.'}</h2>
                         <p className="mx-auto mt-4 max-w-[560px] text-lg leading-8 text-ink-soft">
                             {selection.device === 'AndroidOther'
-                                ? "Thanks — our team will review your phone details and reach out within 1 business day with a personalised offer."
+                                ? "Thanks! Our team will review your phone details and reach out within 1 business day with a personalized offer."
                                 : "We'll email your prepaid shipping label, inspection guidance, and next steps within 1 business day. Payout is issued within 24 hours of device inspection."}
                         </p>
                         {selection.device !== 'AndroidOther' && (

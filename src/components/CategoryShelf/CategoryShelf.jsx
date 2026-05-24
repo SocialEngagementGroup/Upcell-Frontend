@@ -26,10 +26,10 @@ const CategoryShelf = () => {
                     >
                         <div className="relative z-[2] max-w-[340px]">
                             <h3 className="mb-4 text-[42px]">iPhone</h3>
-                            <p className="mb-8 text-lg leading-8 text-ink-soft">Certified premium iPhones from iPhone 11 through iPhone 16 Pro Max — battery health disclosed, unlocked options available, and trade-in pricing included.</p>
+                            <p className="mb-8 text-lg leading-8 text-ink-soft">Certified premium iPhones, from the iPhone 11 to the iPhone 16 Pro Max. We disclose battery health up front, offer unlocked options, and factor trade-in pricing into every deal.</p>
                             <span className="text-[15px] font-bold tracking-tight text-apple-text underline-offset-8 group-hover:underline">Shop Premium iPhone →</span>
                         </div>
-                        <img src="/staticImages/category-iphone.png" alt="iPhone" className="pointer-events-none absolute -bottom-4 -right-10 w-[64%] max-w-[420px] object-contain transition-transform duration-700 group-hover:scale-105 drop-shadow-[0_35px_60px_rgba(15,23,42,0.16)]" />
+                        <img src="/staticImages/category-iphone.png" alt="iPhone" className="pointer-events-none absolute top-1/2 -translate-y-1/2 -right-10 w-[54%] max-w-[360px] object-contain transition-transform duration-700 group-hover:scale-105" />
                     </Link>
 
                     <div className="grid gap-6">
@@ -37,12 +37,12 @@ const CategoryShelf = () => {
                             to="/shop?category=iPad" 
                             className="premium-card group relative flex min-h-[220px] items-center overflow-hidden rounded-[40px] bg-[linear-gradient(135deg,#f8f8fa_0%,#ffffff_100%)] p-10 transition-all duration-500 hover:-translate-y-1.5 hover:shadow-medium"
                         >
-                            <div className="relative z-[2] max-w-[280px]">
+                            <div className="relative z-[2] max-w-[360px]">
                                 <h3 className="mb-3">iPad</h3>
-                                <p className="mb-6 text-sm leading-7 text-ink-soft">Pre-owned iPad Air, iPad mini, and iPad Pro — inspected and graded, with Wi-Fi and cellular options at honest prices.</p>
+                                <p className="mb-6 text-sm leading-7 text-ink-soft">Premium pre-owned iPad Air, iPad mini, and iPad Pro models, each inspected and graded against our 40-point standard. Pick Wi-Fi or cellular and the storage that fits how you work, study, and create. Every iPad is honestly priced and backed by a 12-month warranty.</p>
                                 <span className="text-sm font-bold text-apple-text underline-offset-4 group-hover:underline">Shop Premium iPad →</span>
                             </div>
-                            <img src="/staticImages/category-ipad.png" alt="iPad" className="pointer-events-none absolute -bottom-6 -right-4 w-[42%] max-w-[220px] object-contain transition-transform duration-700 group-hover:scale-105 drop-shadow-[0_35px_60px_rgba(15,23,42,0.14)]" />
+                            <img src="/staticImages/category-ipad.png" alt="iPad" className="pointer-events-none absolute top-1/2 -translate-y-1/2 -right-6 w-[44%] max-w-[300px] object-contain transition-transform duration-700 group-hover:scale-105" />
                         </Link>
 
                         <Link 
@@ -51,10 +51,10 @@ const CategoryShelf = () => {
                         >
                             <div className="relative z-[2] max-w-[280px]">
                                 <h3 className="mb-3 text-white">MacBook</h3>
-                                <p className="mb-6 text-sm leading-7 text-white/70">Premium MacBook Air and MacBook Pro with M1, M2, and M3 chips — professionally tested and ready to ship at a fraction of retail.</p>
+                                <p className="mb-6 text-sm leading-7 text-white/70">Premium MacBook Air and MacBook Pro models with M1, M2, and M3 chips. Each one is professionally tested and ready to ship at a fraction of retail price.</p>
                                 <span className="text-sm font-bold text-white underline-offset-4 group-hover:underline">Shop Premium MacBook →</span>
                             </div>
-                            <img src="/staticImages/category-macbook.png" alt="MacBook" className="pointer-events-none absolute -bottom-4 -right-2 w-[54%] max-w-[300px] object-contain opacity-95 transition-transform duration-700 group-hover:scale-105 drop-shadow-[0_45px_80px_rgba(0,0,0,0.45)]" />
+                            <img src="/staticImages/category-macbook.png" alt="MacBook" className="pointer-events-none absolute top-1/2 -translate-y-1/2 -right-2 w-[54%] max-w-[300px] object-contain opacity-95 transition-transform duration-700 group-hover:scale-105" />
                         </Link>
                     </div>
                 </div>

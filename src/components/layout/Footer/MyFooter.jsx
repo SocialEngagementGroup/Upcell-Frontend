@@ -58,7 +58,7 @@ const MyFooter = () => {
                                 <img src="/staticImages/upcellLogoFooter.png" alt="Upcell Logo" className="h-12 w-auto" />
                             </Link>
                             <p className="max-w-[320px] text-[13px] leading-6 text-ink-soft">
-                                Certified premium iPhones, iPads, and MacBooks — professionally inspected, honestly graded, and backed by a 12-month warranty. Save up to 40% vs. new.
+                                Premium Apple devices you can trust. We professionally inspect and honestly grade every certified iPhone, iPad, and MacBook, then back it with a 12-month warranty. Save up to 40% versus buying new.
                             </p>
                             <div className="flex gap-3 pt-2">
                                 <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram" className="flex h-11 w-11 items-center justify-center rounded-full border border-black/[0.06] text-apple-gray hover:-translate-y-0.5 hover:bg-surface-alt hover:text-apple-text"><SocialIcons.Instagram /></a>

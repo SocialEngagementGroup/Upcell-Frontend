@@ -31,7 +31,7 @@ const ModernHero = () => {
                             <div className="absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
                             <img
                                 src="/staticImages/hero-iphone15.png"
-                                alt="Certified premium iPhone — UpCell certified Apple devices"
+                                alt="Certified premium iPhone from UpCell, a trusted seller of premium Apple devices"
                                 className="relative z-[2] w-full max-w-[420px] animate-[floatSoft_5.5s_ease-in-out_infinite] object-contain drop-shadow-[0_45px_100px_rgba(255,255,255,0.08)]"
                             />
                         </div>

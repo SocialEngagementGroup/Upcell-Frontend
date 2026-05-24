@@ -30,7 +30,7 @@ const HomeTrustFeatures = () => {
                 </svg>
             ),
             title: "Save Up to 40% vs. New",
-            description: "Certified premium Apple devices at a fraction of retail — same performance, 12-month warranty, better value."
+            description: "Certified premium Apple devices at a fraction of retail price. You get the same performance and a 12-month warranty for far better value."
         }
     ];
 

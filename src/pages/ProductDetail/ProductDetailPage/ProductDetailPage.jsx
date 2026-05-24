@@ -295,7 +295,7 @@ const ProductDetailPage = () => {
                             onClick={handleAddToCart}
                             disabled={product.outOfStock}
                         >
-                            {product.outOfStock ? 'Out of stock' : `Add to cart — $${grandTotal}`}
+                            {product.outOfStock ? 'Out of stock' : `Add to cart · $${grandTotal}`}
                         </button>
 
                         </div>
