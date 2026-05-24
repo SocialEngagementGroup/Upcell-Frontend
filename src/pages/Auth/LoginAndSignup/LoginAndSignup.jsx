@@ -121,13 +121,13 @@ const LoginAndSignup = () => {
     };
 
     return (
-        <div className="flex min-h-[calc(100vh-72px)] w-full items-center justify-center bg-[#f5f5f7] px-4 py-10 md:py-16">
+        <div className="flex min-h-screen w-full items-stretch justify-center bg-[#f5f5f7] px-4 pb-6 pt-[96px] sm:px-6 lg:h-screen">
             <div className="mx-auto flex w-full max-w-[1040px] overflow-hidden rounded-[40px] bg-white shadow-[0_30px_80px_rgba(15,23,42,0.12)]">
                 <div className="relative hidden w-[44%] flex-col justify-between overflow-hidden bg-[linear-gradient(160deg,#0c0c0c_0%,#2b2a2a_100%)] p-12 text-white lg:flex">
                     <div className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full bg-brand-red/30 blur-[90px]" />
                     <div className="pointer-events-none absolute -bottom-24 -left-12 h-56 w-56 rounded-full bg-brand-red/20 blur-[90px]" />
                     <Link to="/" className="relative z-10">
-                        <img src="/staticImages/upcellLogoLight.png" alt="UpCell" className="h-9 w-auto" />
+                        <img src="/staticImages/upcellLogoLight.png" alt="UpCell" className="h-12 w-auto" />
                     </Link>
                     <div className="relative z-10">
                         <h2 className="text-[34px] font-extrabold leading-[1.1] text-white">Premium devices,<br />better prices.</h2>
@@ -152,11 +152,12 @@ const LoginAndSignup = () => {
                     <p className="relative z-10 text-xs text-white/40">&copy; {new Date().getFullYear()} UpCell. All rights reserved.</p>
                 </div>
 
-                <div className="flex w-full flex-col justify-center p-8 sm:p-12 lg:w-[56%]">
+                <div className="flex w-full flex-col overflow-y-auto px-8 py-8 sm:px-12 sm:py-10 lg:w-[56%]">
+                  <div className="m-auto w-full">
                     <Link to="/" className="mb-8 inline-block lg:hidden">
                         <img src="/staticImages/upcellLogo.png" alt="UpCell" className="h-8 w-auto" />
                     </Link>
-                    <header className="mb-8">
+                    <header className="mb-6">
                         <h1 className="text-3xl font-extrabold mb-2">{signin ? "Welcome back" : "Join UpCell"}</h1>
                         <p className="text-apple-gray text-base">
                             {isAdminLogin
@@ -172,7 +173,7 @@ const LoginAndSignup = () => {
                 )}
 
                 {signin ? (
-                    <form className="flex flex-col gap-6" onSubmit={handleSinginWithEmail} onChangeCapture={markInteraction}>
+                    <form className="flex flex-col gap-5" onSubmit={handleSinginWithEmail} onChangeCapture={markInteraction}>
                         <div className="flex flex-col gap-2.5">
                             <label htmlFor="email" className="text-[13px] font-bold uppercase tracking-[0.1em] text-apple-gray">Email address</label>
                             <input 
@@ -198,7 +199,7 @@ const LoginAndSignup = () => {
                         <button type="submit" className="premium-button w-full mt-2" disabled={isSubmitting}>{isSubmitting ? 'Signing in...' : 'Sign in'}</button>
                     </form>
                 ) : (
-                    <form className="flex flex-col gap-6" onSubmit={handleSingupWithEmail} onChangeCapture={markInteraction}>
+                    <form className="flex flex-col gap-5" onSubmit={handleSingupWithEmail} onChangeCapture={markInteraction}>
                         <div className="flex flex-col gap-2.5">
                             <label htmlFor="email" className="text-[13px] font-bold uppercase tracking-[0.1em] text-apple-gray">Email address</label>
                             <input 
@@ -236,7 +237,7 @@ const LoginAndSignup = () => {
                     </form>
                 )}
 
-                    <div className="flex items-center gap-4 my-6 text-sm text-apple-gray before:flex-1 before:h-px before:bg-black/10 after:flex-1 after:h-px after:bg-black/10">or</div>
+                    <div className="flex items-center gap-4 my-3.5 text-sm text-apple-gray before:flex-1 before:h-px before:bg-black/10 after:flex-1 after:h-px after:bg-black/10">or</div>
 
                     <div className="flex flex-col gap-3">
                         <button onClick={handleGoogleSignin} disabled={isSubmitting} className="premium-button-secondary w-full gap-3 border-black/10 bg-[#f8f8fa] hover:bg-[#f0f0f3]">
@@ -249,13 +250,14 @@ const LoginAndSignup = () => {
                         </button>
                     </div>
 
-                    <footer className="text-center mt-8 text-[14px] text-apple-gray">
+                    <footer className="text-center mt-6 text-[14px] text-apple-gray">
                         {signin ? (
                             <>New to UpCell? <button className="text-apple-text font-black hover:underline underline-offset-4 bg-transparent p-0 transition-all" type="button" onClick={settingSingup}>Sign up</button></>
                         ) : (
                             <>Already have an account? <button className="text-apple-text font-black hover:underline underline-offset-4 bg-transparent p-0 transition-all" type="button" onClick={settingSingin}>Sign in</button></>
                         )}
                     </footer>
+                  </div>
                 </div>
             </div>
         </div>

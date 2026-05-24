@@ -1,22 +1,18 @@
-
-
 const Loading = () => {
     return (
-        <>
-        <div className="d-flex justify-content-between my-5">
-            <div class="spinner-grow text-success" role="status">
-                <span class="visually-hidden">Loading...</span>
+        <div className="flex flex-col items-center justify-center gap-5 py-16">
+            <div className="flex items-center gap-2">
+                {[0, 150, 300].map((delay) => (
+                    <span
+                        key={delay}
+                        className="h-3 w-3 animate-bounce rounded-full bg-brand-red"
+                        style={{ animationDelay: `${delay}ms` }}
+                    />
+                ))}
             </div>
-            <div class="spinner-grow text-danger" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-            <div class="spinner-grow text-warning" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
+            <p className="text-lg font-bold text-apple-text">Loading ...</p>
+            <span className="sr-only">Loading...</span>
         </div>
-        
-        <p className="text-center fs-1">Loading ...</p>
-        </>
     );
 };
 
