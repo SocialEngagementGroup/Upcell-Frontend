@@ -50,16 +50,16 @@ const FeaturedUnits = () => {
     return (
         <section className="px-4 py-14 md:px-6 md:py-24">
             <div className="page-container">
-                <div className="mb-20 flex flex-col items-center justify-center text-center">
+                <div className="mb-12 flex flex-col items-center justify-center text-center md:mb-20">
                     <h2 className="tracking-[-0.01em]">Handpicked <br className="hidden md:block" /> For Your Choice.</h2>
                 </div>
-                
-                <div className="space-y-24">
+
+                <div className="space-y-16 md:space-y-24">
                     {categoryConfig.map(cat => categories[cat.key].length > 0 && (
                         <div key={cat.key}>
-                            <div className="mb-10 flex items-center justify-between border-b border-apple-gray/5 pb-6">
-                                <h3 className="text-3xl font-black tracking-tight">{cat.title}</h3>
-                                <Link to={`/shop?category=${cat.key.toLowerCase()}`} className="text-sm font-bold text-apple-gray hover:text-apple-text transition-colors">
+                            <div className="mb-6 flex items-center justify-between border-b border-apple-gray/5 pb-4 md:mb-10 md:pb-6">
+                                <h3 className="text-2xl font-black tracking-tight md:text-3xl">{cat.title}</h3>
+                                <Link to={`/shop?category=${cat.key.toLowerCase()}`} className="hidden text-sm font-bold text-apple-gray hover:text-apple-text transition-colors sm:inline">
                                     View Full {cat.key} Range →
                                 </Link>
                             </div>
@@ -72,10 +72,10 @@ const FeaturedUnits = () => {
                     ))}
                 </div>
 
-                <div className="mt-24 flex justify-center">
-                    <Link 
-                        to="/shop" 
-                        className="premium-button min-w-[240px]"
+                <div className="mt-14 flex justify-center md:mt-24">
+                    <Link
+                        to="/shop"
+                        className="premium-button w-full max-w-[340px] sm:w-auto sm:min-w-[240px]"
                     >
                         Explore Full Collection
                     </Link>

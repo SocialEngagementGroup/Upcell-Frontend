@@ -20,11 +20,11 @@ const TradeInAction = () => {
                     <p className="mt-8 text-lg leading-8 text-white/60 md:text-xl md:leading-9 max-w-[700px] mx-auto">
                         Get an instant trade-in quote for your used iPhone, iPad, or MacBook. Free prepaid shipping, fully insured transit, and payout within 24 hours of inspection.
                     </p>
-                    <div className="mt-12 flex flex-wrap justify-center gap-4">
-                        <Link to="/trade-in" className="inline-flex h-[56px] items-center justify-center rounded-full bg-white px-10 text-[15px] font-black text-black transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(255,255,255,0.15)] min-w-[220px]">
+                    <div className="mt-10 flex w-full flex-col justify-center gap-3 sm:mt-12 sm:flex-row sm:flex-wrap sm:gap-4">
+                        <Link to="/trade-in" className="inline-flex h-[56px] items-center justify-center rounded-full bg-white px-10 text-[15px] font-black text-black transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(255,255,255,0.15)] w-full sm:w-auto sm:min-w-[220px]">
                             Get Your Trade-In Quote
                         </Link>
-                        <Link to="/shop" className="inline-flex h-[56px] items-center justify-center rounded-full border border-white/20 bg-white/5 px-10 text-[15px] font-black text-white backdrop-blur transition-all duration-300 hover:-translate-y-1 hover:bg-white/10 min-w-[220px]">
+                        <Link to="/shop" className="inline-flex h-[56px] items-center justify-center rounded-full border border-white/20 bg-white/5 px-10 text-[15px] font-black text-white backdrop-blur transition-all duration-300 hover:-translate-y-1 hover:bg-white/10 w-full sm:w-auto sm:min-w-[220px]">
                             Shop Premium Apple
                         </Link>
                     </div>

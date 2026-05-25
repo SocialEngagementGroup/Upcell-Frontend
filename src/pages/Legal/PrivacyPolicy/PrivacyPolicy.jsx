@@ -5,21 +5,21 @@ const PrivacyPolicy = () => {
     return (
         <div className="page-shell">
             <section className="page-container pb-10 pt-6">
-                <div className="premium-card rounded-[40px] bg-[linear-gradient(180deg,#ffffff_0%,#f3f5f8_100%)] px-8 py-10 md:px-12 md:py-14">
-                    <nav className="mb-8 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-apple-gray">
+                <div className="premium-card rounded-[28px] bg-[linear-gradient(180deg,#ffffff_0%,#f3f5f8_100%)] px-6 py-8 sm:rounded-[40px] sm:px-8 sm:py-10 md:px-12 md:py-14">
+                    <nav className="mb-6 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-apple-gray sm:mb-8">
                         <Link to="/" className="hover:text-apple-text transition-colors">Home</Link>
                         <KeyboardArrowRightIcon className="!text-sm" />
                         <span className="text-apple-text">Privacy</span>
                     </nav>
-                    <h1 className="text-[clamp(2.8rem,5vw,5rem)] leading-[0.92]">Privacy policy</h1>
-                    <p className="mt-5 max-w-[620px] text-lg leading-8 text-ink-soft">
+                    <h1 className="text-[clamp(2.1rem,5vw,5rem)] leading-[0.96] sm:leading-[0.92]">Privacy policy</h1>
+                    <p className="mt-4 max-w-[620px] text-base leading-7 text-ink-soft sm:mt-5 sm:text-lg sm:leading-8">
                         Last updated: March 2024. We collect and use information only as needed to operate the UpCell experience and support our customers.
                     </p>
                 </div>
             </section>
 
             <section className="page-container pb-16">
-                <article className="legal-prose premium-card rounded-[36px] px-8 py-10 md:px-12 md:py-14">
+                <article className="legal-prose premium-card rounded-[28px] px-6 py-8 sm:rounded-[36px] sm:px-8 sm:py-10 md:px-12 md:py-14">
                     <h2>Introduction</h2>
                     <p>UpCell is committed to protecting the privacy of our customers and site visitors. This policy explains how we collect, use, retain, and share information connected to our services.</p>
                     <h2>About us</h2>

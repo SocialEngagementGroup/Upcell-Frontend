@@ -37,18 +37,18 @@ const MyAccount = () => {
     return (
         <div className="page-shell">
             <section className="page-container pb-10 pt-6">
-                <div className="premium-card rounded-[40px] bg-[linear-gradient(180deg,#ffffff_0%,#f3f5f8_100%)] px-8 py-10 md:px-12 md:py-14">
-                    <nav className="mb-8 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-apple-gray">
+                <div className="premium-card rounded-[28px] bg-[linear-gradient(180deg,#ffffff_0%,#f3f5f8_100%)] px-6 py-8 sm:rounded-[40px] sm:px-8 sm:py-10 md:px-12 md:py-14">
+                    <nav className="mb-6 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-apple-gray sm:mb-8">
                         <Link to="/" className="hover:text-apple-text transition-colors">Home</Link>
                         <KeyboardArrowRightIcon className="!text-sm" />
                         <span className="text-apple-text">Account</span>
                     </nav>
                     <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
                         <div>
-                            <h1 className="text-[clamp(2.6rem,4.8vw,4.8rem)] leading-[0.94]">Your orders and account details.</h1>
-                            <p className="mt-4 text-lg leading-8 text-ink-soft">{user?.email}</p>
+                            <h1 className="text-[clamp(2.1rem,4.8vw,4.8rem)] leading-[0.96] sm:leading-[0.94]">Your orders and account details.</h1>
+                            <p className="mt-3 break-words text-base leading-7 text-ink-soft sm:mt-4 sm:text-lg sm:leading-8">{user?.email}</p>
                         </div>
-                        <button className="premium-button-secondary" onClick={handleSingOut}>Sign out</button>
+                        <button className="premium-button-secondary w-full md:w-auto" onClick={handleSingOut}>Sign out</button>
                     </div>
                 </div>
             </section>

@@ -160,7 +160,7 @@ const ProductDetailPage = () => {
                 </nav>
 
                 <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
-                    <div className="premium-card rounded-[40px] p-6 md:p-8">
+                    <div className="premium-card rounded-[28px] p-4 sm:rounded-[40px] sm:p-6 md:p-8">
                         <div className="flex gap-4">
                             <div className="hidden w-[92px] flex-col gap-3 md:flex">
                                 {[1, 2, 3].map((item) => (
@@ -170,21 +170,21 @@ const ProductDetailPage = () => {
                                 ))}
                             </div>
 
-                            <div className="relative flex min-h-[560px] flex-1 items-center justify-center overflow-hidden rounded-[34px] bg-[linear-gradient(180deg,#fbfbfd_0%,#edf0f5_100%)] px-6 py-10">
+                            <div className="relative flex min-h-[340px] flex-1 items-center justify-center overflow-hidden rounded-[24px] bg-[linear-gradient(180deg,#fbfbfd_0%,#edf0f5_100%)] px-4 py-8 sm:min-h-[460px] sm:rounded-[34px] sm:px-6 sm:py-10 lg:min-h-[560px]">
                                 <div className="absolute inset-x-[18%] top-[12%] h-[70%] rounded-full bg-[radial-gradient(circle,_rgba(255,255,255,0.92),_rgba(220,225,232,0.35)_55%,_transparent_72%)] blur-2xl" />
                                 <img
                                     src={product.image}
                                     alt={product.productName}
-                                    className="relative z-[2] max-h-[460px] w-auto object-contain drop-shadow-[0_35px_80px_rgba(15,23,42,0.18)]"
+                                    className="relative z-[2] max-h-[280px] w-auto object-contain drop-shadow-[0_35px_80px_rgba(15,23,42,0.18)] sm:max-h-[460px]"
                                 />
                             </div>
                         </div>
                     </div>
 
-                    <div className="premium-card rounded-[40px] p-8 md:p-10">
+                    <div className="premium-card rounded-[28px] p-6 sm:rounded-[40px] sm:p-8 md:p-10">
                     <div className="md:mt-0">
-                        <h1 className="text-[clamp(2.4rem,4vw,4.3rem)] leading-[0.95]">{product.productName}</h1>
-                        <div className="mt-3 text-4xl font-extrabold text-apple-text">${product.price}</div>
+                        <h1 className="text-[clamp(2rem,4vw,4.3rem)] leading-[1] sm:leading-[0.95]">{product.productName}</h1>
+                        <div className="mt-3 text-3xl font-extrabold text-apple-text sm:text-4xl">${product.price}</div>
 
                         {/* ─── Color Selection ─── */}
                         <div className="mt-10">
@@ -304,8 +304,8 @@ const ProductDetailPage = () => {
             </section>
 
             <section className="page-container pb-10">
-                <div className="rounded-[40px] bg-[linear-gradient(135deg,#0f1012_0%,#1b1d22_55%,#2c3138_100%)] px-8 py-10 text-white shadow-medium md:px-12 md:py-14">
-                    <div className="mt-2 grid gap-6 lg:grid-cols-3">
+                <div className="rounded-[28px] bg-[linear-gradient(135deg,#0f1012_0%,#1b1d22_55%,#2c3138_100%)] px-6 py-8 text-white shadow-medium sm:rounded-[40px] sm:px-8 sm:py-10 md:px-12 md:py-14">
+                    <div className="grid gap-6 sm:mt-2 lg:grid-cols-3">
                         {featureCards.map((card) => (
                             <div key={card.title} className="rounded-[28px] border border-white/10 bg-white/5 p-6 backdrop-blur">
                                 <h3 className="text-2xl text-white">{card.title}</h3>
@@ -316,8 +316,8 @@ const ProductDetailPage = () => {
                 </div>
             </section>
 
-            <section className="page-container pb-16 pt-20">
-                <div className="mb-10 text-center md:text-left">
+            <section className="page-container pb-16 pt-12 md:pt-20">
+                <div className="mb-8 text-center md:mb-10 md:text-left">
                     <h2 className="text-[clamp(2rem,3vw,3.2rem)]">Continue the collection.</h2>
                 </div>
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">

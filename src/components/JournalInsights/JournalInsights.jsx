@@ -11,10 +11,10 @@ const JournalInsights = () => {
     return (
         <section className="px-4 py-14 md:px-6 md:py-24 bg-transparent overflow-hidden">
             <div className="page-container">
-                <div className="mb-14 flex items-center justify-between border-b border-apple-gray/5 pb-6">
+                <div className="mb-8 flex flex-col items-start gap-3 border-b border-apple-gray/5 pb-6 sm:flex-row sm:items-center sm:justify-between md:mb-14">
                     <h2 className="text-[clamp(2rem,3.2vw,3.2rem)] leading-none tracking-tight font-black">Latest from the blog</h2>
-                    <Link 
-                        to="/blogs" 
+                    <Link
+                        to="/blogs"
                         className="group flex items-center gap-2 text-sm font-bold text-apple-gray hover:text-apple-text transition-colors"
                     >
                         View All Blogs

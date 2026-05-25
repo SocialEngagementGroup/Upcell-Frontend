@@ -77,6 +77,7 @@ const ShopPage = () => {
     const [sortBy, setSortBy] = useState('featured');
     const [searchQuery, setSearchQuery] = useState('');
     const [sortMenuOpen, setSortMenuOpen] = useState(false);
+    const [filtersOpen, setFiltersOpen] = useState(false);
     const sortMenuRef = useRef(null);
 
     const sidebarCategories = useMemo(() => {
@@ -237,14 +238,14 @@ const ShopPage = () => {
             <ScrollToTop />
 
             <section className="page-container pb-10 pt-6">
-                <div className="premium-card overflow-hidden rounded-[40px] bg-[linear-gradient(180deg,#ffffff_0%,#f3f5f8_100%)] px-8 py-10 md:px-12 md:py-14">
-                    <nav className="mb-8 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-apple-gray">
+                <div className="premium-card overflow-hidden rounded-[28px] bg-[linear-gradient(180deg,#ffffff_0%,#f3f5f8_100%)] px-6 py-8 sm:rounded-[40px] sm:px-8 sm:py-10 md:px-12 md:py-14">
+                    <nav className="mb-6 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-apple-gray sm:mb-8">
                         <Link to="/">Home</Link>
                         <KeyboardArrowRightIcon className="!text-sm" />
                         <span>Shop</span>
                     </nav>
-                    <h1 className="max-w-[1100px] text-[clamp(2.6rem,5vw,5rem)] leading-[0.94]">Shop Certified Premium <br className='hidden md:block' /> iPhones, iPads & MacBooks</h1>
-                    <p className="mt-5 max-w-[640px] text-lg leading-8 text-ink-soft">
+                    <h1 className="max-w-[1100px] text-[clamp(2.1rem,5vw,5rem)] leading-[0.96] sm:leading-[0.94]">Shop Certified Premium <br className='hidden md:block' /> iPhones, iPads & MacBooks</h1>
+                    <p className="mt-4 max-w-[640px] text-base leading-7 text-ink-soft sm:mt-5 sm:text-lg sm:leading-8">
                         Every certified premium Apple device is graded for condition, priced honestly, and backed by a 12-month warranty. Save up to 40% vs. buying new.
                     </p>
                 </div>
@@ -314,8 +315,17 @@ const ShopPage = () => {
                     </div>
                 </div>
 
+                <button
+                    type="button"
+                    onClick={() => setFiltersOpen((current) => !current)}
+                    className="mb-4 flex h-12 w-full items-center justify-center gap-2 rounded-full border border-black/[0.08] bg-white text-sm font-bold text-apple-text transition-all hover:border-black/15 lg:hidden"
+                >
+                    <span>{filtersOpen ? 'Hide filters' : 'Show filters'}</span>
+                    <KeyboardArrowDownRoundedIcon className={`!text-[20px] text-apple-gray transition-transform duration-200 ${filtersOpen ? 'rotate-180' : ''}`} />
+                </button>
+
                 <div className="grid gap-8 lg:grid-cols-[300px_1fr]">
-                    <aside className="premium-card h-fit rounded-[32px] p-6 lg:sticky lg:top-28">
+                    <aside className={`premium-card h-fit rounded-[32px] p-6 lg:sticky lg:top-28 lg:block ${filtersOpen ? 'block' : 'hidden'}`}>
                         <div className="flex items-center justify-between">
                             <h3 className="text-xl">Refine</h3>
                             <button className="text-sm font-bold text-apple-gray hover:text-apple-text" onClick={resetFilters}>

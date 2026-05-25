@@ -436,14 +436,14 @@ const TradeIn = () => {
 
             {/* ─── Hero ─── */}
             <section className="page-container pb-10 pt-6">
-                <div className="rounded-[40px] bg-[linear-gradient(135deg,#0f1012_0%,#1b1e24_55%,#2b3138_100%)] px-8 py-10 text-white shadow-medium md:px-12 md:py-14">
-                    <nav className="mb-8 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-white/60">
+                <div className="rounded-[28px] bg-[linear-gradient(135deg,#0f1012_0%,#1b1e24_55%,#2b3138_100%)] px-6 py-8 text-white shadow-medium sm:rounded-[40px] sm:px-8 sm:py-10 md:px-12 md:py-14">
+                    <nav className="mb-6 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-white/60 sm:mb-8">
                         <Link to="/" className="hover:text-white transition-colors">Home</Link>
                         <KeyboardArrowRightIcon className="!text-sm" />
                         <span className="text-white">Trade In</span>
                     </nav>
-                    <h1 className="mt-6 text-[clamp(2.8rem,5vw,5rem)] leading-[0.92] text-white">Trade In Your iPhone, iPad, MacBook or Android and Get Paid Fast</h1>
-                    <p className="mt-5 max-w-[680px] text-lg leading-8 text-white/72">
+                    <h1 className="mt-4 text-[clamp(2.1rem,5vw,5rem)] leading-[0.96] text-white sm:mt-6 sm:leading-[0.92]">Trade In Your iPhone, iPad, MacBook or Android and Get Paid Fast</h1>
+                    <p className="mt-4 max-w-[680px] text-base leading-7 text-white/72 sm:mt-5 sm:text-lg sm:leading-8">
                         Get an instant trade-in estimate for your used Apple or Android device. Free insured shipping, 24-hour payout after inspection, and a transparent process from start to finish.
                     </p>
                 </div>
@@ -451,12 +451,12 @@ const TradeIn = () => {
 
             {/* ─── Progress Bar ─── */}
             <section className="page-container pb-16">
-                <div className="mb-8 flex items-center justify-between">
-                    <div className="flex flex-wrap gap-3">
+                <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex flex-wrap gap-2 sm:gap-3">
                         {stepLabels.filter(l => l !== 'Confirmation').map((label, index) => (
                             <div
                                 key={label}
-                                className={`rounded-full px-5 py-3 text-sm font-bold transition-all duration-300 ${
+                                className={`rounded-full px-3 py-2 text-xs font-bold transition-all duration-300 sm:px-5 sm:py-3 sm:text-sm ${
                                     step === index + 1
                                         ? 'bg-apple-text text-white'
                                         : step > index + 1
@@ -470,7 +470,7 @@ const TradeIn = () => {
                     </div>
                     {(step > 1 || showAndroidBrands) && (
                         <button
-                            className="flex h-[56px] items-center gap-2 rounded-full border border-black/[0.08] bg-white px-6 text-[15px] font-bold text-apple-text transition-all duration-300 hover:bg-surface-alt active:scale-[0.98]"
+                            className="flex h-12 shrink-0 items-center gap-2 self-start rounded-full border border-black/[0.08] bg-white px-6 text-[15px] font-bold text-apple-text transition-all duration-300 hover:bg-surface-alt active:scale-[0.98] sm:h-[56px] sm:self-auto"
                             onClick={() => {
                                 if (showAndroidBrands && step === 1) {
                                     setShowAndroidBrands(false);
@@ -492,7 +492,7 @@ const TradeIn = () => {
                             return (
                                 <button
                                     key={device.id}
-                                    className="premium-card rounded-[32px] p-8 text-left transition-all duration-300 hover:-translate-y-1.5 hover:shadow-medium"
+                                    className="premium-card rounded-[28px] p-6 text-left transition-all duration-300 hover:-translate-y-1.5 hover:shadow-medium sm:rounded-[32px] sm:p-8"
                                     onClick={() => {
                                         markInteraction();
                                         if (device.id === 'Android') {
@@ -507,7 +507,7 @@ const TradeIn = () => {
                                     <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-surface-alt">
                                         <Icon className="!text-[24px] text-apple-text" />
                                     </div>
-                                    <h2 className="text-[34px]">{device.title}</h2>
+                                    <h2 className="text-[28px] sm:text-[34px]">{device.title}</h2>
                                     <p className="mt-3 text-base leading-8 text-ink-soft">{device.desc}</p>
                                 </button>
                             );
@@ -526,7 +526,7 @@ const TradeIn = () => {
                                 return (
                                     <button
                                         key={brand.id}
-                                        className="premium-card rounded-[32px] p-8 text-left transition-all duration-300 hover:-translate-y-1.5 hover:shadow-medium"
+                                        className="premium-card rounded-[28px] p-6 text-left transition-all duration-300 hover:-translate-y-1.5 hover:shadow-medium sm:rounded-[32px] sm:p-8"
                                         onClick={() => {
                                             markInteraction();
                                             setSelection((prev) => ({ ...prev, device: brand.id, model: '', carrier: '', storage: '', answers: {}, customBrand: '', customModel: '' }));
@@ -576,9 +576,9 @@ const TradeIn = () => {
                 {/* ─── Step: Choose Carrier (only for iPhone / iPad) ─── */}
                 {hasCarrier && step === stepMap['Carrier'] && (
                     <div>
-                        <h2 className="mb-2 text-[32px]">Select your carrier</h2>
+                        <h2 className="mb-2 text-[28px] sm:text-[32px]">Select your carrier</h2>
                         <p className="mb-6 text-base text-ink-soft">Choose the carrier your device is currently on or if it's unlocked.</p>
-                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                        <div className="grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-4">
                             {carrierOptions[selection.device].map((carrier) => (
                                 <button
                                     key={carrier.id}
@@ -599,9 +599,9 @@ const TradeIn = () => {
                 {/* ─── Step: Choose Storage ─── */}
                 {step === stepMap['Storage'] && (
                     <div>
-                        <h2 className="mb-2 text-[32px]">Select your storage capacity</h2>
+                        <h2 className="mb-2 text-[28px] sm:text-[32px]">Select your storage capacity</h2>
                         <p className="mb-6 text-base text-ink-soft">Choose the storage size of your device.</p>
-                        <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5">
+                        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
                             {(storageOptions[selection.device] || []).map((storage) => (
                                 <button
                                     key={storage}
@@ -707,15 +707,15 @@ const TradeIn = () => {
                     <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
                         <div className="space-y-8">
                             {/* Valuation Summary Card */}
-                            <div className="premium-card rounded-[36px] p-8 md:p-10 border border-apple-text/10">
+                            <div className="premium-card rounded-[28px] p-6 sm:rounded-[36px] sm:p-8 md:p-10 border border-apple-text/10">
                                 <div className="flex items-center gap-4 mb-6">
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-50">
+                                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-green-50">
                                         <CheckCircleIcon className="!text-[24px] text-green-600" />
                                     </div>
-                                    <h2 className="text-[32px] font-bold">Your evaluation is ready</h2>
+                                    <h2 className="text-[26px] font-bold sm:text-[32px]">Your evaluation is ready</h2>
                                 </div>
-                                <div className="flex items-baseline gap-2">
-                                    <span className="text-6xl font-extrabold text-apple-text">${estimate || 0}</span>
+                                <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                                    <span className="text-5xl font-extrabold text-apple-text sm:text-6xl">${estimate || 0}</span>
                                     <span className="text-ink-soft text-lg font-medium">Estimated Payout</span>
                                 </div>
                                 <p className="mt-6 text-base leading-8 text-ink-soft max-w-[540px]">
@@ -743,8 +743,8 @@ const TradeIn = () => {
                             </div>
 
                             {/* Contact Form Card */}
-                            <div className="premium-card rounded-[36px] p-8 md:p-10">
-                                <h3 className="text-[28px] mb-6">Finalize your details</h3>
+                            <div className="premium-card rounded-[28px] p-6 sm:rounded-[36px] sm:p-8 md:p-10">
+                                <h3 className="text-[24px] mb-6 sm:text-[28px]">Finalize your details</h3>
                                 <div className="grid gap-4 sm:grid-cols-2">
                                     <div className="sm:col-span-2">
                                         <input className="premium-input w-full" placeholder="Full name" value={selection.name} onChange={(e) => {
@@ -817,8 +817,8 @@ const TradeIn = () => {
                 {step === stepMap['Your details'] && selection.device === 'AndroidOther' && (
                     <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
                         <div className="space-y-8">
-                            <div className="premium-card rounded-[36px] p-8 md:p-10">
-                                <h2 className="text-[32px] font-bold">Tell us about your phone</h2>
+                            <div className="premium-card rounded-[28px] p-6 sm:rounded-[36px] sm:p-8 md:p-10">
+                                <h2 className="text-[26px] font-bold sm:text-[32px]">Tell us about your phone</h2>
                                 <p className="mt-3 text-base leading-8 text-ink-soft max-w-[560px]">
                                     We don't have a fixed price list for this device, so our team will review your details and reach out within 1 business day with a personalised offer.
                                 </p>
@@ -845,8 +845,8 @@ const TradeIn = () => {
                                 </div>
                             </div>
 
-                            <div className="premium-card rounded-[36px] p-8 md:p-10">
-                                <h3 className="text-[28px] mb-6">Your contact details</h3>
+                            <div className="premium-card rounded-[28px] p-6 sm:rounded-[36px] sm:p-8 md:p-10">
+                                <h3 className="text-[24px] mb-6 sm:text-[28px]">Your contact details</h3>
                                 <div className="grid gap-4 sm:grid-cols-2">
                                     <div className="sm:col-span-2">
                                         <input className="premium-input w-full" placeholder="Full name" value={selection.name} onChange={(e) => {
@@ -893,9 +893,9 @@ const TradeIn = () => {
 
                 {/* ─── Step: Confirmation ─── */}
                 {step === stepMap['Confirmation'] && (
-                    <div className="premium-card rounded-[36px] px-8 py-16 text-center">
+                    <div className="premium-card rounded-[28px] px-6 py-12 text-center sm:rounded-[36px] sm:px-8 sm:py-16">
                         <CheckCircleIcon className="!text-[72px] text-apple-text" />
-                        <h2 className="mt-6 text-[42px]">{selection.device === 'AndroidOther' ? 'Request received.' : 'Trade-in request received.'}</h2>
+                        <h2 className="mt-6 text-[32px] sm:text-[42px]">{selection.device === 'AndroidOther' ? 'Request received.' : 'Trade-in request received.'}</h2>
                         <p className="mx-auto mt-4 max-w-[560px] text-lg leading-8 text-ink-soft">
                             {selection.device === 'AndroidOther'
                                 ? "Thanks! Our team will review your phone details and reach out within 1 business day with a personalized offer."
@@ -914,9 +914,9 @@ const TradeIn = () => {
                                 <div className="mt-3 text-xs text-ink-soft">Status: {savedRequest.status}</div>
                             </div>
                         )}
-                        <div className="mt-10 flex justify-center gap-4">
-                            <Link to="/shop" className="premium-button min-w-[200px]">Continue shopping</Link>
-                            <button className="premium-button-secondary min-w-[200px]" onClick={resetFlow}>Start again</button>
+                        <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row sm:gap-4">
+                            <Link to="/shop" className="premium-button w-full sm:w-auto sm:min-w-[200px]">Continue shopping</Link>
+                            <button className="premium-button-secondary w-full sm:w-auto sm:min-w-[200px]" onClick={resetFlow}>Start again</button>
                         </div>
                     </div>
                 )}

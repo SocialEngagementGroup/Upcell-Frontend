@@ -32,10 +32,10 @@ const ThankYou = () => {
             <ScrollToTop />
 
             <section className="page-container pb-10 pt-6">
-                <div className="premium-card rounded-[40px] bg-[linear-gradient(180deg,#ffffff_0%,#f3f5f8_100%)] px-8 py-10 text-center md:px-12 md:py-14">
+                <div className="premium-card rounded-[28px] bg-[linear-gradient(180deg,#ffffff_0%,#f3f5f8_100%)] px-6 py-8 text-center sm:rounded-[40px] sm:px-8 sm:py-10 md:px-12 md:py-14">
                     <CheckCircleIcon className="!text-[72px] text-apple-text" />
-                    <h1 className="mt-6 text-[clamp(2.8rem,5vw,5rem)] leading-[0.92]">Order confirmed.</h1>
-                    <p className="mx-auto mt-5 max-w-[620px] text-lg leading-8 text-ink-soft">
+                    <h1 className="mt-6 text-[clamp(2.2rem,5vw,5rem)] leading-[0.96] sm:leading-[0.92]">Order confirmed.</h1>
+                    <p className="mx-auto mt-4 max-w-[620px] text-base leading-7 text-ink-soft sm:mt-5 sm:text-lg sm:leading-8">
                         Thank you for choosing UpCell. Your order is being prepared now and will move to shipping shortly.
                     </p>
                 </div>
@@ -45,7 +45,7 @@ const ThankYou = () => {
                 <div className="grid gap-6 md:grid-cols-3">
                     <div className="premium-card rounded-[30px] p-6">
                         <div className="text-xs font-bold uppercase tracking-[0.18em] text-apple-gray">Order ID</div>
-                        <div className="mt-3 text-xl font-extrabold text-apple-text">{order?._id || 'Unavailable'}</div>
+                        <div className="mt-3 break-all text-base font-extrabold text-apple-text sm:text-xl">{order?._id || 'Unavailable'}</div>
                     </div>
                     <div className="premium-card rounded-[30px] p-6">
                         <div className="text-xs font-bold uppercase tracking-[0.18em] text-apple-gray">Order date</div>
@@ -63,7 +63,7 @@ const ThankYou = () => {
 
             <section className="page-container pb-16">
                 <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
-                    <main className="premium-card rounded-[36px] p-8 md:p-10">
+                    <main className="premium-card rounded-[28px] p-6 sm:rounded-[36px] sm:p-8 md:p-10">
                         <h2>Order summary</h2>
                         <div className="mt-6 space-y-4">
                             {orderItems.map((item, index) => {
@@ -91,9 +91,9 @@ const ThankYou = () => {
                             <div className="flex justify-between border-t border-black/[0.06] pt-4 text-base"><span className="font-bold text-apple-text">Total</span><strong className="text-2xl text-apple-text">${grandTotal.toFixed(2)}</strong></div>
                         </div>
 
-                        <div className="mt-8 flex flex-wrap gap-4">
-                            <Link to="/shop" className="premium-button">Continue shopping</Link>
-                            <Link to="/support" className="premium-button-secondary">Contact support</Link>
+                        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4">
+                            <Link to="/shop" className="premium-button w-full sm:w-auto">Continue shopping</Link>
+                            <Link to="/support" className="premium-button-secondary w-full sm:w-auto">Contact support</Link>
                         </div>
                     </main>
 

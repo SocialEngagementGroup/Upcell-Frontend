@@ -72,22 +72,22 @@ const Contactus = () => {
     return (
         <div className="page-shell">
             <section className="page-container pb-10 pt-6">
-                <div className="premium-card rounded-[40px] bg-[linear-gradient(180deg,#ffffff_0%,#f3f5f8_100%)] px-8 py-10 md:px-12 md:py-14">
-                    <nav className="mb-8 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-apple-gray">
+                <div className="premium-card rounded-[28px] bg-[linear-gradient(180deg,#ffffff_0%,#f3f5f8_100%)] px-6 py-8 sm:rounded-[40px] sm:px-8 sm:py-10 md:px-12 md:py-14">
+                    <nav className="mb-6 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-apple-gray sm:mb-8">
                         <Link to="/" className="hover:text-apple-text transition-colors">Home</Link>
                         <KeyboardArrowRightIcon className="!text-sm" />
                         <span className="text-apple-text">Support</span>
                     </nav>
-                    <h1 className="text-[clamp(2.8rem,5vw,5rem)] leading-[0.92]">Contact UpCell: Premium Apple Device Support</h1>
-                    <p className="mt-5 max-w-[680px] text-lg leading-8 text-ink-soft">
+                    <h1 className="text-[clamp(2.1rem,5vw,5rem)] leading-[0.96] sm:leading-[0.92]">Contact UpCell: Premium Apple Device Support</h1>
+                    <p className="mt-4 max-w-[680px] text-base leading-7 text-ink-soft sm:mt-5 sm:text-lg sm:leading-8">
                         Questions about a certified premium iPhone, iPad, or MacBook? Need help with a trade-in quote, order update, or return? Our team responds within 24 hours. Reach us by email, Facebook, or Instagram.
                     </p>
                 </div>
             </section>
 
-            <section className="page-container pb-24">
-                <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr]">
-                    <div className="flex flex-col justify-center space-y-10 py-6">
+            <section className="page-container pb-16 sm:pb-24">
+                <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:gap-12">
+                    <div className="flex flex-col justify-center space-y-8 py-2 sm:space-y-10 sm:py-6">
                         <div className="grid gap-6">
                             {[
                                 { icon: <EmailOutlinedIcon />, title: 'Email support', info: 'usa.Upcells@gmail.com', href: 'mailto:usa.Upcells@gmail.com' },
@@ -113,9 +113,9 @@ const Contactus = () => {
                         </div>
                     </div>
 
-                    <div className="premium-card rounded-[48px] bg-white p-10 md:p-14 shadow-medium transition-shadow hover:shadow-hover">
-                        <div className="mb-10">
-                            <h3 className="text-3xl font-black">Send us a message</h3>
+                    <div className="premium-card rounded-[28px] bg-white p-6 sm:rounded-[48px] sm:p-10 md:p-14 shadow-medium transition-shadow hover:shadow-hover">
+                        <div className="mb-8 sm:mb-10">
+                            <h3 className="text-2xl font-black sm:text-3xl">Send us a message</h3>
                             <p className="mt-3 text-apple-gray">Direct inquiries are monitored 6 days a week.</p>
                         </div>
                         <form className="grid gap-6" onSubmit={handleSubmit}>
@@ -136,10 +136,10 @@ const Contactus = () => {
                 </div>
             </section>
 
-            <section className="page-container pb-24">
+            <section className="page-container pb-16 sm:pb-24">
                 <div className="mx-auto max-w-[800px]">
-                    <div className="mb-14 text-center">
-                        <h2 className="text-[clamp(2.4rem,4vw,3.6rem)] tracking-tight">Frequently asked questions.</h2>
+                    <div className="mb-8 text-center sm:mb-14">
+                        <h2 className="text-[clamp(2rem,4vw,3.6rem)] tracking-tight">Frequently asked questions.</h2>
                     </div>
                     
                     <div className="grid gap-4">
@@ -148,11 +148,11 @@ const Contactus = () => {
                                 key={index} 
                                 className={`overflow-hidden rounded-[32px] border transition-all duration-500 ${openIndex === index ? 'border-apple-text bg-white shadow-medium' : 'border-apple-gray/10 bg-apple-gray/5 hover:border-apple-gray/30'}`}
                             >
-                                <button 
+                                <button
                                     onClick={() => setOpenIndex(openIndex === index ? -1 : index)}
-                                    className="flex w-full items-center justify-between p-8 text-left"
+                                    className="flex w-full items-center justify-between p-5 text-left sm:p-8"
                                 >
-                                    <h3 className="pr-8 text-xl font-black tracking-tight md:text-2xl">{item.q}</h3>
+                                    <h3 className="pr-4 text-lg font-black tracking-tight sm:pr-8 sm:text-xl md:text-2xl">{item.q}</h3>
                                     <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-all duration-500 ${openIndex === index ? 'bg-apple-text text-white rotate-180' : 'bg-white text-apple-text'}`}>
                                         {openIndex === index ? <RemoveIcon className="!text-lg" /> : <AddIcon className="!text-lg" />}
                                     </div>
@@ -161,7 +161,7 @@ const Contactus = () => {
                                 <div 
                                     className={`transition-all duration-500 ease-in-out ${openIndex === index ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}
                                 >
-                                    <div className="px-8 pb-8 text-lg leading-relaxed text-ink-soft opacity-80">
+                                    <div className="px-5 pb-5 text-base leading-relaxed text-ink-soft opacity-80 sm:px-8 sm:pb-8 sm:text-lg">
                                         {item.a}
                                     </div>
                                 </div>
