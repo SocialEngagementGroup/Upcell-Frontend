@@ -1,7 +1,6 @@
 import allDummyProducts, { getProductById } from "./dummyData";
 
 const KEYS = {
-    user: "upcell_user",
     orders: "upcell_orders",
 };
 
@@ -17,13 +16,6 @@ const readJson = (key, fallback) => {
 
 const writeJson = (key, value) => {
     localStorage.setItem(key, JSON.stringify(value));
-};
-
-export const getStoredUser = () => readJson(KEYS.user, null);
-
-export const setStoredUser = (user) => {
-    if (user) writeJson(KEYS.user, user);
-    else localStorage.removeItem(KEYS.user);
 };
 
 export const getStoredOrders = () => readJson(KEYS.orders, []);

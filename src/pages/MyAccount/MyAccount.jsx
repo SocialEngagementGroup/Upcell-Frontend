@@ -1,18 +1,17 @@
 import { useContext, useEffect, useState } from "react";
 import { userContext } from "../../utilities/UserContextProvider";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import SingleCustomerOrder from "./SingleCustomerOrder";
 import axiosInstance from "../../utilities/axiosInstance";
 
 const MyAccount = () => {
     const { user, logOut } = useContext(userContext);
-    const navigate = useNavigate();
     const [orders, setOrders] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
     const handleSingOut = () => {
-        logOut().then(() => navigate("/")).catch((error) => console.log(error));
+        logOut({ redirectUrl: "/" }).catch((error) => console.log(error));
     };
 
     useEffect(() => {
