@@ -1,5 +1,6 @@
-const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/';
-const analyticsEndpoint = new URL('analytics-events', baseUrl).toString();
+import { apiBaseUrl } from './env';
+
+const analyticsEndpoint = new URL('analytics-events', apiBaseUrl).toString();
 const analyticsStorageKey = 'upcell_analytics_session_id';
 
 const normalizePayload = (payload = {}) => ({

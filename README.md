@@ -31,7 +31,7 @@ The frontend client for the Upcell (Global Traders) platform, a modern e-commerc
    ```
 2. Create a `.env` file in the `Frontend` directory:
    ```env
-   VITE_API_URL=http://localhost:5001/
+   VITE_API_URL=https://your-render-backend-url.onrender.com/
    VITE_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
    ```
 3. Run the development server:
@@ -40,4 +40,4 @@ The frontend client for the Upcell (Global Traders) platform, a modern e-commerc
    ```
 
 ## API Configuration
-The frontend communicates with the backend via `axiosInstance.js`. Ensure the `baseURL` is correctly set to your backend server (e.g., `http://localhost:5000/` for local development).
+The frontend communicates with the backend via `axiosInstance.js`. Set `VITE_API_URL` to the correct backend URL for the current environment.

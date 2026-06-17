@@ -1,12 +1,13 @@
 import { useContext, useEffect, useState } from "react";
 import { userContext } from "../../utilities/UserContextProvider";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import SingleCustomerOrder from "./SingleCustomerOrder";
 import axiosInstance from "../../utilities/axiosInstance";
 
 const MyAccount = () => {
-    const { user, logOut } = useContext(userContext);
+    const { user, loading, logOut } = useContext(userContext);
+    const navigate = useNavigate();
     const [orders, setOrders] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -15,6 +16,15 @@ const MyAccount = () => {
     };
 
     useEffect(() => {
+        if (loading) {
+            return;
+        }
+
+        if (user?.role === "admin") {
+            navigate("/admin-secret", { replace: true });
+            return;
+        }
+
         if (!user?.email) {
             setIsLoading(false);
             return;
@@ -31,7 +41,7 @@ const MyAccount = () => {
                 setOrders([]);
                 setIsLoading(false);
             });
-    }, [user?.email]);
+    }, [loading, navigate, user?.email, user?.role]);
 
     return (
         <div className="page-shell">

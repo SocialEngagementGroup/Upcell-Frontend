@@ -1,8 +1,9 @@
 import axios from "axios";
 import { trackAnalyticsEvent } from "./analytics";
+import { apiBaseUrl } from "./env";
 
 const axiosInstance = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/"
+    baseURL: apiBaseUrl
 })
 
 const getRequestUrl = (config = {}) => {
