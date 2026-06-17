@@ -22,7 +22,7 @@ const Checkout = () => {
     const [products, setProducts] = useState([]);
     const [shipping, setShipping] = useState('standard');
     const [isLoading, setIsLoading] = useState(false);
-    const [paymentMethod, setPaymentMethod] = useState('stripe');
+    const paymentMethod = 'manual';
     const { markInteraction, trackSuccess, trackFailure } = useFormAnalytics('checkout');
 
     const isObjectId = (id) => /^[0-9a-fA-F]{24}$/.test(id);
@@ -95,7 +95,7 @@ const Checkout = () => {
                 orders: data.orders,
                 shipping,
                 paymentMethod,
-                paidWith: paymentMethod === 'paypal' ? 'Paypal' : 'Card',
+                paidWith: 'Manual',
             }).then((res) => {
                 trackSuccess({
                     phase: 'request',
@@ -139,9 +139,9 @@ const Checkout = () => {
                         <KeyboardArrowRightIcon className="!text-sm" />
                         <span className="text-apple-text">Checkout</span>
                     </nav>
-                    <h1 className="text-[clamp(2.1rem,4.8vw,4.9rem)] leading-[0.96] sm:leading-[0.94]">Secure your order with a calmer checkout.</h1>
+                    <h1 className="text-[clamp(2.1rem,4.8vw,4.9rem)] leading-[0.96] sm:leading-[0.94]">Request your order with a calmer checkout.</h1>
                     <p className="mt-4 max-w-[620px] text-base leading-7 text-ink-soft sm:mt-5 sm:text-lg sm:leading-8">
-                        Your details, delivery choices, and payment methods are arranged to feel simple, quiet, and premium.
+                        Online payment is coming soon. Submit your details now and our team will contact you to complete the order.
                     </p>
                 </div>
             </section>
@@ -198,23 +198,35 @@ const Checkout = () => {
 
                             <section>
                                 <h3 className="text-[28px]">Payment</h3>
-                                <div className="mt-5 grid gap-4">
+                                <div className="mt-5 rounded-[24px] border border-black/[0.08] bg-surface-alt p-5">
+                                    <div className="font-bold text-apple-text">Online payment coming soon</div>
+                                    <p className="mt-2 text-sm leading-6 text-ink-soft">
+                                        We are temporarily taking orders as contact-to-order requests while payment setup is parked. Our team will confirm availability and payment details after submission.
+                                    </p>
+                                </div>
+
+                                {/* HIDDEN PAYMENT OPTIONS - Kept for future use */}
+                                {/* 
+                                <div className="mt-5 grid gap-4 hidden">
                                     {[
-                                        { id: 'stripe', title: 'Card / Apple Pay / Google Pay', sub: 'Secure checkout via Stripe' },
-                                        { id: 'paypal', title: 'PayPal', sub: 'Pay using your PayPal account' },
+                                        { id: 'stripe', title: 'Credit Card (Stripe)', sub: 'Secure payment via Stripe' },
+                                        { id: 'paypal', title: 'PayPal', sub: 'Pay with your PayPal account' },
                                     ].map((option) => (
                                         <label key={option.id} className={`flex cursor-pointer items-center justify-between rounded-[24px] border p-5 ${paymentMethod === option.id ? 'border-apple-text bg-surface-alt' : 'border-black/[0.08] bg-white'}`}>
                                             <div>
                                                 <div className="font-bold text-apple-text">{option.title}</div>
                                                 <div className="mt-1 text-sm text-ink-soft">{option.sub}</div>
                                             </div>
-                                            <input type="radio" checked={paymentMethod === option.id} onChange={() => {
-                                                markInteraction();
-                                                setPaymentMethod(option.id);
-                                            }} />
+                                            <div className="flex items-center gap-4">
+                                                <input type="radio" checked={paymentMethod === option.id} onChange={() => {
+                                                    markInteraction();
+                                                    // setPaymentMethod(option.id); // Assuming you had a state for this
+                                                }} />
+                                            </div>
                                         </label>
                                     ))}
                                 </div>
+                                */}
                             </section>
 
                             <div className="flex flex-col gap-4 border-t border-black/[0.06] pt-6 md:flex-row md:items-center md:justify-between">
@@ -223,7 +235,7 @@ const Checkout = () => {
                                     Encrypted checkout and secure order processing.
                                 </p>
                                 <button type="submit" className="premium-button w-full md:w-auto md:min-w-[220px]" disabled={isLoading}>
-                                    {isLoading ? 'Processing...' : 'Complete Purchase'}
+                                    {isLoading ? 'Submitting...' : 'Submit order request'}
                                 </button>
                             </div>
                         </form>
