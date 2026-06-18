@@ -1,46 +1,54 @@
-import { createContext, useEffect, useState } from "react";
-import { getStoredUser, setStoredUser } from "./localStore";
+import { createContext, useState, useEffect } from "react";
+import { useClerk, useUser } from "@clerk/clerk-react";
 
-export const userContext = createContext()
+export const userContext = createContext();
+
+const normalizeRole = (role) => {
+    if (typeof role !== "string") return null;
+    return role.trim().toLowerCase();
+};
 
 const UserContextProvider = ({ children }) => {
-    const [user, setUser] = useState(null)
-    const [loading, setLoading] = useState(true)
+    const { signOut } = useClerk();
+    const { user: clerkUser, isLoaded, isSignedIn } = useUser();
+    
+    const [roleReady, setRoleReady] = useState(false);
 
     useEffect(() => {
-        setUser(getStoredUser());
-        setLoading(false);
-    }, []);
+        if (!isLoaded || !isSignedIn) {
+            setRoleReady(true);
+            return undefined;
+        }
 
-    const persistUser = (nextUser) => {
-        setUser(nextUser);
-        setStoredUser(nextUser);
-        return nextUser;
-    };
+        setRoleReady(false);
+        const timer = setTimeout(() => setRoleReady(true), 500);
+        return () => clearTimeout(timer);
+    }, [isLoaded, isSignedIn, clerkUser?.id]);
 
-    const signIn = async ({ email, name, isAdmin = false }) => {
-        const nextUser = {
-            email,
-            displayName: name || email.split("@")[0],
-            isAdmin,
-        };
-
-        return persistUser(nextUser);
-    };
-
-    const signUp = async ({ email, name, isAdmin = false }) => signIn({ email, name, isAdmin });
-
-    const logOut = async () => {
-        persistUser(null);
-    };
+    const user = isSignedIn && clerkUser
+        ? {
+            id: clerkUser.id,
+            email: clerkUser.primaryEmailAddress?.emailAddress || clerkUser.emailAddresses?.[0]?.emailAddress || "",
+            displayName: clerkUser.fullName || clerkUser.username || clerkUser.primaryEmailAddress?.emailAddress || "",
+            role: normalizeRole(clerkUser.publicMetadata?.role) || "customer",
+            clerkUser,
+        }
+        : null;
 
     const credencials = {
         user,
-        loading,
-        logOut,
-        signIn,
-        signUp,
-    }
+        loading: !isLoaded || (isSignedIn && !roleReady),
+        logOut: signOut,
+    };
+
+    console.log("[DEBUG UserContextProvider] isLoaded:", isLoaded);
+    console.log("[DEBUG UserContextProvider] isSignedIn:", isSignedIn);
+    console.log("[DEBUG UserContextProvider] clerkUser.id:", clerkUser?.id);
+    console.log("[DEBUG UserContextProvider] clerkUser email:", clerkUser?.primaryEmailAddress?.emailAddress);
+    console.log("[DEBUG UserContextProvider] clerkUser publicMetadata:", clerkUser?.publicMetadata);
+    console.log("[DEBUG UserContextProvider] normalized role:", normalizeRole(clerkUser?.publicMetadata?.role));
+    console.log("[DEBUG UserContextProvider] exported user object role:", user?.role);
+    console.log("[DEBUG UserContextProvider] loading value:", credencials.loading);
 
     return (
         <userContext.Provider value={credencials}>

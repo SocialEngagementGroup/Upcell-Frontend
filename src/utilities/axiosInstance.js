@@ -1,21 +1,41 @@
 import axios from "axios";
 import { trackAnalyticsEvent } from "./analytics";
+import { apiBaseUrl } from "./env";
 
 const axiosInstance = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/"
+    baseURL: apiBaseUrl
 })
+
+const getRequestUrl = (config = {}) => {
+    return String(config.url || "");
+};
+
+const isAdminRequest = (requestUrl) => {
+    return requestUrl.includes("admin") || requestUrl.includes("shop-categories") || requestUrl.includes("product-family");
+};
+
+const redirectToLogin = (requestUrl) => {
+    if (typeof window === "undefined") return;
+
+    const currentPath = window.location.pathname;
+    const isAlreadyOnLogin = currentPath === "/login";
+
+    if (isAlreadyOnLogin) return;
+
+    const shouldUseAdminLogin = currentPath.startsWith("/admin-secret") || isAdminRequest(requestUrl);
+    const loginPath = shouldUseAdminLogin ? "/login?admin=true" : "/login";
+
+    window.location.replace(loginPath);
+};
 
 // Authentication Interceptor
 axiosInstance.interceptors.request.use(async (config) => {
-    // Firebase Auth has been removed.
-    // Implement your new authentication token logic here.
-    
-    /* Example:
-    const token = localStorage.getItem("token");
+    const token = await window.Clerk?.session?.getToken();
+
     if (token) {
+        config.headers = config.headers || {};
         config.headers.Authorization = `Bearer ${token}`;
     }
-    */
     
     return config;
 }, (error) => {
@@ -23,7 +43,7 @@ axiosInstance.interceptors.request.use(async (config) => {
 });
 
 axiosInstance.interceptors.response.use((response) => response, (error) => {
-    const requestUrl = error?.config?.url || "";
+    const requestUrl = getRequestUrl(error?.config);
     const isAnalyticsRequest = typeof requestUrl === 'string' && requestUrl.includes('analytics-events');
     const isAdminRoute = window.location.pathname.startsWith('/admin-secret');
 
@@ -39,6 +59,10 @@ axiosInstance.interceptors.response.use((response) => response, (error) => {
                 statusCode: error?.response?.status || null,
             },
         });
+    }
+
+    if (error?.response?.status === 401 && !isAnalyticsRequest) {
+        redirectToLogin(requestUrl);
     }
 
     return Promise.reject(error);

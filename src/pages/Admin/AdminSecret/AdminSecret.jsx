@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
+import { userContext } from '../../../utilities/UserContextProvider';
 
 const links = [
     { to: '', label: 'Overview', end: true },
@@ -14,6 +15,12 @@ const links = [
 ];
 
 const AdminSecret = () => {
+    const { logOut } = useContext(userContext);
+
+    const handleSignOut = () => {
+        logOut({ redirectUrl: '/' }).catch((error) => console.log(error));
+    };
+
     return (
         <div className="admin-shell">
             <div className="admin-container pb-16">
@@ -38,6 +45,9 @@ const AdminSecret = () => {
                                 </NavLink>
                             ))}
                         </nav>
+                        <button className="premium-button-secondary mt-6 w-full" type="button" onClick={handleSignOut}>
+                            Sign out
+                        </button>
                     </aside>
 
                     <main className="min-w-0">

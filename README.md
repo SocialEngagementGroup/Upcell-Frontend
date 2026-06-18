@@ -8,8 +8,7 @@ The frontend client for the Upcell (Global Traders) platform, a modern e-commerc
 - **State Management**: React Context API (`UserContextProvider`)
 - **Backend Communication**: Axios
 - **External Services**:
-  - **Firebase Auth**: User authentication
-  - **Firebase Storage**: Image hosting
+  - **Clerk**: User authentication and role metadata
   - **React Toastify**: User notifications
 
 ## Project Structure
@@ -22,7 +21,7 @@ The frontend client for the Upcell (Global Traders) platform, a modern e-commerc
 - **Search**: Dynamic product searching functionality.
 - **Shopping Cart**: Local and account-based cart management.
 - **Admin Dashboard**: Product management, order tracking, and sales analytics.
-- **Authentication**: Secure login and signup powered by Firebase.
+- **Authentication**: Secure login and signup powered by Clerk.
 
 ## Setup & Installation
 
@@ -32,12 +31,8 @@ The frontend client for the Upcell (Global Traders) platform, a modern e-commerc
    ```
 2. Create a `.env` file in the `Frontend` directory:
    ```env
-   VITE_API_KEY=your_firebase_api_key
-   VITE_AUTH_DOMAIN=your_firebase_auth_domain
-   VITE_PROJECT_ID=your_firebase_project_id
-   VITE_STORAGE_BUCKET=your_firebase_storage_bucket
-   VITE_MESSAGING_SENDER=your_firebase_messaging_sender
-   VITE_APP_ID=your_firebase_app_id
+   VITE_API_URL=https://your-render-backend-url.onrender.com/
+   VITE_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
    ```
 3. Run the development server:
    ```bash
@@ -45,4 +40,4 @@ The frontend client for the Upcell (Global Traders) platform, a modern e-commerc
    ```
 
 ## API Configuration
-The frontend communicates with the backend via `axiosInstance.js`. Ensure the `baseURL` is correctly set to your backend server (e.g., `http://localhost:5000/` for local development).
+The frontend communicates with the backend via `axiosInstance.js`. Set `VITE_API_URL` to the correct backend URL for the current environment.

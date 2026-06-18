@@ -1,5 +1,6 @@
 import React, { Suspense, lazy } from 'react';
 import ReactDOM from 'react-dom/client';
+import { ClerkProvider } from '@clerk/clerk-react';
 
 import './index.css';
 
@@ -46,6 +47,12 @@ const lazyElement = (element) => (
     {element}
   </Suspense>
 );
+
+const clerkPublishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+
+if (!clerkPublishableKey) {
+  throw new Error("Missing VITE_CLERK_PUBLISHABLE_KEY");
+}
 
 const router = createBrowserRouter([
   {
@@ -177,9 +184,11 @@ const router = createBrowserRouter([
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <UserContextProvider>
-    <ErrorBoundary>
-      <RouterProvider router={router} />
-    </ErrorBoundary>
-  </UserContextProvider>
+  <ClerkProvider publishableKey={clerkPublishableKey}>
+    <UserContextProvider>
+      <ErrorBoundary>
+        <RouterProvider router={router} />
+      </ErrorBoundary>
+    </UserContextProvider>
+  </ClerkProvider>
 );

@@ -6,16 +6,25 @@ import SingleCustomerOrder from "./SingleCustomerOrder";
 import axiosInstance from "../../utilities/axiosInstance";
 
 const MyAccount = () => {
-    const { user, logOut } = useContext(userContext);
+    const { user, loading, logOut } = useContext(userContext);
     const navigate = useNavigate();
     const [orders, setOrders] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
     const handleSingOut = () => {
-        logOut().then(() => navigate("/")).catch((error) => console.log(error));
+        logOut({ redirectUrl: "/" }).catch((error) => console.log(error));
     };
 
     useEffect(() => {
+        if (loading) {
+            return;
+        }
+
+        if (user?.role === "admin") {
+            navigate("/admin-secret", { replace: true });
+            return;
+        }
+
         if (!user?.email) {
             setIsLoading(false);
             return;
@@ -32,7 +41,7 @@ const MyAccount = () => {
                 setOrders([]);
                 setIsLoading(false);
             });
-    }, [user?.email]);
+    }, [loading, navigate, user?.email, user?.role]);
 
     return (
         <div className="page-shell">

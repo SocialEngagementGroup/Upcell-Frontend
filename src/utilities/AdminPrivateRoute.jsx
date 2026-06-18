@@ -7,25 +7,21 @@ import { userContext } from "./UserContextProvider";
 const AdminPrivateRoute = ({ children }) => {
     const {user, loading} = useContext(userContext)
 
+    console.log("[DEBUG AdminPrivateRoute] loading:", loading);
+    console.log("[DEBUG AdminPrivateRoute] user?.email:", user?.email);
+    console.log("[DEBUG AdminPrivateRoute] user?.role:", user?.role);
+    console.log("[DEBUG AdminPrivateRoute] current path:", window.location.pathname + window.location.search);
+    console.log("[DEBUG AdminPrivateRoute] decision:", loading ? "waiting" : (user?.role === "admin" ? "allow" : "redirect"));
+
     if (loading){
         return <div>loading...</div>
     }
 
-    if(user){
-        const admins = (import.meta.env.VITE_ADMINS || "")
-            .split(",")
-            .map((email) => email.trim())
-            .filter(Boolean)
-
-        if(user?.isAdmin || admins.includes(user?.email)){
-
-            return <>{children}</>
-        }
+    if (user?.role === "admin") {
+        return <>{children}</>
     }
 
-    return (
-        <Navigate to="/login?admin=true"></Navigate>
-    );
+    return <Navigate to={user ? "/" : "/login?admin=true"} replace />;
 };
 
 export default AdminPrivateRoute;
