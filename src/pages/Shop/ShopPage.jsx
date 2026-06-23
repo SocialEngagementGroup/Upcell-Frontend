@@ -6,9 +6,8 @@ import { toast } from 'react-toastify';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
-import axiosInstance from '../../utilities/axiosInstance';
 import ModernProductCard from '../../components/ModernProductCard/ModernProductCard';
-import { normalizeProduct } from '../../utilities/catalog';
+import { groupProductsByParent, normalizeProduct, fetchCachedProducts } from '../../utilities/catalog';
 
 const topCategories = ['All Devices', 'iPhone', 'iPad', 'MacBook'];
 const storageOrder = ['128GB', '256GB', '512GB', '1TB', '2TB', '4TB'];
@@ -189,15 +188,14 @@ const ShopPage = () => {
         if (topCategories.includes(activeCategory)) return;
         setActiveCategory('All Devices');
     }, [activeCategory]);
-
     useEffect(() => {
         const hasCachedProducts = products.length > 0;
         if (!hasCachedProducts) setProductsLoading(true);
 
-        axiosInstance.get('products/shop')
-            .then((res) => {
-                writeCachedShopProducts(res.data);
-                setProducts(res.data.map(normalizeProduct));
+        fetchCachedProducts()
+            .then((data) => {
+                writeCachedShopProducts(data);
+                setProducts(data);
             })
             .catch((error) => console.log(error))
             .finally(() => setProductsLoading(false));
@@ -296,7 +294,7 @@ const ShopPage = () => {
             return true;
         });
 
-        const sorted = [...matchingVariations];
+        const sorted = groupProductsByParent(matchingVariations);
         sorted.sort(sortByFamilyThenProductName);
         if (sortBy === 'price-low') sorted.sort((a, b) => a.price - b.price);
         if (sortBy === 'price-high') sorted.sort((a, b) => b.price - a.price);
@@ -323,8 +321,7 @@ const ShopPage = () => {
     };
 
     const activeSortOption = sortOptions.find((option) => option.value === sortBy) || sortOptions[0];
-
-    return (
+return (
         <div className="page-shell">
             <ScrollToTop />
 
@@ -508,6 +505,7 @@ const ShopPage = () => {
 };
 
 export default ShopPage;
+
 
 
 

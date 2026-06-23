@@ -3,7 +3,8 @@ import { CartContext } from "../../App";
 import { Link } from "react-router-dom";
 import ScrollToTop from "../../utilities/ScrollToTop";
 import CartProduct from "./CartProduct";
-import axiosInstance from "../../utilities/axiosInstance";
+import { fetchCachedProducts } from "../../utilities/catalog";
+import RouteLoadingScreen from "../../components/RouteLoadingScreen/RouteLoadingScreen";
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 
 const Cart = () => {
@@ -22,52 +23,27 @@ const Cart = () => {
         const isObjectId = (id) => /^[0-9a-fA-F]{24}$/.test(id);
         const uniqueIds = [...new Set(cart)].filter(isObjectId);
 
-        const syncCartProducts = (fetchedProducts = []) => {
-            if (isCancelled) return;
-
-            setProducts(fetchedProducts);
-
-            const validIds = new Set(fetchedProducts.map((product) => product._id));
-            const hasStaleIds = cart.some((id) => !validIds.has(id));
-
-            if (hasStaleIds) {
-                setCart((current) => current.filter((id) => validIds.has(id)));
-            }
-        };
-
         setIsLoading(true);
 
-        axiosInstance.post('cart', { ids: uniqueIds })
-            .then(async (res) => {
-                const fetchedProducts = res.data || [];
+        fetchCachedProducts()
+            .then((allProducts) => {
+                if (isCancelled) return;
+                const fetchedProducts = allProducts.filter((product) => uniqueIds.includes(product._id));
+                setProducts(fetchedProducts);
 
-                if (fetchedProducts.length > 0) {
-                    syncCartProducts(fetchedProducts);
-                    return;
+                const validIds = new Set(fetchedProducts.map((product) => product._id));
+                const hasStaleIds = cart.some((id) => !validIds.has(id));
+
+                if (hasStaleIds) {
+                    setCart((current) => current.filter((id) => validIds.has(id)));
                 }
-
-                const fallbackResponse = await axiosInstance.get('product');
-                const fallbackProducts = (fallbackResponse.data || []).filter((product) => uniqueIds.includes(product._id));
-                syncCartProducts(fallbackProducts);
             })
-            .catch(async (error) => {
+            .catch((error) => {
                 console.log(error);
-
-                try {
-                    const fallbackResponse = await axiosInstance.get('product');
-                    const fallbackProducts = (fallbackResponse.data || []).filter((product) => uniqueIds.includes(product._id));
-                    syncCartProducts(fallbackProducts);
-                } catch (fallbackError) {
-                    console.log(fallbackError);
-                    if (!isCancelled) {
-                        setProducts([]);
-                    }
-                }
+                if (!isCancelled) setProducts([]);
             })
             .finally(() => {
-                if (!isCancelled) {
-                    setIsLoading(false);
-                }
+                if (!isCancelled) setIsLoading(false);
             });
 
         return () => {

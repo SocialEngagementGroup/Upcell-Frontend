@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { SignIn, SignUp, useClerk, useUser } from '@clerk/clerk-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import RouteLoadingScreen from '../../../components/RouteLoadingScreen/RouteLoadingScreen';
+import { getClerkPrimaryEmail, getUserRole } from '../../../utilities/auth';
 
 const clerkAppearance = {
     variables: {
@@ -29,10 +31,6 @@ const clerkAppearance = {
     },
 };
 
-const normalizeRole = (role) => {
-    if (typeof role !== "string") return null;
-    return role.trim().toLowerCase();
-};
 
 const LoginAndSignup = () => {
     const location = useLocation();
@@ -42,8 +40,8 @@ const LoginAndSignup = () => {
     const [signin, setSignin] = useState(!location.search.includes("mode=signup"));
     const isAdminLogin = location.search.includes("admin=true");
     const afterAuthUrl = isAdminLogin ? "/admin-secret" : "/myaccount";
-    const currentRole = normalizeRole(user?.publicMetadata?.role);
-    const currentEmail = user?.primaryEmailAddress?.emailAddress || user?.emailAddresses?.[0]?.emailAddress || "";
+    const currentRole = getUserRole(user);
+    const currentEmail = getClerkPrimaryEmail(user);
 
     const [roleReady, setRoleReady] = useState(false);
 
@@ -59,32 +57,20 @@ const LoginAndSignup = () => {
     }, [isLoaded, isSignedIn, user?.id]);
 
     useEffect(() => {
-        console.log("[DEBUG LoginAndSignup useEffect] isLoaded:", isLoaded);
-        console.log("[DEBUG LoginAndSignup useEffect] isSignedIn:", isSignedIn);
-        console.log("[DEBUG LoginAndSignup useEffect] roleReady:", roleReady);
-        console.log("[DEBUG LoginAndSignup useEffect] isAdminLogin:", isAdminLogin);
-        console.log("[DEBUG LoginAndSignup useEffect] currentRole:", currentRole);
-        console.log("[DEBUG LoginAndSignup useEffect] current email:", currentEmail);
-        console.log("[DEBUG LoginAndSignup useEffect] current pathname/search:", location.pathname + location.search);
-
         if (!isLoaded || !isSignedIn || !roleReady) {
-            console.log("[DEBUG LoginAndSignup] Action: Waiting (not fully loaded/signed in)");
             return;
         }
 
         if (isAdminLogin && currentRole !== "admin") {
-            console.log("[DEBUG LoginAndSignup] Action: Waiting (show account switch required)");
             return;
         }
 
         if (currentRole === "admin") {
-            console.log("[DEBUG LoginAndSignup] Action: navigate to /admin-secret");
             navigate("/admin-secret", { replace: true });
         } else {
-            console.log("[DEBUG LoginAndSignup] Action: navigate to /myaccount");
             navigate("/myaccount", { replace: true });
         }
-    }, [currentRole, isAdminLogin, isLoaded, isSignedIn, roleReady, navigate, location.pathname, location.search, currentEmail]);
+    }, [currentRole, isAdminLogin, isLoaded, isSignedIn, roleReady, navigate]);
 
     const handleSwitchToAdmin = () => {
         signOut({ redirectUrl: "/login?admin=true" });
@@ -92,11 +78,7 @@ const LoginAndSignup = () => {
 
     const renderAuthContent = () => {
         if (!isLoaded || (isSignedIn && !roleReady)) {
-            return (
-                <div className="rounded-[28px] border border-[#e5e7eb] bg-white px-6 py-10 text-center shadow-[0_22px_60px_rgba(15,23,42,0.14)]">
-                    <p className="text-sm font-bold text-apple-text">Checking session...</p>
-                </div>
-            );
+            return <RouteLoadingScreen compact />;
         }
 
         if (isAdminLogin && isSignedIn && currentRole !== "admin") {
@@ -118,11 +100,7 @@ const LoginAndSignup = () => {
         }
 
         if (isSignedIn) {
-            return (
-                <div className="rounded-[28px] border border-[#e5e7eb] bg-white px-6 py-10 text-center shadow-[0_22px_60px_rgba(15,23,42,0.14)]">
-                    <p className="text-sm font-bold text-apple-text">Redirecting...</p>
-                </div>
-            );
+            return <RouteLoadingScreen compact />;
         }
 
         return signin ? (
@@ -183,3 +161,6 @@ const LoginAndSignup = () => {
 };
 
 export default LoginAndSignup;
+
+
+
