@@ -7,9 +7,8 @@ import { toast } from 'react-toastify';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 
-import axiosInstance from '../../../utilities/axiosInstance';
+import { groupProductsByParent, fetchCachedProducts } from '../../../utilities/catalog';
 import ModernProductCard from '../../../components/ModernProductCard/ModernProductCard';
-import { groupProductsByParent, normalizeProduct } from '../../../utilities/catalog';
 
 
 
@@ -54,9 +53,9 @@ const ProductDetailPage = () => {
     const { setCart } = useContext(CartContext);
 
     useEffect(() => {
-        axiosInstance.get(`allSameParentProducts/${parentId}`)
-            .then((res) => {
-                const matchedProducts = res.data.map(normalizeProduct);
+        fetchCachedProducts()
+            .then((cachedProducts) => {
+                const matchedProducts = cachedProducts.filter(p => p.parentCatagory === parentId || p.parentId === parentId);
                 if (!matchedProducts.length) return;
 
                 setAllProducts(matchedProducts);
@@ -82,9 +81,9 @@ const ProductDetailPage = () => {
     ), [allProducts]);
 
     useEffect(() => {
-        axiosInstance.get('product')
-            .then((res) => {
-                const related = groupProductsByParent(res.data.map(normalizeProduct))
+        fetchCachedProducts()
+            .then((cachedProducts) => {
+                const related = groupProductsByParent(cachedProducts)
                     .filter((item) => item.parentCatagory !== parentId && ['iPhone', 'iPad', 'MacBook'].includes(item.family))
                     .slice(0, 4);
                 setRecommendedProducts(related);
@@ -336,3 +335,7 @@ const ProductDetailPage = () => {
 };
 
 export default ProductDetailPage;
+
+
+
+

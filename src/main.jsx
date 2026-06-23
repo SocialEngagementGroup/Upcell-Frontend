@@ -50,9 +50,6 @@ const lazyElement = (element) => (
 
 const clerkPublishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
-if (!clerkPublishableKey) {
-  throw new Error("Missing VITE_CLERK_PUBLISHABLE_KEY");
-}
 
 const router = createBrowserRouter([
   {
@@ -183,12 +180,25 @@ const router = createBrowserRouter([
   },
 ]);
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <ClerkProvider publishableKey={clerkPublishableKey}>
-    <UserContextProvider>
-      <ErrorBoundary>
-        <RouterProvider router={router} />
-      </ErrorBoundary>
-    </UserContextProvider>
-  </ClerkProvider>
-);
+const root = ReactDOM.createRoot(document.getElementById('root'));
+
+if (!clerkPublishableKey) {
+  root.render(
+    <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', padding: '24px', fontFamily: 'system-ui, sans-serif' }}>
+      <div style={{ maxWidth: '520px', border: '1px solid #eee', borderRadius: '24px', padding: '32px', boxShadow: '0 18px 60px rgba(15,23,42,0.08)' }}>
+        <h1 style={{ margin: 0, fontSize: '28px' }}>Missing Vercel environment key</h1>
+        <p style={{ color: '#555', lineHeight: 1.6 }}>Add <strong>VITE_CLERK_PUBLISHABLE_KEY</strong> to this Vercel environment, then redeploy.</p>
+      </div>
+    </div>
+  );
+} else {
+  root.render(
+    <ClerkProvider publishableKey={clerkPublishableKey}>
+      <UserContextProvider>
+        <ErrorBoundary>
+          <RouterProvider router={router} />
+        </ErrorBoundary>
+      </UserContextProvider>
+    </ClerkProvider>
+  );
+}

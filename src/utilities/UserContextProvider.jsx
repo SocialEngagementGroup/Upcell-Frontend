@@ -1,17 +1,12 @@
 import { createContext, useState, useEffect } from "react";
 import { useClerk, useUser } from "@clerk/clerk-react";
+import { getClerkPrimaryEmail, getUserRole } from "./auth";
 
 export const userContext = createContext();
-
-const normalizeRole = (role) => {
-    if (typeof role !== "string") return null;
-    return role.trim().toLowerCase();
-};
 
 const UserContextProvider = ({ children }) => {
     const { signOut } = useClerk();
     const { user: clerkUser, isLoaded, isSignedIn } = useUser();
-    
     const [roleReady, setRoleReady] = useState(false);
 
     useEffect(() => {
@@ -25,12 +20,13 @@ const UserContextProvider = ({ children }) => {
         return () => clearTimeout(timer);
     }, [isLoaded, isSignedIn, clerkUser?.id]);
 
+    const email = getClerkPrimaryEmail(clerkUser);
     const user = isSignedIn && clerkUser
         ? {
             id: clerkUser.id,
-            email: clerkUser.primaryEmailAddress?.emailAddress || clerkUser.emailAddresses?.[0]?.emailAddress || "",
-            displayName: clerkUser.fullName || clerkUser.username || clerkUser.primaryEmailAddress?.emailAddress || "",
-            role: normalizeRole(clerkUser.publicMetadata?.role) || "customer",
+            email: email,
+            displayName: clerkUser.fullName || clerkUser.username || email,
+            role: getUserRole(clerkUser),
             clerkUser,
         }
         : null;
@@ -40,15 +36,6 @@ const UserContextProvider = ({ children }) => {
         loading: !isLoaded || (isSignedIn && !roleReady),
         logOut: signOut,
     };
-
-    console.log("[DEBUG UserContextProvider] isLoaded:", isLoaded);
-    console.log("[DEBUG UserContextProvider] isSignedIn:", isSignedIn);
-    console.log("[DEBUG UserContextProvider] clerkUser.id:", clerkUser?.id);
-    console.log("[DEBUG UserContextProvider] clerkUser email:", clerkUser?.primaryEmailAddress?.emailAddress);
-    console.log("[DEBUG UserContextProvider] clerkUser publicMetadata:", clerkUser?.publicMetadata);
-    console.log("[DEBUG UserContextProvider] normalized role:", normalizeRole(clerkUser?.publicMetadata?.role));
-    console.log("[DEBUG UserContextProvider] exported user object role:", user?.role);
-    console.log("[DEBUG UserContextProvider] loading value:", credencials.loading);
 
     return (
         <userContext.Provider value={credencials}>
