@@ -41,15 +41,6 @@ const UserContextProvider = ({ children }) => {
         logOut: signOut,
     };
 
-    console.log("[DEBUG UserContextProvider] isLoaded:", isLoaded);
-    console.log("[DEBUG UserContextProvider] isSignedIn:", isSignedIn);
-    console.log("[DEBUG UserContextProvider] clerkUser.id:", clerkUser?.id);
-    console.log("[DEBUG UserContextProvider] clerkUser email:", clerkUser?.primaryEmailAddress?.emailAddress);
-    console.log("[DEBUG UserContextProvider] clerkUser publicMetadata:", clerkUser?.publicMetadata);
-    console.log("[DEBUG UserContextProvider] normalized role:", normalizeRole(clerkUser?.publicMetadata?.role));
-    console.log("[DEBUG UserContextProvider] exported user object role:", user?.role);
-    console.log("[DEBUG UserContextProvider] loading value:", credencials.loading);
-
     return (
         <userContext.Provider value={credencials}>
             {children}

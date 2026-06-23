@@ -8,7 +8,7 @@ import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownR
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import axiosInstance from '../../utilities/axiosInstance';
 import ModernProductCard from '../../components/ModernProductCard/ModernProductCard';
-import { groupProductsByParent, normalizeProduct } from '../../utilities/catalog';
+import { normalizeProduct } from '../../utilities/catalog';
 
 const topCategories = ['All Devices', 'iPhone', 'iPad', 'MacBook'];
 const storageOrder = ['128GB', '256GB', '512GB', '1TB', '2TB', '4TB'];
@@ -66,10 +66,91 @@ const sortOptions = [
     { value: 'name', label: 'Name' },
 ];
 
+
+const SHOP_PRODUCTS_CACHE_KEY = 'upcell_shop_products_cache';
+const SHOP_PRODUCTS_CACHE_TTL = 5 * 60 * 1000;
+
+const readCachedShopProducts = () => {
+    if (typeof window === 'undefined') return [];
+
+    try {
+        const cached = window.sessionStorage.getItem(SHOP_PRODUCTS_CACHE_KEY);
+        if (!cached) return [];
+
+        const parsed = JSON.parse(cached);
+        if (!Array.isArray(parsed.products) || Date.now() - parsed.savedAt > SHOP_PRODUCTS_CACHE_TTL) {
+            window.sessionStorage.removeItem(SHOP_PRODUCTS_CACHE_KEY);
+            return [];
+        }
+
+        return parsed.products.map(normalizeProduct);
+    } catch (error) {
+        window.sessionStorage.removeItem(SHOP_PRODUCTS_CACHE_KEY);
+        return [];
+    }
+};
+
+const writeCachedShopProducts = (products) => {
+    if (typeof window === 'undefined') return;
+
+    try {
+        window.sessionStorage.setItem(SHOP_PRODUCTS_CACHE_KEY, JSON.stringify({
+            savedAt: Date.now(),
+            products,
+        }));
+    } catch (error) {
+        window.sessionStorage.removeItem(SHOP_PRODUCTS_CACHE_KEY);
+    }
+};
+const ShopProductPreloader = () => (
+    <div className="space-y-6" aria-live="polite" aria-busy="true">
+        <div className="premium-card overflow-hidden rounded-[32px] p-6">
+            <div className="flex items-center gap-4">
+                <div className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[linear-gradient(180deg,#ffffff_0%,#f1f3f6_100%)] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06)]">
+                    <div className="h-8 w-8 animate-spin rounded-full border-[3px] border-black/10 border-t-brand-red" />
+                </div>
+                <div className="min-w-0">
+                    <div className="text-xs font-black uppercase tracking-[0.22em] text-brand-red">UpCell</div>
+                    <h2 className="mt-1 text-[24px] leading-tight text-apple-text sm:text-[30px]">Preparing certified devices</h2>
+                    <p className="mt-2 text-sm text-apple-gray">Loading the latest available iPhones, iPads, and MacBooks.</p>
+                </div>
+            </div>
+        </div>
+
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, index) => (
+                <div
+                    key={index}
+                    className="overflow-hidden rounded-[40px] border border-black/[0.06] bg-white p-7 shadow-[0_18px_60px_rgba(15,23,42,0.05)]"
+                >
+                    <div className="flex h-[240px] items-center justify-center rounded-[28px] bg-[linear-gradient(180deg,#f8f9fb_0%,#edf0f4_100%)]">
+                        <div className="h-28 w-20 animate-pulse rounded-[24px] bg-white/80 shadow-[0_18px_46px_rgba(15,23,42,0.10)]" />
+                    </div>
+                    <div className="mt-8 h-3 w-20 animate-pulse rounded-full bg-black/10" />
+                    <div className="mt-4 h-6 w-4/5 animate-pulse rounded-full bg-black/10" />
+                    <div className="mt-3 flex gap-2">
+                        {[0, 1, 2].map((swatch) => (
+                            <span key={swatch} className="h-4 w-4 animate-pulse rounded-full bg-black/10" />
+                        ))}
+                    </div>
+                    <div className="mt-8 flex items-end justify-between">
+                        <div>
+                            <div className="h-2 w-10 animate-pulse rounded-full bg-black/10" />
+                            <div className="mt-3 h-8 w-24 animate-pulse rounded-full bg-black/10" />
+                        </div>
+                        <div className="h-4 w-24 animate-pulse rounded-full bg-black/10" />
+                    </div>
+                </div>
+            ))}
+        </div>
+        <span className="sr-only">Loading products</span>
+    </div>
+);
 const ShopPage = () => {
     const location = useLocation();
     const { setCart } = useContext(CartContext);
-    const [products, setProducts] = useState([]);
+    const [products, setProducts] = useState(() => readCachedShopProducts());
+    const [productsLoading, setProductsLoading] = useState(() => readCachedShopProducts().length === 0);
     const [activeCategory, setActiveCategory] = useState('All Devices');
     const [priceRange, setPriceRange] = useState(3500);
     const [selectedModels, setSelectedModels] = useState([]);
@@ -110,9 +191,16 @@ const ShopPage = () => {
     }, [activeCategory]);
 
     useEffect(() => {
-        axiosInstance.get('product')
-            .then((res) => setProducts(res.data.map(normalizeProduct)))
-            .catch((error) => console.log(error));
+        const hasCachedProducts = products.length > 0;
+        if (!hasCachedProducts) setProductsLoading(true);
+
+        axiosInstance.get('products/shop')
+            .then((res) => {
+                writeCachedShopProducts(res.data);
+                setProducts(res.data.map(normalizeProduct));
+            })
+            .catch((error) => console.log(error))
+            .finally(() => setProductsLoading(false));
     }, []);
 
     const availableCategories = useMemo(() => {
@@ -134,7 +222,7 @@ const ShopPage = () => {
         Array.from(new Set(
             products
                 .filter((product) => activeCategory === 'All Devices' || product.family === activeCategory)
-                .map((product) => product.storage)
+                .flatMap((product) => product.availableStorages?.length ? product.availableStorages : [product.storage])
                 .filter((storage) => storage && storageOrder.includes(storage))
         ))
             .sort((left, right) => {
@@ -191,8 +279,11 @@ const ShopPage = () => {
                 }
             }
 
-            if (selectedStorages.length > 0 && !selectedStorages.includes(product.storage)) {
-                return false;
+            if (selectedStorages.length > 0) {
+                const storages = product.availableStorages?.length ? product.availableStorages : [product.storage];
+                if (!selectedStorages.some((storage) => storages.includes(storage))) {
+                    return false;
+                }
             }
 
             if (normalizedSearch) {
@@ -205,7 +296,7 @@ const ShopPage = () => {
             return true;
         });
 
-        const sorted = groupProductsByParent(matchingVariations);
+        const sorted = [...matchingVariations];
         sorted.sort(sortByFamilyThenProductName);
         if (sortBy === 'price-low') sorted.sort((a, b) => a.price - b.price);
         if (sortBy === 'price-high') sorted.sort((a, b) => b.price - a.price);
@@ -390,15 +481,17 @@ const ShopPage = () => {
                     </aside>
 
                     <main>
+                        {productsLoading ? (
+                            <ShopProductPreloader />
+                        ) : (
+                            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                                {filteredProducts.map((product) => (
+                                    <ModernProductCard key={product._id} product={product} />
+                                ))}
+                            </div>
+                        )}
 
-
-                        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                            {filteredProducts.map((product) => (
-                                <ModernProductCard key={product._id} product={product} />
-                            ))}
-                        </div>
-
-                        {filteredProducts.length === 0 && (
+                        {!productsLoading && filteredProducts.length === 0 && (
                             <div className="premium-card mt-6 rounded-[32px] px-8 py-12 text-center">
                                 <h3>No premium devices match those filters.</h3>
                                 <p className="mt-3 text-base text-ink-soft">Reset the filters to browse the full certified premium Apple collection.</p>
@@ -415,3 +508,9 @@ const ShopPage = () => {
 };
 
 export default ShopPage;
+
+
+
+
+
+

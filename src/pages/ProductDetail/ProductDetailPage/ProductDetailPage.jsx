@@ -9,7 +9,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 
 import axiosInstance from '../../../utilities/axiosInstance';
 import ModernProductCard from '../../../components/ModernProductCard/ModernProductCard';
-import { groupProductsByParent, normalizeProduct } from '../../../utilities/catalog';
+import { normalizeProduct } from '../../../utilities/catalog';
 
 
 
@@ -82,13 +82,8 @@ const ProductDetailPage = () => {
     ), [allProducts]);
 
     useEffect(() => {
-        axiosInstance.get('product')
-            .then((res) => {
-                const related = groupProductsByParent(res.data.map(normalizeProduct))
-                    .filter((item) => item.parentCatagory !== parentId && ['iPhone', 'iPad', 'MacBook'].includes(item.family))
-                    .slice(0, 4);
-                setRecommendedProducts(related);
-            })
+        axiosInstance.get(`products/recommended?excludeParentId=${parentId}&limit=4`)
+            .then((res) => setRecommendedProducts(res.data.map(normalizeProduct)))
             .catch((error) => console.log(error));
     }, [parentId]);
 
@@ -336,3 +331,5 @@ const ProductDetailPage = () => {
 };
 
 export default ProductDetailPage;
+
+

@@ -7,12 +7,6 @@ import { userContext } from "./UserContextProvider";
 const AdminPrivateRoute = ({ children }) => {
     const {user, loading} = useContext(userContext)
 
-    console.log("[DEBUG AdminPrivateRoute] loading:", loading);
-    console.log("[DEBUG AdminPrivateRoute] user?.email:", user?.email);
-    console.log("[DEBUG AdminPrivateRoute] user?.role:", user?.role);
-    console.log("[DEBUG AdminPrivateRoute] current path:", window.location.pathname + window.location.search);
-    console.log("[DEBUG AdminPrivateRoute] decision:", loading ? "waiting" : (user?.role === "admin" ? "allow" : "redirect"));
-
     if (loading){
         return <div>loading...</div>
     }
