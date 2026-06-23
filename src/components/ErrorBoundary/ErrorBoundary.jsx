@@ -45,7 +45,7 @@ class ErrorBoundary extends React.Component {
                 Return to home
               </Link>
             </div>
-            {process.env.NODE_ENV === 'development' && (
+            {import.meta.env.DEV && (
               <div className="mt-10 overflow-hidden rounded-2xl bg-black/5 p-4 text-left text-xs font-mono text-apple-gray">
                 <p className="font-bold text-apple-text">Error detail:</p>
                 <div className="mt-2 break-words opacity-70">
@@ -63,3 +63,4 @@ class ErrorBoundary extends React.Component {
 }
 
 export default ErrorBoundary;
+
