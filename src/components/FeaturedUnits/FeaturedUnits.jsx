@@ -22,15 +22,15 @@ const FeaturedUnits = () => {
                 const iphones = normalized
                     .filter((p) => p.family === 'iPhone')
                     .sort(sortByLatestProductName)
-                    .slice(0, 4);
+                    .slice(0, 5);
                 const ipads = normalized
                     .filter((p) => p.family === 'iPad')
                     .sort(sortByLatestProductName)
-                    .slice(0, 4);
+                    .slice(0, 5);
                 const macbooks = normalized
                     .filter((p) => p.family === 'MacBook')
                     .sort(sortByLatestProductName)
-                    .slice(0, 4);
+                    .slice(0, 5);
 
                 setCategories({
                     iPhone: iphones,
@@ -63,7 +63,7 @@ const FeaturedUnits = () => {
                                     View Full {cat.key} Range →
                                 </Link>
                             </div>
-                            <div className="grid grid-cols-4 gap-6 max-xl:grid-cols-3 max-lg:grid-cols-2 max-sm:grid-cols-1">
+                            <div className="grid grid-cols-5 gap-6 max-xl:grid-cols-3 max-lg:grid-cols-2 max-sm:grid-cols-2">
                                 {categories[cat.key].map(product => (
                                     <ModernProductCard key={product._id} product={product} />
                                 ))}
