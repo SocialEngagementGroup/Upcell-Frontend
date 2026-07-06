@@ -10,8 +10,10 @@ const AddProduct = () => {
     const [allCatagories, setCatagories] = useState([]);
     const [existingProducts, setExistingProducts] = useState([]);
     const [submitting, setSubmitting] = useState(false);
+    const [editingProduct, setEditingProduct] = useState(null);
     const initialProductName = searchParams.get('product') || '';
     const initialCategoryId = searchParams.get('categoryId') || '';
+    const initialParentId = searchParams.get('parentId') || '';
 
     useEffect(() => {
         Promise.allSettled([
@@ -109,8 +111,10 @@ const AddProduct = () => {
     return (
         <section className="space-y-6">
             <div className="admin-panel rounded-[36px] bg-[linear-gradient(180deg,#ffffff_0%,#f3f5f8_100%)] px-8 py-10">
-                <span className="eyebrow mb-5">Add Product</span>
-                <h1 className="text-[clamp(2rem,3.8vw,3.6rem)] leading-[0.94]">Create a new product listing.</h1>
+                <span className="eyebrow mb-5">{editingProduct ? 'Edit Product' : 'Add Product'}</span>
+                <h1 className="text-[clamp(2rem,3.8vw,3.6rem)] leading-[0.94]">
+                    {editingProduct ? `Editing ${editingProduct.productName}.` : 'Create a new product listing.'}
+                </h1>
             </div>
 
             <div className="admin-panel rounded-[36px] p-6 md:p-7 xl:p-8">
@@ -119,9 +123,11 @@ const AddProduct = () => {
                     existingProducts={existingProducts}
                     initialProductName={initialProductName}
                     initialCategoryId={initialCategoryId}
+                    initialParentId={initialParentId}
                     onCreateCategory={handleCreateCategory}
                     onSubmit={handleSubmit}
                     submitting={submitting}
+                    onEditingProductChange={setEditingProduct}
                 />
             </div>
         </section>

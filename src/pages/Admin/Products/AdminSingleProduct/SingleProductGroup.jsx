@@ -171,7 +171,7 @@ const SingleProductGroup = ({ productGroup, onDelete }) => {
                 <div className="flex gap-3">
                     <button
                         className="premium-button-secondary"
-                        onClick={() => navigate(`/admin-secret/addproduct?product=${encodeURIComponent(productGroup.productName)}`)}
+                        onClick={() => navigate(`/admin-secret/addproduct?product=${encodeURIComponent(productGroup.productName)}&parentId=${productGroup.parentId}`)}
                     >
                         Edit product
                     </button>
