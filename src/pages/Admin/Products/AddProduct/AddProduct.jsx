@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import ProductBatchForm from '../../../../components/ProductForm/ProductBatchForm';
 import axiosInstance from '../../../../utilities/axiosInstance';
+import { clearProductCache } from '../../../../utilities/catalog';
 import { toast } from 'react-toastify';
 import { useSearchParams } from 'react-router-dom';
 
@@ -13,36 +14,46 @@ const AddProduct = () => {
     const initialCategoryId = searchParams.get('categoryId') || '';
 
     useEffect(() => {
-        Promise.all([
+        Promise.allSettled([
             axiosInstance.get("shop-categories"),
             axiosInstance.get("catagory"),
             axiosInstance.get("product"),
         ])
             .then(([categoryResult, parentResult, productResult]) => {
-                setCatagories(categoryResult.data);
+                if (categoryResult.status === "fulfilled") {
+                    setCatagories(categoryResult.value.data);
+                } else {
+                    console.log(categoryResult.reason);
+                    toast.error("Failed to load categories");
+                }
 
-                const groupedProducts = parentResult.data.map((parent) => ({
-                    parentId: parent._id,
-                    productName: parent.modelName,
-                    categoryId: parent.categoryId || '',
-                    categoryName: parent.categoryName || '',
-                    images: parent.images || [],
-                    variants: productResult.data
-                        .filter((variant) => String(variant.parentCatagory) === String(parent._id))
-                        .map((variant) => ({
-                            storage: variant.storage || '',
-                            colorName: variant.color?.name || '',
-                            colorValue: variant.color?.value || variant.color?.hex || '#000000',
-                            price: variant.price ?? '',
-                            discountPrice: variant.discountPrice ?? '',
-                            originalPrice: variant.originalPrice ?? '',
-                            outOfStock: Boolean(variant.outOfStock),
-                        })),
-                }));
+                if (parentResult.status === "fulfilled" && productResult.status === "fulfilled") {
+                    const groupedProducts = parentResult.value.data.map((parent) => ({
+                        parentId: parent._id,
+                        productName: parent.modelName,
+                        categoryId: parent.categoryId || '',
+                        categoryName: parent.categoryName || '',
+                        images: parent.images || [],
+                        variants: productResult.value.data
+                            .filter((variant) => String(variant.parentCatagory) === String(parent._id))
+                            .map((variant) => ({
+                                storage: variant.storage || '',
+                                colorName: variant.color?.name || '',
+                                colorValue: variant.color?.value || variant.color?.hex || '#000000',
+                                price: variant.price ?? '',
+                                discountPrice: variant.discountPrice ?? '',
+                                originalPrice: variant.originalPrice ?? '',
+                                outOfStock: Boolean(variant.outOfStock),
+                            })),
+                    }));
 
-                setExistingProducts(groupedProducts);
-            })
-            .catch((error) => console.log(error));
+                    setExistingProducts(groupedProducts);
+                } else {
+                    if (parentResult.status === "rejected") console.log(parentResult.reason);
+                    if (productResult.status === "rejected") console.log(productResult.reason);
+                    toast.error("Failed to load existing products");
+                }
+            });
     }, []);
 
     async function handleCreateCategory(payload) {
@@ -51,6 +62,7 @@ const AddProduct = () => {
             const next = [...current.filter((category) => category._id !== result.data._id), result.data];
             return next.sort((left, right) => left.modelName.localeCompare(right.modelName));
         });
+        clearProductCache();
         toast.success("Category created");
         return result.data;
     }
@@ -83,6 +95,7 @@ const AddProduct = () => {
                 return next.sort((left, right) => left.productName.localeCompare(right.productName));
             });
 
+            clearProductCache();
             toast.success(result.status === 200 ? "Product updated" : "Product added");
             setSearchParams({});
         } catch (error) {

@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../../../utilities/axiosInstance';
+import { clearProductCache } from '../../../../utilities/catalog';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
@@ -39,6 +40,7 @@ const SingleProductGroup = ({ productGroup, onDelete }) => {
         try {
             await axiosInstance.delete(`product-family/${productGroup.parentId}`);
             onDelete(productGroup.parentId);
+            clearProductCache();
             toast.success('Product family deleted');
         } catch (error) {
             console.log(error);
@@ -58,8 +60,10 @@ const SingleProductGroup = ({ productGroup, onDelete }) => {
                 outOfStock: Boolean(variant.outOfStock),
             });
             setEditingVariantId('');
+            clearProductCache();
         } catch (error) {
             console.log(error);
+            toast.error('Failed to save variant');
         } finally {
             setSavingVariantId('');
         }
@@ -73,6 +77,7 @@ const SingleProductGroup = ({ productGroup, onDelete }) => {
             if (isLastVariant) {
                 await axiosInstance.delete(`product-family/${productGroup.parentId}`);
                 onDelete(productGroup.parentId);
+                clearProductCache();
                 toast.success('Last variant deleted with product family');
                 return;
             }
@@ -82,6 +87,7 @@ const SingleProductGroup = ({ productGroup, onDelete }) => {
             if (editingVariantId === variant._id) {
                 setEditingVariantId('');
             }
+            clearProductCache();
             toast.success('Variant deleted');
         } catch (error) {
             console.log(error);
@@ -101,9 +107,11 @@ const SingleProductGroup = ({ productGroup, onDelete }) => {
             await axiosInstance.patch(`product/${variant._id}`, {
                 outOfStock: nextOutOfStock,
             });
+            clearProductCache();
         } catch (error) {
             console.log(error);
             updateDraftVariant(variant._id, { outOfStock: variant.outOfStock });
+            toast.error('Failed to update stock status');
         } finally {
             setSavingVariantId('');
         }

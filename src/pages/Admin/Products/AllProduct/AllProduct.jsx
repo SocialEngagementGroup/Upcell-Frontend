@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import axiosInstance from '../../../../utilities/axiosInstance';
 import { useSearchParams } from 'react-router-dom';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
@@ -44,6 +44,7 @@ const AllProduct = () => {
     // Locally hide families deleted in this session (optimistic; backend already removed them).
     const [removedIds, setRemovedIds] = useState(() => new Set());
     const [searchParams, setSearchParams] = useSearchParams();
+    const queryClient = useQueryClient();
     const searchRef = useRef(null);
     const scrollRef = useRef(null);
     const productListRef = useRef(null);
@@ -169,6 +170,10 @@ const AllProduct = () => {
             next.add(parentId);
             return next;
         });
+        // Also invalidate the cached queries so a later refetch reflects the
+        // real backend state instead of relying solely on the local hide-list.
+        queryClient.invalidateQueries({ queryKey: ['admin-products'] });
+        queryClient.invalidateQueries({ queryKey: ['admin-categories'] });
     };
 
     const totalVariants = filteredProducts.reduce((sum, product) => sum + product.variants.length, 0);

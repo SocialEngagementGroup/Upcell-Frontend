@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import axiosInstance from '../../../../utilities/axiosInstance';
+import { clearProductCache } from '../../../../utilities/catalog';
 import ProductForm from '../../../../components/ProductForm/ProductForm';
 import ImageToSelect from '../../../../components/ImageToSelect/ImageToSelect';
 
@@ -41,11 +43,14 @@ const EditProduct = () => {
 
         axiosInstance.patch(`product/${updatedProduct._id}`, updatedProduct)
             .then(() => {
-                if (window.confirm("Updated. Go back to all product?")) {
-                    navigate("/admin-secret/products");
-                }
+                clearProductCache();
+                toast.success("Product updated");
+                navigate("/admin-secret/products");
             })
-            .catch(() => alert("error happened !!"));
+            .catch((error) => {
+                console.log(error);
+                toast.error("Failed to update product");
+            });
     }
 
     return (
