@@ -1,6 +1,7 @@
 import React, { Suspense, lazy } from 'react';
 import ReactDOM from 'react-dom/client';
 import { ClerkProvider } from '@clerk/clerk-react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import './index.css';
 
@@ -11,6 +12,7 @@ import UserContextProvider from './utilities/UserContextProvider.jsx';
 import AdminPrivateRoute from './utilities/AdminPrivateRoute.jsx';
 import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary.jsx';
 import RouteLoadingScreen from './components/RouteLoadingScreen/RouteLoadingScreen.jsx';
+import RouteError from './components/RouteError/RouteError.jsx';
 
 const Home = lazy(() => import('./pages/Home/Home.jsx'));
 const Cart = lazy(() => import('./pages/Cart/Cart.jsx'));
@@ -35,12 +37,17 @@ const ReturnPolicy = lazy(() => import('./pages/Legal/ReturnPolicy/ReturnPolicy.
 const PrivacyPolicy = lazy(() => import('./pages/Legal/PrivacyPolicy/PrivacyPolicy.jsx'));
 const AboutUs = lazy(() => import('./pages/Legal/AboutUs/AboutUs.jsx'));
 const ThankYou = lazy(() => import('./pages/ThankYou/ThankYou.jsx'));
+const ContactThankYou = lazy(() => import('./pages/ThankYou/ContactThankYou.jsx'));
 const JournalPost = lazy(() => import('./pages/Auxiliary/Resources/JournalPost.jsx'));
 const NotFound = lazy(() => import('./pages/NotFound/NotFound.jsx'));
 const AdminTradeIn = lazy(() => import('./pages/Admin/TradeIn/AdminTradeIn.jsx'));
+const SingleTradeInPage = lazy(() => import('./pages/Admin/TradeIn/SingleTradeInPage.jsx'));
 const AdminNewsletter = lazy(() => import('./pages/Admin/Newsletter/AdminNewsletter.jsx'));
 const AdminContact = lazy(() => import('./pages/Admin/Contact/AdminContact.jsx'));
 const AdminAnalytics = lazy(() => import('./pages/Admin/Analytics/AdminAnalytics.jsx'));
+const AdminWholesale = lazy(() => import('./pages/Admin/Wholesale/AdminWholesale.jsx'));
+const AdminNotifications = lazy(() => import('./pages/Admin/Notifications/AdminNotifications.jsx'));
+const AdminEmailSettings = lazy(() => import('./pages/Admin/EmailSettings/AdminEmailSettings.jsx'));
 
 const lazyElement = (element) => (
   <Suspense fallback={<RouteLoadingScreen />}>
@@ -55,6 +62,7 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
+    errorElement: <RouteError />,
     children: [
       {
         path: "",
@@ -117,6 +125,10 @@ const router = createBrowserRouter([
         element: lazyElement(<ThankYou />),
       },
       {
+        path: "contact-thank-you",
+        element: lazyElement(<ContactThankYou />),
+      },
+      {
         path: "admin-secret",
         element: lazyElement(<AdminPrivateRoute><AdminSecret /></AdminPrivateRoute>),
         children: [
@@ -133,6 +145,18 @@ const router = createBrowserRouter([
             element: lazyElement(<AdminTradeIn />),
           },
           {
+            path: "trade-in/:id",
+            element: lazyElement(<SingleTradeInPage />),
+          },
+          {
+            path: "notifications",
+            element: lazyElement(<AdminNotifications />),
+          },
+          {
+            path: "email-settings",
+            element: lazyElement(<AdminEmailSettings />),
+          },
+          {
             path: "newsletter",
             element: lazyElement(<AdminNewsletter />),
           },
@@ -143,6 +167,10 @@ const router = createBrowserRouter([
           {
             path: "analytics",
             element: lazyElement(<AdminAnalytics />),
+          },
+          {
+            path: "wholesale",
+            element: lazyElement(<AdminWholesale />),
           },
           {
             path: "catagory",
@@ -180,6 +208,17 @@ const router = createBrowserRouter([
   },
 ]);
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60 * 1000,
+      gcTime: 5 * 60 * 1000,
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 if (!clerkPublishableKey) {
@@ -193,12 +232,14 @@ if (!clerkPublishableKey) {
   );
 } else {
   root.render(
-    <ClerkProvider publishableKey={clerkPublishableKey}>
-      <UserContextProvider>
-        <ErrorBoundary>
-          <RouterProvider router={router} />
-        </ErrorBoundary>
-      </UserContextProvider>
-    </ClerkProvider>
+    <QueryClientProvider client={queryClient}>
+      <ClerkProvider publishableKey={clerkPublishableKey}>
+        <UserContextProvider>
+          <ErrorBoundary>
+            <RouterProvider router={router} />
+          </ErrorBoundary>
+        </UserContextProvider>
+      </ClerkProvider>
+    </QueryClientProvider>
   );
 }

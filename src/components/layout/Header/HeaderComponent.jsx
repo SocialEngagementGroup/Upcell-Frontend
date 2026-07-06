@@ -31,7 +31,8 @@ const HeaderComponent = () => {
     <header className="fixed left-0 top-0 z-[1000] w-full bg-black">
       <div className="surface-panel flex h-[72px] w-full items-center justify-between px-8 md:px-16 lg:px-24">
         <div>
-          <Link to="/" className="flex items-center">
+          {/* Offsets ~49px of transparent padding baked into the logo PNG's left edge */}
+          <Link to="/" className="-ml-[49px] flex items-center">
             <img src="/staticImages/upcellLogo.png" alt="Upcell Logo" className="h-[90px] w-auto object-contain" />
           </Link>
         </div>

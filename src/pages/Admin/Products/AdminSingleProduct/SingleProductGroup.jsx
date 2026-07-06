@@ -127,7 +127,7 @@ const SingleProductGroup = ({ productGroup, onDelete }) => {
     };
 
     return (
-        <div className="admin-panel rounded-[30px] p-6 transition-all duration-300">
+        <div className="admin-panel rounded-[18px] p-4 transition-all duration-300">
             <div className="flex items-start justify-between gap-4">
                 <div
                     onClick={() => setIsOpen((current) => !current)}
@@ -142,7 +142,7 @@ const SingleProductGroup = ({ productGroup, onDelete }) => {
                     </div>
                     <div>
                         <div className="flex items-center gap-3">
-                            <h3 className={`text-[28px] font-medium transition-colors ${isOpen ? 'text-brand-red' : 'group-hover:text-brand-red'}`}>
+                            <h3 className={`text-[30px] font-medium transition-colors ${isOpen ? 'text-brand-red' : 'group-hover:text-brand-red'}`}>
                                 {productGroup.productName}
                             </h3>
                             <span className={`text-xl transition-transform duration-300 ${isOpen ? 'rotate-180 text-brand-red' : 'text-ink-soft'}`}>
@@ -204,7 +204,7 @@ const SingleProductGroup = ({ productGroup, onDelete }) => {
                                         <td className="px-6 py-4 align-middle">
                                             <div className="flex items-center gap-3">
                                                 <span
-                                                    className="h-4 w-4 rounded-full border border-black/[0.08]"
+                                                    className="h-5 w-5 rounded-full border-[1.5px] border-black/20"
                                                     style={{ backgroundColor: variant.color?.value || variant.color?.hex || '#d1d5db' }}
                                                 />
                                                 <span className="text-sm font-semibold text-apple-text">{variant.color?.name || '-'}</span>

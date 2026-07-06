@@ -19,7 +19,7 @@ export default {
         'brand-red': '#d90b0f',
       },
       maxWidth: {
-        'site': '1440px',
+        'site': '1760px',
       },
       transitionTimingFunction: {
         'smooth': 'cubic-bezier(0.4, 0, 0.2, 1)',

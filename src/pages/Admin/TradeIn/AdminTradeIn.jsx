@@ -8,7 +8,14 @@ import AdminStatsGrid from '../../../components/AdminStatsGrid/AdminStatsGrid';
 import AdminLoadingState from '../../../components/AdminState/AdminLoadingState';
 import AdminEmptyState from '../../../components/AdminState/AdminEmptyState';
 
-const tradeInStatuses = ["New", "Contacted", "Received", "Quoted", "Paid", "Closed"];
+const tradeInStatuses = [
+    "New",
+    "Contacted",
+    "Received",
+    // "Quoted", // hidden from UI — no business logic depends on this status
+    // "Paid", // hidden from UI — no business logic depends on this status
+    "Closed",
+];
 const PAGE_LIMIT = 10;
 const defaultPagination = {
     page: 1,

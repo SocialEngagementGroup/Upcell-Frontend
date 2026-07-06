@@ -1,10 +1,11 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { CartContext } from '../../App';
 import ScrollToTop from '../../utilities/ScrollToTop';
 import { toast } from 'react-toastify';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
+import KeyboardArrowLeftRoundedIcon from '@mui/icons-material/KeyboardArrowLeftRounded';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import ModernProductCard from '../../components/ModernProductCard/ModernProductCard';
 import { groupProductsByParent, normalizeProduct, fetchCachedProducts } from '../../utilities/catalog';
@@ -65,6 +66,26 @@ const sortOptions = [
     { value: 'name', label: 'Name' },
 ];
 
+const PRODUCTS_PER_PAGE = 10;
+const PAGE_WINDOW_SIZE = 5;
+
+// Sliding window of up to 5 page numbers centered on the current page.
+const getPageWindow = (currentPage, totalPages) => {
+    if (totalPages <= PAGE_WINDOW_SIZE) {
+        return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+
+    let start = Math.max(1, currentPage - Math.floor(PAGE_WINDOW_SIZE / 2));
+    let end = start + PAGE_WINDOW_SIZE - 1;
+
+    if (end > totalPages) {
+        end = totalPages;
+        start = end - PAGE_WINDOW_SIZE + 1;
+    }
+
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+};
+
 
 const SHOP_PRODUCTS_CACHE_KEY = 'upcell_shop_products_cache';
 const SHOP_PRODUCTS_CACHE_TTL = 5 * 60 * 1000;
@@ -116,7 +137,7 @@ const ShopProductPreloader = () => (
             </div>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {Array.from({ length: 6 }).map((_, index) => (
                 <div
                     key={index}
@@ -147,6 +168,7 @@ const ShopProductPreloader = () => (
 );
 const ShopPage = () => {
     const location = useLocation();
+    const navigate = useNavigate();
     const { setCart } = useContext(CartContext);
     const [products, setProducts] = useState(() => readCachedShopProducts());
     const [productsLoading, setProductsLoading] = useState(() => readCachedShopProducts().length === 0);
@@ -158,7 +180,60 @@ const ShopPage = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [sortMenuOpen, setSortMenuOpen] = useState(false);
     const [filtersOpen, setFiltersOpen] = useState(false);
+    const [searchFocused, setSearchFocused] = useState(false);
+    const [focusedIndex, setFocusedIndex] = useState(-1);
+    const [currentPage, setCurrentPage] = useState(1);
     const sortMenuRef = useRef(null);
+    const searchRef = useRef(null);
+    const scrollRef = useRef(null);
+    const productGridRef = useRef(null);
+
+    const showSuggestions = searchFocused && searchQuery.trim().length >= 2;
+    // Suggestions are derived from the already-loaded catalog -> instant, no network call.
+    const searchPending = productsLoading;
+
+    const suggestions = useMemo(() => {
+        const term = searchQuery.trim().toLowerCase();
+        if (term.length < 2) return [];
+
+        // Match by name/category, then collapse to one row per product family
+        // (prefer in-stock, then cheapest).
+        const byParent = new Map();
+        for (const product of products) {
+            const name = (product.productName || '').toLowerCase();
+            const category = (product.categoryName || '').toLowerCase();
+            if (!name.includes(term) && !category.includes(term)) continue;
+
+            const key = String(product.parentCatagory || product.parentId || '');
+            if (!key) continue;
+
+            const existing = byParent.get(key);
+            if (!existing) {
+                byParent.set(key, product);
+                continue;
+            }
+            const isBetter =
+                (!product.outOfStock && existing.outOfStock) ||
+                (product.outOfStock === existing.outOfStock && Number(product.price || 0) < Number(existing.price || 0));
+            if (isBetter) byParent.set(key, product);
+        }
+
+        return Array.from(byParent.values())
+            .sort((a, b) => Number(a.price || 0) - Number(b.price || 0))
+            .map((product) => ({
+                _id: product._id,
+                parentCatagory: product.parentCatagory || product.parentId,
+                productName: product.productName,
+                categoryName: product.categoryName,
+                image: product.image,
+                price: product.price,
+            }));
+    }, [products, searchQuery]);
+
+    const handleSuggestionSelect = (suggestion) => {
+        setSearchFocused(false);
+        navigate(`/iphone/${suggestion.parentCatagory}/${suggestion._id}`);
+    };
 
     const sidebarCategories = useMemo(() => {
         const exactCategories = Array.from(new Set(
@@ -252,6 +327,19 @@ const ShopPage = () => {
         return () => document.removeEventListener('mousedown', handlePointerDown);
     }, [sortMenuOpen]);
 
+    useEffect(() => {
+        if (!searchFocused) return undefined;
+
+        const handlePointerDown = (event) => {
+            if (searchRef.current && !searchRef.current.contains(event.target)) {
+                setSearchFocused(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handlePointerDown);
+        return () => document.removeEventListener('mousedown', handlePointerDown);
+    }, [searchFocused]);
+
     const toggleValue = (value, state, setState) => {
         setState((prev) => (
             prev.includes(value)
@@ -302,6 +390,27 @@ const ShopPage = () => {
         return sorted;
     }, [products, activeCategory, priceRange, searchQuery, selectedModels, selectedStorages, sortBy]);
 
+    const totalPages = Math.max(1, Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE));
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [activeCategory, priceRange, searchQuery, selectedModels, selectedStorages, sortBy]);
+
+    useEffect(() => {
+        setCurrentPage((current) => Math.min(current, totalPages));
+    }, [totalPages]);
+
+    const paginatedProducts = useMemo(() => {
+        const start = (currentPage - 1) * PRODUCTS_PER_PAGE;
+        return filteredProducts.slice(start, start + PRODUCTS_PER_PAGE);
+    }, [filteredProducts, currentPage]);
+
+    const goToPage = (page) => {
+        const nextPage = Math.min(Math.max(page, 1), totalPages);
+        setCurrentPage(nextPage);
+        productGridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
     const sliderPercentage = (priceRange / 3500) * 100;
 
     const handleAddToCart = (event, productId) => {
@@ -320,8 +429,44 @@ const ShopPage = () => {
         setSearchQuery('');
     };
 
+    useEffect(() => {
+        setFocusedIndex(-1);
+    }, [searchQuery, searchFocused]);
+
+    const handleKeyDown = (e) => {
+        if (!showSuggestions || suggestions.length === 0) return;
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            setFocusedIndex((prev) => {
+                const next = prev < suggestions.length - 1 ? prev + 1 : prev;
+                if (scrollRef.current && next >= 0) {
+                    const el = scrollRef.current.children[next];
+                    if (el) el.scrollIntoView({ block: 'nearest' });
+                }
+                return next;
+            });
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            setFocusedIndex((prev) => {
+                const next = prev > 0 ? prev - 1 : prev;
+                if (scrollRef.current && next >= 0) {
+                    const el = scrollRef.current.children[next];
+                    if (el) el.scrollIntoView({ block: 'nearest' });
+                }
+                return next;
+            });
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (focusedIndex >= 0 && focusedIndex < suggestions.length) {
+                handleSuggestionSelect(suggestions[focusedIndex]);
+            }
+        } else if (e.key === 'Escape') {
+            setSearchFocused(false);
+        }
+    };
+
     const activeSortOption = sortOptions.find((option) => option.value === sortBy) || sortOptions[0];
-return (
+    return (
         <div className="page-shell">
             <ScrollToTop />
 
@@ -353,16 +498,77 @@ return (
                         ))}
                     </div>
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                        <label className="relative block min-w-0 sm:w-[320px]">
+                        <div ref={searchRef} className="relative block min-w-0 sm:w-[320px]">
                             <SearchRoundedIcon className="pointer-events-none absolute left-4 top-1/2 !text-[20px] -translate-y-1/2 text-apple-gray" />
                             <input
                                 type="search"
                                 value={searchQuery}
                                 onChange={(event) => setSearchQuery(event.target.value)}
+                                onFocus={() => setSearchFocused(true)}
+                                onKeyDown={handleKeyDown}
                                 placeholder="Search products"
-                                className="h-12 w-full rounded-full border border-black/[0.08] bg-white pl-12 pr-4 text-sm font-semibold text-apple-text outline-none transition-all placeholder:font-medium placeholder:text-apple-gray focus:border-apple-text/20 focus:shadow-[0_0_0_4px_rgba(29,29,31,0.05)]"
+                                autoComplete="off"
+                                className="h-12 w-full rounded-full border border-black/[0.08] bg-white pl-12 pr-4 text-sm font-bold text-apple-text outline-none transition-all placeholder:font-medium placeholder:text-apple-gray focus:border-apple-text/20 focus:shadow-[0_0_0_4px_rgba(29,29,31,0.05)]"
                             />
-                        </label>
+
+                            {showSuggestions && (
+                                <div className="suggest-dropdown absolute left-0 right-0 z-30 mt-2 overflow-hidden rounded-[15px] border border-black/10 bg-white/95 shadow-[0_24px_60px_rgba(15,23,42,0.16)] backdrop-blur">
+                                    <div ref={scrollRef} className="suggest-scroll max-h-[400px] overflow-y-auto">
+                                        {suggestions.length > 0 ? (
+                                            suggestions.map((suggestion, index) => {
+                                                const isFocused = index === focusedIndex;
+                                                return (
+                                                    <button
+                                                        key={suggestion._id}
+                                                        type="button"
+                                                        onClick={() => handleSuggestionSelect(suggestion)}
+                                                        onMouseEnter={() => setFocusedIndex(index)}
+                                                        className={`group flex w-full items-center gap-3 border-b border-solid border-[#ededed] px-4 py-3 text-left transition-all duration-150 ${isFocused ? 'bg-[#d90b0f]' : 'hover:bg-[#d90b0f]'
+                                                            }`}
+                                                    >
+                                                        <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] transition-colors ${isFocused ? 'bg-white/20' : 'bg-surface-alt group-hover:bg-white/20'
+                                                            }`}>
+                                                            {suggestion.image && (
+                                                                <img src={suggestion.image} alt={suggestion.productName} className="max-h-[80%] w-auto object-contain" />
+                                                            )}
+                                                        </span>
+                                                        <span className="min-w-0 flex-1">
+                                                            <span className={`block truncate text-sm font-bold ${isFocused ? 'text-white' : 'text-apple-text group-hover:text-white'
+                                                                }`}>{suggestion.productName}</span>
+                                                            {suggestion.categoryName && (
+                                                                <span className={`block truncate text-xs ${isFocused ? 'text-white/80' : 'text-apple-gray group-hover:text-white/80'
+                                                                    }`}>{suggestion.categoryName}</span>
+                                                            )}
+                                                        </span>
+                                                        <span className={`shrink-0 text-sm font-extrabold ${isFocused ? 'text-white' : 'text-apple-text group-hover:text-white'
+                                                            }`}>${suggestion.price}</span>
+                                                    </button>
+                                                );
+                                            })
+                                        ) : (
+                                            <div className="px-4 py-3 text-sm text-apple-gray">
+                                                {searchPending ? (
+                                                    <span className="flex items-center gap-2">
+                                                        <span className="font-bold text-apple-text">Searching</span>
+                                                        <span className="flex items-center gap-1">
+                                                            {[0, 150, 300].map((delay) => (
+                                                                <span
+                                                                    key={delay}
+                                                                    className="h-1.5 w-1.5 animate-bounce rounded-full bg-brand-red"
+                                                                    style={{ animationDelay: `${delay}ms` }}
+                                                                />
+                                                            ))}
+                                                        </span>
+                                                    </span>
+                                                ) : (
+                                                    `No matches for "${searchQuery.trim()}"`
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
 
                         <div ref={sortMenuRef} className="relative">
                             <button
@@ -386,11 +592,10 @@ return (
                                                     setSortBy(option.value);
                                                     setSortMenuOpen(false);
                                                 }}
-                                                className={`flex w-full items-center justify-between rounded-[18px] px-4 py-3 text-left text-sm font-bold transition-all ${
-                                                    selected
-                                                        ? 'bg-apple-text text-white shadow-[0_12px_24px_rgba(29,29,31,0.18)]'
-                                                        : 'text-apple-text hover:bg-surface-alt'
-                                                }`}
+                                                className={`flex w-full items-center justify-between rounded-[18px] px-4 py-3 text-left text-sm font-bold transition-all ${selected
+                                                    ? 'bg-[#d20b0f] text-white shadow-[0_12px_24px_rgba(210,11,15,0.28)]'
+                                                    : 'text-apple-text hover:bg-surface-alt'
+                                                    }`}
                                             >
                                                 <span>{option.label}</span>
                                                 {selected && <span className="text-xs font-black uppercase tracking-[0.16em] text-white/70">On</span>}
@@ -422,7 +627,7 @@ return (
                         </div>
 
                         <div className="mt-8">
-                            <div className="text-xs font-bold uppercase tracking-[0.2em] text-apple-gray">Category</div>
+                            <div className="text-sm font-bold uppercase tracking-[0.2em] text-ink-soft">Category</div>
                             <div className="mt-4 flex flex-col gap-3">
                                 {availableCategories.map((category) => (
                                     <label key={category} className="flex items-center gap-3 text-sm text-ink-soft">
@@ -439,7 +644,7 @@ return (
                         </div>
 
                         <div className="mt-8">
-                            <div className="text-xs font-bold uppercase tracking-[0.2em] text-apple-gray">Storage</div>
+                            <div className="text-sm font-bold uppercase tracking-[0.2em] text-ink-soft">Storage</div>
                             <div className="mt-4 grid grid-cols-3 gap-3">
                                 {availableStorages.map((storage) => (
                                     <button
@@ -456,7 +661,7 @@ return (
                         </div>
 
                         <div className="mt-8">
-                            <div className="text-xs font-bold uppercase tracking-[0.2em] text-apple-gray">Max price</div>
+                            <div className="text-sm font-bold uppercase tracking-[0.2em] text-ink-soft">Max price</div>
                             <input
                                 type="range"
                                 min="0"
@@ -481,8 +686,8 @@ return (
                         {productsLoading ? (
                             <ShopProductPreloader />
                         ) : (
-                            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                                {filteredProducts.map((product) => (
+                            <div ref={productGridRef} className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                                {paginatedProducts.map((product) => (
                                     <ModernProductCard key={product._id} product={product} />
                                 ))}
                             </div>
@@ -496,6 +701,44 @@ return (
                                     Reset filters
                                 </button>
                             </div>
+                        )}
+
+                        {!productsLoading && totalPages > 1 && (
+                            <nav className="mt-10 flex items-center justify-center gap-2" aria-label="Product pagination">
+                                <button
+                                    type="button"
+                                    onClick={() => goToPage(currentPage - 1)}
+                                    disabled={currentPage === 1}
+                                    className="flex h-11 w-11 items-center justify-center rounded-full border border-black/[0.08] bg-white text-apple-text transition-all hover:border-black/15 disabled:cursor-not-allowed disabled:opacity-40"
+                                    aria-label="Previous page"
+                                >
+                                    <KeyboardArrowLeftRoundedIcon />
+                                </button>
+
+                                {getPageWindow(currentPage, totalPages).map((page) => (
+                                    <button
+                                        key={page}
+                                        type="button"
+                                        onClick={() => goToPage(page)}
+                                        aria-current={page === currentPage ? 'page' : undefined}
+                                        className={page === currentPage
+                                            ? 'flex h-11 w-11 items-center justify-center rounded-full bg-brand-red text-sm font-bold text-white shadow-[0_12px_24px_rgba(217,11,15,0.28)]'
+                                            : 'flex h-11 w-11 items-center justify-center rounded-full border border-black/[0.08] bg-white text-sm font-bold text-apple-text transition-all hover:border-black/15'}
+                                    >
+                                        {page}
+                                    </button>
+                                ))}
+
+                                <button
+                                    type="button"
+                                    onClick={() => goToPage(currentPage + 1)}
+                                    disabled={currentPage === totalPages}
+                                    className="flex h-11 w-11 items-center justify-center rounded-full border border-black/[0.08] bg-white text-apple-text transition-all hover:border-black/15 disabled:cursor-not-allowed disabled:opacity-40"
+                                    aria-label="Next page"
+                                >
+                                    <KeyboardArrowRightIcon />
+                                </button>
+                            </nav>
                         )}
                     </main>
                 </div>
