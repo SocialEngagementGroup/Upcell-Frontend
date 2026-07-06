@@ -59,14 +59,14 @@ const ModernProductCard = ({ product }) => {
                     )}
                 </div>
 
-                <div className="mt-6 flex items-end justify-between gap-3">
+                <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
                     <div>
                         <div className="mb-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-apple-gray/65">
                             From
                         </div>
-                        <span className="text-[32px] font-black leading-none text-apple-text">{price}</span>
+                        <span className="text-[26px] font-black leading-none text-apple-text">{price}</span>
                     </div>
-                    <div className="group/link flex shrink-0 items-center gap-1.5 rounded-full bg-brand-red px-4 py-2.5 text-sm font-bold text-white shadow-[0_10px_20px_rgba(217,11,15,0.25)] transition-all duration-300 group-hover:bg-[#b00a0d]">
+                    <div className="group/link flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full bg-brand-red px-3.5 py-2 text-sm font-bold text-white shadow-[0_10px_20px_rgba(217,11,15,0.25)] transition-all duration-300 group-hover:bg-[#b00a0d]">
                         View Product
                         <span className="transition-transform duration-300 group-hover/link:translate-x-1">→</span>
                     </div>

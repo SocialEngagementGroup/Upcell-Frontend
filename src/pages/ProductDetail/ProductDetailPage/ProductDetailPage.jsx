@@ -304,7 +304,7 @@ const ProductDetailPage = () => {
 
             <section className="page-container pb-10">
                 <div className="rounded-[28px] bg-[linear-gradient(135deg,#0f1012_0%,#1b1d22_55%,#2c3138_100%)] px-6 py-8 text-white shadow-medium sm:rounded-[40px] sm:px-8 sm:py-10 md:px-12 md:py-14">
-                    <div className="grid gap-6 sm:mt-2 lg:grid-cols-3">
+                    <div className="grid gap-6 sm:mt-2 md:grid-cols-3">
                         {featureCards.map((card) => (
                             <div key={card.title} className="rounded-[28px] border border-white/10 bg-white/5 p-6 backdrop-blur">
                                 <h3 className="text-2xl text-white">{card.title}</h3>
@@ -319,7 +319,7 @@ const ProductDetailPage = () => {
                 <div className="mb-8 text-center md:mb-10 md:text-left">
                     <h2 className="text-[clamp(2rem,3vw,3.2rem)]">Continue the collection.</h2>
                 </div>
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                     {recommendedProducts.map((item) => (
                         <ModernProductCard key={item._id} product={item} />
                     ))}

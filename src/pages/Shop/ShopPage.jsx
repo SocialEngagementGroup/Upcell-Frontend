@@ -137,7 +137,7 @@ const ShopProductPreloader = () => (
             </div>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {Array.from({ length: 6 }).map((_, index) => (
                 <div
                     key={index}
@@ -686,7 +686,7 @@ const ShopPage = () => {
                         {productsLoading ? (
                             <ShopProductPreloader />
                         ) : (
-                            <div ref={productGridRef} className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                            <div ref={productGridRef} className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                                 {paginatedProducts.map((product) => (
                                     <ModernProductCard key={product._id} product={product} />
                                 ))}
