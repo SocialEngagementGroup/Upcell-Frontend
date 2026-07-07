@@ -53,7 +53,7 @@ const readFileAsDataUrl = (file) => new Promise((resolve, reject) => {
     reader.readAsDataURL(file);
 });
 
-const ProductBatchForm = ({ categories, existingProducts, initialProductName, initialCategoryId, onCreateCategory, onSubmit, submitting }) => {
+const ProductBatchForm = ({ categories, existingProducts, initialProductName, initialCategoryId, initialParentId, onCreateCategory, onSubmit, submitting, onEditingProductChange }) => {
     const [formState, setFormState] = useState({
         productName: '',
         categoryId: '',
@@ -87,10 +87,18 @@ const ProductBatchForm = ({ categories, existingProducts, initialProductName, in
     }, [editingProduct, initialCategoryId]);
 
     const matchedExistingProduct = useMemo(() => {
+        // Prefer an exact parentId match (passed straight through from the
+        // "Edit product" button) over name matching, which can miss if the
+        // name has different case/whitespace or the list hasn't loaded yet.
+        if (initialParentId) {
+            const byId = existingProducts.find((product) => product.parentId === initialParentId);
+            if (byId) return byId;
+        }
+
         const productName = formState.productName.trim().toLowerCase();
         if (!productName) return null;
         return existingProducts.find((product) => product.productName.trim().toLowerCase() === productName) || null;
-    }, [existingProducts, formState.productName]);
+    }, [existingProducts, formState.productName, initialParentId]);
 
     const productSuggestions = useMemo(() => {
         const query = formState.productName.trim().toLowerCase();
@@ -113,11 +121,16 @@ const ProductBatchForm = ({ categories, existingProducts, initialProductName, in
         setUseNewCategory(false);
         setNewCategoryName('');
         setNewCategoryDescription('');
+        const fallbackCategoryName = (matchedExistingProduct.categoryName || '').trim().toLowerCase();
+        const matchedCategoryId = matchedExistingProduct.categoryId || (
+            fallbackCategoryName && fallbackCategoryName !== 'undefined'
+                ? categories.find((category) => category.modelName.trim().toLowerCase() === fallbackCategoryName)?._id || ''
+                : ''
+        );
+
         setFormState({
             productName: matchedExistingProduct.productName,
-            categoryId: matchedExistingProduct.categoryId || (
-                categories.find((category) => category.modelName === matchedExistingProduct.categoryName)?._id || ''
-            ),
+            categoryId: matchedCategoryId,
         });
         setImages((matchedExistingProduct.images || []).map((image) => image.url).filter(Boolean));
         setVariants(
@@ -140,6 +153,10 @@ const ProductBatchForm = ({ categories, existingProducts, initialProductName, in
         );
         setShowProductSuggestions(false);
     }, [categories, editingProduct?.parentId, matchedExistingProduct]);
+
+    useEffect(() => {
+        onEditingProductChange?.(editingProduct);
+    }, [editingProduct, onEditingProductChange]);
 
     const handleProductNameChange = (value) => {
         setFormState((current) => ({ ...current, productName: value }));
@@ -379,7 +396,13 @@ const ProductBatchForm = ({ categories, existingProducts, initialProductName, in
                                 <option key={category._id} value={category._id}>{category.modelName}</option>
                             ))}
                         </select>
-                    ) : (
+                    ) : null}
+                    {editingProduct && !useNewCategory && !formState.categoryId && (
+                        <p className="mt-2 text-sm font-bold text-red-600">
+                            This product's saved category couldn't be matched automatically — please pick one above before saving.
+                        </p>
+                    )}
+                    {useNewCategory && (
                         <input
                             id="category"
                             className="admin-input"
@@ -687,7 +710,7 @@ const ProductBatchForm = ({ categories, existingProducts, initialProductName, in
             </div>
 
             <button className="premium-button w-fit" type="submit" disabled={!canSubmit || submitting}>
-                {submitting ? 'Saving…' : 'Save product'}
+                {submitting ? 'Saving…' : editingProduct ? 'Save changes' : 'Save product'}
             </button>
         </form>
     );

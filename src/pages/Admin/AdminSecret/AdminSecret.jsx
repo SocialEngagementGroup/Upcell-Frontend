@@ -1,6 +1,7 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { userContext } from '../../../utilities/UserContextProvider';
+import axiosInstance from '../../../utilities/axiosInstance';
 
 const links = [
     { to: '', label: 'Overview', end: true },
@@ -9,13 +10,24 @@ const links = [
     { to: 'addproduct', label: 'Add Product' },
     { to: 'orders', label: 'Orders' },
     { to: 'trade-in', label: 'Trade In' },
+    { to: 'notifications', label: 'Notifications' },
+    { to: 'email-settings', label: 'Email Settings' },
     { to: 'newsletter', label: 'Newsletter' },
     { to: 'contact', label: 'Contact' },
+    { to: 'wholesale', label: 'Wholesale' },
     { to: 'analytics', label: 'Analytics' },
 ];
 
 const AdminSecret = () => {
     const { logOut } = useContext(userContext);
+    const [unreadCount, setUnreadCount] = useState(0);
+
+    useEffect(() => {
+        axiosInstance
+            .get('admin-notifications-unread-count')
+            .then((res) => setUnreadCount(res.data.count || 0))
+            .catch((error) => console.log(error));
+    }, []);
 
     const handleSignOut = () => {
         logOut({ redirectUrl: '/' }).catch((error) => console.log(error));
@@ -36,12 +48,17 @@ const AdminSecret = () => {
                                     to={link.to}
                                     end={link.end}
                                     className={({ isActive }) =>
-                                        `rounded-2xl px-4 py-3 text-sm font-bold transition-all ${
+                                        `flex items-center justify-between rounded-2xl px-4 py-3 text-sm font-bold transition-all ${
                                             isActive ? 'bg-apple-text text-white' : 'bg-surface-alt text-apple-text hover:bg-black/[0.04]'
                                         }`
                                     }
                                 >
-                                    {link.label}
+                                    <span>{link.label}</span>
+                                    {link.to === 'notifications' && unreadCount > 0 ? (
+                                        <span className="rounded-full bg-brand-red px-2 py-0.5 text-[11px] font-bold text-white">
+                                            {unreadCount}
+                                        </span>
+                                    ) : null}
                                 </NavLink>
                             ))}
                         </nav>

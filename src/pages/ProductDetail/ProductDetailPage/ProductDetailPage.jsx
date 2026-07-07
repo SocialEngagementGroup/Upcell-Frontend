@@ -7,7 +7,9 @@ import { toast } from 'react-toastify';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 
-import { groupProductsByParent, fetchCachedProducts } from '../../../utilities/catalog';
+import { groupProductsByParent } from '../../../utilities/catalog';
+import { useProductsQuery } from '../../../queries/products';
+import { EMPTY_ARRAY } from '../../../queries/keys';
 import ModernProductCard from '../../../components/ModernProductCard/ModernProductCard';
 
 
@@ -43,29 +45,31 @@ const getStorageSortValue = (storageLabel = '') => {
 const ProductDetailPage = () => {
     const { parentId, productId } = useParams();
     const navigate = useNavigate();
-    const [allProducts, setAllProducts] = useState([]);
+    const { data: products = EMPTY_ARRAY } = useProductsQuery();
     const [product, setProduct] = useState();
     const [selectedColor, setSelectedColor] = useState();
     const [selectedStorage, setSelectedStorage] = useState();
     const [quantity, setQuantity] = useState(1);
     const [addonQtys, setAddonQtys] = useState({});
-    const [recommendedProducts, setRecommendedProducts] = useState([]);
     const { setCart } = useContext(CartContext);
 
-    useEffect(() => {
-        fetchCachedProducts()
-            .then((cachedProducts) => {
-                const matchedProducts = cachedProducts.filter(p => p.parentCatagory === parentId || p.parentId === parentId);
-                if (!matchedProducts.length) return;
+    const allProducts = useMemo(() => (
+        products.filter((item) => item.parentCatagory === parentId || item.parentId === parentId)
+    ), [products, parentId]);
 
-                setAllProducts(matchedProducts);
-                const selectedProduct = matchedProducts.find((item) => item._id === productId) || matchedProducts[0];
-                setProduct(selectedProduct);
-                setSelectedColor(selectedProduct?.color);
-                setSelectedStorage(selectedProduct?.storage);
-            })
-            .catch((error) => console.log(error));
-    }, [parentId, productId]);
+    useEffect(() => {
+        if (!allProducts.length) return;
+        const selectedProduct = allProducts.find((item) => item._id === productId) || allProducts[0];
+        setProduct(selectedProduct);
+        setSelectedColor(selectedProduct?.color);
+        setSelectedStorage(selectedProduct?.storage);
+    }, [allProducts, productId]);
+
+    const recommendedProducts = useMemo(() => (
+        groupProductsByParent(products)
+            .filter((item) => item.parentCatagory !== parentId && ['iPhone', 'iPad', 'MacBook'].includes(item.family))
+            .slice(0, 4)
+    ), [products, parentId]);
 
     const availableColors = useMemo(() => {
         const colors = new Map();
@@ -79,17 +83,6 @@ const ProductDetailPage = () => {
         Array.from(new Set(allProducts.map((item) => item.storage).filter(Boolean)))
             .sort((left, right) => getStorageSortValue(left) - getStorageSortValue(right) || left.localeCompare(right, undefined, { numeric: true }))
     ), [allProducts]);
-
-    useEffect(() => {
-        fetchCachedProducts()
-            .then((cachedProducts) => {
-                const related = groupProductsByParent(cachedProducts)
-                    .filter((item) => item.parentCatagory !== parentId && ['iPhone', 'iPad', 'MacBook'].includes(item.family))
-                    .slice(0, 4);
-                setRecommendedProducts(related);
-            })
-            .catch((error) => console.log(error));
-    }, [parentId]);
 
     const syncSelection = (nextColor, nextStorage) => {
         const matchedProduct = allProducts.find((item) => (
@@ -304,7 +297,7 @@ const ProductDetailPage = () => {
 
             <section className="page-container pb-10">
                 <div className="rounded-[28px] bg-[linear-gradient(135deg,#0f1012_0%,#1b1d22_55%,#2c3138_100%)] px-6 py-8 text-white shadow-medium sm:rounded-[40px] sm:px-8 sm:py-10 md:px-12 md:py-14">
-                    <div className="grid gap-6 sm:mt-2 lg:grid-cols-3">
+                    <div className="grid gap-6 sm:mt-2 md:grid-cols-3">
                         {featureCards.map((card) => (
                             <div key={card.title} className="rounded-[28px] border border-white/10 bg-white/5 p-6 backdrop-blur">
                                 <h3 className="text-2xl text-white">{card.title}</h3>
@@ -319,7 +312,7 @@ const ProductDetailPage = () => {
                 <div className="mb-8 text-center md:mb-10 md:text-left">
                     <h2 className="text-[clamp(2rem,3vw,3.2rem)]">Continue the collection.</h2>
                 </div>
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                     {recommendedProducts.map((item) => (
                         <ModernProductCard key={item._id} product={item} />
                     ))}

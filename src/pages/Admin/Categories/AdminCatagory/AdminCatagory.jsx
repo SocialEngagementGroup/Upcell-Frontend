@@ -1,10 +1,22 @@
-import React, { useState } from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
-import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
+import React, { useMemo, useState } from 'react';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import AdminPageHeader from '../../../../components/AdminPageHeader/AdminPageHeader';
+import SearchWithSuggestions from '../../../../components/SearchWithSuggestions/SearchWithSuggestions';
+import { useShopCategoriesQuery } from '../../../../queries/categories';
+import { EMPTY_ARRAY } from '../../../../queries/keys';
 
 const AdminCatagory = () => {
+    const navigate = useNavigate();
     const [categorySearchQuery, setCategorySearchQuery] = useState('');
+    const { data: shopCategories = EMPTY_ARRAY, isLoading } = useShopCategoriesQuery();
+
+    const suggestions = useMemo(() => {
+        const term = categorySearchQuery.trim().toLowerCase();
+        if (!term) return [];
+        return shopCategories
+            .filter((category) => (category.modelName || '').toLowerCase().includes(term))
+            .slice(0, 8);
+    }, [shopCategories, categorySearchQuery]);
 
     return (
         <section className="space-y-6">
@@ -32,16 +44,35 @@ const AdminCatagory = () => {
                         </NavLink>
                     </div>
 
-                    <label className="relative block w-full lg:max-w-[380px]">
-                        <SearchRoundedIcon className="pointer-events-none absolute left-4 top-1/2 !text-[20px] -translate-y-1/2 text-apple-gray" />
-                        <input
-                            type="search"
+                    <div className="w-full lg:max-w-[380px]">
+                        <SearchWithSuggestions
                             value={categorySearchQuery}
-                            onChange={(event) => setCategorySearchQuery(event.target.value)}
+                            onChange={setCategorySearchQuery}
                             placeholder="Search categories"
-                            className="h-12 w-full rounded-full border border-black/[0.08] bg-white pl-12 pr-4 text-sm font-semibold text-apple-text outline-none transition-all placeholder:font-medium placeholder:text-apple-gray focus:border-apple-text/20 focus:shadow-[0_0_0_4px_rgba(29,29,31,0.05)]"
+                            suggestions={suggestions}
+                            isLoading={isLoading}
+                            onSelect={(category) => {
+                                setCategorySearchQuery(category.modelName);
+                                navigate('');
+                            }}
+                            getSuggestionKey={(category) => category._id}
+                            renderSuggestion={(category, focused) => (
+                                <>
+                                    <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] transition-colors ${focused ? 'bg-white/20' : 'bg-surface-alt group-hover:bg-white/20'}`}>
+                                        {category.images?.[0]?.url && (
+                                            <img src={category.images[0].url} alt={category.modelName} className="max-h-[80%] w-auto object-contain" />
+                                        )}
+                                    </span>
+                                    <span className="min-w-0 flex-1">
+                                        <span className={`block truncate text-sm font-bold ${focused ? 'text-white' : 'text-apple-text'}`}>{category.modelName}</span>
+                                        {category.description && (
+                                            <span className={`block truncate text-xs ${focused ? 'text-white/80' : 'text-apple-gray'}`}>{category.description}</span>
+                                        )}
+                                    </span>
+                                </>
+                            )}
                         />
-                    </label>
+                    </div>
                 </div>
             </div>
             <Outlet context={{ categorySearchQuery, setCategorySearchQuery }} />

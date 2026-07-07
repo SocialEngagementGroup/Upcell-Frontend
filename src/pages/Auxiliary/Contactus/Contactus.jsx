@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import FacebookOutlinedIcon from '@mui/icons-material/FacebookOutlined';
@@ -20,6 +20,7 @@ const faqs = [
 ];
 
 const Contactus = () => {
+    const navigate = useNavigate();
     const [openIndex, setOpenIndex] = useState(0);
     const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -57,9 +58,9 @@ const Contactus = () => {
                 subject: formData.subject.trim(),
                 message: formData.message.trim(),
             });
-            setSubmitMessage('Message sent successfully. Our team will get back to you soon.');
             trackSuccess({ source: 'contact-form' });
             setFormData({ name: '', email: '', subject: '', message: '' });
+            navigate('/contact-thank-you');
         } catch (error) {
             const failureMessage = extractApiError(error, 'Unable to send your message right now.');
             setSubmitMessage(failureMessage);

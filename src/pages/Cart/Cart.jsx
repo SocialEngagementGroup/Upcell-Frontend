@@ -1,55 +1,32 @@
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo } from "react";
 import { CartContext } from "../../App";
 import { Link } from "react-router-dom";
 import ScrollToTop from "../../utilities/ScrollToTop";
 import CartProduct from "./CartProduct";
-import { fetchCachedProducts } from "../../utilities/catalog";
+import { useProductsQuery } from "../../queries/products";
+import { EMPTY_ARRAY } from "../../queries/keys";
 import RouteLoadingScreen from "../../components/RouteLoadingScreen/RouteLoadingScreen";
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 
 const Cart = () => {
-    const [products, setProducts] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
     const { cart, setCart } = useContext(CartContext);
+    const { data: allProducts = EMPTY_ARRAY, isLoading: productsLoading } = useProductsQuery();
+    const isLoading = Boolean(cart?.length) && productsLoading;
+
+    const products = useMemo(() => {
+        const isObjectId = (id) => /^[0-9a-fA-F]{24}$/.test(id);
+        const uniqueIds = new Set([...new Set(cart)].filter(isObjectId));
+        return allProducts.filter((product) => uniqueIds.has(product._id));
+    }, [allProducts, cart]);
 
     useEffect(() => {
-        if (!cart?.length) {
-            setProducts([]);
-            setIsLoading(false);
-            return;
+        if (!cart?.length || productsLoading) return;
+        const validIds = new Set(products.map((product) => product._id));
+        const hasStaleIds = cart.some((id) => !validIds.has(id));
+        if (hasStaleIds) {
+            setCart((current) => current.filter((id) => validIds.has(id)));
         }
-
-        let isCancelled = false;
-        const isObjectId = (id) => /^[0-9a-fA-F]{24}$/.test(id);
-        const uniqueIds = [...new Set(cart)].filter(isObjectId);
-
-        setIsLoading(true);
-
-        fetchCachedProducts()
-            .then((allProducts) => {
-                if (isCancelled) return;
-                const fetchedProducts = allProducts.filter((product) => uniqueIds.includes(product._id));
-                setProducts(fetchedProducts);
-
-                const validIds = new Set(fetchedProducts.map((product) => product._id));
-                const hasStaleIds = cart.some((id) => !validIds.has(id));
-
-                if (hasStaleIds) {
-                    setCart((current) => current.filter((id) => validIds.has(id)));
-                }
-            })
-            .catch((error) => {
-                console.log(error);
-                if (!isCancelled) setProducts([]);
-            })
-            .finally(() => {
-                if (!isCancelled) setIsLoading(false);
-            });
-
-        return () => {
-            isCancelled = true;
-        };
-    }, [cart, setCart]);
+    }, [cart, products, productsLoading, setCart]);
 
     const total = useMemo(() => (
         cart.reduce((sum, id) => sum + (products.find((item) => item._id === id)?.price || 0), 0)

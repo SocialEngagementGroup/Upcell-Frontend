@@ -3,7 +3,14 @@ import axiosInstance from '../../../utilities/axiosInstance';
 import { toast } from 'react-toastify';
 import AdminConfirmModal from '../../../components/AdminConfirmModal/AdminConfirmModal';
 
-const tradeInStatuses = ["New", "Contacted", "Received", "Quoted", "Paid", "Closed"];
+const tradeInStatuses = [
+    "New",
+    "Contacted",
+    "Received",
+    // "Quoted", // hidden from UI — no business logic depends on this status
+    // "Paid", // hidden from UI — no business logic depends on this status
+    "Closed",
+];
 
 const formatAnswerValue = (value) => {
     if (value === true) return 'Yes';

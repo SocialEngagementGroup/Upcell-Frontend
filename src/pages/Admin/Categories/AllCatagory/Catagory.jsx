@@ -1,43 +1,34 @@
-import axiosInstance from '../../../../utilities/axiosInstance.js';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import SingleCatagory from '../AdminSingleCatagory/SingleCatagory.jsx';
 import AdminStatsGrid from '../../../../components/AdminStatsGrid/AdminStatsGrid.jsx';
 import AdminLoadingState from '../../../../components/AdminState/AdminLoadingState.jsx';
 import AdminEmptyState from '../../../../components/AdminState/AdminEmptyState.jsx';
+import { useParentCategoriesQuery, useShopCategoriesQuery } from '../../../../queries/categories';
+import { useProductsQuery } from '../../../../queries/products';
+import { EMPTY_ARRAY } from '../../../../queries/keys';
 
 const AllCatagories = () => {
-    const [allCatagories, setAllCatagories] = useState([]);
-    const [productGroups, setProductGroups] = useState([]);
-    const [update, setUpdate] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
     const outletContext = useOutletContext() || {};
     const searchQuery = outletContext.categorySearchQuery || '';
 
-    useEffect(() => {
-        setIsLoading(true);
-        Promise.all([
-            axiosInstance.get("shop-categories"),
-            axiosInstance.get("catagory"),
-            axiosInstance.get("product"),
-        ]).then(([categoryResult, parentResult, productResult]) => {
-            const orderedCategories = [...categoryResult.data].sort((left, right) => (
-                (left.modelName || '').localeCompare(right.modelName || '')
-            ));
-            setAllCatagories(orderedCategories);
+    const { data: shopCategories = EMPTY_ARRAY, isLoading: shopCategoriesLoading } = useShopCategoriesQuery();
+    const { data: parents = EMPTY_ARRAY, isLoading: parentsLoading } = useParentCategoriesQuery();
+    const { data: variants = EMPTY_ARRAY, isLoading: variantsLoading } = useProductsQuery();
 
-            const grouped = parentResult.data.map((parent) => ({
-                parentId: parent._id,
-                productName: parent.modelName,
-                categoryName: parent.categoryName || '',
-                image: parent.images?.[0]?.url || '',
-                variants: productResult.data.filter((variant) => String(variant.parentCatagory) === String(parent._id)),
-            }));
+    const isLoading = shopCategoriesLoading || parentsLoading || variantsLoading;
 
-            setProductGroups(grouped);
-        }).catch((error) => console.log("Error fetching categories/products:", error))
-            .finally(() => setIsLoading(false));
-    }, [update]);
+    const allCatagories = useMemo(() => (
+        [...shopCategories].sort((left, right) => (left.modelName || '').localeCompare(right.modelName || ''))
+    ), [shopCategories]);
+
+    const productGroups = useMemo(() => parents.map((parent) => ({
+        parentId: parent._id,
+        productName: parent.modelName,
+        categoryName: parent.categoryName || '',
+        image: parent.images?.[0]?.url || '',
+        variants: variants.filter((variant) => String(variant.parentCatagory) === String(parent._id)),
+    })), [parents, variants]);
 
     const filteredCategories = useMemo(() => {
         const normalizedSearch = searchQuery.trim().toLowerCase();
@@ -72,9 +63,7 @@ const AllCatagories = () => {
                         <SingleCatagory
                             key={catagory._id}
                             catagory={catagory}
-                            setUpdate={setUpdate}
                             productGroups={productGroups}
-                            setProductGroups={setProductGroups}
                         />
                     ))}
                 </div>

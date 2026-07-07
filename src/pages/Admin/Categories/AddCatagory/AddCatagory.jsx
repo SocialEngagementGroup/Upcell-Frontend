@@ -1,21 +1,24 @@
 import React from 'react';
-import axiosInstance from '../../../../utilities/axiosInstance';
 import { toast } from 'react-toastify';
+import { useCreateShopCategoryMutation } from '../../../../queries/categories';
 
 const AddCatagory = () => {
+    const createCategory = useCreateShopCategoryMutation();
+
     const handleSubmit = (e) => {
         e.preventDefault();
         const modelName = e.target.categoryName.value.trim();
 
-        axiosInstance.post("shop-categories", { modelName })
-            .then(() => {
+        createCategory.mutate({ modelName }, {
+            onSuccess: () => {
                 e.target.categoryName.value = "";
                 toast.success("Category created successfully");
-            })
-            .catch((error) => {
+            },
+            onError: (error) => {
                 console.log("error ***: ", error);
                 toast.error("Failed to create category");
-            });
+            },
+        });
     };
 
     return (
@@ -31,7 +34,9 @@ const AddCatagory = () => {
                     placeholder='Enter category name (e.g. iPhone 15 Pro)' 
                     required 
                 />
-                <button className="premium-button px-8 h-14" type="submit">Create category</button>
+                <button className="premium-button px-8 h-14" type="submit" disabled={createCategory.isPending}>
+                    {createCategory.isPending ? 'Creating…' : 'Create category'}
+                </button>
             </form>
         </section>
     );
