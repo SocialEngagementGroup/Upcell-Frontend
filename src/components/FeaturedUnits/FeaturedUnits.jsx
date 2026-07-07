@@ -1,51 +1,31 @@
-import React, { useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import axiosInstance from '../../utilities/axiosInstance';
-import { groupProductsByParent, normalizeProduct } from '../../utilities/catalog';
+import { groupProductsByParent } from '../../utilities/catalog';
+import { useProductsQuery } from '../../queries/products';
+import { EMPTY_ARRAY } from '../../queries/keys';
 import ModernProductCard from '../ModernProductCard/ModernProductCard';
 
 const sortByLatestProductName = (left, right) => (
     right.productName.localeCompare(left.productName, undefined, { numeric: true, sensitivity: 'base' })
 );
 
+const categoryConfig = [
+    { key: 'iPhone', title: 'Handpicked iPhones' },
+    { key: 'iPad', title: 'Selected iPads' },
+    { key: 'MacBook', title: 'Premium MacBooks' }
+];
+
 const FeaturedUnits = () => {
-    const [categories, setCategories] = useState({
-        iPhone: [],
-        iPad: [],
-        MacBook: []
-    });
+    const { data: products = EMPTY_ARRAY } = useProductsQuery();
 
-    useEffect(() => {
-        axiosInstance.get('product')
-            .then((res) => {
-                const normalized = groupProductsByParent(res.data.map(normalizeProduct));
-                const iphones = normalized
-                    .filter((p) => p.family === 'iPhone')
-                    .sort(sortByLatestProductName)
-                    .slice(0, 5);
-                const ipads = normalized
-                    .filter((p) => p.family === 'iPad')
-                    .sort(sortByLatestProductName)
-                    .slice(0, 5);
-                const macbooks = normalized
-                    .filter((p) => p.family === 'MacBook')
-                    .sort(sortByLatestProductName)
-                    .slice(0, 5);
-
-                setCategories({
-                    iPhone: iphones,
-                    iPad: ipads,
-                    MacBook: macbooks
-                });
-            })
-            .catch((error) => console.log(error));
-    }, []);
-
-    const categoryConfig = [
-        { key: 'iPhone', title: 'Handpicked iPhones' },
-        { key: 'iPad', title: 'Selected iPads' },
-        { key: 'MacBook', title: 'Premium MacBooks' }
-    ];
+    const categories = useMemo(() => {
+        const normalized = groupProductsByParent(products);
+        return {
+            iPhone: normalized.filter((p) => p.family === 'iPhone').sort(sortByLatestProductName).slice(0, 5),
+            iPad: normalized.filter((p) => p.family === 'iPad').sort(sortByLatestProductName).slice(0, 5),
+            MacBook: normalized.filter((p) => p.family === 'MacBook').sort(sortByLatestProductName).slice(0, 5),
+        };
+    }, [products]);
 
     return (
         <section className="px-4 py-14 md:px-6 md:py-24">

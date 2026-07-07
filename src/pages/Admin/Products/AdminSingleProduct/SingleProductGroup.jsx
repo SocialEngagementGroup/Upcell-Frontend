@@ -1,14 +1,12 @@
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQueryClient } from '@tanstack/react-query';
-import axiosInstance from '../../../../utilities/axiosInstance';
-import { clearProductCache } from '../../../../utilities/catalog';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { toast } from 'react-toastify';
 import AdminConfirmModal from '../../../../components/AdminConfirmModal/AdminConfirmModal';
+import { useDeleteProductFamilyMutation, useDeleteProductVariantMutation, useUpdateProductVariantMutation } from '../../../../queries/products';
 
 const currency = (value) => {
     if (value === '' || value === null || typeof value === 'undefined') return '-';
@@ -17,11 +15,9 @@ const currency = (value) => {
 
 const SingleProductGroup = ({ productGroup, onDelete }) => {
     const navigate = useNavigate();
-    const queryClient = useQueryClient();
-    const invalidateAdminProductLists = () => {
-        queryClient.invalidateQueries({ queryKey: ['admin-products'] });
-        queryClient.invalidateQueries({ queryKey: ['admin-categories'] });
-    };
+    const deleteProductFamily = useDeleteProductFamilyMutation();
+    const deleteProductVariant = useDeleteProductVariantMutation();
+    const updateProductVariant = useUpdateProductVariantMutation();
     const [isOpen, setIsOpen] = useState(false);
     const [draftVariants, setDraftVariants] = useState(() => productGroup.variants);
     const [savingVariantId, setSavingVariantId] = useState('');
@@ -42,88 +38,101 @@ const SingleProductGroup = ({ productGroup, onDelete }) => {
         })
     ), [draftVariants]);
 
-    const handleDelete = async () => {
-        try {
-            await axiosInstance.delete(`product-family/${productGroup.parentId}`);
-            onDelete(productGroup.parentId);
-            clearProductCache();
-            toast.success('Product family deleted');
-        } catch (error) {
-            console.log(error);
-            toast.error('Failed to delete product family');
-        } finally {
-            setConfirmState({ open: false, mode: '', variant: null });
-        }
+    const handleDelete = () => {
+        setSavingVariantId('family');
+        deleteProductFamily.mutate(productGroup.parentId, {
+            onSuccess: () => {
+                onDelete(productGroup.parentId);
+                toast.success('Product family deleted');
+            },
+            onError: (error) => {
+                console.log(error);
+                toast.error('Failed to delete product family');
+            },
+            onSettled: () => {
+                setSavingVariantId('');
+                setConfirmState({ open: false, mode: '', variant: null });
+            },
+        });
     };
 
-    const handleVariantSave = async (variant) => {
+    const handleVariantSave = (variant) => {
         setSavingVariantId(variant._id);
-        try {
-            await axiosInstance.patch(`product/${variant._id}`, {
+        updateProductVariant.mutate({
+            id: variant._id,
+            patch: {
                 price: variant.price,
                 discountPrice: variant.discountPrice,
                 originalPrice: variant.originalPrice,
                 outOfStock: Boolean(variant.outOfStock),
-            });
-            setEditingVariantId('');
-            clearProductCache();
-            invalidateAdminProductLists();
-        } catch (error) {
-            console.log(error);
-            toast.error('Failed to save variant');
-        } finally {
-            setSavingVariantId('');
-        }
+            },
+        }, {
+            onSuccess: () => setEditingVariantId(''),
+            onError: (error) => {
+                console.log(error);
+                toast.error('Failed to save variant');
+            },
+            onSettled: () => setSavingVariantId(''),
+        });
     };
 
-    const handleVariantDelete = async (variant) => {
+    const handleVariantDelete = (variant) => {
         setSavingVariantId(variant._id);
+        const isLastVariant = draftVariants.length === 1;
 
-        try {
-            const isLastVariant = draftVariants.length === 1;
-            if (isLastVariant) {
-                await axiosInstance.delete(`product-family/${productGroup.parentId}`);
-                onDelete(productGroup.parentId);
-                clearProductCache();
-                toast.success('Last variant deleted with product family');
-                return;
-            }
-
-            await axiosInstance.delete(`product/${variant._id}`);
-            setDraftVariants((current) => current.filter((item) => item._id !== variant._id));
-            if (editingVariantId === variant._id) {
-                setEditingVariantId('');
-            }
-            clearProductCache();
-            invalidateAdminProductLists();
-            toast.success('Variant deleted');
-        } catch (error) {
-            console.log(error);
-            toast.error('Failed to delete variant');
-        } finally {
-            setSavingVariantId('');
-            setConfirmState({ open: false, mode: '', variant: null });
+        if (isLastVariant) {
+            deleteProductFamily.mutate(productGroup.parentId, {
+                onSuccess: () => {
+                    onDelete(productGroup.parentId);
+                    toast.success('Last variant deleted with product family');
+                },
+                onError: (error) => {
+                    console.log(error);
+                    toast.error('Failed to delete variant');
+                },
+                onSettled: () => {
+                    setSavingVariantId('');
+                    setConfirmState({ open: false, mode: '', variant: null });
+                },
+            });
+            return;
         }
+
+        deleteProductVariant.mutate(variant._id, {
+            onSuccess: () => {
+                setDraftVariants((current) => current.filter((item) => item._id !== variant._id));
+                if (editingVariantId === variant._id) {
+                    setEditingVariantId('');
+                }
+                toast.success('Variant deleted');
+            },
+            onError: (error) => {
+                console.log(error);
+                toast.error('Failed to delete variant');
+            },
+            onSettled: () => {
+                setSavingVariantId('');
+                setConfirmState({ open: false, mode: '', variant: null });
+            },
+        });
     };
 
-    const handleStockToggle = async (variant) => {
+    const handleStockToggle = (variant) => {
         const nextOutOfStock = !variant.outOfStock;
         updateDraftVariant(variant._id, { outOfStock: nextOutOfStock });
         setSavingVariantId(variant._id);
 
-        try {
-            await axiosInstance.patch(`product/${variant._id}`, {
-                outOfStock: nextOutOfStock,
-            });
-            clearProductCache();
-            invalidateAdminProductLists();
-        } catch (error) {
-            console.log(error);
-            updateDraftVariant(variant._id, { outOfStock: variant.outOfStock });
-            toast.error('Failed to update stock status');
-        } finally {
-            setSavingVariantId('');
-        }
+        updateProductVariant.mutate({
+            id: variant._id,
+            patch: { outOfStock: nextOutOfStock },
+        }, {
+            onError: (error) => {
+                console.log(error);
+                updateDraftVariant(variant._id, { outOfStock: variant.outOfStock });
+                toast.error('Failed to update stock status');
+            },
+            onSettled: () => setSavingVariantId(''),
+        });
     };
 
     const handleQuickEdit = (variantId) => {
@@ -353,7 +362,7 @@ const SingleProductGroup = ({ productGroup, onDelete }) => {
                         ? 'This is the last remaining variant, so deleting it will also remove the whole product family.'
                         : 'This removes only the selected variant from the product family.'}
                 confirmLabel={confirmState.mode === 'family' ? 'Delete product' : 'Delete variant'}
-                isLoading={Boolean(confirmState.variant && savingVariantId === confirmState.variant._id)}
+                isLoading={confirmState.mode === 'family' ? savingVariantId === 'family' : Boolean(confirmState.variant && savingVariantId === confirmState.variant._id)}
                 onCancel={() => setConfirmState({ open: false, mode: '', variant: null })}
                 onConfirm={() => {
                     if (confirmState.mode === 'family') {

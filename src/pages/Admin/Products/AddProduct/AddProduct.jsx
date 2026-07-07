@@ -1,10 +1,19 @@
-import { useEffect, useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useMemo, useState } from 'react';
 import ProductBatchForm from '../../../../components/ProductForm/ProductBatchForm';
-import axiosInstance from '../../../../utilities/axiosInstance';
-import { clearProductCache } from '../../../../utilities/catalog';
 import { toast } from 'react-toastify';
 import { useSearchParams } from 'react-router-dom';
+import {
+    useProductsByParentQuery,
+    useProductsQuery,
+    useSaveProductMutation,
+} from '../../../../queries/products';
+import {
+    useParentCategoriesQuery,
+    useParentCategoryQuery,
+    useShopCategoriesQuery,
+    useCreateShopCategoryMutation,
+} from '../../../../queries/categories';
+import { EMPTY_ARRAY } from '../../../../queries/keys';
 
 const buildGroupedProduct = (parent, variants = []) => ({
     parentId: parent._id,
@@ -23,9 +32,11 @@ const buildGroupedProduct = (parent, variants = []) => ({
     })),
 });
 
-const mergeGroupedProducts = (current, incoming) => {
-    const merged = new Map(incoming.map((product) => [product.parentId, product]));
-    current.forEach((product) => {
+// `overrides` wins on matching parentId (used for the edit fast-path result,
+// which is fresher/more targeted than the full-catalog list it's merged into).
+const mergeGroupedProducts = (base, overrides) => {
+    const merged = new Map(overrides.map((product) => [product.parentId, product]));
+    base.forEach((product) => {
         if (!merged.has(product.parentId)) merged.set(product.parentId, product);
     });
     return Array.from(merged.values());
@@ -33,107 +44,52 @@ const mergeGroupedProducts = (current, incoming) => {
 
 const AddProduct = () => {
     const [searchParams, setSearchParams] = useSearchParams();
-    const queryClient = useQueryClient();
-    const [allCatagories, setCatagories] = useState([]);
-    const [existingProducts, setExistingProducts] = useState([]);
-    const [submitting, setSubmitting] = useState(false);
     const [editingProduct, setEditingProduct] = useState(null);
     const initialProductName = searchParams.get('product') || '';
     const initialCategoryId = searchParams.get('categoryId') || '';
     const initialParentId = searchParams.get('parentId') || '';
-    const [loadingEditTarget, setLoadingEditTarget] = useState(Boolean(initialParentId));
+
+    const { data: shopCategories = EMPTY_ARRAY } = useShopCategoriesQuery();
+    const { data: parents = EMPTY_ARRAY } = useParentCategoriesQuery();
+    const { data: variants = EMPTY_ARRAY } = useProductsQuery();
 
     // Fast path for "Edit product": fetch only the one product being edited
-    // instead of waiting on the full catalog scan below, which can take a
+    // instead of waiting on the full catalog scan above, which can take a
     // long time on the current shared/free-tier database.
-    useEffect(() => {
-        if (!initialParentId) return;
+    const { data: editParent, isLoading: editParentLoading } = useParentCategoryQuery(initialParentId);
+    const { data: editVariants, isLoading: editVariantsLoading } = useProductsByParentQuery(initialParentId);
+    const loadingEditTarget = Boolean(initialParentId) && !editParent && (editParentLoading || editVariantsLoading);
 
-        Promise.allSettled([
-            axiosInstance.get(`catagory/${initialParentId}`),
-            axiosInstance.get(`allSameParentProducts/${initialParentId}`),
-        ])
-            .then(([parentResult, variantResult]) => {
-                if (parentResult.status === "fulfilled" && variantResult.status === "fulfilled") {
-                    const grouped = buildGroupedProduct(parentResult.value.data, variantResult.value.data);
-                    setExistingProducts((current) => mergeGroupedProducts(current, [grouped]));
-                } else {
-                    if (parentResult.status === "rejected") console.log(parentResult.reason);
-                    if (variantResult.status === "rejected") console.log(variantResult.reason);
-                    toast.error("Failed to load this product's details");
-                }
-            })
-            .finally(() => setLoadingEditTarget(false));
-    }, [initialParentId]);
+    const existingProducts = useMemo(() => {
+        const fullList = parents.map((parent) => buildGroupedProduct(
+            parent,
+            variants.filter((variant) => String(variant.parentCatagory) === String(parent._id))
+        ));
 
-    useEffect(() => {
-        Promise.allSettled([
-            axiosInstance.get("shop-categories"),
-            axiosInstance.get("catagory"),
-            axiosInstance.get("product"),
-        ])
-            .then(([categoryResult, parentResult, productResult]) => {
-                if (categoryResult.status === "fulfilled") {
-                    setCatagories(categoryResult.value.data);
-                } else {
-                    console.log(categoryResult.reason);
-                    toast.error("Failed to load categories");
-                }
+        if (editParent) {
+            return mergeGroupedProducts(fullList, [buildGroupedProduct(editParent, editVariants || [])]);
+        }
 
-                if (parentResult.status === "fulfilled" && productResult.status === "fulfilled") {
-                    const groupedProducts = parentResult.value.data.map((parent) => (
-                        buildGroupedProduct(
-                            parent,
-                            productResult.value.data.filter((variant) => String(variant.parentCatagory) === String(parent._id))
-                        )
-                    ));
+        return fullList;
+    }, [parents, variants, editParent, editVariants]);
 
-                    setExistingProducts((current) => mergeGroupedProducts(current, groupedProducts));
-                } else {
-                    if (parentResult.status === "rejected") console.log(parentResult.reason);
-                    if (productResult.status === "rejected") console.log(productResult.reason);
-                    toast.error("Failed to load existing products");
-                }
-            });
-    }, []);
+    const createCategory = useCreateShopCategoryMutation();
+    const saveProduct = useSaveProductMutation();
 
     async function handleCreateCategory(payload) {
-        const result = await axiosInstance.post("shop-categories", payload);
-        setCatagories((current) => {
-            const next = [...current.filter((category) => category._id !== result.data._id), result.data];
-            return next.sort((left, right) => left.modelName.localeCompare(right.modelName));
-        });
-        clearProductCache();
+        const created = await createCategory.mutateAsync(payload);
         toast.success("Category created");
-        return result.data;
+        return created;
     }
 
     async function handleSubmit(payload) {
-        setSubmitting(true);
         try {
-            const result = await axiosInstance.post("product", payload);
-            const savedParent = result.data.parent;
-            const savedVariants = result.data.variants || [];
-
-            setExistingProducts((current) => {
-                const next = current.filter((product) => product.parentId !== savedParent._id);
-                next.push(buildGroupedProduct(savedParent, savedVariants));
-                return next.sort((left, right) => left.productName.localeCompare(right.productName));
-            });
-
-            clearProductCache();
-            // The Admin product list (AllProduct.jsx) reads from these React Query
-            // cache keys with a 30s staleTime — without invalidating them here, a
-            // save looks like it "did nothing" if you go back to the list right away.
-            queryClient.invalidateQueries({ queryKey: ['admin-products'] });
-            queryClient.invalidateQueries({ queryKey: ['admin-categories'] });
+            const result = await saveProduct.mutateAsync(payload);
             toast.success(result.status === 200 ? "Product updated" : "Product added");
             setSearchParams({});
         } catch (error) {
             console.log(error);
             toast.error("Failed to save product");
-        } finally {
-            setSubmitting(false);
         }
     }
 
@@ -152,14 +108,14 @@ const AddProduct = () => {
 
             <div className="admin-panel rounded-[36px] p-6 md:p-7 xl:p-8">
                 <ProductBatchForm
-                    categories={allCatagories}
+                    categories={shopCategories}
                     existingProducts={existingProducts}
                     initialProductName={initialProductName}
                     initialCategoryId={initialCategoryId}
                     initialParentId={initialParentId}
                     onCreateCategory={handleCreateCategory}
                     onSubmit={handleSubmit}
-                    submitting={submitting}
+                    submitting={saveProduct.isPending}
                     onEditingProductChange={setEditingProduct}
                 />
             </div>

@@ -1,57 +1,61 @@
 import React, { useState } from 'react';
-import axiosInstance from "../../../../utilities/axiosInstance";
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import AdminConfirmModal from '../../../../components/AdminConfirmModal/AdminConfirmModal';
+import { useUpdateShopCategoryMutation, useDeleteShopCategoryMutation } from '../../../../queries/categories';
+import { useDeleteProductFamilyMutation } from '../../../../queries/products';
 
-const SingleCatagory = ({ catagory, setUpdate, productGroups, setProductGroups }) => {
+const SingleCatagory = ({ catagory, productGroups }) => {
     const navigate = useNavigate();
     const [editClicked, setEditClicked] = useState(false);
     const [isProductsOpen, setIsProductsOpen] = useState(false);
     const [pendingDeleteProduct, setPendingDeleteProduct] = useState(null);
-    const [isDeletingProduct, setIsDeletingProduct] = useState(false);
     const [confirmDeleteCategory, setConfirmDeleteCategory] = useState(false);
-    const [isDeletingCategory, setIsDeletingCategory] = useState(false);
+
+    const updateCategory = useUpdateShopCategoryMutation();
+    const deleteCategory = useDeleteShopCategoryMutation();
+    const deleteProductFamily = useDeleteProductFamilyMutation();
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        axiosInstance.patch(`shop-categories/${catagory._id}`, {
-            modelName: e.target.categoryName.value.trim(),
-        }).then(() => {
-            setUpdate((prev) => !prev);
-            setEditClicked(false);
-            toast.success('Category name updated');
-        }).catch((error) => {
-            console.log(error);
-            toast.error('Failed to update category');
+        updateCategory.mutate({
+            id: catagory._id,
+            patch: { modelName: e.target.categoryName.value.trim() },
+        }, {
+            onSuccess: () => {
+                setEditClicked(false);
+                toast.success('Category name updated');
+            },
+            onError: (error) => {
+                console.log(error);
+                toast.error('Failed to update category');
+            },
         });
     };
 
     const handleDeleteProduct = (parentId) => {
-        setIsDeletingProduct(true);
-        axiosInstance.delete(`product-family/${parentId}`).then(() => {
-                setProductGroups((prev) => prev.filter((product) => product.parentId !== parentId));
+        deleteProductFamily.mutate(parentId, {
+            onSuccess: () => {
                 toast.success('Product family deleted');
-            }).catch((err) => {
-                console.log(err);
+            },
+            onError: (error) => {
+                console.log(error);
                 toast.error('Failed to delete product family');
-            }).finally(() => {
-                setIsDeletingProduct(false);
-                setPendingDeleteProduct(null);
-            });
+            },
+            onSettled: () => setPendingDeleteProduct(null),
+        });
     };
 
     const handleDeleteCategory = () => {
-        setIsDeletingCategory(true);
-        axiosInstance.delete(`shop-categories/${catagory._id}`).then(() => {
-            setUpdate((prev) => !prev);
-            toast.success('Category deleted');
-        }).catch((error) => {
-            console.log(error);
-            toast.error('Failed to delete category');
-        }).finally(() => {
-            setIsDeletingCategory(false);
-            setConfirmDeleteCategory(false);
+        deleteCategory.mutate(catagory._id, {
+            onSuccess: () => {
+                toast.success('Category deleted');
+            },
+            onError: (error) => {
+                console.log(error);
+                toast.error('Failed to delete category');
+            },
+            onSettled: () => setConfirmDeleteCategory(false),
         });
     };
 
@@ -62,7 +66,7 @@ const SingleCatagory = ({ catagory, setUpdate, productGroups, setProductGroups }
     return (
         <div className="admin-panel rounded-[30px] p-6 transition-all duration-300">
             <div className="flex items-start justify-between gap-4">
-                <div 
+                <div
                     onClick={() => setIsProductsOpen(!isProductsOpen)}
                     className="group flex cursor-pointer items-center gap-3"
                 >
@@ -107,15 +111,17 @@ const SingleCatagory = ({ catagory, setUpdate, productGroups, setProductGroups }
             {editClicked && (
                 <div className="mt-6 border-t border-black/[0.06] pt-6">
                     <form className="grid max-w-lg gap-4" onSubmit={handleSubmit}>
-                        <input 
-                            className="admin-input" 
-                            name="categoryName" 
-                            type='text' 
-                            placeholder='Category name' 
-                            defaultValue={catagory?.modelName} 
-                            required 
+                        <input
+                            className="admin-input"
+                            name="categoryName"
+                            type='text'
+                            placeholder='Category name'
+                            defaultValue={catagory?.modelName}
+                            required
                         />
-                        <button className="premium-button w-fit" type="submit">Save changes</button>
+                        <button className="premium-button w-fit" type="submit" disabled={updateCategory.isPending}>
+                            {updateCategory.isPending ? 'Saving…' : 'Save changes'}
+                        </button>
                     </form>
                 </div>
             )}
@@ -153,8 +159,8 @@ const SingleCatagory = ({ catagory, setUpdate, productGroups, setProductGroups }
                                             </td>
                                             <td className="px-6 py-4 text-right">
                                                 <div className="flex justify-end gap-3">
-                                                    <button 
-                                                        onClick={() => navigate(`/admin-secret/addproduct?product=${encodeURIComponent(product.productName)}`)}
+                                                    <button
+                                                        onClick={() => navigate(`/admin-secret/addproduct?product=${encodeURIComponent(product.productName)}&parentId=${product.parentId}`)}
                                                         className="text-sm font-bold text-brand-red hover:underline"
                                                     >
                                                         Edit
@@ -187,7 +193,7 @@ const SingleCatagory = ({ catagory, setUpdate, productGroups, setProductGroups }
                 title="Delete this product family?"
                 description={`This will remove ${pendingDeleteProduct?.productName || 'this product'} and all of its variants from the selected category view.`}
                 confirmLabel="Delete product"
-                isLoading={isDeletingProduct}
+                isLoading={Boolean(pendingDeleteProduct) && deleteProductFamily.isPending}
                 onCancel={() => setPendingDeleteProduct(null)}
                 onConfirm={() => pendingDeleteProduct && handleDeleteProduct(pendingDeleteProduct.parentId)}
             />
@@ -199,7 +205,7 @@ const SingleCatagory = ({ catagory, setUpdate, productGroups, setProductGroups }
                     ? `This removes the category entry only — the ${filteredProducts.length} product${filteredProducts.length === 1 ? '' : 's'} in it won't be deleted, but they'll need a category re-assigned next time they're edited.`
                     : 'This removes the category entry from the catalog.'}
                 confirmLabel="Delete category"
-                isLoading={isDeletingCategory}
+                isLoading={deleteCategory.isPending}
                 onCancel={() => setConfirmDeleteCategory(false)}
                 onConfirm={handleDeleteCategory}
             />

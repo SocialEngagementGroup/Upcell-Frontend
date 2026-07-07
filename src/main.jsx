@@ -28,7 +28,6 @@ const AdminCatagory = lazy(() => import('./pages/Admin/Categories/AdminCatagory/
 const AdminHome = lazy(() => import('./pages/Admin/Dashboard/AdminHome/AdminHome.jsx'));
 const AllProduct = lazy(() => import('./pages/Admin/Products/AllProduct/AllProduct.jsx'));
 const AddProduct = lazy(() => import('./pages/Admin/Products/AddProduct/AddProduct.jsx'));
-const EditProduct = lazy(() => import('./pages/Admin/Products/EditProduct/EditProduct.jsx'));
 const Checkout = lazy(() => import('./pages/Checkout/Checkout.jsx'));
 const AdminOrder = lazy(() => import('./pages/Admin/Orders/AdminOrder/AdminOrder.jsx'));
 const LoginAndSignup = lazy(() => import('./pages/Auth/LoginAndSignup/LoginAndSignup.jsx'));
@@ -193,10 +192,6 @@ const router = createBrowserRouter([
           {
             path: "addproduct",
             element: lazyElement(<AddProduct />),
-          },
-          {
-            path: "editProduct/:id",
-            element: lazyElement(<EditProduct />),
           },
         ],
       },

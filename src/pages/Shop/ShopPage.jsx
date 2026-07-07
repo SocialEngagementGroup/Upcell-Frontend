@@ -6,9 +6,11 @@ import { toast } from 'react-toastify';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 import KeyboardArrowLeftRoundedIcon from '@mui/icons-material/KeyboardArrowLeftRounded';
-import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import ModernProductCard from '../../components/ModernProductCard/ModernProductCard';
-import { groupProductsByParent, normalizeProduct, fetchCachedProducts } from '../../utilities/catalog';
+import SearchWithSuggestions from '../../components/SearchWithSuggestions/SearchWithSuggestions';
+import { groupProductsByParent } from '../../utilities/catalog';
+import { useProductsQuery } from '../../queries/products';
+import { EMPTY_ARRAY } from '../../queries/keys';
 
 const topCategories = ['All Devices', 'iPhone', 'iPad', 'MacBook'];
 const storageOrder = ['128GB', '256GB', '512GB', '1TB', '2TB', '4TB'];
@@ -87,41 +89,6 @@ const getPageWindow = (currentPage, totalPages) => {
 };
 
 
-const SHOP_PRODUCTS_CACHE_KEY = 'upcell_shop_products_cache';
-const SHOP_PRODUCTS_CACHE_TTL = 5 * 60 * 1000;
-
-const readCachedShopProducts = () => {
-    if (typeof window === 'undefined') return [];
-
-    try {
-        const cached = window.sessionStorage.getItem(SHOP_PRODUCTS_CACHE_KEY);
-        if (!cached) return [];
-
-        const parsed = JSON.parse(cached);
-        if (!Array.isArray(parsed.products) || Date.now() - parsed.savedAt > SHOP_PRODUCTS_CACHE_TTL) {
-            window.sessionStorage.removeItem(SHOP_PRODUCTS_CACHE_KEY);
-            return [];
-        }
-
-        return parsed.products.map(normalizeProduct);
-    } catch (error) {
-        window.sessionStorage.removeItem(SHOP_PRODUCTS_CACHE_KEY);
-        return [];
-    }
-};
-
-const writeCachedShopProducts = (products) => {
-    if (typeof window === 'undefined') return;
-
-    try {
-        window.sessionStorage.setItem(SHOP_PRODUCTS_CACHE_KEY, JSON.stringify({
-            savedAt: Date.now(),
-            products,
-        }));
-    } catch (error) {
-        window.sessionStorage.removeItem(SHOP_PRODUCTS_CACHE_KEY);
-    }
-};
 const ShopProductPreloader = () => (
     <div className="space-y-6" aria-live="polite" aria-busy="true">
         <div className="premium-card overflow-hidden rounded-[32px] p-6">
@@ -170,8 +137,7 @@ const ShopPage = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { setCart } = useContext(CartContext);
-    const [products, setProducts] = useState(() => readCachedShopProducts());
-    const [productsLoading, setProductsLoading] = useState(() => readCachedShopProducts().length === 0);
+    const { data: products = EMPTY_ARRAY, isLoading: productsLoading } = useProductsQuery();
     const [activeCategory, setActiveCategory] = useState('All Devices');
     const [priceRange, setPriceRange] = useState(3500);
     const [selectedModels, setSelectedModels] = useState([]);
@@ -180,18 +146,11 @@ const ShopPage = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [sortMenuOpen, setSortMenuOpen] = useState(false);
     const [filtersOpen, setFiltersOpen] = useState(false);
-    const [searchFocused, setSearchFocused] = useState(false);
-    const [focusedIndex, setFocusedIndex] = useState(-1);
     const [currentPage, setCurrentPage] = useState(1);
     const sortMenuRef = useRef(null);
-    const searchRef = useRef(null);
-    const scrollRef = useRef(null);
     const productGridRef = useRef(null);
 
-    const showSuggestions = searchFocused && searchQuery.trim().length >= 2;
     // Suggestions are derived from the already-loaded catalog -> instant, no network call.
-    const searchPending = productsLoading;
-
     const suggestions = useMemo(() => {
         const term = searchQuery.trim().toLowerCase();
         if (term.length < 2) return [];
@@ -231,7 +190,6 @@ const ShopPage = () => {
     }, [products, searchQuery]);
 
     const handleSuggestionSelect = (suggestion) => {
-        setSearchFocused(false);
         navigate(`/iphone/${suggestion.parentCatagory}/${suggestion._id}`);
     };
 
@@ -263,18 +221,6 @@ const ShopPage = () => {
         if (topCategories.includes(activeCategory)) return;
         setActiveCategory('All Devices');
     }, [activeCategory]);
-    useEffect(() => {
-        const hasCachedProducts = products.length > 0;
-        if (!hasCachedProducts) setProductsLoading(true);
-
-        fetchCachedProducts()
-            .then((data) => {
-                writeCachedShopProducts(data);
-                setProducts(data);
-            })
-            .catch((error) => console.log(error))
-            .finally(() => setProductsLoading(false));
-    }, []);
 
     const availableCategories = useMemo(() => {
         return sidebarCategories
@@ -326,19 +272,6 @@ const ShopPage = () => {
         document.addEventListener('mousedown', handlePointerDown);
         return () => document.removeEventListener('mousedown', handlePointerDown);
     }, [sortMenuOpen]);
-
-    useEffect(() => {
-        if (!searchFocused) return undefined;
-
-        const handlePointerDown = (event) => {
-            if (searchRef.current && !searchRef.current.contains(event.target)) {
-                setSearchFocused(false);
-            }
-        };
-
-        document.addEventListener('mousedown', handlePointerDown);
-        return () => document.removeEventListener('mousedown', handlePointerDown);
-    }, [searchFocused]);
 
     const toggleValue = (value, state, setState) => {
         setState((prev) => (
@@ -429,42 +362,6 @@ const ShopPage = () => {
         setSearchQuery('');
     };
 
-    useEffect(() => {
-        setFocusedIndex(-1);
-    }, [searchQuery, searchFocused]);
-
-    const handleKeyDown = (e) => {
-        if (!showSuggestions || suggestions.length === 0) return;
-        if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            setFocusedIndex((prev) => {
-                const next = prev < suggestions.length - 1 ? prev + 1 : prev;
-                if (scrollRef.current && next >= 0) {
-                    const el = scrollRef.current.children[next];
-                    if (el) el.scrollIntoView({ block: 'nearest' });
-                }
-                return next;
-            });
-        } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            setFocusedIndex((prev) => {
-                const next = prev > 0 ? prev - 1 : prev;
-                if (scrollRef.current && next >= 0) {
-                    const el = scrollRef.current.children[next];
-                    if (el) el.scrollIntoView({ block: 'nearest' });
-                }
-                return next;
-            });
-        } else if (e.key === 'Enter') {
-            e.preventDefault();
-            if (focusedIndex >= 0 && focusedIndex < suggestions.length) {
-                handleSuggestionSelect(suggestions[focusedIndex]);
-            }
-        } else if (e.key === 'Escape') {
-            setSearchFocused(false);
-        }
-    };
-
     const activeSortOption = sortOptions.find((option) => option.value === sortBy) || sortOptions[0];
     return (
         <div className="page-shell">
@@ -498,76 +395,32 @@ const ShopPage = () => {
                         ))}
                     </div>
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                        <div ref={searchRef} className="relative block min-w-0 sm:w-[320px]">
-                            <SearchRoundedIcon className="pointer-events-none absolute left-4 top-1/2 !text-[20px] -translate-y-1/2 text-apple-gray" />
-                            <input
-                                type="search"
+                        <div className="min-w-0 sm:w-[320px]">
+                            <SearchWithSuggestions
                                 value={searchQuery}
-                                onChange={(event) => setSearchQuery(event.target.value)}
-                                onFocus={() => setSearchFocused(true)}
-                                onKeyDown={handleKeyDown}
+                                onChange={setSearchQuery}
                                 placeholder="Search products"
-                                autoComplete="off"
-                                className="h-12 w-full rounded-full border border-black/[0.08] bg-white pl-12 pr-4 text-sm font-bold text-apple-text outline-none transition-all placeholder:font-medium placeholder:text-apple-gray focus:border-apple-text/20 focus:shadow-[0_0_0_4px_rgba(29,29,31,0.05)]"
+                                suggestions={suggestions}
+                                isLoading={productsLoading}
+                                onSelect={handleSuggestionSelect}
+                                getSuggestionKey={(suggestion) => suggestion._id}
+                                renderSuggestion={(suggestion, focused) => (
+                                    <>
+                                        <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] transition-colors ${focused ? 'bg-white/20' : 'bg-surface-alt group-hover:bg-white/20'}`}>
+                                            {suggestion.image && (
+                                                <img src={suggestion.image} alt={suggestion.productName} className="max-h-[80%] w-auto object-contain" />
+                                            )}
+                                        </span>
+                                        <span className="min-w-0 flex-1">
+                                            <span className={`block truncate text-sm font-bold ${focused ? 'text-white' : 'text-apple-text'}`}>{suggestion.productName}</span>
+                                            {suggestion.categoryName && (
+                                                <span className={`block truncate text-xs ${focused ? 'text-white/80' : 'text-apple-gray'}`}>{suggestion.categoryName}</span>
+                                            )}
+                                        </span>
+                                        <span className={`shrink-0 text-sm font-extrabold ${focused ? 'text-white' : 'text-apple-text'}`}>${suggestion.price}</span>
+                                    </>
+                                )}
                             />
-
-                            {showSuggestions && (
-                                <div className="suggest-dropdown absolute left-0 right-0 z-30 mt-2 overflow-hidden rounded-[15px] border border-black/10 bg-white/95 shadow-[0_24px_60px_rgba(15,23,42,0.16)] backdrop-blur">
-                                    <div ref={scrollRef} className="suggest-scroll max-h-[400px] overflow-y-auto">
-                                        {suggestions.length > 0 ? (
-                                            suggestions.map((suggestion, index) => {
-                                                const isFocused = index === focusedIndex;
-                                                return (
-                                                    <button
-                                                        key={suggestion._id}
-                                                        type="button"
-                                                        onClick={() => handleSuggestionSelect(suggestion)}
-                                                        onMouseEnter={() => setFocusedIndex(index)}
-                                                        className={`group flex w-full items-center gap-3 border-b border-solid border-[#ededed] px-4 py-3 text-left transition-all duration-150 ${isFocused ? 'bg-[#d90b0f]' : 'hover:bg-[#d90b0f]'
-                                                            }`}
-                                                    >
-                                                        <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] transition-colors ${isFocused ? 'bg-white/20' : 'bg-surface-alt group-hover:bg-white/20'
-                                                            }`}>
-                                                            {suggestion.image && (
-                                                                <img src={suggestion.image} alt={suggestion.productName} className="max-h-[80%] w-auto object-contain" />
-                                                            )}
-                                                        </span>
-                                                        <span className="min-w-0 flex-1">
-                                                            <span className={`block truncate text-sm font-bold ${isFocused ? 'text-white' : 'text-apple-text group-hover:text-white'
-                                                                }`}>{suggestion.productName}</span>
-                                                            {suggestion.categoryName && (
-                                                                <span className={`block truncate text-xs ${isFocused ? 'text-white/80' : 'text-apple-gray group-hover:text-white/80'
-                                                                    }`}>{suggestion.categoryName}</span>
-                                                            )}
-                                                        </span>
-                                                        <span className={`shrink-0 text-sm font-extrabold ${isFocused ? 'text-white' : 'text-apple-text group-hover:text-white'
-                                                            }`}>${suggestion.price}</span>
-                                                    </button>
-                                                );
-                                            })
-                                        ) : (
-                                            <div className="px-4 py-3 text-sm text-apple-gray">
-                                                {searchPending ? (
-                                                    <span className="flex items-center gap-2">
-                                                        <span className="font-bold text-apple-text">Searching</span>
-                                                        <span className="flex items-center gap-1">
-                                                            {[0, 150, 300].map((delay) => (
-                                                                <span
-                                                                    key={delay}
-                                                                    className="h-1.5 w-1.5 animate-bounce rounded-full bg-brand-red"
-                                                                    style={{ animationDelay: `${delay}ms` }}
-                                                                />
-                                                            ))}
-                                                        </span>
-                                                    </span>
-                                                ) : (
-                                                    `No matches for "${searchQuery.trim()}"`
-                                                )}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            )}
                         </div>
 
                         <div ref={sortMenuRef} className="relative">
