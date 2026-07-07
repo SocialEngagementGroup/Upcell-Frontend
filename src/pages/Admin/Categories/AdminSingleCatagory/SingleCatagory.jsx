@@ -10,6 +10,8 @@ const SingleCatagory = ({ catagory, setUpdate, productGroups, setProductGroups }
     const [isProductsOpen, setIsProductsOpen] = useState(false);
     const [pendingDeleteProduct, setPendingDeleteProduct] = useState(null);
     const [isDeletingProduct, setIsDeletingProduct] = useState(false);
+    const [confirmDeleteCategory, setConfirmDeleteCategory] = useState(false);
+    const [isDeletingCategory, setIsDeletingCategory] = useState(false);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -39,6 +41,20 @@ const SingleCatagory = ({ catagory, setUpdate, productGroups, setProductGroups }
             });
     };
 
+    const handleDeleteCategory = () => {
+        setIsDeletingCategory(true);
+        axiosInstance.delete(`shop-categories/${catagory._id}`).then(() => {
+            setUpdate((prev) => !prev);
+            toast.success('Category deleted');
+        }).catch((error) => {
+            console.log(error);
+            toast.error('Failed to delete category');
+        }).finally(() => {
+            setIsDeletingCategory(false);
+            setConfirmDeleteCategory(false);
+        });
+    };
+
     const filteredProducts = productGroups.filter(
         (product) => product.categoryName === catagory?.modelName
     );
@@ -61,11 +77,20 @@ const SingleCatagory = ({ catagory, setUpdate, productGroups, setProductGroups }
                     </span>
                 </div>
                 <div className="flex gap-3">
-                    <button 
-                        className="premium-button-secondary" 
+                    <button
+                        className="premium-button-secondary"
                         onClick={(e) => { e.stopPropagation(); setEditClicked((prev) => !prev); }}
                     >
                         {editClicked ? 'Close editor' : 'Edit name'}
+                    </button>
+                    <button
+                        className="text-sm font-bold text-red-500 hover:underline"
+                        onClick={(event) => {
+                            event.stopPropagation();
+                            setConfirmDeleteCategory(true);
+                        }}
+                    >
+                        Delete category
                     </button>
                     <button
                         className="premium-button h-11 py-0 px-5 text-sm"
@@ -165,6 +190,18 @@ const SingleCatagory = ({ catagory, setUpdate, productGroups, setProductGroups }
                 isLoading={isDeletingProduct}
                 onCancel={() => setPendingDeleteProduct(null)}
                 onConfirm={() => pendingDeleteProduct && handleDeleteProduct(pendingDeleteProduct.parentId)}
+            />
+
+            <AdminConfirmModal
+                open={confirmDeleteCategory}
+                title={`Delete "${catagory?.modelName}"?`}
+                description={filteredProducts.length
+                    ? `This removes the category entry only — the ${filteredProducts.length} product${filteredProducts.length === 1 ? '' : 's'} in it won't be deleted, but they'll need a category re-assigned next time they're edited.`
+                    : 'This removes the category entry from the catalog.'}
+                confirmLabel="Delete category"
+                isLoading={isDeletingCategory}
+                onCancel={() => setConfirmDeleteCategory(false)}
+                onConfirm={handleDeleteCategory}
             />
         </div>
     );

@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import axiosInstance from '../../../../utilities/axiosInstance';
 import { clearProductCache } from '../../../../utilities/catalog';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
@@ -16,6 +17,11 @@ const currency = (value) => {
 
 const SingleProductGroup = ({ productGroup, onDelete }) => {
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
+    const invalidateAdminProductLists = () => {
+        queryClient.invalidateQueries({ queryKey: ['admin-products'] });
+        queryClient.invalidateQueries({ queryKey: ['admin-categories'] });
+    };
     const [isOpen, setIsOpen] = useState(false);
     const [draftVariants, setDraftVariants] = useState(() => productGroup.variants);
     const [savingVariantId, setSavingVariantId] = useState('');
@@ -61,6 +67,7 @@ const SingleProductGroup = ({ productGroup, onDelete }) => {
             });
             setEditingVariantId('');
             clearProductCache();
+            invalidateAdminProductLists();
         } catch (error) {
             console.log(error);
             toast.error('Failed to save variant');
@@ -88,6 +95,7 @@ const SingleProductGroup = ({ productGroup, onDelete }) => {
                 setEditingVariantId('');
             }
             clearProductCache();
+            invalidateAdminProductLists();
             toast.success('Variant deleted');
         } catch (error) {
             console.log(error);
@@ -108,6 +116,7 @@ const SingleProductGroup = ({ productGroup, onDelete }) => {
                 outOfStock: nextOutOfStock,
             });
             clearProductCache();
+            invalidateAdminProductLists();
         } catch (error) {
             console.log(error);
             updateDraftVariant(variant._id, { outOfStock: variant.outOfStock });
