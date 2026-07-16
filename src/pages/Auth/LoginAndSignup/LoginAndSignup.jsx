@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { SignIn, SignUp, useClerk, useUser } from '@clerk/clerk-react';
+import React, { useContext, useEffect, useState } from 'react';
+import { SignIn, SignUp } from '@clerk/clerk-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import RouteLoadingScreen from '../../../components/RouteLoadingScreen/RouteLoadingScreen';
-import { getClerkPrimaryEmail, getUserRole } from '../../../utilities/auth';
+import { userContext } from '../../../utilities/UserContextProvider';
 
 const clerkAppearance = {
     variables: {
@@ -35,29 +35,21 @@ const clerkAppearance = {
 const LoginAndSignup = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const { signOut } = useClerk();
-    const { user, isLoaded, isSignedIn } = useUser();
+    const { user, loading, logOut } = useContext(userContext);
     const [signin, setSignin] = useState(!location.search.includes("mode=signup"));
     const isAdminLogin = location.search.includes("admin=true");
-    const afterAuthUrl = isAdminLogin ? "/admin-secret" : "/myaccount";
-    const currentRole = getUserRole(user);
-    const currentEmail = getClerkPrimaryEmail(user);
-
-    const [roleReady, setRoleReady] = useState(false);
-
-    useEffect(() => {
-        if (!isLoaded || !isSignedIn) {
-            setRoleReady(true);
-            return undefined;
-        }
-
-        setRoleReady(false);
-        const timer = setTimeout(() => setRoleReady(true), 500);
-        return () => clearTimeout(timer);
-    }, [isLoaded, isSignedIn, user?.id]);
+    // Always return here after Clerk finishes auth (email/password or an
+    // OAuth round-trip) instead of redirecting straight to a role-gated
+    // route. This keeps exactly one thing (the effect below) responsible
+    // for deciding where a signed-in user actually goes, so Clerk's own
+    // redirect and our role check can never race/loop against each other.
+    const postAuthReturnUrl = `${location.pathname}${location.search}`;
+    const isSignedIn = Boolean(user);
+    const currentRole = user?.role;
+    const currentEmail = user?.email;
 
     useEffect(() => {
-        if (!isLoaded || !isSignedIn || !roleReady) {
+        if (loading || !isSignedIn) {
             return;
         }
 
@@ -70,14 +62,14 @@ const LoginAndSignup = () => {
         } else {
             navigate("/myaccount", { replace: true });
         }
-    }, [currentRole, isAdminLogin, isLoaded, isSignedIn, roleReady, navigate]);
+    }, [currentRole, isAdminLogin, isSignedIn, loading, navigate]);
 
     const handleSwitchToAdmin = () => {
-        signOut({ redirectUrl: "/login?admin=true" });
+        logOut({ redirectUrl: "/login?admin=true" });
     };
 
     const renderAuthContent = () => {
-        if (!isLoaded || (isSignedIn && !roleReady)) {
+        if (loading) {
             return <RouteLoadingScreen compact />;
         }
 
@@ -107,16 +99,16 @@ const LoginAndSignup = () => {
             <SignIn
                 routing="hash"
                 signUpUrl="/login?mode=signup"
-                forceRedirectUrl={afterAuthUrl}
-                fallbackRedirectUrl={afterAuthUrl}
+                forceRedirectUrl={postAuthReturnUrl}
+                fallbackRedirectUrl={postAuthReturnUrl}
                 appearance={clerkAppearance}
             />
         ) : (
             <SignUp
                 routing="hash"
                 signInUrl={isAdminLogin ? "/login?admin=true" : "/login"}
-                forceRedirectUrl={afterAuthUrl}
-                fallbackRedirectUrl={afterAuthUrl}
+                forceRedirectUrl={postAuthReturnUrl}
+                fallbackRedirectUrl={postAuthReturnUrl}
                 appearance={clerkAppearance}
             />
         );

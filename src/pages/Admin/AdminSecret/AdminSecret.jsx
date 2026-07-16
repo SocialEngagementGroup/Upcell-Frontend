@@ -16,6 +16,7 @@ const links = [
     { to: 'contact', label: 'Contact' },
     { to: 'wholesale', label: 'Wholesale' },
     { to: 'analytics', label: 'Analytics' },
+    { to: 'audit-log', label: 'Audit Log' },
 ];
 
 const AdminSecret = () => {
