@@ -1,6 +1,12 @@
 import { apiBaseUrl } from './env';
 
-const analyticsEndpoint = new URL('analytics-events', apiBaseUrl).toString();
+// apiBaseUrl is "/" when VITE_API_URL is unset (local dev goes through the
+// vite proxy), and `new URL()` rejects a relative base, so resolve against the
+// current origin first. Absolute VITE_API_URL values pass through unchanged.
+const analyticsEndpoint = new URL(
+    'analytics-events',
+    new URL(apiBaseUrl, window.location.origin)
+).toString();
 const analyticsStorageKey = 'upcell_analytics_session_id';
 
 const normalizePayload = (payload = {}) => ({
