@@ -1,6 +1,6 @@
 # Upcell Frontend
 
-The frontend client for the Upcell (Global Traders) platform, a modern e-commerce interface built with React and Vite.
+The frontend client for the UpCell platform, a modern e-commerce interface built with React and Vite.
 
 ## Tech Stack
 - **Framework**: React.js with Vite
