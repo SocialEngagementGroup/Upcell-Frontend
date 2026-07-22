@@ -68,7 +68,9 @@ const sortOptions = [
     { value: 'name', label: 'Name' },
 ];
 
-const PRODUCTS_PER_PAGE = 10;
+// 12 keeps every row full at all three grid widths (2 / 3 / 4 columns), so the
+// last row never renders with empty slots beside it.
+const PRODUCTS_PER_PAGE = 12;
 const PAGE_WINDOW_SIZE = 5;
 
 // Sliding window of up to 5 page numbers centered on the current page.
