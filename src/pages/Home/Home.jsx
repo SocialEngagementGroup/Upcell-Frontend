@@ -1,7 +1,7 @@
 import React from "react";
 import ModernHero from "./ModernHero";
-import CategoryShelf from "../../components/CategoryShelf/CategoryShelf";
 import FeaturedUnits from "../../components/FeaturedUnits/FeaturedUnits";
+import CategoryShelf from "../../components/CategoryShelf/CategoryShelf";
 import TradeInAction from "../../components/TradeInAction/TradeInAction";
 import HomeTrustFeatures from "../../components/HomeTrustFeatures/HomeTrustFeatures";
 import JournalInsights from "../../components/JournalInsights/JournalInsights";
@@ -12,8 +12,8 @@ const Home = () => {
         <div className="page-shell w-full overflow-x-hidden">
             <ScrollToTop />
             <ModernHero />
-            <CategoryShelf />
             <FeaturedUnits />
+            <CategoryShelf />
             <TradeInAction />
             <HomeTrustFeatures />
             <JournalInsights />
