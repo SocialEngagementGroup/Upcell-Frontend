@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import ScrollToTop from '../../utilities/ScrollToTop';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import LocalShippingOutlinedIcon from '@mui/icons-material/LocalShippingOutlined';
 import axiosInstance from '../../utilities/axiosInstance';
+import { CartContext } from '../../App';
 
 const accessories = [
     { name: 'AirPods Pro (2nd Gen)', desc: 'Noise cancellation and effortless pairing.', price: 249.0, image: 'https://via.placeholder.com/200x200?text=AirPods' },
@@ -13,9 +14,15 @@ const accessories = [
 const ThankYou = () => {
     const orderId = new URLSearchParams(window.location.search).get('order_id');
     const [order, setOrder] = useState(null);
+    const { setCart } = useContext(CartContext);
 
     useEffect(() => {
         if (!orderId) return;
+        // Reaching this page with an order id means checkout actually
+        // completed (Stripe's success_url, or a redirect here after PayPal/
+        // manual order creation) — this is the one place all three payment
+        // paths agree the cart should be emptied.
+        setCart([]);
         axiosInstance.get(`order/${orderId}`)
             .then((res) => setOrder(res.data))
             .catch((error) => console.log(error));

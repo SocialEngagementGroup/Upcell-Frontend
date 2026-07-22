@@ -22,7 +22,7 @@ const Checkout = () => {
     const [products, setProducts] = useState([]);
     const [shipping, setShipping] = useState('standard');
     const [isLoading, setIsLoading] = useState(false);
-    const paymentMethod = 'manual';
+    const [paymentMethod, setPaymentMethod] = useState('stripe');
     const { markInteraction, trackSuccess, trackFailure } = useFormAnalytics('checkout');
 
     const isObjectId = (id) => /^[0-9a-fA-F]{24}$/.test(id);
@@ -89,37 +89,63 @@ const Checkout = () => {
         setIsLoading(true);
         markInteraction();
 
-        try {
-            axiosInstance.post('orders', {
-                ...data,
-                orders: data.orders,
-                shipping,
-                paymentMethod,
-                paidWith: 'Manual',
-            }).then((res) => {
-                trackSuccess({
-                    phase: 'request',
-                    shipping,
-                    paymentMethod,
-                    itemCount: productIds.length,
-                });
-                if (params.id === 'cart') {
-                    localStorage.setItem('cart', JSON.stringify([]));
-                }
-                window.location = `/succeed?order_id=${res.data._id}`;
-            }).catch((error) => {
-                console.log(error);
-                setIsLoading(false);
-                const failureMessage = extractApiError(error, 'Something went wrong. Please check your information and try again.');
-                toast.error(failureMessage);
-                trackFailure(failureMessage, { phase: 'request', shipping, paymentMethod, itemCount: productIds.length });
-            });
-        } catch (error) {
+        // Generated once per submit and reused for every request this
+        // attempt makes — if the browser/network retries the same request,
+        // the backend forwards this same key to PayPal/Stripe, so a retry
+        // lands on the original transaction instead of creating a second one.
+        const idempotencyKey = crypto.randomUUID();
+
+        const clearCartIfNeeded = () => {
+            if (params.id === 'cart') {
+                localStorage.setItem('cart', JSON.stringify([]));
+            }
+        };
+
+        const handleFailure = (error) => {
             console.log(error);
             setIsLoading(false);
             const failureMessage = extractApiError(error, 'Something went wrong. Please check your information and try again.');
             toast.error(failureMessage);
             trackFailure(failureMessage, { phase: 'request', shipping, paymentMethod, itemCount: productIds.length });
+        };
+
+        try {
+            if (paymentMethod === 'stripe') {
+                // Cart is intentionally NOT cleared here — the customer hasn't
+                // paid yet, only started a Stripe session. If they cancel and
+                // land back on /cart, their items should still be there.
+                // Clearing happens on ThankYou once payment is confirmed.
+                axiosInstance.post('checkout-stripe', { ...data, shipping, idempotencyKey }).then((res) => {
+                    trackSuccess({ phase: 'request', shipping, paymentMethod, itemCount: productIds.length });
+                    window.location = res.data.url;
+                }).catch(handleFailure);
+            } else if (paymentMethod === 'paypal') {
+                // Same as Stripe above — cart clears in PaypalReturn only
+                // after capture actually confirms the payment succeeded.
+                axiosInstance.post('checkout-customer', { ...data, shipping, idempotencyKey }).then((res) => {
+                    const approveLink = res.data?.links?.find((link) => link.rel === 'payer-action' || link.rel === 'approve')?.href;
+                    if (!approveLink) {
+                        handleFailure(new Error('PayPal did not return an approval link.'));
+                        return;
+                    }
+                    trackSuccess({ phase: 'request', shipping, paymentMethod, itemCount: productIds.length });
+                    window.location = approveLink;
+                }).catch(handleFailure);
+            } else {
+                axiosInstance.post('orders', {
+                    ...data,
+                    orders: data.orders,
+                    shipping,
+                    paymentMethod,
+                    paidWith: 'Manual',
+                }).then((res) => {
+                    trackSuccess({ phase: 'request', shipping, paymentMethod, itemCount: productIds.length });
+                    clearCartIfNeeded();
+                    window.location = `/succeed?order_id=${res.data._id}`;
+                }).catch(handleFailure);
+            }
+        } catch (error) {
+            handleFailure(error);
         }
     };
 
@@ -139,9 +165,9 @@ const Checkout = () => {
                         <KeyboardArrowRightIcon className="!text-sm" />
                         <span className="text-apple-text">Checkout</span>
                     </nav>
-                    <h1 className="text-[clamp(2.1rem,4.8vw,4.9rem)] leading-[0.96] sm:leading-[0.94]">Request your order with a calmer checkout.</h1>
+                    <h1 className="text-[clamp(2.1rem,4.8vw,4.9rem)] leading-[0.96] sm:leading-[0.94]">Complete your order.</h1>
                     <p className="mt-4 max-w-[620px] text-base leading-7 text-ink-soft sm:mt-5 sm:text-lg sm:leading-8">
-                        Online payment is coming soon. Submit your details now and our team will contact you to complete the order.
+                        Pay securely with Stripe or PayPal, or submit your details and our team will contact you to complete the order.
                     </p>
                 </div>
             </section>
@@ -198,19 +224,11 @@ const Checkout = () => {
 
                             <section>
                                 <h3 className="text-[28px]">Payment</h3>
-                                <div className="mt-5 rounded-[24px] border border-black/[0.08] bg-surface-alt p-5">
-                                    <div className="font-bold text-apple-text">Online payment coming soon</div>
-                                    <p className="mt-2 text-sm leading-6 text-ink-soft">
-                                        We are temporarily taking orders as contact-to-order requests while payment setup is parked. Our team will confirm availability and payment details after submission.
-                                    </p>
-                                </div>
-
-                                {/* HIDDEN PAYMENT OPTIONS - Kept for future use */}
-                                {/* 
-                                <div className="mt-5 grid gap-4 hidden">
+                                <div className="mt-5 grid gap-4">
                                     {[
                                         { id: 'stripe', title: 'Credit Card (Stripe)', sub: 'Secure payment via Stripe' },
                                         { id: 'paypal', title: 'PayPal', sub: 'Pay with your PayPal account' },
+                                        { id: 'manual', title: 'Contact to order', sub: 'Submit your details and our team will contact you to complete payment' },
                                     ].map((option) => (
                                         <label key={option.id} className={`flex cursor-pointer items-center justify-between rounded-[24px] border p-5 ${paymentMethod === option.id ? 'border-apple-text bg-surface-alt' : 'border-black/[0.08] bg-white'}`}>
                                             <div>
@@ -218,15 +236,14 @@ const Checkout = () => {
                                                 <div className="mt-1 text-sm text-ink-soft">{option.sub}</div>
                                             </div>
                                             <div className="flex items-center gap-4">
-                                                <input type="radio" checked={paymentMethod === option.id} onChange={() => {
+                                                <input type="radio" name="paymentMethod" checked={paymentMethod === option.id} onChange={() => {
                                                     markInteraction();
-                                                    // setPaymentMethod(option.id); // Assuming you had a state for this
+                                                    setPaymentMethod(option.id);
                                                 }} />
                                             </div>
                                         </label>
                                     ))}
                                 </div>
-                                */}
                             </section>
 
                             <div className="flex flex-col gap-4 border-t border-black/[0.06] pt-6 md:flex-row md:items-center md:justify-between">
@@ -235,7 +252,7 @@ const Checkout = () => {
                                     Encrypted checkout and secure order processing.
                                 </p>
                                 <button type="submit" className="premium-button w-full md:w-auto md:min-w-[220px]" disabled={isLoading}>
-                                    {isLoading ? 'Submitting...' : 'Submit order request'}
+                                    {isLoading ? 'Submitting...' : paymentMethod === 'stripe' ? 'Pay with Stripe' : paymentMethod === 'paypal' ? 'Pay with PayPal' : 'Submit order request'}
                                 </button>
                             </div>
                         </form>
