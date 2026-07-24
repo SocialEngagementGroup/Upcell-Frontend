@@ -36,6 +36,7 @@ const ReturnPolicy = lazy(() => import('./pages/Legal/ReturnPolicy/ReturnPolicy.
 const PrivacyPolicy = lazy(() => import('./pages/Legal/PrivacyPolicy/PrivacyPolicy.jsx'));
 const AboutUs = lazy(() => import('./pages/Legal/AboutUs/AboutUs.jsx'));
 const ThankYou = lazy(() => import('./pages/ThankYou/ThankYou.jsx'));
+const PaypalReturn = lazy(() => import('./pages/PaypalReturn/PaypalReturn.jsx'));
 const ContactThankYou = lazy(() => import('./pages/ThankYou/ContactThankYou.jsx'));
 const JournalPost = lazy(() => import('./pages/Auxiliary/Resources/JournalPost.jsx'));
 const NotFound = lazy(() => import('./pages/NotFound/NotFound.jsx'));
@@ -123,6 +124,10 @@ const router = createBrowserRouter([
       {
         path: "succeed",
         element: lazyElement(<ThankYou />),
+      },
+      {
+        path: "paypal-return",
+        element: lazyElement(<PaypalReturn />),
       },
       {
         path: "contact-thank-you",
