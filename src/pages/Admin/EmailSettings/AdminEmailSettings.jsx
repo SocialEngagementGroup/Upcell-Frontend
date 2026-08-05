@@ -35,6 +35,7 @@ const AdminEmailSettings = () => {
     const [tradeInAdminEmail, setTradeInAdminEmail] = useState('');
     const [enableCustomerEmails, setEnableCustomerEmails] = useState(true);
     const [enableAdminEmails, setEnableAdminEmails] = useState(true);
+    const [enableErrorAlerts, setEnableErrorAlerts] = useState(true);
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
 
@@ -46,6 +47,7 @@ const AdminEmailSettings = () => {
             setTradeInAdminEmail(res.data.tradeInAdminEmail || '');
             setEnableCustomerEmails(Boolean(res.data.enableCustomerEmails));
             setEnableAdminEmails(Boolean(res.data.enableAdminEmails));
+            setEnableErrorAlerts(res.data.enableErrorAlerts !== false);
         } catch (error) {
             console.log(error);
             toast.error('Failed to load email settings');
@@ -66,6 +68,7 @@ const AdminEmailSettings = () => {
                 tradeInAdminEmail,
                 enableCustomerEmails,
                 enableAdminEmails,
+                enableErrorAlerts,
             });
             setConfig(res.data);
             toast.success('Email settings saved');
@@ -119,6 +122,19 @@ const AdminEmailSettings = () => {
                     label="Admin emails"
                     description="Send a notification to the admin email above when a new trade-in request comes in."
                 />
+
+                <div className="border-t border-black/5 pt-6">
+                    <label className="mb-3 block text-xs font-bold uppercase tracking-[0.18em] text-apple-gray">
+                        System alerts
+                    </label>
+                    <ToggleSwitch
+                        checked={enableErrorAlerts}
+                        onChange={setEnableErrorAlerts}
+                        disabled={isSaving}
+                        label="Server error alerts"
+                        description="Email + group chat alert when the site hits a server error. Turn off temporarily while testing something expected to error (like an unfinished feature) — remember to turn it back on."
+                    />
+                </div>
 
                 <div className="rounded-[28px] bg-surface-alt p-5">
                     <div className="text-xs font-bold uppercase tracking-[0.18em] text-apple-gray">Total emails sent</div>
