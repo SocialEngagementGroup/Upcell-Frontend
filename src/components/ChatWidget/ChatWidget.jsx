@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import SendRoundedIcon from '@mui/icons-material/SendRounded';
@@ -9,7 +9,12 @@ import AssignmentReturnRoundedIcon from '@mui/icons-material/AssignmentReturnRou
 import SwapHorizRoundedIcon from '@mui/icons-material/SwapHorizRounded';
 import SupportAgentRoundedIcon from '@mui/icons-material/SupportAgentRounded';
 import { useChat } from './useChat';
+import { useAutoCarousel } from './useAutoCarousel';
 import quickQuestions from './quickQuestions';
+import { useProductsQuery } from '../../queries/products';
+import { getProductRouteParent, groupProductsByParent } from '../../utilities/catalog';
+
+const MAX_LATEST_IPHONES = 12;
 
 const BOT_AVATAR_SRC = '/staticImages/faviconUpcell.png';
 const SUPPORT_EMAIL = 'upcellit@gmail.com';
@@ -26,17 +31,11 @@ const QUICK_QUESTION_ICONS = {
     human: SupportAgentRoundedIcon,
 };
 
-const CATEGORY_SHORTCUTS = [
-    { id: 'iphone', label: 'iPhone', image: '/staticImages/category-iphone.png', to: '/shop?category=iPhone' },
-    { id: 'ipad', label: 'iPad', image: '/staticImages/category-ipad.png', to: '/shop?category=iPad' },
-    { id: 'macbook', label: 'MacBook', image: '/staticImages/category-macbook.png', to: '/shop?category=MacBook' },
-];
-
 const BotAvatar = () => (
     <img
         src={BOT_AVATAR_SRC}
         alt=""
-        className="h-9 w-9 flex-shrink-0 rounded-full bg-white object-contain p-1.5 ring-1 ring-gray-200"
+        className="h-10 w-10 flex-shrink-0 rounded-full bg-black object-contain p-1.5"
     />
 );
 
@@ -121,6 +120,24 @@ const ChatWidget = () => {
 
     const { mutateAsync, isPending } = useChat();
 
+    // Reuses the site's existing shared /product query (already depended on
+    // by ShopPage, ProductDetailPage, etc. — see catalog.js) rather than
+    // adding a new endpoint. Only fetches while the widget is actually open.
+    const { data: allProducts = [] } = useProductsQuery({ enabled: isOpen });
+
+    // One flat list, latest model first — each product is its own slide.
+    const latestIphones = useMemo(() => {
+        const iphones = groupProductsByParent(allProducts.filter((product) => product.family === 'iPhone'));
+        const withRank = iphones.map((product) => {
+            const match = product.productName?.match(/\d+/);
+            return { ...product, _generationRank: match ? parseInt(match[0], 10) : 0 };
+        });
+        withRank.sort((a, b) => b._generationRank - a._generationRank);
+        return withRank.slice(0, MAX_LATEST_IPHONES);
+    }, [allProducts]);
+
+    const showEmptyState = isOpen && messages.length === 0;
+
     useEffect(() => {
         if (isOpen) {
             inputRef.current?.focus();
@@ -130,6 +147,8 @@ const ChatWidget = () => {
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages, isPending]);
+
+    const iphoneCarousel = useAutoCarousel({ active: showEmptyState && latestIphones.length > 0 });
 
     const closePanel = () => {
         setIsOpen(false);
@@ -181,49 +200,60 @@ const ChatWidget = () => {
                     role="dialog"
                     aria-label="Chat with UpCell support"
                     onKeyDown={handleKeyDown}
-                    className="mb-3 flex h-[calc(100vh-7rem)] max-h-[42rem] w-[calc(100vw-2rem)] max-w-sm flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-xl motion-reduce:transition-none sm:h-[39rem] sm:w-[26rem]"
+                    className="mb-3 flex h-[calc(100vh-7rem)] max-h-[42rem] w-[calc(100vw-2rem)] max-w-sm flex-col overflow-hidden rounded-2xl border-2 border-gray-900 bg-white shadow-xl motion-reduce:transition-none sm:h-[39rem] sm:w-[26rem]"
                 >
-                    <div className="border-b-2 border-brand-red bg-[linear-gradient(160deg,#1c1c1e_0%,#2c2c2e_100%)] px-4 py-3">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <BotAvatar />
-                                <div className="flex flex-col leading-tight">
-                                    <span className="text-base font-bold text-white">UpCell Support</span>
-                                    <span className="flex items-center gap-1.5 text-xs font-normal text-white/60">
-                                        <span className="relative flex h-1.5 w-1.5">
-                                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-red opacity-75 motion-reduce:hidden" />
-                                            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-brand-red" />
-                                        </span>
-                                        Typically replies in a few seconds
-                                    </span>
-                                </div>
-                            </div>
-                            <button
-                                type="button"
-                                onClick={closePanel}
-                                aria-label="Close chat"
-                                className="rounded-full p-1 text-white/80 hover:bg-white/10 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
-                            >
-                                <CloseRoundedIcon fontSize="medium" />
-                            </button>
+                    <div className="relative overflow-hidden border-b-2 border-brand-red p-5 shadow-md">
+                        <div className="absolute inset-0 bg-[#141416]">
+                            <img
+                                src="/product-images/product-photos/iphone-17-iphone-17-pro-max-17-pro-max-deep-blue-2dca7e0552.png"
+                                alt=""
+                                aria-hidden="true"
+                                className="pointer-events-none absolute -right-8 -top-6 h-[160%] w-auto rotate-6 select-none object-contain opacity-90"
+                            />
+                            <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(20,20,22,0.88)_0%,rgba(20,20,22,0.6)_35%,rgba(20,20,22,0)_65%)]" />
                         </div>
-                        <div className="mt-2 flex flex-wrap gap-1.5">
-                            <a
-                                href={`mailto:${SUPPORT_EMAIL}`}
-                                className="flex w-fit items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1.5 text-[13px] font-medium text-white/90 transition hover:bg-white/20 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
-                            >
-                                <MailOutlineRoundedIcon className="!text-base" />
-                                {SUPPORT_EMAIL}
-                            </a>
-                            {SUPPORT_PHONE_HREF && (
+                        <div className="relative z-10">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <BotAvatar />
+                                    <div className="flex flex-col leading-tight">
+                                        <span className="text-lg font-bold text-white">UpCell Support</span>
+                                        <span className="flex items-center gap-1.5 text-sm font-normal text-white/70">
+                                            <span className="relative flex h-2 w-2">
+                                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-red opacity-75 motion-reduce:hidden" />
+                                                <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-red" />
+                                            </span>
+                                            Typically replies in a few seconds
+                                        </span>
+                                    </div>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={closePanel}
+                                    aria-label="Close chat"
+                                    className="rounded-full p-1 text-white/80 hover:bg-white/10 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                                >
+                                    <CloseRoundedIcon fontSize="medium" />
+                                </button>
+                            </div>
+                            <div className="mt-2 flex flex-wrap gap-1.5">
                                 <a
-                                    href={SUPPORT_PHONE_HREF}
+                                    href={`mailto:${SUPPORT_EMAIL}`}
                                     className="flex w-fit items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1.5 text-[13px] font-medium text-white/90 transition hover:bg-white/20 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
                                 >
-                                    <LocalPhoneRoundedIcon className="!text-base" />
-                                    {SUPPORT_PHONE}
+                                    <MailOutlineRoundedIcon className="!text-base" />
+                                    {SUPPORT_EMAIL}
                                 </a>
-                            )}
+                                {SUPPORT_PHONE_HREF && (
+                                    <a
+                                        href={SUPPORT_PHONE_HREF}
+                                        className="flex w-fit items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1.5 text-[13px] font-medium text-white/90 transition hover:bg-white/20 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                                    >
+                                        <LocalPhoneRoundedIcon className="!text-base" />
+                                        {SUPPORT_PHONE}
+                                    </a>
+                                )}
+                            </div>
                         </div>
                     </div>
 
@@ -231,39 +261,48 @@ const ChatWidget = () => {
                         role="log"
                         aria-live="polite"
                         aria-relevant="additions"
-                        className="chat-scrollbar flex-1 space-y-3 overflow-y-auto bg-[linear-gradient(180deg,#fbfbfc_0%,#f2f2f4_100%)] px-4 py-3"
+                        className="no-scrollbar flex-1 space-y-3 overflow-y-auto bg-[linear-gradient(180deg,#fbfbfc_0%,#f2f2f4_100%)] px-4 py-3"
                     >
-                        {messages.length === 0 && (
-                            <div className="space-y-3">
-                                <div className="flex items-end justify-start gap-2">
-                                    <BotAvatar />
-                                    <div className="max-w-[80%] space-y-1 rounded-2xl rounded-bl-sm bg-white px-3 py-2 text-[15px] text-gray-900 shadow-sm">
-                                        <p className="font-normal">Hi! Ask me anything, or tap a quick question below to get started.</p>
-                                    </div>
-                                </div>
-                                <div className="pl-11">
-                                    <p className="mb-2 text-[11px] font-bold uppercase tracking-wide text-gray-400">Browse by category</p>
-                                    <div className="chat-scrollbar flex gap-2 overflow-x-auto pb-1">
-                                        {CATEGORY_SHORTCUTS.map((cat) => (
-                                            <Link
-                                                key={cat.id}
-                                                to={cat.to}
-                                                onClick={closePanel}
-                                                className="group w-20 flex-shrink-0 overflow-hidden rounded-xl border border-gray-200 bg-white transition hover:border-brand-red/40 hover:shadow-sm"
-                                            >
-                                                <div className="aspect-square w-full overflow-hidden bg-gray-50">
-                                                    <img
-                                                        src={cat.image}
-                                                        alt={cat.label}
-                                                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                                                    />
-                                                </div>
-                                                <p className="px-1 py-1 text-center text-[11px] font-semibold text-gray-700 group-hover:text-brand-red">
-                                                    {cat.label}
+                        {latestIphones.length > 0 && (
+                            <div
+                                ref={iphoneCarousel.trackRef}
+                                className="no-scrollbar flex snap-x snap-mandatory overflow-x-auto scroll-smooth active:cursor-grabbing"
+                                style={{ cursor: 'grab' }}
+                                {...iphoneCarousel.trackHandlers}
+                            >
+                                {latestIphones.map((product) => (
+                                    <Link
+                                        key={product._id}
+                                        to={`/iphone/${getProductRouteParent(product)}/${product._id}`}
+                                        onClick={iphoneCarousel.handleLinkClick(closePanel)}
+                                        draggable={false}
+                                        className="group block w-1/4 flex-shrink-0 snap-start px-1"
+                                    >
+                                        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md transition hover:border-brand-red/40 hover:shadow-lg">
+                                            <div className="aspect-square w-full overflow-hidden bg-gray-50">
+                                                <img
+                                                    src={product.image}
+                                                    alt={product.productName}
+                                                    draggable={false}
+                                                    className="pointer-events-none h-full w-full select-none object-contain p-1.5"
+                                                />
+                                            </div>
+                                            <div className="px-1.5 py-1.5 text-center">
+                                                <p className="truncate text-[10px] font-semibold text-gray-900">{product.productName}</p>
+                                                <p className="text-[10px] font-bold text-brand-red">
+                                                    {String(product.price).startsWith('$') ? product.price : `$${product.price}`}
                                                 </p>
-                                            </Link>
-                                        ))}
-                                    </div>
+                                            </div>
+                                        </div>
+                                    </Link>
+                                ))}
+                            </div>
+                        )}
+                        {messages.length === 0 && (
+                            <div className="flex items-end justify-start gap-2">
+                                <BotAvatar />
+                                <div className="max-w-[80%] space-y-1 rounded-2xl rounded-bl-sm bg-white px-3 py-2 text-[15px] text-gray-900 shadow-md">
+                                    <p className="font-normal">Hi! Ask me anything, or tap a quick question below to get started.</p>
                                 </div>
                             </div>
                         )}
@@ -274,10 +313,10 @@ const ChatWidget = () => {
                             >
                                 {msg.role === 'assistant' && <BotAvatar />}
                                 <div
-                                    className={`max-w-[80%] space-y-1 rounded-2xl px-3 py-2 text-[15px] font-normal leading-relaxed ${
+                                    className={`max-w-[80%] space-y-1 rounded-2xl px-3 py-2 text-[15px] font-normal leading-relaxed shadow-md ${
                                         msg.role === 'user'
                                             ? 'rounded-br-sm bg-gray-900 text-white'
-                                            : 'rounded-bl-sm bg-white text-gray-900 shadow-sm'
+                                            : 'rounded-bl-sm bg-white text-gray-900'
                                     }`}
                                 >
                                     {msg.role === 'assistant' ? renderMessageText(msg.text) : <p>{msg.text}</p>}
@@ -287,7 +326,7 @@ const ChatWidget = () => {
                         {isPending && (
                             <div className="flex items-end justify-start gap-2" aria-hidden="true">
                                 <BotAvatar />
-                                <div className="flex items-center gap-1 rounded-2xl rounded-bl-sm bg-white px-3 py-2.5 shadow-sm">
+                                <div className="flex items-center gap-1 rounded-2xl rounded-bl-sm bg-white px-3 py-2.5 shadow-md">
                                     <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-gray-400 [animation-delay:-0.3s]" />
                                     <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-gray-400 [animation-delay:-0.15s]" />
                                     <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-gray-400" />
@@ -305,23 +344,25 @@ const ChatWidget = () => {
                         <div ref={messagesEndRef} />
                     </div>
 
-                    <div className="chat-scrollbar flex gap-1.5 overflow-x-auto border-t border-gray-100 px-3 py-2">
-                        {quickQuestions.map((item) => {
-                            const Icon = QUICK_QUESTION_ICONS[item.id];
-                            return (
-                                <button
-                                    key={item.id}
-                                    type="button"
-                                    onClick={() => handleQuickQuestion(item)}
-                                    disabled={isPending}
-                                    className="group flex flex-shrink-0 items-center gap-1 rounded-full border border-gray-300 bg-white px-2.5 py-1 text-[13px] font-semibold text-gray-800 transition hover:border-gray-900 hover:bg-gray-900 hover:text-white disabled:opacity-40"
-                                >
-                                    {Icon && <Icon className="!text-lg text-brand-red group-hover:text-white" />}
-                                    {item.label}
-                                </button>
-                            );
-                        })}
-                    </div>
+                    {messages.length === 0 && (
+                        <div className="grid grid-cols-2 gap-1.5 border-t border-gray-100 px-3 py-2">
+                            {quickQuestions.map((item) => {
+                                const Icon = QUICK_QUESTION_ICONS[item.id];
+                                return (
+                                    <button
+                                        key={item.id}
+                                        type="button"
+                                        onClick={() => handleQuickQuestion(item)}
+                                        disabled={isPending}
+                                        className="group flex items-center justify-center gap-1 rounded-xl border-2 border-gray-600 bg-white px-2.5 py-2 text-[13px] font-semibold text-gray-800 shadow-sm transition hover:border-gray-900 hover:bg-gray-900 hover:text-white disabled:opacity-40"
+                                    >
+                                        {Icon && <Icon className="!text-lg text-brand-red group-hover:text-white" />}
+                                        {item.label}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    )}
 
                     <form onSubmit={handleSubmit} className="flex items-center gap-2 border-t border-gray-100 px-3 py-2">
                         <label htmlFor="chat-widget-input" className="sr-only">Type your message</label>
