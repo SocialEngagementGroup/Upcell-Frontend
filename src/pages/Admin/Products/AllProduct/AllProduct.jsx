@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+﻿import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import SingleProductGroup from '../AdminSingleProduct/SingleProductGroup';
 import AdminPageHeader from '../../../../components/AdminPageHeader/AdminPageHeader';
@@ -59,13 +59,16 @@ const AllProduct = () => {
         const variationList = Array.isArray(variations) ? variations : [];
         if (!parentList.length) return [];
         return parentList
-            .map((parent) => ({
-                parentId: parent._id,
-                productName: parent.modelName,
-                categoryName: parent.categoryName || '',
-                image: parent.images?.[0]?.url || '',
-                variants: variationList.filter((variant) => String(variant.parentCatagory) === String(parent._id)),
-            }))
+            .map((parent) => {
+                const parentVariants = variationList.filter((variant) => String(variant.parentCatagory) === String(parent._id));
+                return {
+                    parentId: parent._id,
+                    productName: parent.modelName,
+                    categoryName: parent.categoryName || '',
+                    image: parentVariants[0]?.image || parent.images?.[0]?.url || '',
+                    variants: parentVariants,
+                };
+            })
             .filter((group) => !removedIds.has(group.parentId))
             .sort(sortByProductName);
     }, [parents, variations, removedIds]);
@@ -219,3 +222,4 @@ const AllProduct = () => {
 };
 
 export default AllProduct;
+

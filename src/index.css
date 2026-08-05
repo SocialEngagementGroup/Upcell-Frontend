@@ -109,12 +109,16 @@
     }
 
     .legal-prose {
-        @apply max-w-[860px] mx-auto text-[15px] leading-8;
+        @apply max-w-[1040px] mx-auto text-base leading-8;
         color: #515154;
     }
 
     .legal-prose h2 {
-        @apply mt-12 mb-4 text-2xl text-apple-text;
+        @apply mt-12 mb-4 scroll-mt-28 border-t border-black/[0.06] pt-8 text-2xl font-bold text-apple-text;
+    }
+
+    .legal-prose h2:first-of-type {
+        @apply mt-0 border-t-0 pt-0;
     }
 
     .legal-prose p {
@@ -122,8 +126,41 @@
         color: #515154;
     }
 
+    .legal-prose strong {
+        @apply font-semibold text-apple-text;
+    }
+
+    .legal-prose ul {
+        @apply list-disc;
+    }
+
+    .legal-prose ol {
+        @apply list-decimal;
+    }
+
     .legal-prose ul, .legal-prose ol {
-        @apply mb-6 pl-6;
+        @apply mb-6 space-y-1 pl-6;
+    }
+
+    .legal-prose table {
+        @apply w-full border-collapse text-left text-[14px];
+    }
+
+    .legal-prose th {
+        @apply border-b border-r border-black/[0.08] bg-surface-alt/70 px-4 py-3 text-xs font-bold uppercase tracking-wider text-ink-soft last:border-r-0;
+    }
+
+    .legal-prose td {
+        @apply border-b border-r border-black/[0.06] px-4 py-3 align-top last:border-r-0;
+        color: #515154;
+    }
+
+    .legal-prose tr:last-child td {
+        @apply border-b-0;
+    }
+
+    .legal-prose .legal-table-wrap {
+        @apply mb-6 overflow-x-auto rounded-2xl border border-black/[0.08];
     }
 
     .legal-prose li {

@@ -91,7 +91,9 @@ const MyFooter = () => {
                             <h4 className="text-sm font-extrabold uppercase tracking-[0.14em] text-apple-text">Assistance</h4>
                             <div className="flex flex-col gap-3 text-[15px] text-ink-soft">
                                 <Link to="/return-policy">Warranty & Returns</Link>
+                                <Link to="/delivery-policy">Delivery Policy</Link>
                                 <Link to="/privacy-policy">Privacy Policy</Link>
+                                <Link to="/terms-conditions">Terms & Conditions</Link>
                                 <Link to="/support">Support</Link>
                             </div>
                         </div>

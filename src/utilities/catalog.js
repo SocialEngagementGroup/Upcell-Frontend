@@ -1,3 +1,5 @@
+﻿import { resolveProductImage } from './productImages';
+
 export const inferFamily = (product) => {
     const name = `${product?.categoryName || ''} ${product?.productName || ''} ${product?.description || ''}`.toLowerCase();
     if (name.includes('iphone')) return 'iPhone';
@@ -11,6 +13,7 @@ export const getProductRouteParent = (product) => product?.parentCatagory || pro
 
 export const normalizeProduct = (product) => ({
     ...product,
+    image: resolveProductImage(product),
     color: {
         ...(product?.color || {}),
         value: product?.color?.value || product?.color?.hex || '#d1d5db',
@@ -65,4 +68,5 @@ export const groupProductsByParent = (products = []) => {
     });
     return Array.from(map.values());
 };
+
 

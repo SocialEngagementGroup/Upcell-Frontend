@@ -23,3 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 .env
+
+# Chatbot — kept local-only for now, not pushed to GitHub (see Documentation/Upcell-Chatbot-Plan.md)
+src/components/ChatWidget/

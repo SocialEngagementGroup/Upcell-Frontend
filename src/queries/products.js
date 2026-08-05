@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+﻿import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axiosInstance from '../utilities/axiosInstance';
 import { normalizeProduct } from '../utilities/catalog';
 import { productKeys, categoryKeys } from './keys';
@@ -8,7 +8,7 @@ const invalidateProductData = (queryClient) => {
     queryClient.invalidateQueries({ queryKey: categoryKeys.parents() });
 };
 
-// Hoisted so `select` has a stable identity across renders — an inline
+// Hoisted so `select` has a stable identity across renders â€” an inline
 // `select` fn is recreated every render, which defeats React Query's memoized
 // selector and produces a brand-new array every render, forever.
 const selectNormalizedProducts = (products) => products.map(normalizeProduct);
@@ -23,6 +23,7 @@ export const useProductsQuery = (options = {}) => useQuery({
 export const useProductsByParentQuery = (parentId, options = {}) => useQuery({
     queryKey: productKeys.byParent(parentId),
     queryFn: () => axiosInstance.get(`allSameParentProducts/${parentId}`).then((res) => res.data),
+    select: selectNormalizedProducts,
     enabled: Boolean(parentId),
     ...options,
 });
@@ -58,3 +59,4 @@ export const useDeleteProductFamilyMutation = () => {
         onSuccess: () => invalidateProductData(queryClient),
     });
 };
+
