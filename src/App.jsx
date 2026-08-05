@@ -4,6 +4,7 @@ import MyFooter from './components/layout/Footer/MyFooter'
 
 import { ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import ChatWidget from './components/ChatWidget/ChatWidget'
 
 import { createContext, useEffect, useState } from 'react'
 export const CartContext = createContext([])
@@ -27,6 +28,7 @@ function App() {
           <Outlet />
         </main>
         <MyFooter />
+        <ChatWidget />
         <ToastContainer position="top-center" autoClose={1000} />
       </div>
     </CartContext.Provider>
