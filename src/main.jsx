@@ -34,6 +34,8 @@ const LoginAndSignup = lazy(() => import('./pages/Auth/LoginAndSignup/LoginAndSi
 const ProductDetailPage = lazy(() => import('./pages/ProductDetail/ProductDetailPage/ProductDetailPage.jsx'));
 const ReturnPolicy = lazy(() => import('./pages/Legal/ReturnPolicy/ReturnPolicy.jsx'));
 const PrivacyPolicy = lazy(() => import('./pages/Legal/PrivacyPolicy/PrivacyPolicy.jsx'));
+const TermsConditions = lazy(() => import('./pages/Legal/TermsConditions/TermsConditions.jsx'));
+const DeliveryPolicy = lazy(() => import('./pages/Legal/DeliveryPolicy/DeliveryPolicy.jsx'));
 const AboutUs = lazy(() => import('./pages/Legal/AboutUs/AboutUs.jsx'));
 const ThankYou = lazy(() => import('./pages/ThankYou/ThankYou.jsx'));
 const PaypalReturn = lazy(() => import('./pages/PaypalReturn/PaypalReturn.jsx'));
@@ -112,6 +114,14 @@ const router = createBrowserRouter([
       {
         path: "privacy-policy",
         element: lazyElement(<PrivacyPolicy />),
+      },
+      {
+        path: "terms-conditions",
+        element: lazyElement(<TermsConditions />),
+      },
+      {
+        path: "delivery-policy",
+        element: lazyElement(<DeliveryPolicy />),
       },
       {
         path: "about",
