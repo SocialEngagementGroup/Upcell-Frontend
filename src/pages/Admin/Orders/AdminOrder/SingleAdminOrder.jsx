@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import axiosInstance from "../../../../utilities/axiosInstance";
 import JsBarcode from "jsbarcode";
 import { toast } from 'react-toastify';
+import { ORDER_STATUS_OPTIONS, orderStatusLabel, paymentDisplay } from "../../../../constants/orderStatus";
 
 const SingleAdminOrder = ({ order, onStatusChanged }) => {
     const { line_items, name, email, phone, city, postal, street, country, shipping, paid, status, createdAt, updatedAt } = order;
@@ -32,13 +33,14 @@ const SingleAdminOrder = ({ order, onStatusChanged }) => {
     }, [order]);
 
     const total = line_items.reduce((sum, item) => sum + (item?.price_data?.product_data?.metadata?.totalPaid || 0), 0);
+    const payment = paymentDisplay({ paid, status });
 
     return (
         <div className="admin-panel rounded-[30px] p-6">
             <div className="grid gap-5 lg:grid-cols-[1fr_1fr_240px]">
                 <div className="space-y-2 text-sm text-ink-soft">
                     <p>Total amount: <strong className="text-apple-text">${total}</strong></p>
-                    <p>Payment: <strong className={paid ? 'text-green-600' : 'text-red-600'}>{paid ? 'Completed' : 'Failed'}</strong></p>
+                    <p>Payment: <strong className={payment.className}>{payment.text}</strong></p>
                     <p>Order ID: <strong className="text-apple-text">{order._id}</strong></p>
                 </div>
 
@@ -50,17 +52,11 @@ const SingleAdminOrder = ({ order, onStatusChanged }) => {
 
                 <div className="space-y-3">
                     <p className="text-sm text-ink-soft">Shipping method: <strong className="text-apple-text uppercase">{shipping}</strong></p>
-                    {paid ? (
-                        <select className="admin-select" value={shippingStatus} onChange={changeShippingStatus}>
-                            <option value="Processing">Processing</option>
-                            <option value="Shipped">Shipped</option>
-                            <option value="Delivered">Delivered</option>
-                            <option value="Returned">Returned</option>
-                            <option value="Refunded">Refunded</option>
-                        </select>
-                    ) : (
-                        <p className="text-sm font-bold text-red-600">{status}</p>
-                    )}
+                    <select className="admin-select" value={shippingStatus} onChange={changeShippingStatus}>
+                        {ORDER_STATUS_OPTIONS.map((option) => (
+                            <option key={option} value={option}>{orderStatusLabel(option)}</option>
+                        ))}
+                    </select>
                     <button className="premium-button-secondary w-full justify-center" onClick={() => setShowDetails((prev) => !prev)}>
                         {showDetails ? 'Hide details' : 'Show details'}
                     </button>
