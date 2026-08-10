@@ -7,6 +7,7 @@ import AdminEmptyState from '../../../../components/AdminState/AdminEmptyState.j
 import { useParentCategoriesQuery, useShopCategoriesQuery } from '../../../../queries/categories';
 import { useProductsQuery } from '../../../../queries/products';
 import { EMPTY_ARRAY } from '../../../../queries/keys';
+import { resolveImageRef } from '../../../../utilities/cloudinary';
 
 const AllCatagories = () => {
     const outletContext = useOutletContext() || {};
@@ -26,7 +27,7 @@ const AllCatagories = () => {
         parentId: parent._id,
         productName: parent.modelName,
         categoryName: parent.categoryName || '',
-        image: parent.images?.[0]?.url || '',
+        image: resolveImageRef(parent.images?.[0], { width: 160 }) || '',
         variants: variants.filter((variant) => String(variant.parentCatagory) === String(parent._id)),
     })), [parents, variants]);
 

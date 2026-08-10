@@ -72,3 +72,15 @@ export const resolveImageSrc = (value, options = {}) => {
 export const resolveImageSrcSet = (value, widths = IMAGE_WIDTHS, options = {}) => (
     isCloudinaryId(value) ? cloudinarySrcSet(value, widths, options) : ""
 );
+
+// An image reference as stored in MongoDB. The backfill added `publicId`
+// alongside the original `url` rather than replacing it, so documents carry
+// both — prefer the public_id, and fall back to the legacy path for anything
+// that has not been backfilled. Accepts a bare string too, since
+// singlevariations stores the path directly rather than in an object.
+export const resolveImageRef = (ref, options = {}) => {
+    if (!ref) return "";
+    if (typeof ref === "string") return resolveImageSrc(ref, options);
+
+    return resolveImageSrc(ref.publicId || ref.url, options);
+};

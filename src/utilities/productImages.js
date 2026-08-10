@@ -1,5 +1,5 @@
 ﻿import productImageManifest from '../data/productImageManifest.js';
-import { cloudinaryUrl, resolveImageSrc } from './cloudinary';
+import { cloudinaryUrl, resolveImageRef } from './cloudinary';
 
 // Width the catalogue actually renders at. Applied here rather than in each
 // component because this is the single point every product image passes
@@ -172,12 +172,17 @@ const scoreImage = (image, productTokens, colorTokens, family) => {
     return score;
 };
 
-// The product's own image field is the fallback whenever the manifest cannot
-// identify a match. It may hold a Cloudinary public_id (post-backfill) or a
-// legacy /product-images/... path, so it goes through resolveImageSrc rather
-// than being returned raw — that is what lets the catalogue work while the
-// database is only part migrated.
-const fallbackImage = (product) => resolveImageSrc(product?.image, { width: CATALOG_IMAGE_WIDTH });
+// Fallback for products the manifest cannot match — newer models such as the
+// iPhone 17e are not in it at all, so this path is common, not exceptional.
+//
+// imagePublicId is what the backfill wrote; image still holds the original
+// /product-images/... path because the backfill was additive. Reading `image`
+// alone left those products pointing at local files that are no longer
+// deployed, so the public_id must be preferred.
+const fallbackImage = (product) => resolveImageRef(
+    { publicId: product?.imagePublicId, url: product?.image },
+    { width: CATALOG_IMAGE_WIDTH }
+);
 
 export const resolveProductImage = (product) => {
     const productTokens = getProductTokens(product);

@@ -10,6 +10,7 @@ import SearchWithSuggestions from '../../../../components/SearchWithSuggestions/
 import { useProductsQuery } from '../../../../queries/products';
 import { useParentCategoriesQuery } from '../../../../queries/categories';
 import { EMPTY_ARRAY } from '../../../../queries/keys';
+import { resolveImageRef } from '../../../../utilities/cloudinary';
 
 const familyOrder = ['iPhone', 'iPad', 'MacBook'];
 const PRODUCTS_PER_PAGE = 10;
@@ -65,7 +66,9 @@ const AllProduct = () => {
                     parentId: parent._id,
                     productName: parent.modelName,
                     categoryName: parent.categoryName || '',
-                    image: parentVariants[0]?.image || parent.images?.[0]?.url || '',
+                    image: resolveImageRef({ publicId: parentVariants[0]?.imagePublicId, url: parentVariants[0]?.image }, { width: 160 })
+                        || resolveImageRef(parent.images?.[0], { width: 160 })
+                        || '',
                     variants: parentVariants,
                 };
             })
