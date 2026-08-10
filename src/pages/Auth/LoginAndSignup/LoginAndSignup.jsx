@@ -3,6 +3,7 @@ import { SignIn, SignUp } from '@clerk/clerk-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import RouteLoadingScreen from '../../../components/RouteLoadingScreen/RouteLoadingScreen';
 import { userContext } from '../../../utilities/UserContextProvider';
+import { STATIC_IMAGES, staticImageUrl } from '../../../constants/staticImages';
 
 const clerkAppearance = {
     variables: {
@@ -121,7 +122,7 @@ const LoginAndSignup = () => {
                     <div className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full bg-brand-red/30 blur-[90px]" />
                     <div className="pointer-events-none absolute -bottom-24 -left-12 h-56 w-56 rounded-full bg-brand-red/20 blur-[90px]" />
                     <Link to="/" className="relative z-10">
-                        <img src="/staticImages/upcellLogoLight.png" alt="UpCell" className="h-12 w-auto" />
+                        <img src={staticImageUrl(STATIC_IMAGES.LOGO_LIGHT, 240)} alt="UpCell" className="h-12 w-auto" />
                     </Link>
                     <div className="relative z-10">
                         <h2 className="text-[34px] font-extrabold leading-[1.1] text-white">Premium devices,<br />better prices.</h2>
@@ -135,7 +136,7 @@ const LoginAndSignup = () => {
                 <div className="flex w-full flex-col overflow-y-auto px-5 py-8 sm:px-10 sm:py-10 lg:w-[56%] lg:px-12">
                     <div className="m-auto w-full max-w-[430px]">
                         <Link to="/" className="mb-8 inline-block lg:hidden">
-                            <img src="/staticImages/upcellLogo.png" alt="UpCell" className="h-8 w-auto" />
+                            <img src={staticImageUrl(STATIC_IMAGES.LOGO, 160)} alt="UpCell" className="h-8 w-auto" />
                         </Link>
                         <header className="mb-6">
                             <h1 className="text-3xl font-extrabold mb-2">{signin ? "Welcome back" : "Join UpCell"}</h1>

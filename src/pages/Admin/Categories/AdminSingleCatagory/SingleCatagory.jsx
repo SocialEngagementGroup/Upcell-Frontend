@@ -4,6 +4,8 @@ import { toast } from 'react-toastify';
 import AdminConfirmModal from '../../../../components/AdminConfirmModal/AdminConfirmModal';
 import { useUpdateShopCategoryMutation, useDeleteShopCategoryMutation } from '../../../../queries/categories';
 import { useDeleteProductFamilyMutation } from '../../../../queries/products';
+import { STATIC_IMAGES, staticImageUrl } from '../../../../constants/staticImages';
+import { resolveImageSrc } from '../../../../utilities/cloudinary';
 
 const SingleCatagory = ({ catagory, productGroups }) => {
     const navigate = useNavigate();
@@ -144,7 +146,7 @@ const SingleCatagory = ({ catagory, productGroups }) => {
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-4">
                                                     <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-lg bg-surface-alt p-1">
-                                                        <img src={product.image || '/staticImages/notAvailable.webp'} className="h-full w-full object-contain" alt="" />
+                                                        <img src={resolveImageSrc(product.image, { width: 80 }) || staticImageUrl(STATIC_IMAGES.NOT_AVAILABLE, 80)} className="h-full w-full object-contain" alt="" />
                                                     </div>
                                                     <div>
                                                         <span className="block font-semibold text-apple-text">{product.productName}</span>

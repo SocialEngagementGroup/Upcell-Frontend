@@ -1,8 +1,14 @@
+import { STATIC_IMAGES, staticImageUrl } from '../constants/staticImages';
+
+// Blog hero images render at card and article width; 900px covers both,
+// including retina on the card.
+const BLOG_IMAGE_WIDTH = 900;
+
 export const blogData = [
     { 
         id: '1',
         slug: 'apple-purchase-smarter',
-        image: '/staticImages/blog/apple-purchase-smarter.jpg',
+        image: staticImageUrl(STATIC_IMAGES.BLOG_APPLE_PURCHASE, BLOG_IMAGE_WIDTH),
         title: 'Make your Apple purchase smarter', 
         excerpt: 'What to look for in a premium pre-owned device, from storage choices to condition grading.',
         date: 'April 01, 2026',
@@ -20,7 +26,7 @@ In this deep dive, we explore how UpCell's 40-point inspection process ensures t
     { 
         id: '2',
         slug: 'creative-work-hardware',
-        image: '/staticImages/blog/creative-work-hardware.jpg',
+        image: staticImageUrl(STATIC_IMAGES.BLOG_CREATIVE_WORK, BLOG_IMAGE_WIDTH),
         title: 'Creative work on Apple hardware', 
         excerpt: 'How to choose the right iPhone, iPad, or MacBook for content, study, and everyday workflows.',
         date: 'March 28, 2026',
@@ -38,7 +44,7 @@ At the core of this discussion is reliability. A creative professional cannot af
     { 
         id: '3',
         slug: 'battery-health-guide',
-        image: '/staticImages/blog/battery-health-guide.jpg',
+        image: staticImageUrl(STATIC_IMAGES.BLOG_BATTERY_HEALTH, BLOG_IMAGE_WIDTH),
         title: 'Battery health and long-term value', 
         excerpt: 'A quick guide to preserving performance and understanding what battery condition means in real life.',
         date: 'March 24, 2026',
@@ -56,7 +62,7 @@ This article also touches on the environmental impact of battery longevity. By t
     { 
         id: '4',
         slug: 'trade-in-timing',
-        image: '/staticImages/blog/trade-in-timing.jpg',
+        image: staticImageUrl(STATIC_IMAGES.BLOG_TRADE_IN_TIMING, BLOG_IMAGE_WIDTH),
         title: 'When to trade in your current device', 
         excerpt: 'Timing, condition, and model demand can all shape the value you receive back.',
         date: 'March 15, 2026',

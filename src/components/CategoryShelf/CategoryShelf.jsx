@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { STATIC_IMAGES, staticImageUrl } from '../../constants/staticImages';
 
 const CategoryShelf = () => {
     return (
@@ -29,7 +30,7 @@ const CategoryShelf = () => {
                             <p className="mb-8 text-base leading-7 text-ink-soft sm:text-lg sm:leading-8">Certified premium iPhones, from the iPhone 11 to the iPhone 16 Pro Max. We disclose battery health up front, offer unlocked options, and factor trade-in pricing into every deal.</p>
                             <span className="text-[15px] font-bold tracking-tight text-apple-text underline-offset-8 group-hover:underline">Shop Premium iPhone →</span>
                         </div>
-                        <img src="/staticImages/category-iphone.png" alt="iPhone" className="pointer-events-none absolute top-1/2 -translate-y-1/2 -right-10 w-[54%] max-w-[360px] object-contain transition-transform duration-700 group-hover:scale-105" />
+                        <img src={staticImageUrl(STATIC_IMAGES.CATEGORY_IPHONE, 720)} alt="iPhone" className="pointer-events-none absolute top-1/2 -translate-y-1/2 -right-10 w-[54%] max-w-[360px] object-contain transition-transform duration-700 group-hover:scale-105" />
                     </Link>
 
                     <div className="grid gap-6">
@@ -42,7 +43,7 @@ const CategoryShelf = () => {
                                 <p className="mb-6 text-sm leading-7 text-ink-soft">Premium pre-owned iPad Air, iPad mini, and iPad Pro models, each inspected and graded against our 40-point standard. Pick Wi-Fi or cellular and the storage that fits how you work, study, and create. Every iPad is honestly priced and backed by a 12-month warranty.</p>
                                 <span className="text-sm font-bold text-apple-text underline-offset-4 group-hover:underline">Shop Premium iPad →</span>
                             </div>
-                            <img src="/staticImages/category-ipad.png" alt="iPad" className="pointer-events-none absolute top-1/2 -translate-y-1/2 -right-6 w-[44%] max-w-[300px] object-contain transition-transform duration-700 group-hover:scale-105" />
+                            <img src={staticImageUrl(STATIC_IMAGES.CATEGORY_IPAD, 600)} alt="iPad" className="pointer-events-none absolute top-1/2 -translate-y-1/2 -right-6 w-[44%] max-w-[300px] object-contain transition-transform duration-700 group-hover:scale-105" />
                         </Link>
 
                         <Link
@@ -54,7 +55,7 @@ const CategoryShelf = () => {
                                 <p className="mb-6 text-sm leading-7 text-white/70">Premium MacBook Air and MacBook Pro models with M1, M2, and M3 chips. Each one is professionally tested and ready to ship at a fraction of retail price.</p>
                                 <span className="text-sm font-bold text-white underline-offset-4 group-hover:underline">Shop Premium MacBook →</span>
                             </div>
-                            <img src="/staticImages/category-macbook.png" alt="MacBook" className="pointer-events-none absolute top-1/2 -translate-y-1/2 -right-2 w-[54%] max-w-[300px] object-contain opacity-95 transition-transform duration-700 group-hover:scale-105" />
+                            <img src={staticImageUrl(STATIC_IMAGES.CATEGORY_MACBOOK, 600)} alt="MacBook" className="pointer-events-none absolute top-1/2 -translate-y-1/2 -right-2 w-[54%] max-w-[300px] object-contain opacity-95 transition-transform duration-700 group-hover:scale-105" />
                         </Link>
                     </div>
                 </div>

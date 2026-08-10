@@ -1,4 +1,11 @@
 ﻿import productImageManifest from '../data/productImageManifest.js';
+import { cloudinaryUrl, resolveImageSrc } from './cloudinary';
+
+// Width the catalogue actually renders at. Applied here rather than in each
+// component because this is the single point every product image passes
+// through — without a width, f_auto still ships a 522px source into a 200px
+// grid slot, which is most of the remaining payload.
+const CATALOG_IMAGE_WIDTH = 600;
 
 const normalizeText = (value = '') => (
     String(value)
@@ -165,9 +172,16 @@ const scoreImage = (image, productTokens, colorTokens, family) => {
     return score;
 };
 
+// The product's own image field is the fallback whenever the manifest cannot
+// identify a match. It may hold a Cloudinary public_id (post-backfill) or a
+// legacy /product-images/... path, so it goes through resolveImageSrc rather
+// than being returned raw — that is what lets the catalogue work while the
+// database is only part migrated.
+const fallbackImage = (product) => resolveImageSrc(product?.image, { width: CATALOG_IMAGE_WIDTH });
+
 export const resolveProductImage = (product) => {
     const productTokens = getProductTokens(product);
-    if (!productTokens.length) return product?.image;
+    if (!productTokens.length) return fallbackImage(product);
 
     const family = getFamily(product);
     const colorTokens = getColorTokens(product);
@@ -181,7 +195,7 @@ export const resolveProductImage = (product) => {
         && containsColorTokens(image, colorTokens)
     ));
 
-    if (!candidates.length) return product?.image;
+    if (!candidates.length) return fallbackImage(product);
 
     const best = candidates.reduce((winner, image) => {
         const score = scoreImage(image, productTokens, colorTokens, family);
@@ -189,7 +203,9 @@ export const resolveProductImage = (product) => {
         return winner;
     }, null);
 
-    return best?.score >= 35 ? best.image.url : product?.image;
+    return best?.score >= 35
+        ? cloudinaryUrl(best.image.publicId, { width: CATALOG_IMAGE_WIDTH })
+        : fallbackImage(product);
 };
 
 

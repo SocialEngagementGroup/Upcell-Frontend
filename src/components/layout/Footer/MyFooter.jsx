@@ -3,6 +3,7 @@ import { useState } from 'react';
 import axiosInstance from '../../../utilities/axiosInstance';
 import { extractApiError, validateEmailAddress } from '../../../utilities/formValidation';
 import useFormAnalytics from '../../../utilities/useFormAnalytics';
+import { STATIC_IMAGES, staticImageUrl } from '../../../constants/staticImages';
 
 // Modern Icons
 const SocialIcons = {
@@ -55,7 +56,7 @@ const MyFooter = () => {
                     <div className="grid gap-12 lg:grid-cols-[1.4fr_0.8fr_0.8fr_0.8fr_1.6fr]">
                         <div className="space-y-5 lg:pt-8">
                             <Link to="/" className="flex items-center">
-                                <img src="/staticImages/upcellLogoFooter.png" alt="Upcell Logo" className="h-12 w-auto" />
+                                <img src={staticImageUrl(STATIC_IMAGES.LOGO_FOOTER, 240)} alt="Upcell Logo" className="h-12 w-auto" />
                             </Link>
                             <p className="max-w-[320px] text-[13px] leading-6 text-ink-soft">
                                 Premium Apple devices you can trust. We professionally inspect and honestly grade every certified iPhone, iPad, and MacBook, then back it with a 12-month warranty. Save up to 40% versus buying new.

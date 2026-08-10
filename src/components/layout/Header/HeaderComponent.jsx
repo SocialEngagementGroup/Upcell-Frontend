@@ -7,6 +7,7 @@ import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
+import { STATIC_IMAGES, staticImageUrl } from '../../../constants/staticImages';
 
 
 const HeaderComponent = () => {
@@ -33,7 +34,7 @@ const HeaderComponent = () => {
         <div>
           {/* Offsets ~49px of transparent padding baked into the logo PNG's left edge */}
           <Link to="/" className="-ml-[49px] flex items-center">
-            <img src="/staticImages/upcellLogo.png" alt="Upcell Logo" className="h-[90px] w-auto object-contain" />
+            <img src={staticImageUrl(STATIC_IMAGES.LOGO, 400)} alt="Upcell Logo" className="h-[90px] w-auto object-contain" />
           </Link>
         </div>
 

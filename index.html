@@ -4,6 +4,14 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/staticImages/faviconUpcell.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Every image now comes from Cloudinary, so warm the DNS + TLS handshake
+         before the first <img> is parsed. Deliberately without crossorigin:
+         plain <img src> fetches are non-CORS, and a crossorigin preconnect
+         opens a separate connection the images would not reuse.
+         dns-prefetch is the fallback for browsers without preconnect. -->
+    <link rel="preconnect" href="https://res.cloudinary.com" />
+    <link rel="dns-prefetch" href="https://res.cloudinary.com" />
     <title>UpCell | Certified Premium iPhone, iPad &amp; MacBook | Trade In Your Apple Device</title>
     <meta name="description" content="Shop certified premium iPhones, iPads, and MacBooks at UpCell. Every premium Apple device is professionally inspected, graded for condition, and backed by a 12-month warranty. Save up to 40% versus new, and get a fast trade-in quote for your current device." />
     <meta name="keywords" content="certified premium iPhone, premium iPad, premium MacBook, buy Apple devices, iPhone trade-in, Apple trade-in value, certified Apple, certified premium iPhone, premium MacBook, certified Apple" />
@@ -15,14 +23,17 @@
     <meta property="og:site_name" content="UpCell" />
     <meta property="og:title" content="UpCell | Certified Premium iPhone, iPad &amp; MacBook" />
     <meta property="og:description" content="Shop certified premium Apple devices at UpCell. Professionally inspected, honestly priced, and backed by a 12-month warranty. Get an instant trade-in quote today." />
-    <meta property="og:image" content="/staticImages/hero-iphone15.png" />
+    <!-- Absolute URL: social scrapers (Facebook, LinkedIn, Slack) do not reliably
+         resolve relative og:image paths. f_jpg rather than f_auto because those
+         crawlers send no Accept header and several still reject AVIF/WebP. -->
+    <meta property="og:image" content="https://res.cloudinary.com/jbis4ply/image/upload/f_jpg,q_auto,w_1200/upcell/static/hero-iphone15--fe7042d7" />
     <meta property="og:url" content="https://upcell.com/" />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="UpCell | Certified Premium iPhone, iPad &amp; MacBook" />
     <meta name="twitter:description" content="Shop certified premium Apple devices at UpCell. Professionally inspected, honestly priced, and backed by a 12-month warranty." />
-    <meta name="twitter:image" content="/staticImages/hero-iphone15.png" />
+    <meta name="twitter:image" content="https://res.cloudinary.com/jbis4ply/image/upload/f_jpg,q_auto,w_1200/upcell/static/hero-iphone15--fe7042d7" />
   </head>
   <body>
     <div id="root"></div>

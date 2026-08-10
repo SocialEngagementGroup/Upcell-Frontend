@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import { STATIC_IMAGES, staticImageUrl } from '../../../constants/staticImages';
 
 const values = [
     { title: "Customer First", desc: "We design every experience around clarity, support, and long-term satisfaction." },
@@ -39,7 +40,7 @@ const AboutUs = () => {
                         </p>
                     </div>
                     <div className="premium-card overflow-hidden rounded-[28px] p-3 sm:rounded-[36px]">
-                        <img src="/staticImages/bgAboutUs.png" alt="About UpCell" className="h-48 w-full rounded-[22px] object-cover sm:h-full sm:rounded-[28px]" />
+                        <img src={staticImageUrl(STATIC_IMAGES.ABOUT_US_BG, 900)} alt="About UpCell" className="h-48 w-full rounded-[22px] object-cover sm:h-full sm:rounded-[28px]" />
                     </div>
                 </div>
             </section>
