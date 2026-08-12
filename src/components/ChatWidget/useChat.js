@@ -1,24 +1,21 @@
 import { useMutation } from '@tanstack/react-query';
 import axiosInstance from '../../utilities/axiosInstance';
 
-const CHAT_SESSION_STORAGE_KEY = 'upcell_chat_session_id';
-
-const getChatSessionId = () => {
-    const existingId = window.sessionStorage.getItem(CHAT_SESSION_STORAGE_KEY);
-    if (existingId) return existingId;
-
-    const nextId = `chat-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-    window.sessionStorage.setItem(CHAT_SESSION_STORAGE_KEY, nextId);
-    return nextId;
-};
-
+// Session identity is issued by the server (a signed HttpOnly cookie, or
+// the logged-in user via the existing Clerk auth) — see
+// Backend/src/middleware/chatSession.middleware.js. This client used to
+// mint its own sessionId with Date.now()+Math.random() and send it in the
+// body; the server no longer reads that field at all, so nothing here
+// needs to generate or store an id. `withCredentials` is required so the
+// browser actually sends/accepts that cookie.
 export const useChat = () => {
     return useMutation({
         mutationFn: async (message) => {
-            const { data } = await axiosInstance.post('/chat', {
-                message,
-                sessionId: getChatSessionId(),
-            });
+            const { data } = await axiosInstance.post(
+                '/chat',
+                { message },
+                { withCredentials: true }
+            );
             return data;
         },
     });

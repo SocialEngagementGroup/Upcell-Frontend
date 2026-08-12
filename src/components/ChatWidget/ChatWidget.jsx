@@ -8,6 +8,7 @@ import LocalShippingRoundedIcon from '@mui/icons-material/LocalShippingRounded';
 import AssignmentReturnRoundedIcon from '@mui/icons-material/AssignmentReturnRounded';
 import SwapHorizRoundedIcon from '@mui/icons-material/SwapHorizRounded';
 import SupportAgentRoundedIcon from '@mui/icons-material/SupportAgentRounded';
+import PersonRoundedIcon from '@mui/icons-material/PersonRounded';
 import { useChat } from './useChat';
 import { useAutoCarousel } from './useAutoCarousel';
 import quickQuestions from './quickQuestions';
@@ -18,10 +19,7 @@ const MAX_LATEST_IPHONES = 12;
 
 const BOT_AVATAR_SRC = '/staticImages/faviconUpcell.png';
 const SUPPORT_EMAIL = 'upcellit@gmail.com';
-// e.g. '+1 (614) 555-0123' — set this once a real support line exists.
-// The phone chip in the header only renders once this is non-empty, so an
-// unfinished/placeholder number never ships visible on the live site.
-const SUPPORT_PHONE = '';
+const SUPPORT_PHONE = '+1 (380) 266-3942';
 const SUPPORT_PHONE_HREF = SUPPORT_PHONE ? `tel:${SUPPORT_PHONE.replace(/[^\d+]/g, '')}` : null;
 
 const QUICK_QUESTION_ICONS = {
@@ -35,8 +33,18 @@ const BotAvatar = () => (
     <img
         src={BOT_AVATAR_SRC}
         alt=""
-        className="h-10 w-10 flex-shrink-0 rounded-full bg-black object-contain p-1.5"
+        className="h-10 w-10 flex-shrink-0 rounded-full border border-gray-200 bg-black object-contain p-1.5"
     />
+);
+
+// Inverted counterpart to BotAvatar — light circle instead of black, dark
+// icon instead of the logo, same tiny border, same size. A literal color
+// invert of the logo image itself would flip brand-red into an off-brand
+// cyan, so "inverted" is expressed as a light/dark swap of the same treatment.
+const UserAvatar = () => (
+    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-gray-200 bg-apple-bg">
+        <PersonRoundedIcon className="!text-xl text-apple-text" />
+    </div>
 );
 
 // Renders **bold** spans within a single line of text.
@@ -51,6 +59,13 @@ const formatInlineText = (line) => {
 
 // Turns plain-text/markdown-lite replies (paragraphs, "- " / "1. " lists, **bold**)
 // into real chat-message markup instead of one raw text blob.
+//
+// SEG F-08: this only ever builds React elements (<p>/<ul>/<li>/<strong>) from
+// parsed substrings — never dangerouslySetInnerHTML, never a raw HTML string,
+// never an arbitrary href/src pulled from model output. That's what keeps
+// model-authored text from becoming a rendering surface. If markdown ever
+// needs to support links or images, route them through an explicit allowlist
+// instead of just extending this parser — see F-08 in the SEG doc.
 const renderMessageText = (text) => {
     const lines = text.split('\n');
     const blocks = [];
@@ -200,7 +215,7 @@ const ChatWidget = () => {
                     role="dialog"
                     aria-label="Chat with UpCell support"
                     onKeyDown={handleKeyDown}
-                    className="mb-3 flex h-[calc(100vh-7rem)] max-h-[42rem] w-[calc(100vw-2rem)] max-w-sm flex-col overflow-hidden rounded-2xl border-2 border-gray-900 bg-white shadow-xl motion-reduce:transition-none sm:h-[39rem] sm:w-[26rem]"
+                    className="mb-3 flex h-[calc(100vh-7rem)] max-h-[42rem] w-[calc(100vw-2rem)] max-w-sm flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-xl motion-reduce:transition-none sm:h-[39rem] sm:w-[26rem]"
                 >
                     <div className="relative overflow-hidden border-b-2 border-brand-red p-5 shadow-md">
                         <div className="absolute inset-0 bg-[#141416]">
@@ -254,6 +269,11 @@ const ChatWidget = () => {
                                     </a>
                                 )}
                             </div>
+                            {/* SEG F-12 / EU AI Act Article 50: visible before the first
+                                message is ever sent, not buried in a terms page. */}
+                            <p className="mt-2 text-[11px] text-white/60">
+                                You&apos;re chatting with an AI assistant, not a human.
+                            </p>
                         </div>
                     </div>
 
@@ -301,7 +321,7 @@ const ChatWidget = () => {
                         {messages.length === 0 && (
                             <div className="flex items-end justify-start gap-2">
                                 <BotAvatar />
-                                <div className="max-w-[80%] space-y-1 rounded-2xl rounded-bl-sm bg-white px-3 py-2 text-[15px] text-gray-900 shadow-md">
+                                <div className="max-w-[80%] space-y-1 rounded-2xl rounded-bl-sm bg-surface px-3 py-2 text-[15px] text-apple-text shadow-md">
                                     <p className="font-normal">Hi! Ask me anything, or tap a quick question below to get started.</p>
                                 </div>
                             </div>
@@ -315,12 +335,13 @@ const ChatWidget = () => {
                                 <div
                                     className={`max-w-[80%] space-y-1 rounded-2xl px-3 py-2 text-[15px] font-normal leading-relaxed shadow-md ${
                                         msg.role === 'user'
-                                            ? 'rounded-br-sm bg-gray-900 text-white'
-                                            : 'rounded-bl-sm bg-white text-gray-900'
+                                            ? 'rounded-br-sm bg-ink-soft text-apple-bg'
+                                            : 'rounded-bl-sm bg-surface text-apple-text'
                                     }`}
                                 >
                                     {msg.role === 'assistant' ? renderMessageText(msg.text) : <p>{msg.text}</p>}
                                 </div>
+                                {msg.role === 'user' && <UserAvatar />}
                             </div>
                         ))}
                         {isPending && (
