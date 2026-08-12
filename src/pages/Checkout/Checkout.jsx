@@ -3,6 +3,10 @@ import { useParams, Link } from 'react-router-dom';
 import { CartContext } from '../../App';
 import ScrollToTop from '../../utilities/ScrollToTop';
 import axiosInstance from '../../utilities/axiosInstance';
+import visa from '../../assets/visa.svg';
+import mastercard from '../../assets/master.svg';
+import americanExpress from '../../assets/americanExpress.svg';
+import discover from '../../assets/discover.svg';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
@@ -241,6 +245,14 @@ const Checkout = () => {
                             <div className="flex justify-between"><span>Estimated tax</span><strong className="text-apple-text">${estTax.toFixed(2)}</strong></div>
                             <div className="flex justify-between"><span>Shipping</span><strong className="text-apple-text">{shippingCost === 0 ? 'Free' : `$${shippingCost.toFixed(2)}`}</strong></div>
                             <div className="flex justify-between border-t border-black/[0.06] pt-4 text-base"><span className="font-bold text-apple-text">Total</span><strong className="text-2xl text-apple-text">${total.toFixed(2)} <span className="text-sm font-normal text-ink-soft">USD</span></strong></div>
+                        </div>
+
+                        <div className="mt-6 grid grid-cols-4 gap-3">
+                            {[visa, mastercard, americanExpress, discover].map((icon, index) => (
+                                <div key={index} className="flex h-12 items-center justify-center rounded-[16px] border border-black/[0.06] bg-white">
+                                    <img src={icon} alt="Card network accepted" className="max-h-7 w-auto object-contain" />
+                                </div>
+                            ))}
                         </div>
                     </aside>
                 </div>
