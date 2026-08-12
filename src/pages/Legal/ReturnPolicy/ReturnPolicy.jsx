@@ -13,7 +13,7 @@ const ReturnPolicy = () => {
                     </nav>
                     <h1 className="text-[clamp(2.1rem,5vw,5rem)] leading-[0.96] sm:leading-[0.92]">30-Day Return Policy on All Certified Premium Apple Devices</h1>
                     <p className="mt-4 max-w-[640px] text-base leading-7 text-ink-soft sm:mt-5 sm:text-lg sm:leading-8">
-                        Every certified premium iPhone, iPad, and MacBook purchased from UpCell is covered by a 30-day return window and a 12-month limited warranty. If something isn’t right, we’ll guide you through the process clearly.
+                        Every certified premium iPhone, iPad, and MacBook purchased from Upcell IT Inc. is covered by a 30-day return window and a 12-month limited warranty. If something isn’t right, we’ll guide you through the process clearly.
                     </p>
                 </div>
             </section>

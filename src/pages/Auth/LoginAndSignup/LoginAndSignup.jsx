@@ -122,7 +122,7 @@ const LoginAndSignup = () => {
                     <div className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full bg-brand-red/30 blur-[90px]" />
                     <div className="pointer-events-none absolute -bottom-24 -left-12 h-56 w-56 rounded-full bg-brand-red/20 blur-[90px]" />
                     <Link to="/" className="relative z-10">
-                        <img src={staticImageUrl(STATIC_IMAGES.LOGO_LIGHT, 240)} alt="UpCell" className="h-12 w-auto" />
+                        <img src={staticImageUrl(STATIC_IMAGES.LOGO_LIGHT, 240)} alt="Upcell IT Inc." className="h-12 w-auto" />
                     </Link>
                     <div className="relative z-10">
                         <h2 className="text-[34px] font-extrabold leading-[1.1] text-white">Premium devices,<br />better prices.</h2>
@@ -130,16 +130,16 @@ const LoginAndSignup = () => {
                             Sign in to track your orders, manage trade-ins, and check out faster on certified premium Apple devices.
                         </p>
                     </div>
-                    <p className="relative z-10 text-xs text-white/40">&copy; {new Date().getFullYear()} UpCell. All rights reserved.</p>
+                    <p className="relative z-10 text-xs text-white/40">&copy; {new Date().getFullYear()} Upcell IT Inc.. All rights reserved.</p>
                 </div>
 
                 <div className="flex w-full flex-col overflow-y-auto px-5 py-8 sm:px-10 sm:py-10 lg:w-[56%] lg:px-12">
                     <div className="m-auto w-full max-w-[430px]">
                         <Link to="/" className="mb-8 inline-block lg:hidden">
-                            <img src={staticImageUrl(STATIC_IMAGES.LOGO, 160)} alt="UpCell" className="h-8 w-auto" />
+                            <img src={staticImageUrl(STATIC_IMAGES.LOGO, 160)} alt="Upcell IT Inc." className="h-8 w-auto" />
                         </Link>
                         <header className="mb-6">
-                            <h1 className="text-3xl font-extrabold mb-2">{signin ? "Welcome back" : "Join UpCell"}</h1>
+                            <h1 className="text-3xl font-extrabold mb-2">{signin ? "Welcome back" : "Join Upcell IT Inc."}</h1>
                             <p className="text-apple-gray text-base">
                                 {isAdminLogin ? "Sign in with an admin account to manage the shop." : "Sign in to manage your orders."}
                             </p>

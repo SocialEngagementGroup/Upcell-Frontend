@@ -93,7 +93,7 @@ const DeliveryPolicy = () => {
                     </ul>
                     <p>
                         If anything is wrong — damaged packaging or a wrong item — contact us at{' '}
-                        <a href="mailto:upcellit@gmail.com" className="font-bold text-brand-red">upcellit@gmail.com</a>{' '}
+                        <a href="mailto:usa.Upcells@gmail.com" className="font-bold text-brand-red">usa.Upcells@gmail.com</a>{' '}
                         within 48 hours of receipt. Devices damaged during shipping, or that do not function on first use, are covered under our Return &amp; Refund Policy without a restocking fee.
                     </p>
 
@@ -111,12 +111,12 @@ const DeliveryPolicy = () => {
                         <li>Do not include chargers, cases, or accessories unless requested</li>
                         <li>Remove SIM cards and sign out of iCloud / disable Find My before shipping</li>
                     </ul>
-                    <p><strong>Risk in transit.</strong> UpCell is not responsible for trade-in devices lost or damaged in transit before they reach our facility. We strongly recommend using a trackable and insured shipping service and keeping your shipping receipt.</p>
+                    <p><strong>Risk in transit.</strong> Upcell IT Inc. is not responsible for trade-in devices lost or damaged in transit before they reach our facility. We strongly recommend using a trackable and insured shipping service and keeping your shipping receipt.</p>
                     <p><strong>After we receive it.</strong> We will confirm receipt by email and inspect your device. Your quote is confirmed or a revised offer sent, and payment is issued by bank transfer within 2 business days of receiving your device. If you decline a revised offer, your device will be returned to you.</p>
 
                     <h2>9. Return Shipping (Sending a Purchase Back)</h2>
                     <p>
-                        Before mailing anything back, contact us for return authorization and shipping instructions — unauthorized returns may be delayed or refused. Unless the return resulted from our error or a confirmed defect, you are responsible for return shipping costs. Use a trackable and insured service; UpCell is not responsible for merchandise lost or damaged during return shipping. Full details are in the{' '}
+                        Before mailing anything back, contact us for return authorization and shipping instructions — unauthorized returns may be delayed or refused. Unless the return resulted from our error or a confirmed defect, you are responsible for return shipping costs. Use a trackable and insured service; Upcell IT Inc. is not responsible for merchandise lost or damaged during return shipping. Full details are in the{' '}
                         <Link to="/terms-conditions#returns-refunds" className="font-bold text-brand-red">Return &amp; Refund Policy</Link>{' '}
                         in our Terms &amp; Conditions.
                     </p>
@@ -127,7 +127,7 @@ const DeliveryPolicy = () => {
                     <p>
                         UpCell IT Inc.<br />
                         973 Harrisburg Pike, Columbus, OH 43223, United States<br />
-                        Email: <a href="mailto:upcellit@gmail.com" className="font-bold text-brand-red">upcellit@gmail.com</a>
+                        Email: <a href="mailto:usa.Upcells@gmail.com" className="font-bold text-brand-red">usa.Upcells@gmail.com</a>
                     </p>
                 </article>
             </section>

@@ -43,7 +43,7 @@ const ThankYou = () => {
                     <CheckCircleIcon className="!text-[72px] text-apple-text" />
                     <h1 className="mt-6 text-[clamp(2.2rem,5vw,5rem)] leading-[0.96] sm:leading-[0.92]">Order confirmed.</h1>
                     <p className="mx-auto mt-4 max-w-[620px] text-base leading-7 text-ink-soft sm:mt-5 sm:text-lg sm:leading-8">
-                        Thank you for choosing UpCell. Your order is being prepared now and will move to shipping shortly.
+                        Thank you for choosing Upcell IT Inc.. Your order is being prepared now and will move to shipping shortly.
                     </p>
                 </div>
             </section>

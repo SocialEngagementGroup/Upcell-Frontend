@@ -132,7 +132,7 @@ const MyFooter = () => {
                     </div>
 
                     <div className="mt-8 flex flex-col gap-3 border-t border-black/[0.06] pt-6 text-[13px] text-apple-gray md:flex-row md:items-center md:justify-between">
-                        <p>&copy; {new Date().getFullYear()} UpCell. All rights reserved.</p>
+                        <p>&copy; {new Date().getFullYear()} Upcell IT Inc. All rights reserved.</p>
                         <p>Certified premium Apple devices. Trusted trade-ins. Transparent pricing.</p>
                     </div>
                 </div>

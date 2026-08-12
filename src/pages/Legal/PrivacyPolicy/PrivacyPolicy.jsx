@@ -106,7 +106,7 @@ const PrivacyPolicy = () => {
                         </table>
                     </div>
                     <p>We may also disclose information where required by law, to respond to lawful requests from authorities, or to protect the rights, safety, or property of UpCell IT or others. Suspected fraudulent transactions or returns, including devices reported lost or stolen, or returned with mismatched identifying information, may be reported to the appropriate payment provider or authorities.</p>
-                    <p>If UpCell is ever involved in a merger, acquisition, or sale of assets, customer information may be transferred as part of that transaction; this Policy would continue to apply to it.</p>
+                    <p>If Upcell IT Inc. is ever involved in a merger, acquisition, or sale of assets, customer information may be transferred as part of that transaction; this Policy would continue to apply to it.</p>
 
                     <h2>5. Bank Details &amp; Payment Information</h2>
                     <ul>
@@ -118,7 +118,7 @@ const PrivacyPolicy = () => {
 
                     <h2>6. Cookies, Analytics &amp; Advertising</h2>
                     <p>We use cookies and similar technologies to keep you signed in, remember your session, and understand how the Site is used.</p>
-                    <p>We also use conversion tracking to measure which channels and campaigns bring visitors to UpCell. This includes:</p>
+                    <p>We also use conversion tracking to measure which channels and campaigns bring visitors to Upcell IT Inc.. This includes:</p>
                     <ul>
                         <li><strong>Advertising pixels/tags,</strong> such as the Google Ads tag and Meta Pixel, that record when a visitor arriving from an ad completes an action such as a purchase, trade-in request, or inquiry</li>
                         <li><strong>Call tracking,</strong> which uses trackable phone numbers to attribute calls to the campaign that generated them; calls may be logged for attribution purposes</li>
@@ -147,8 +147,7 @@ const PrivacyPolicy = () => {
                         <li>Control cookies through your browser (Section 6)</li>
                     </ul>
                     <p>
-                        To exercise any of these rights, email us at{' '}
-                        <a href="mailto:upcellit@gmail.com" className="font-bold text-brand-red">upcellit@gmail.com</a>.
+                        If you have questions about this Privacy Policy, your rights, or how we handle your data, contact us at <a href="mailto:usa.Upcells@gmail.com" className="font-bold text-brand-red">usa.Upcells@gmail.com</a>.
                         We will verify your identity before acting on a request and respond within a reasonable timeframe. Depending on where you live, you may have additional rights under state law; we honor applicable rights for all customers.
                     </p>
 
@@ -163,7 +162,7 @@ const PrivacyPolicy = () => {
                     <p>
                         UpCell IT Inc.<br />
                         973 Harrisburg Pike, Columbus, OH 43223, United States<br />
-                        Email: <a href="mailto:upcellit@gmail.com" className="font-bold text-brand-red">upcellit@gmail.com</a>
+                        Email: <a href="mailto:usa.Upcells@gmail.com" className="font-bold text-brand-red">usa.Upcells@gmail.com</a>
                     </p>
                 </article>
             </section>
