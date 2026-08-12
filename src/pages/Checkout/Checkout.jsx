@@ -240,7 +240,7 @@ const Checkout = () => {
                             <div className="flex justify-between"><span>Subtotal</span><strong className="text-apple-text">${subtotal.toFixed(2)}</strong></div>
                             <div className="flex justify-between"><span>Estimated tax</span><strong className="text-apple-text">${estTax.toFixed(2)}</strong></div>
                             <div className="flex justify-between"><span>Shipping</span><strong className="text-apple-text">{shippingCost === 0 ? 'Free' : `$${shippingCost.toFixed(2)}`}</strong></div>
-                            <div className="flex justify-between border-t border-black/[0.06] pt-4 text-base"><span className="font-bold text-apple-text">Total</span><strong className="text-2xl text-apple-text">${total.toFixed(2)}</strong></div>
+                            <div className="flex justify-between border-t border-black/[0.06] pt-4 text-base"><span className="font-bold text-apple-text">Total</span><strong className="text-2xl text-apple-text">${total.toFixed(2)} <span className="text-sm font-normal text-ink-soft">USD</span></strong></div>
                         </div>
                     </aside>
                 </div>

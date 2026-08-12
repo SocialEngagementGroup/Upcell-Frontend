@@ -21,7 +21,7 @@ const TermsConditions = () => {
             <section className="page-container pb-16">
                 <article className="legal-prose premium-card rounded-[28px] px-6 py-8 sm:rounded-[36px] sm:px-8 sm:py-10 md:px-12 md:py-14">
                     <p>
-                        Welcome to UpCell IT. These Terms &amp; Conditions (&ldquo;Terms&rdquo;) govern your use of upcellit.com (the &ldquo;Site&rdquo;) and your purchase of products or use of services offered by UpCell Inc. (&ldquo;UpCell IT,&rdquo; &ldquo;we,&rdquo; &ldquo;us&rdquo;), located at 973 Harrisburg Pike, Columbus, OH, United States. By using the Site, placing an order, or submitting a trade-in request, you agree to these Terms. If you do not agree, please do not use the site.
+                        Welcome to UpCell IT. These Terms &amp; Conditions (&ldquo;Terms&rdquo;) govern your use of upcellit.com (the &ldquo;Site&rdquo;) and your purchase of products or use of services offered by UpCell Inc. (&ldquo;UpCell IT,&rdquo; &ldquo;we,&rdquo; &ldquo;us&rdquo;), located at 973 Harrisburg Pike, Columbus, OH 43223, United States. By using the Site, placing an order, or submitting a trade-in request, you agree to these Terms. If you do not agree, please do not use the site.
                     </p>
 
                     <h2>1. About Our Products</h2>
@@ -139,7 +139,7 @@ const TermsConditions = () => {
                     <h2>14. Contact</h2>
                     <p>
                         UpCell IT Inc.<br />
-                        973 Harrisburg Pike, Columbus, OH, United States<br />
+                        973 Harrisburg Pike, Columbus, OH 43223, United States<br />
                         Email: <a href="mailto:upcellit@gmail.com" className="font-bold text-brand-red">upcellit@gmail.com</a>
                     </p>
                     <p>To request a return, provide your name, order number, device model, IMEI or serial number, and reason for the return.</p>

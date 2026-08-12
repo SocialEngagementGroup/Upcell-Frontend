@@ -162,7 +162,7 @@ const PrivacyPolicy = () => {
                     <p>Questions or requests about your personal information:</p>
                     <p>
                         UpCell IT Inc.<br />
-                        973 Harrisburg Pike, Columbus, OH, United States<br />
+                        973 Harrisburg Pike, Columbus, OH 43223, United States<br />
                         Email: <a href="mailto:upcellit@gmail.com" className="font-bold text-brand-red">upcellit@gmail.com</a>
                     </p>
                 </article>

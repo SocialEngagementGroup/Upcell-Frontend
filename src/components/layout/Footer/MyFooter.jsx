@@ -61,6 +61,10 @@ const MyFooter = () => {
                             <p className="max-w-[320px] text-[13px] leading-6 text-ink-soft">
                                 Premium Apple devices you can trust. We professionally inspect and honestly grade every certified iPhone, iPad, and MacBook, then back it with a 12-month warranty. Save up to 40% versus buying new.
                             </p>
+                            <div className="space-y-1 text-[13px] leading-6 text-ink-soft">
+                                <a href="tel:+13802663942" className="block hover:text-apple-text">+1 (380) 266-3942</a>
+                                <p>973 Harrisburg Pike, Columbus, OH 43223, United States</p>
+                            </div>
                             <div className="flex gap-3 pt-2">
                                 <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram" className="flex h-11 w-11 items-center justify-center rounded-full border border-black/[0.06] text-apple-gray hover:-translate-y-0.5 hover:bg-surface-alt hover:text-apple-text"><SocialIcons.Instagram /></a>
                                 <a href="https://facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook" className="flex h-11 w-11 items-center justify-center rounded-full border border-black/[0.06] text-apple-gray hover:-translate-y-0.5 hover:bg-surface-alt hover:text-apple-text"><SocialIcons.Facebook /></a>

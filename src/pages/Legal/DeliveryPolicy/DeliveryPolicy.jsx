@@ -30,7 +30,7 @@ const DeliveryPolicy = () => {
                         <li>Priority shipping — available at an additional cost shown at checkout</li>
                         <li>Priority overnight shipping — available at an additional cost shown at checkout</li>
                     </ul>
-                    <p><strong>Pickup</strong> — collect your device from our location at 973 Harrisburg Pike, Columbus, OH. Pay by bank transfer in advance, or cash at pickup.</p>
+                    <p><strong>Pickup</strong> — collect your device from our location at 973 Harrisburg Pike, Columbus, OH 43223. Pay by bank transfer in advance, or cash at pickup.</p>
 
                     <h2>2. Processing Times</h2>
                     <p>Bank transfer orders are processed once payment has cleared into our account. Bank transfers typically take 1–3 business days to clear. Your order ships (or is prepared for pickup) after funds are verified — we will confirm by email when your order status changes.</p>
@@ -126,7 +126,7 @@ const DeliveryPolicy = () => {
                     <p>Questions about shipping, pickup, a return, or a trade-in shipment:</p>
                     <p>
                         UpCell IT Inc.<br />
-                        973 Harrisburg Pike, Columbus, OH, United States<br />
+                        973 Harrisburg Pike, Columbus, OH 43223, United States<br />
                         Email: <a href="mailto:upcellit@gmail.com" className="font-bold text-brand-red">upcellit@gmail.com</a>
                     </p>
                 </article>

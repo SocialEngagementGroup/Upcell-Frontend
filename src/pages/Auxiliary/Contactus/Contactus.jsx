@@ -4,6 +4,8 @@ import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import FacebookOutlinedIcon from '@mui/icons-material/FacebookOutlined';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
+import LocalPhoneOutlinedIcon from '@mui/icons-material/LocalPhoneOutlined';
+import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import axiosInstance from '../../../utilities/axiosInstance';
@@ -81,7 +83,7 @@ const Contactus = () => {
                     </nav>
                     <h1 className="text-[clamp(2.1rem,5vw,5rem)] leading-[0.96] sm:leading-[0.92]">Contact UpCell: Premium Apple Device Support</h1>
                     <p className="mt-4 max-w-[680px] text-base leading-7 text-ink-soft sm:mt-5 sm:text-lg sm:leading-8">
-                        Questions about a certified premium iPhone, iPad, or MacBook? Need help with a trade-in quote, order update, or return? Our team responds within 24 hours. Reach us by email, Facebook, or Instagram.
+                        Questions about a certified premium iPhone, iPad, or MacBook? Need help with a trade-in quote, order update, or return? Our team responds within 24 hours. Reach us by phone, email, Facebook, or Instagram.
                     </p>
                 </div>
             </section>
@@ -91,9 +93,11 @@ const Contactus = () => {
                     <div className="flex flex-col justify-center space-y-8 py-2 sm:space-y-10 sm:py-6">
                         <div className="grid gap-6">
                             {[
+                                { icon: <LocalPhoneOutlinedIcon />, title: 'Phone support', info: '+1 (380) 266-3942', href: 'tel:+13802663942' },
                                 { icon: <EmailOutlinedIcon />, title: 'Email support', info: 'usa.Upcells@gmail.com', href: 'mailto:usa.Upcells@gmail.com' },
                                 { icon: <FacebookOutlinedIcon />, title: 'Facebook Messenger', info: 'facebook.com/usa.Upcells', href: 'https://www.facebook.com/usa.Upcells' },
                                 { icon: <InstagramIcon />, title: 'Instagram Direct', info: '@Upcells_usa', href: 'https://www.instagram.com/Upcells_usa/' },
+                                { icon: <PlaceOutlinedIcon />, title: 'Our location', info: '973 Harrisburg Pike, Columbus, OH 43223', href: 'https://maps.google.com/?q=973+Harrisburg+Pike,+Columbus,+OH+43223' },
                             ].map((item) => (
                                 <a 
                                     key={item.title} 
