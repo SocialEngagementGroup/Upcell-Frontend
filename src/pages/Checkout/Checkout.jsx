@@ -154,6 +154,7 @@ const Checkout = () => {
 
                             <section>
                                 <h3 className="text-[28px]">Shipping address</h3>
+                                <p className="mt-2 text-sm text-ink-soft">We ship within the United States only.</p>
                                 <div className="mt-5 grid gap-4">
                                     <input className="premium-input" type="text" name="name" placeholder="Full name" required />
                                     <input className="premium-input" type="text" name="street" placeholder="Street address" required />
@@ -161,7 +162,7 @@ const Checkout = () => {
                                         <input className="premium-input" type="text" name="city" placeholder="City" required />
                                         <input className="premium-input" type="text" name="postalCode" placeholder="Postal code" required />
                                     </div>
-                                    <input className="premium-input" type="text" name="country" placeholder="Country" required />
+                                    <input className="premium-input bg-black/[0.03] text-ink-soft" type="text" name="country" value="United States" readOnly aria-readonly="true" />
                                 </div>
                             </section>
 
