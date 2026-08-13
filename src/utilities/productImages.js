@@ -193,17 +193,33 @@ export const resolveProductImage = (product) => {
     const requiredModelTokens = getRequiredModelTokens(product, family);
     const forbiddenModelTokens = getForbiddenModelTokens(family, requiredModelTokens);
 
-    const candidates = imageRecords.filter((image) => (
+    const matching = (colors) => imageRecords.filter((image) => (
         hasRequiredFamilyPath(image, family)
         && containsRequiredTokens(image, requiredModelTokens)
         && avoidsForbiddenTokens(image, forbiddenModelTokens)
-        && containsColorTokens(image, colorTokens)
+        && containsColorTokens(image, colors)
     ));
+
+    // Colour is a hard filter first, because a colour-specific photo is always
+    // the right answer when one exists. But not every model is photographed per
+    // colour: the iPhone 17 Pro files are named iphone-17-pro-1/2/3 with no
+    // colour in them, so requiring a colour token eliminated every candidate and
+    // sent the whole model to the generic fallback. Retrying without the colour
+    // constraint gives those products a real photo of the right model rather
+    // than a stock hero image of a different phone. Colour matches still win
+    // outright wherever they exist — this only runs when nothing matched at all.
+    let candidates = matching(colorTokens);
+    let scoringColorTokens = colorTokens;
+
+    if (!candidates.length && colorTokens.length) {
+        candidates = matching([]);
+        scoringColorTokens = [];
+    }
 
     if (!candidates.length) return fallbackImage(product);
 
     const best = candidates.reduce((winner, image) => {
-        const score = scoreImage(image, productTokens, colorTokens, family);
+        const score = scoreImage(image, productTokens, scoringColorTokens, family);
         if (!winner || score > winner.score) return { image, score };
         return winner;
     }, null);
