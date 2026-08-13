@@ -26,3 +26,14 @@ dist-ssr
 
 # Chatbot — kept local-only for now, not pushed to GitHub (see Documentation/Upcell-Chatbot-Plan.md)
 src/components/ChatWidget/
+
+# Images — now served from Cloudinary (upcell/ folder tree).
+# Uploaded by Backend/scripts/migrate-images-to-cloudinary.js; the id for each
+# file is recorded in Backend/scripts/cloudinary-manifest.json. These stay on
+# disk as a local fallback but are no longer shipped in the repo or the build.
+public/product-images/
+public/adds/
+public/staticImages/*
+# The favicon is the one exception: index.html requests it before any JS runs,
+# so it must exist as a real file in the deployed build.
+!public/staticImages/faviconUpcell.png

@@ -7,8 +7,8 @@ import AdminPageHeader from "../../../../components/AdminPageHeader/AdminPageHea
 import AdminStatsGrid from "../../../../components/AdminStatsGrid/AdminStatsGrid";
 import AdminLoadingState from "../../../../components/AdminState/AdminLoadingState";
 import AdminEmptyState from "../../../../components/AdminState/AdminEmptyState";
+import { ORDER_STATUS_TABS, orderStatusLabel } from "../../../../constants/orderStatus";
 
-const statuses = ["Processing", "Shipped", "Delivered", "Returned", "Refunded", "payment failed"];
 const PAGE_LIMIT = 10;
 const defaultPagination = {
     page: 1,
@@ -96,7 +96,7 @@ const AdminOrder = () => {
         { label: 'Results', value: pagination.totalItems, sub: 'orders matching the current filter' },
         { label: 'Showing', value: orders.length, sub: 'orders on this page' },
         { label: 'Page', value: `${pagination.page}/${pagination.totalPages}`, sub: 'current pagination position' },
-        { label: 'View', value: orderStatus === 'Processing' ? 'Paid' : orderStatus, sub: 'active order filter' },
+        { label: 'View', value: orderStatusLabel(orderStatus), sub: 'active order filter' },
     ];
 
     return (
@@ -112,13 +112,13 @@ const AdminOrder = () => {
             <div className="admin-panel rounded-[36px] p-6 md:p-8">
                 <div className="flex flex-col gap-5">
                     <div className="flex flex-wrap gap-3">
-                        {statuses.map((status) => (
+                        {ORDER_STATUS_TABS.map((status) => (
                             <button
                                 key={status}
                                 className={orderStatus === status ? 'premium-button' : 'premium-button-secondary'}
                                 onClick={() => applyStatusFilter(status)}
                             >
-                                {status === 'Processing' ? 'Paid' : status}
+                                {orderStatusLabel(status)}
                             </button>
                         ))}
                     </div>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { STATIC_IMAGES, staticImageUrl } from '../../constants/staticImages';
 
 const ModernHero = () => {
     return (
@@ -30,8 +31,8 @@ const ModernHero = () => {
                         <div className="relative flex w-full max-w-[560px] items-center justify-center overflow-hidden rounded-[32px] border border-white/10 bg-white/[0.02] px-6 py-8 backdrop-blur-3xl sm:rounded-[44px] sm:px-8 sm:py-10">
                             <div className="absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
                             <img
-                                src="/staticImages/hero-iphone15.png"
-                                alt="Certified premium iPhone from UpCell, a trusted seller of premium Apple devices"
+                                src={staticImageUrl(STATIC_IMAGES.HERO_IPHONE_15, 840)}
+                                alt="Certified premium iPhone from UpCell IT Inc., a trusted seller of premium Apple devices"
                                 className="relative z-[2] w-full max-w-[280px] animate-[floatSoft_5.5s_ease-in-out_infinite] object-contain drop-shadow-[0_45px_100px_rgba(255,255,255,0.08)] sm:max-w-[420px]"
                             />
                         </div>

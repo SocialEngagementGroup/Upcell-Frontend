@@ -1,4 +1,5 @@
 import React from 'react';
+import { STATIC_IMAGES, staticImageUrl } from '../../constants/staticImages';
 
 // Classic Apple logo silhouette (single path).
 const AppleMark = ({ className = '' }) => (
@@ -25,7 +26,7 @@ const RouteLoadingScreen = ({ compact = false }) => {
                 </div>
 
                 {/* brand wordmark */}
-                <img src="/staticImages/upcellLogo.png" alt="UpCell" className="mt-7 h-8 w-auto" />
+                <img src={staticImageUrl(STATIC_IMAGES.LOGO, 160)} alt="UpCell IT Inc." className="mt-7 h-8 w-auto" />
 
                 <h2 className="mt-4 text-[22px] font-bold tracking-tight text-apple-text">Loading UpCell</h2>
                 <p className="mt-2 text-[15px] text-ink-soft">Preparing your premium experience…</p>

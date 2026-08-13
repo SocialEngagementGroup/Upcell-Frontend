@@ -1,4 +1,5 @@
 import React from 'react';
+import { resolveImageRef } from '../../../../utilities/cloudinary';
 
 const ImagesForCatagory = ({ image, setImages }) => {
     const handleDelete = () => {
@@ -8,7 +9,7 @@ const ImagesForCatagory = ({ image, setImages }) => {
 
     return (
         <div className="relative overflow-hidden rounded-[20px] border border-black/[0.08] bg-white p-2">
-            <img src={image?.url} alt='product' className="h-24 w-24 rounded-2xl object-cover" />
+            <img src={resolveImageRef(image, { width: 200 })} alt='product' className="h-24 w-24 rounded-2xl object-cover" />
             <button className="absolute inset-x-2 bottom-2 rounded-xl bg-apple-text px-3 py-2 text-xs font-bold text-white" onClick={handleDelete}>
                 Delete
             </button>

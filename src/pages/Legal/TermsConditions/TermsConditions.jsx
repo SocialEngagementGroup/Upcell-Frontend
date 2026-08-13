@@ -21,18 +21,19 @@ const TermsConditions = () => {
             <section className="page-container pb-16">
                 <article className="legal-prose premium-card rounded-[28px] px-6 py-8 sm:rounded-[36px] sm:px-8 sm:py-10 md:px-12 md:py-14">
                     <p>
-                        Welcome to UpCell IT. These Terms &amp; Conditions (&ldquo;Terms&rdquo;) govern your use of upcellit.com (the &ldquo;Site&rdquo;) and your purchase of products or use of services offered by UpCell Inc. (&ldquo;UpCell IT,&rdquo; &ldquo;we,&rdquo; &ldquo;us&rdquo;), located at 973 Harrisburg Pike, Columbus, OH, United States. By using the Site, placing an order, or submitting a trade-in request, you agree to these Terms. If you do not agree, please do not use the site.
+                        Welcome to UpCell IT. These Terms &amp; Conditions (&ldquo;Terms&rdquo;) govern your use of upcellit.com (the &ldquo;Site&rdquo;) and your purchase of products or use of services offered by UpCell IT Inc. (&ldquo;UpCell IT,&rdquo; &ldquo;we,&rdquo; &ldquo;us&rdquo;), located at 973 Harrisburg Pike, Columbus, OH 43223, United States. By using the Site, placing an order, or submitting a trade-in request, you agree to these Terms. If you do not agree, please do not use the site.
                     </p>
 
                     <h2>1. About Our Products</h2>
-                    <p>UpCell IT sells certified, used, brand-new devices, including iPhone, iPad, and MacBook models. Every device we sell is inspected and verified before it is listed. All devices come sealed and unused unless explicitly stated otherwise on the product page.</p>
+                    <p>UpCell IT Inc. sells certified premium Apple devices, including iPhone, iPad, and MacBook models. Every device is professionally inspected and graded for condition before it is listed, and the condition grade is shown on each product page. Devices are covered by a 12-month limited warranty.</p>
                     <p>Product images are for illustration. Minor variations in packaging or included accessories may occur where noted on the listing.</p>
 
                     <h2>2. Eligibility &amp; Accounts</h2>
                     <p>You must be at least 18 years old (or the age of majority in your state) to place an order or submit a trade-in request.</p>
+                    <p>We accept orders for delivery to addresses within the United States only. We do not accept orders for export outside the United States. We reserve the right to cancel any order we reasonably believe is intended for export, and to issue a full refund before the order is dispatched.</p>
                     <p>
-                        You may create an account to track orders. You are responsible for keeping your login credentials secure and for all activity under your account. Notify us immediately at{' '}
-                        <a href="mailto:upcellit@gmail.com" className="font-bold text-brand-red">upcellit@gmail.com</a> if you suspect unauthorized use of your account.
+                        You are responsible for keeping your account information secure. Contact us immediately at{' '}
+                        <a href="mailto:usa.Upcells@gmail.com" className="font-bold text-brand-red">usa.Upcells@gmail.com</a> if you suspect unauthorized use of your account.
                     </p>
 
                     <h2>3. Orders &amp; Payment</h2>
@@ -60,8 +61,8 @@ const TermsConditions = () => {
                     <p><strong>Devices we do not buy.</strong> We do not purchase lost, stolen, or fraudulently obtained devices. Devices reported lost or stolen, or that fail our fraud checks, will be refused and may, where required by law, be surrendered to authorities.</p>
                     <p><strong>Blacklisted and financed devices.</strong> We may accept devices that are carrier-blacklisted or subject to an outstanding finance balance, provided this status is disclosed in the questionnaire and you are the device&rsquo;s legal owner with the full right to sell it. Quotes for such devices are adjusted to reflect their status. Undisclosed blacklist or finance status discovered during verification will result in a revised offer or refusal of the device.</p>
                     <p><strong>Ownership.</strong> By submitting a device, you confirm you are its legal owner with full right to sell it, and that selling it does not breach any agreement with a carrier, finance provider, or other party. Ownership transfers to UpCell IT when the final offer is accepted and payout is issued.</p>
-                    <p><strong>Risk in transit.</strong> UpCell is not responsible for trade-in devices lost or damaged in transit before they reach our facility. We recommend using a trackable and insured shipping service.</p>
-                    <p><strong>Payout timing.</strong> We inspect your device and issue payment by bank transfer within 2 business days of receiving it at our facility. You are responsible for providing accurate bank details; UpCell is not liable for delays caused by incorrect account information.</p>
+                    <p><strong>Risk in transit.</strong> UpCell IT Inc. is not responsible for trade-in devices lost or damaged in transit before they reach our facility. We recommend using a trackable and insured shipping service.</p>
+                    <p><strong>Payout timing.</strong> We inspect your device and issue payment by bank transfer within 2 business days of receiving it at our facility. You are responsible for providing accurate bank details; UpCell IT Inc. is not liable for delays caused by incorrect account information.</p>
 
                     <h2>5. 12-Month Limited Warranty</h2>
                     <p>Every device purchased from UpCell IT includes a 12-month limited warranty from the date of delivery or pickup, covering defects in workmanship and hardware.</p>
@@ -77,14 +78,14 @@ const TermsConditions = () => {
                     </ul>
                     <p>
                         <strong>Making a claim.</strong> Contact us at{' '}
-                        <a href="mailto:upcellit@gmail.com" className="font-bold text-brand-red">upcellit@gmail.com</a>{' '}
-                        with your order number and a description of the issue. If a warranty claim is accepted, we will repair the device whenever possible; if repair is not economically feasible, we will replace it with an equivalent model, or provide store credit or another remedy permitted under these warranty terms.
+                        <a href="mailto:usa.Upcells@gmail.com" className="font-bold text-brand-red">usa.Upcells@gmail.com</a>{' '}
+                        with your order number, a description of the problem, and photos/video if applicable. We will provide troubleshooting steps or return instructions.
                     </p>
                     <p><strong>Shipping for warranty service.</strong> You pay shipping to send the device to us; UpCell IT pays return shipping on approved claims. Average turnaround is 3–7 business days after we receive the device.</p>
-                    <p>Hardware problems reported after the 14-day return period (Section 6) are handled under this warranty.</p>
+                    <p>Hardware problems reported after the 30-day return period (Section 6) are handled under this warranty.</p>
 
                     <h2 id="returns-refunds">6. Returns &amp; Refunds</h2>
-                    <p>We want you to be satisfied with your purchase. Eligible products may be returned within 14 calendar days of delivery or in-store purchase, subject to the requirements below. A return based on preference or a change of mind must be made within this 14-day period.</p>
+                    <p>We want you to be satisfied with your purchase. Eligible products may be returned within 30 calendar days of delivery or in-store purchase, subject to the requirements below. A return based on preference or a change of mind must be made within this 30-day period.</p>
                     <p><strong>Return eligibility.</strong> To qualify for a return:</p>
                     <ul>
                         <li>The device must be returned in the same condition in which it was sold</li>
@@ -106,7 +107,7 @@ const TermsConditions = () => {
                         <li>Special-order or custom-ordered merchandise</li>
                         <li>Products damaged after purchase</li>
                     </ul>
-                    <p><strong>Online returns.</strong> Before mailing a product back, contact UpCell to request return authorization and shipping instructions. Returns sent without authorization may be delayed or refused. Unless the return resulted from our error or a confirmed defect, you are responsible for return shipping, and original shipping charges are nonrefundable. We recommend using a trackable and insured shipping service — UpCell IT is not responsible for merchandise lost or damaged during return shipping.</p>
+                    <p><strong>Online returns.</strong> Before mailing a product back, contact UpCell IT Inc. to request return authorization and shipping instructions. Returns sent without authorization may be delayed or refused. Unless the return resulted from our error or a confirmed defect, you are responsible for return shipping, and original shipping charges are nonrefundable. We recommend using a trackable and insured shipping service — UpCell IT is not responsible for merchandise lost or damaged during return shipping.</p>
                     <p><strong>Inspection and refunds.</strong> All returns are inspected before approval. Approval normally requires confirmation of the device&rsquo;s IMEI or serial number, physical and cosmetic condition, account and activation-lock status, functionality, and included accessories and packaging. Approved refunds are issued to the original payment method; processing times may vary depending on your bank or payment provider. Cash purchases are refunded by bank transfer. Devices that do not satisfy this policy may be returned to you at your expense.</p>
                     <p><strong>Exchanges.</strong> Approved exchanges are subject to product availability. If the requested replacement is unavailable, UpCell IT may issue a refund or store credit in line with this policy.</p>
                     <p><strong>Defective devices.</strong> Accidental damage, cracked screens, liquid damage, misuse, unauthorized repairs, and normal cosmetic wear are not manufacturing defects. Hardware problems reported after the return period are handled under the 12-month limited warranty (Section 5).</p>
@@ -119,10 +120,10 @@ const TermsConditions = () => {
                     <p>You agree not to use the Site to submit false or fraudulent orders, returns, or trade-in requests, attempt to access accounts or data that are not yours, interfere with the Site&rsquo;s operation, or violate any applicable law. We reserve the right to refuse service, cancel orders, and suspend accounts where we reasonably suspect fraud or abuse.</p>
 
                     <h2>9. Intellectual Property</h2>
-                    <p>All content on the Site — including the UpCell IT name, logo, product descriptions, images, and design — is the property of UpCell Inc. or its licensors and may not be copied or reused without written permission. Apple, iPhone, iPad, and MacBook are trademarks of Apple Inc.; Samsung and Google are trademarks of their respective owners. UpCell is an independent retailer and is not affiliated with or endorsed by these companies.</p>
+                    <p>All content on the Site — including the UpCell IT name, logo, product descriptions, images, and design — is the property of UpCell IT Inc. or its licensors and may not be copied or reused without written permission. Apple, iPhone, iPad, and MacBook are trademarks of Apple Inc.; Samsung and Google are trademarks of their respective owners. UpCell IT Inc. is an independent retailer and is not affiliated with or endorsed by these companies.</p>
 
                     <h2>10. Limitation of Liability</h2>
-                    <p>To the maximum extent permitted by law, UpCell&rsquo;s total liability arising from any order or trade-in is limited to the amount you paid for the product (or the payout value of the trade-in) giving rise to the claim. UpCell is not liable for indirect, incidental, or consequential damages, including loss of data stored on any device. Nothing in these Terms limits liability that cannot be limited under applicable law, including your statutory consumer rights.</p>
+                    <p>To the maximum extent permitted by law, UpCell IT Inc.&rsquo;s total liability arising from any order or trade-in is limited to the amount you paid for the product (or the payout value of the trade-in) giving rise to the claim. UpCell IT Inc. is not liable for indirect, incidental, or consequential damages, including loss of data stored on any device. Nothing in these Terms limits liability that cannot be limited under applicable law, including your statutory consumer rights.</p>
 
                     <h2>11. Privacy</h2>
                     <p>
@@ -139,8 +140,8 @@ const TermsConditions = () => {
                     <h2>14. Contact</h2>
                     <p>
                         UpCell IT Inc.<br />
-                        973 Harrisburg Pike, Columbus, OH, United States<br />
-                        Email: <a href="mailto:upcellit@gmail.com" className="font-bold text-brand-red">upcellit@gmail.com</a>
+                        973 Harrisburg Pike, Columbus, OH 43223, United States<br />
+                        Email: <a href="mailto:usa.Upcells@gmail.com" className="font-bold text-brand-red">usa.Upcells@gmail.com</a>
                     </p>
                     <p>To request a return, provide your name, order number, device model, IMEI or serial number, and reason for the return.</p>
                 </article>

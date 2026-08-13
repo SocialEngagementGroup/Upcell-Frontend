@@ -4,6 +4,7 @@ import AdminPageHeader from '../../../../components/AdminPageHeader/AdminPageHea
 import SearchWithSuggestions from '../../../../components/SearchWithSuggestions/SearchWithSuggestions';
 import { useShopCategoriesQuery } from '../../../../queries/categories';
 import { EMPTY_ARRAY } from '../../../../queries/keys';
+import { resolveImageRef } from '../../../../utilities/cloudinary';
 
 const AdminCatagory = () => {
     const navigate = useNavigate();
@@ -59,8 +60,8 @@ const AdminCatagory = () => {
                             renderSuggestion={(category, focused) => (
                                 <>
                                     <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] transition-colors ${focused ? 'bg-white/20' : 'bg-surface-alt group-hover:bg-white/20'}`}>
-                                        {category.images?.[0]?.url && (
-                                            <img src={category.images[0].url} alt={category.modelName} className="max-h-[80%] w-auto object-contain" />
+                                        {resolveImageRef(category.images?.[0], { width: 80 }) && (
+                                            <img src={resolveImageRef(category.images?.[0], { width: 80 })} alt={category.modelName} className="max-h-[80%] w-auto object-contain" />
                                         )}
                                     </span>
                                     <span className="min-w-0 flex-1">

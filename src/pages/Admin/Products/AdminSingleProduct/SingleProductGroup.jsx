@@ -7,6 +7,8 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { toast } from 'react-toastify';
 import AdminConfirmModal from '../../../../components/AdminConfirmModal/AdminConfirmModal';
 import { useDeleteProductFamilyMutation, useDeleteProductVariantMutation, useUpdateProductVariantMutation } from '../../../../queries/products';
+import { STATIC_IMAGES, staticImageUrl } from '../../../../constants/staticImages';
+import { resolveImageSrc } from '../../../../utilities/cloudinary';
 
 const currency = (value) => {
     if (value === '' || value === null || typeof value === 'undefined') return '-';
@@ -162,7 +164,7 @@ const SingleProductGroup = ({ productGroup, onDelete }) => {
                     <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-[22px] bg-surface-alt">
                         <img
                             className="max-h-full w-auto object-contain"
-                            src={productGroup.image || '/staticImages/notAvailable.webp'}
+                            src={resolveImageSrc(productGroup.image, { width: 160 }) || staticImageUrl(STATIC_IMAGES.NOT_AVAILABLE, 160)}
                             alt={productGroup.productName}
                         />
                     </div>

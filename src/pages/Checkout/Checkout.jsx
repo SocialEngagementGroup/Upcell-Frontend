@@ -6,9 +6,6 @@ import axiosInstance from '../../utilities/axiosInstance';
 import visa from '../../assets/visa.svg';
 import mastercard from '../../assets/master.svg';
 import americanExpress from '../../assets/americanExpress.svg';
-import discover from '../../assets/discover.svg';
-import paypal from '../../assets/paypal.svg';
-import applePay from '../../assets/applePay.svg';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
@@ -22,7 +19,7 @@ const Checkout = () => {
     const [products, setProducts] = useState([]);
     const [shipping, setShipping] = useState('standard');
     const [isLoading, setIsLoading] = useState(false);
-    const [paymentMethod, setPaymentMethod] = useState('stripe');
+    const [paymentMethod, setPaymentMethod] = useState('manual');
     const { markInteraction, trackSuccess, trackFailure } = useFormAnalytics('checkout');
 
     const isObjectId = (id) => /^[0-9a-fA-F]{24}$/.test(id);
@@ -89,12 +86,6 @@ const Checkout = () => {
         setIsLoading(true);
         markInteraction();
 
-        // Generated once per submit and reused for every request this
-        // attempt makes — if the browser/network retries the same request,
-        // the backend forwards this same key to PayPal/Stripe, so a retry
-        // lands on the original transaction instead of creating a second one.
-        const idempotencyKey = crypto.randomUUID();
-
         const clearCartIfNeeded = () => {
             if (params.id === 'cart') {
                 localStorage.setItem('cart', JSON.stringify([]));
@@ -110,40 +101,17 @@ const Checkout = () => {
         };
 
         try {
-            if (paymentMethod === 'stripe') {
-                // Cart is intentionally NOT cleared here — the customer hasn't
-                // paid yet, only started a Stripe session. If they cancel and
-                // land back on /cart, their items should still be there.
-                // Clearing happens on ThankYou once payment is confirmed.
-                axiosInstance.post('checkout-stripe', { ...data, shipping, idempotencyKey }).then((res) => {
-                    trackSuccess({ phase: 'request', shipping, paymentMethod, itemCount: productIds.length });
-                    window.location = res.data.url;
-                }).catch(handleFailure);
-            } else if (paymentMethod === 'paypal') {
-                // Same as Stripe above — cart clears in PaypalReturn only
-                // after capture actually confirms the payment succeeded.
-                axiosInstance.post('checkout-customer', { ...data, shipping, idempotencyKey }).then((res) => {
-                    const approveLink = res.data?.links?.find((link) => link.rel === 'payer-action' || link.rel === 'approve')?.href;
-                    if (!approveLink) {
-                        handleFailure(new Error('PayPal did not return an approval link.'));
-                        return;
-                    }
-                    trackSuccess({ phase: 'request', shipping, paymentMethod, itemCount: productIds.length });
-                    window.location = approveLink;
-                }).catch(handleFailure);
-            } else {
-                axiosInstance.post('orders', {
-                    ...data,
-                    orders: data.orders,
-                    shipping,
-                    paymentMethod,
-                    paidWith: 'Manual',
-                }).then((res) => {
-                    trackSuccess({ phase: 'request', shipping, paymentMethod, itemCount: productIds.length });
-                    clearCartIfNeeded();
-                    window.location = `/succeed?order_id=${res.data._id}`;
-                }).catch(handleFailure);
-            }
+            axiosInstance.post('orders', {
+                ...data,
+                orders: data.orders,
+                shipping,
+                paymentMethod,
+                paidWith: 'Manual',
+            }).then((res) => {
+                trackSuccess({ phase: 'request', shipping, paymentMethod, itemCount: productIds.length });
+                clearCartIfNeeded();
+                window.location = `/succeed?order_id=${res.data._id}`;
+            }).catch(handleFailure);
         } catch (error) {
             handleFailure(error);
         }
@@ -167,7 +135,7 @@ const Checkout = () => {
                     </nav>
                     <h1 className="text-[clamp(2.1rem,4.8vw,4.9rem)] leading-[0.96] sm:leading-[0.94]">Complete your order.</h1>
                     <p className="mt-4 max-w-[620px] text-base leading-7 text-ink-soft sm:mt-5 sm:text-lg sm:leading-8">
-                        Pay securely with Stripe or PayPal, or submit your details and our team will contact you to complete the order.
+                        Submit your details and our team will contact you to complete secure payment.
                     </p>
                 </div>
             </section>
@@ -186,6 +154,7 @@ const Checkout = () => {
 
                             <section>
                                 <h3 className="text-[28px]">Shipping address</h3>
+                                <p className="mt-2 text-sm text-ink-soft">We ship within the United States only.</p>
                                 <div className="mt-5 grid gap-4">
                                     <input className="premium-input" type="text" name="name" placeholder="Full name" required />
                                     <input className="premium-input" type="text" name="street" placeholder="Street address" required />
@@ -193,7 +162,7 @@ const Checkout = () => {
                                         <input className="premium-input" type="text" name="city" placeholder="City" required />
                                         <input className="premium-input" type="text" name="postalCode" placeholder="Postal code" required />
                                     </div>
-                                    <input className="premium-input" type="text" name="country" placeholder="Country" required />
+                                    <input className="premium-input bg-black/[0.03] text-ink-soft" type="text" name="country" value="United States" readOnly aria-readonly="true" />
                                 </div>
                             </section>
 
@@ -225,24 +194,12 @@ const Checkout = () => {
                             <section>
                                 <h3 className="text-[28px]">Payment</h3>
                                 <div className="mt-5 grid gap-4">
-                                    {[
-                                        { id: 'stripe', title: 'Credit Card (Stripe)', sub: 'Secure payment via Stripe' },
-                                        { id: 'paypal', title: 'PayPal', sub: 'Pay with your PayPal account' },
-                                        { id: 'manual', title: 'Contact to order', sub: 'Submit your details and our team will contact you to complete payment' },
-                                    ].map((option) => (
-                                        <label key={option.id} className={`flex cursor-pointer items-center justify-between rounded-[24px] border p-5 ${paymentMethod === option.id ? 'border-apple-text bg-surface-alt' : 'border-black/[0.08] bg-white'}`}>
-                                            <div>
-                                                <div className="font-bold text-apple-text">{option.title}</div>
-                                                <div className="mt-1 text-sm text-ink-soft">{option.sub}</div>
-                                            </div>
-                                            <div className="flex items-center gap-4">
-                                                <input type="radio" name="paymentMethod" checked={paymentMethod === option.id} onChange={() => {
-                                                    markInteraction();
-                                                    setPaymentMethod(option.id);
-                                                }} />
-                                            </div>
-                                        </label>
-                                    ))}
+                                    <div className="flex items-center justify-between rounded-[24px] border border-apple-text bg-surface-alt p-5">
+                                        <div>
+                                            <div className="font-bold text-apple-text">Contact to order</div>
+                                            <div className="mt-1 text-sm text-ink-soft">Submit your details and our team will contact you to complete payment</div>
+                                        </div>
+                                    </div>
                                 </div>
                             </section>
 
@@ -252,7 +209,7 @@ const Checkout = () => {
                                     Encrypted checkout and secure order processing.
                                 </p>
                                 <button type="submit" className="premium-button w-full md:w-auto md:min-w-[220px]" disabled={isLoading}>
-                                    {isLoading ? 'Submitting...' : paymentMethod === 'stripe' ? 'Pay with Stripe' : paymentMethod === 'paypal' ? 'Pay with PayPal' : 'Submit order request'}
+                                    {isLoading ? 'Submitting...' : 'Submit order request'}
                                 </button>
                             </div>
                         </form>
@@ -287,13 +244,13 @@ const Checkout = () => {
                             <div className="flex justify-between"><span>Subtotal</span><strong className="text-apple-text">${subtotal.toFixed(2)}</strong></div>
                             <div className="flex justify-between"><span>Estimated tax</span><strong className="text-apple-text">${estTax.toFixed(2)}</strong></div>
                             <div className="flex justify-between"><span>Shipping</span><strong className="text-apple-text">{shippingCost === 0 ? 'Free' : `$${shippingCost.toFixed(2)}`}</strong></div>
-                            <div className="flex justify-between border-t border-black/[0.06] pt-4 text-base"><span className="font-bold text-apple-text">Total</span><strong className="text-2xl text-apple-text">${total.toFixed(2)}</strong></div>
+                            <div className="flex justify-between border-t border-black/[0.06] pt-4 text-base"><span className="font-bold text-apple-text">Total</span><strong className="whitespace-nowrap text-2xl text-apple-text">${total.toFixed(2)} <span className="text-sm font-normal text-ink-soft">USD</span></strong></div>
                         </div>
 
                         <div className="mt-6 grid grid-cols-3 gap-3">
-                            {[visa, mastercard, americanExpress, discover, paypal, applePay].map((icon, index) => (
+                            {[visa, mastercard, americanExpress].map((icon, index) => (
                                 <div key={index} className="flex h-12 items-center justify-center rounded-[16px] border border-black/[0.06] bg-white">
-                                    <img src={icon} alt="Payment method" className="max-h-7 w-auto object-contain" />
+                                    <img src={icon} alt="Card network accepted" className="max-h-7 w-auto object-contain" />
                                 </div>
                             ))}
                         </div>

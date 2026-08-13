@@ -1,4 +1,11 @@
 ﻿import productImageManifest from '../data/productImageManifest.js';
+import { cloudinaryUrl, resolveImageRef } from './cloudinary';
+
+// Width the catalogue actually renders at. Applied here rather than in each
+// component because this is the single point every product image passes
+// through — without a width, f_auto still ships a 522px source into a 200px
+// grid slot, which is most of the remaining payload.
+const CATALOG_IMAGE_WIDTH = 600;
 
 const normalizeText = (value = '') => (
     String(value)
@@ -165,9 +172,21 @@ const scoreImage = (image, productTokens, colorTokens, family) => {
     return score;
 };
 
+// Fallback for products the manifest cannot match — newer models such as the
+// iPhone 17e are not in it at all, so this path is common, not exceptional.
+//
+// imagePublicId is what the backfill wrote; image still holds the original
+// /product-images/... path because the backfill was additive. Reading `image`
+// alone left those products pointing at local files that are no longer
+// deployed, so the public_id must be preferred.
+const fallbackImage = (product) => resolveImageRef(
+    { publicId: product?.imagePublicId, url: product?.image },
+    { width: CATALOG_IMAGE_WIDTH }
+);
+
 export const resolveProductImage = (product) => {
     const productTokens = getProductTokens(product);
-    if (!productTokens.length) return product?.image;
+    if (!productTokens.length) return fallbackImage(product);
 
     const family = getFamily(product);
     const colorTokens = getColorTokens(product);
@@ -181,7 +200,7 @@ export const resolveProductImage = (product) => {
         && containsColorTokens(image, colorTokens)
     ));
 
-    if (!candidates.length) return product?.image;
+    if (!candidates.length) return fallbackImage(product);
 
     const best = candidates.reduce((winner, image) => {
         const score = scoreImage(image, productTokens, colorTokens, family);
@@ -189,7 +208,9 @@ export const resolveProductImage = (product) => {
         return winner;
     }, null);
 
-    return best?.score >= 35 ? best.image.url : product?.image;
+    return best?.score >= 35
+        ? cloudinaryUrl(best.image.publicId, { width: CATALOG_IMAGE_WIDTH })
+        : fallbackImage(product);
 };
 
 
