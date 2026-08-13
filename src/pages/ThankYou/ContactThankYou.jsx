@@ -15,7 +15,7 @@ const ContactThankYou = () => {
                     </div>
                     <h1 className="mt-7 text-[clamp(2.1rem,5vw,4.6rem)] leading-[0.96] sm:leading-[0.92]">Thank you — message received.</h1>
                     <p className="mx-auto mt-4 max-w-[620px] text-base leading-7 text-ink-soft sm:mt-5 sm:text-lg sm:leading-8">
-                        Thanks for reaching out to Upcell IT Inc.. Our team has your message and typically replies within 24 hours. Keep an eye on your inbox for our response.
+                        Thanks for reaching out to UpCell. Our team has your message and typically replies within 24 hours. Keep an eye on your inbox for our response.
                     </p>
 
                     <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
@@ -33,7 +33,7 @@ const ContactThankYou = () => {
                     </div>
                     <div className="premium-card rounded-[28px] p-6 text-center">
                         <div className="text-xs font-bold uppercase tracking-[0.18em] text-apple-gray">Need it faster?</div>
-                        <a href="https://www.facebook.com/usa.Upcell IT Inc.s" target="_blank" rel="noreferrer" className="mt-2 inline-block text-lg font-extrabold text-apple-text hover:text-brand-red transition-colors">Message us on Facebook</a>
+                        <a href="https://www.facebook.com/usa.Upcells" target="_blank" rel="noreferrer" className="mt-2 inline-block text-lg font-extrabold text-apple-text hover:text-brand-red transition-colors">Message us on Facebook</a>
                     </div>
                     <div className="premium-card rounded-[28px] p-6 text-center">
                         <div className="text-xs font-bold uppercase tracking-[0.18em] text-apple-gray">Track an order?</div>

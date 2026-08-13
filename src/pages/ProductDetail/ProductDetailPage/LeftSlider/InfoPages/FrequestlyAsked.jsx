@@ -18,7 +18,7 @@ const faqs = [
         a: `We accept Visa, MasterCard, Discover, and American Express, as well as PayPal. We don’t accept payments via bank transfer, check, or cash.`,
     },
     {
-        q: `What's the Upcell IT Inc. quality assurance fee for ?`,
+        q: `What's the UpCell IT Inc. quality assurance fee for ?`,
         a: `This fee allows us to vet and monitor the sellers we partner with, ensuring they meet our rigorous quality and customer-service standards. Your happiness is our top priority!`,
     },
 ];

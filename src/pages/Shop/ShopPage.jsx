@@ -97,7 +97,7 @@ const ShopProductPreloader = () => (
                     <div className="h-8 w-8 animate-spin rounded-full border-[3px] border-black/10 border-t-brand-red" />
                 </div>
                 <div className="min-w-0">
-                    <div className="text-xs font-black uppercase tracking-[0.22em] text-brand-red">Upcell IT Inc.</div>
+                    <div className="text-xs font-black uppercase tracking-[0.22em] text-brand-red">UpCell IT Inc.</div>
                     <h2 className="mt-1 text-[24px] leading-tight text-apple-text sm:text-[30px]">Preparing certified devices</h2>
                     <p className="mt-2 text-sm text-apple-gray">Loading the latest available iPhones, iPads, and MacBooks.</p>
                 </div>

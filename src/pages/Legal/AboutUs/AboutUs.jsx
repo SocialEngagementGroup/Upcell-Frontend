@@ -21,9 +21,9 @@ const AboutUs = () => {
                         <KeyboardArrowRightIcon className="!text-sm" />
                         <span className="text-apple-text">About</span>
                     </nav>
-                    <h1 className="text-[clamp(2.1rem,5vw,5rem)] leading-[0.96] sm:leading-[0.92]">About Upcell IT Inc.: Certified Premium Apple Devices You Can Trust</h1>
+                    <h1 className="text-[clamp(2.1rem,5vw,5rem)] leading-[0.96] sm:leading-[0.92]">About UpCell IT Inc.: Certified Premium Apple Devices You Can Trust</h1>
                     <p className="mt-4 max-w-[700px] text-base leading-7 text-ink-soft sm:mt-5 sm:text-lg sm:leading-8">
-                        Upcell IT Inc. is a certified reseller of premium Apple hardware. We source, inspect, and present every premium iPhone, iPad, and MacBook to a higher standard than the typical secondhand marketplace.
+                        UpCell IT Inc. is a certified reseller of premium Apple hardware. We source, inspect, and present every premium iPhone, iPad, and MacBook to a higher standard than the typical secondhand marketplace.
                     </p>
                 </div>
             </section>
@@ -40,14 +40,14 @@ const AboutUs = () => {
                         </p>
                     </div>
                     <div className="premium-card overflow-hidden rounded-[28px] p-3 sm:rounded-[36px]">
-                        <img src={staticImageUrl(STATIC_IMAGES.ABOUT_US_BG, 900)} alt="About Upcell IT Inc." className="h-48 w-full rounded-[22px] object-cover sm:h-full sm:rounded-[28px]" />
+                        <img src={staticImageUrl(STATIC_IMAGES.ABOUT_US_BG, 900)} alt="About UpCell IT Inc." className="h-48 w-full rounded-[22px] object-cover sm:h-full sm:rounded-[28px]" />
                     </div>
                 </div>
             </section>
 
             <section className="page-container pb-16 pt-8 sm:pb-24">
                 <div className="mb-8 sm:mb-12">
-                    <h2>What guides Upcell IT Inc..</h2>
+                    <h2>What guides UpCell.</h2>
                 </div>
                 <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
                     {values.map((value, index) => (

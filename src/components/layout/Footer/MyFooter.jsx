@@ -56,7 +56,7 @@ const MyFooter = () => {
                     <div className="grid gap-12 lg:grid-cols-[1.4fr_0.8fr_0.8fr_0.8fr_1.6fr]">
                         <div className="space-y-5 lg:pt-8">
                             <Link to="/" className="flex items-center">
-                                <img src={staticImageUrl(STATIC_IMAGES.LOGO_FOOTER, 240)} alt="Upcell Logo" className="h-12 w-auto" />
+                                <img src={staticImageUrl(STATIC_IMAGES.LOGO_FOOTER, 240)} alt="UpCell Logo" className="h-12 w-auto" />
                             </Link>
                             <p className="max-w-[320px] text-[13px] leading-6 text-ink-soft">
                                 Premium Apple devices you can trust. We professionally inspect and honestly grade every certified iPhone, iPad, and MacBook, then back it with a 12-month warranty. Save up to 40% versus buying new.
@@ -132,7 +132,7 @@ const MyFooter = () => {
                     </div>
 
                     <div className="mt-8 flex flex-col gap-3 border-t border-black/[0.06] pt-6 text-[13px] text-apple-gray md:flex-row md:items-center md:justify-between">
-                        <p>&copy; {new Date().getFullYear()} Upcell IT Inc. All rights reserved.</p>
+                        <p>&copy; {new Date().getFullYear()} UpCell IT Inc. All rights reserved.</p>
                         <p>Certified premium Apple devices. Trusted trade-ins. Transparent pricing.</p>
                     </div>
                 </div>

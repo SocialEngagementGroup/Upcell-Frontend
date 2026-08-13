@@ -13,12 +13,12 @@ import { extractApiError, validateEmailAddress, validateRequiredText } from '../
 import useFormAnalytics from '../../../utilities/useFormAnalytics';
 
 const faqs = [
-    { q: 'How do I contact Upcell IT Inc.?', a: 'Email is the fastest path for order support, trade-ins, or return requests. Social channels are also monitored regularly and typically see responses within 24 hours.' },
+    { q: 'How do I contact UpCell IT Inc.?', a: 'Email is the fastest path for order support, trade-ins, or return requests. Social channels are also monitored regularly and typically see responses within 24 hours.' },
     { q: 'How do I cancel an order?', a: 'Send your order ID as quickly as possible. If the order has not shipped, we can usually help before dispatch. Once an item is with our carrier, the standard return process applies.' },
     { q: 'Where can I find order details?', a: 'Signed-in customers can review past order information inside the account area after purchase. You will also receive automated tracking updates via email.' },
     { q: 'How do you grade device condition?', a: "Every unit undergoes a 40-point inspection. 'Pristine' indicates zero cosmetic wear, while 'Like New' may have a single, nearly invisible mark. We never sell units with cracked glass or structural damage." },
     { q: 'What is the shipping timeline?', a: 'Most orders are processed within 1 business day. Standard shipping typically takes 3-5 days across the US, while expedited options are available at checkout for urgent needs.' },
-    { q: 'Do products come with a warranty?', a: 'Yes. All Upcell IT Inc. devices include a comprehensive 12-month limited warranty covering internal hardware defects. We also offer extended protection plans for accidental damage.' },
+    { q: 'Do products come with a warranty?', a: 'Yes. All UpCell IT Inc. devices include a comprehensive 12-month limited warranty covering internal hardware defects. We also offer extended protection plans for accidental damage.' },
 ];
 
 const Contactus = () => {
@@ -81,7 +81,7 @@ const Contactus = () => {
                         <KeyboardArrowRightIcon className="!text-sm" />
                         <span className="text-apple-text">Support</span>
                     </nav>
-                    <h1 className="text-[clamp(2.1rem,5vw,5rem)] leading-[0.96] sm:leading-[0.92]">Contact Upcell IT Inc.: Premium Apple Device Support</h1>
+                    <h1 className="text-[clamp(2.1rem,5vw,5rem)] leading-[0.96] sm:leading-[0.92]">Contact UpCell IT Inc.: Premium Apple Device Support</h1>
                     <p className="mt-4 max-w-[680px] text-base leading-7 text-ink-soft sm:mt-5 sm:text-lg sm:leading-8">
                         Questions about a certified premium iPhone, iPad, or MacBook? Need help with a trade-in quote, order update, or return? Our team responds within 24 hours. Reach us by phone, email, Facebook, or Instagram.
                     </p>
@@ -95,7 +95,7 @@ const Contactus = () => {
                             {[
                                 { icon: <LocalPhoneOutlinedIcon />, title: 'Phone support', info: '+1 (380) 266-3942', href: 'tel:+13802663942' },
                                 { icon: <EmailOutlinedIcon />, title: 'Email support', info: 'usa.Upcells@gmail.com', href: 'mailto:usa.Upcells@gmail.com' },
-                                { icon: <FacebookOutlinedIcon />, title: 'Facebook Messenger', info: 'facebook.com/usa.Upcell IT Inc.s', href: 'https://www.facebook.com/usa.Upcell IT Inc.s' },
+                                { icon: <FacebookOutlinedIcon />, title: 'Facebook Messenger', info: 'facebook.com/usa.Upcells', href: 'https://www.facebook.com/usa.Upcells' },
                                 { icon: <InstagramIcon />, title: 'Instagram Direct', info: '@Upcells_usa', href: 'https://www.instagram.com/Upcells_usa/' },
                                 { icon: <PlaceOutlinedIcon />, title: 'Our location', info: '973 Harrisburg Pike, Columbus, OH 43223', href: 'https://maps.google.com/?q=973+Harrisburg+Pike,+Columbus,+OH+43223' },
                             ].map((item) => (

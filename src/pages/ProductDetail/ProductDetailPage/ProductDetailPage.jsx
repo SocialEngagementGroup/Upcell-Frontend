@@ -25,7 +25,7 @@ const featureCards = [
     },
     {
         title: 'Warranty included',
-        body: 'Every order is backed by Upcell IT Inc. support and practical coverage designed for peace of mind.',
+        body: 'Every order is backed by UpCell IT Inc. support and practical coverage designed for peace of mind.',
     },
 ];
 const ESSENTIAL_ADDONS = [
