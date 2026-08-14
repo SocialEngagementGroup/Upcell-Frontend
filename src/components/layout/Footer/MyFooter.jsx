@@ -4,6 +4,15 @@ import axiosInstance from '../../../utilities/axiosInstance';
 import { extractApiError, validateEmailAddress } from '../../../utilities/formValidation';
 import useFormAnalytics from '../../../utilities/useFormAnalytics';
 import { STATIC_IMAGES, staticImageUrl } from '../../../constants/staticImages';
+import visa from '../../../assets/visa.svg';
+import mastercard from '../../../assets/master.svg';
+import americanExpress from '../../../assets/americanExpress.svg';
+
+const CARD_NETWORKS = [
+    { src: visa, label: 'Visa accepted' },
+    { src: mastercard, label: 'Mastercard accepted' },
+    { src: americanExpress, label: 'American Express accepted' },
+];
 
 // Modern Icons
 const SocialIcons = {
@@ -63,12 +72,22 @@ const MyFooter = () => {
                             </p>
                             <div className="space-y-1 text-[13px] leading-6 text-ink-soft">
                                 <a href="tel:+13802663942" className="block hover:text-apple-text">+1 (380) 266-3942</a>
+                                <a href="mailto:usa.Upcells@gmail.com" className="block hover:text-apple-text">usa.Upcells@gmail.com</a>
                                 <p>973 Harrisburg Pike, Columbus, OH 43223, United States</p>
                             </div>
                             <div className="flex gap-3 pt-2">
-                                <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram" className="flex h-11 w-11 items-center justify-center rounded-full border border-black/[0.06] text-apple-gray hover:-translate-y-0.5 hover:bg-surface-alt hover:text-apple-text"><SocialIcons.Instagram /></a>
-                                <a href="https://facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook" className="flex h-11 w-11 items-center justify-center rounded-full border border-black/[0.06] text-apple-gray hover:-translate-y-0.5 hover:bg-surface-alt hover:text-apple-text"><SocialIcons.Facebook /></a>
-                                <a href="https://twitter.com" target="_blank" rel="noreferrer" aria-label="Twitter" className="flex h-11 w-11 items-center justify-center rounded-full border border-black/[0.06] text-apple-gray hover:-translate-y-0.5 hover:bg-surface-alt hover:text-apple-text"><SocialIcons.Twitter /></a>
+                                <a href="https://www.instagram.com/Upcells_usa/" target="_blank" rel="noreferrer" aria-label="Instagram" className="flex h-11 w-11 items-center justify-center rounded-full border border-black/[0.06] text-apple-gray hover:-translate-y-0.5 hover:bg-surface-alt hover:text-apple-text"><SocialIcons.Instagram /></a>
+                                <a href="https://www.facebook.com/usa.Upcells" target="_blank" rel="noreferrer" aria-label="Facebook" className="flex h-11 w-11 items-center justify-center rounded-full border border-black/[0.06] text-apple-gray hover:-translate-y-0.5 hover:bg-surface-alt hover:text-apple-text"><SocialIcons.Facebook /></a>
+                            </div>
+                            <div className="pt-1">
+                                <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-apple-gray">We accept</p>
+                                <div className="mt-2 flex flex-wrap gap-2">
+                                    {CARD_NETWORKS.map((card) => (
+                                        <span key={card.label} className="flex h-9 w-14 items-center justify-center rounded-lg border border-black/[0.06] bg-white">
+                                            <img src={card.src} alt={card.label} className="max-h-5 w-auto object-contain" />
+                                        </span>
+                                    ))}
+                                </div>
                             </div>
                         </div>
 
@@ -97,6 +116,7 @@ const MyFooter = () => {
                             <div className="flex flex-col gap-3 text-[15px] text-ink-soft">
                                 <Link to="/return-policy">Warranty & Returns</Link>
                                 <Link to="/delivery-policy">Delivery Policy</Link>
+                                <Link to="/promotions">Promotions & Offer Terms</Link>
                                 <Link to="/privacy-policy">Privacy Policy</Link>
                                 <Link to="/terms-conditions">Terms & Conditions</Link>
                                 <Link to="/support">Support</Link>

@@ -203,10 +203,22 @@ const Checkout = () => {
                                 </div>
                             </section>
 
-                            <div className="flex flex-col gap-4 border-t border-black/[0.06] pt-6 md:flex-row md:items-center md:justify-between">
-                                <p className="flex items-center gap-2 text-sm text-ink-soft">
+                            <div className="rounded-[24px] border border-black/[0.06] bg-surface-alt p-5">
+                                <p className="flex items-center gap-2 text-sm font-bold text-apple-text">
                                     <LockOutlinedIcon className="!text-[18px]" />
-                                    Encrypted checkout and secure order processing.
+                                    Secure, encrypted checkout
+                                </p>
+                                <p className="mt-2 text-sm leading-6 text-ink-soft">
+                                    This page is served over an encrypted HTTPS connection. Card payments are processed through a PCI DSS compliant payment processor. UpCell IT Inc. never stores your full card number or security code.
+                                </p>
+                            </div>
+
+                            <div className="flex flex-col gap-4 border-t border-black/[0.06] pt-6 md:flex-row md:items-center md:justify-between">
+                                <p className="text-sm text-ink-soft">
+                                    Prices shown in US dollars (USD). Ships to the United States only. See our{' '}
+                                    <Link to="/return-policy" className="font-bold text-brand-red">Refund Policy</Link>,{' '}
+                                    <Link to="/delivery-policy" className="font-bold text-brand-red">Delivery Policy</Link>, or contact{' '}
+                                    <a href="mailto:usa.Upcells@gmail.com" className="font-bold text-brand-red">usa.Upcells@gmail.com</a>.
                                 </p>
                                 <button type="submit" className="premium-button w-full md:w-auto md:min-w-[220px]" disabled={isLoading}>
                                     {isLoading ? 'Submitting...' : 'Submit order request'}
@@ -234,7 +246,7 @@ const Checkout = () => {
                                             <div className="font-bold text-apple-text">{product.productName}</div>
                                             <div className="mt-1 text-sm text-ink-soft">{product.color?.name}, {product.storage}</div>
                                         </div>
-                                        <div className="font-bold text-apple-text">${product.price}</div>
+                                        <div className="whitespace-nowrap font-bold text-apple-text">${product.price} USD</div>
                                     </div>
                                 );
                             })}
@@ -247,12 +259,19 @@ const Checkout = () => {
                             <div className="flex justify-between border-t border-black/[0.06] pt-4 text-base"><span className="font-bold text-apple-text">Total</span><strong className="whitespace-nowrap text-2xl text-apple-text">${total.toFixed(2)} <span className="text-sm font-normal text-ink-soft">USD</span></strong></div>
                         </div>
 
-                        <div className="mt-6 grid grid-cols-3 gap-3">
-                            {[visa, mastercard, americanExpress].map((icon, index) => (
-                                <div key={index} className="flex h-12 items-center justify-center rounded-[16px] border border-black/[0.06] bg-white">
-                                    <img src={icon} alt="Card network accepted" className="max-h-7 w-auto object-contain" />
-                                </div>
-                            ))}
+                        <div className="mt-6">
+                            <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-apple-gray">Cards accepted</p>
+                            <div className="mt-2 grid grid-cols-3 gap-3">
+                                {[
+                                    { src: visa, label: 'Visa accepted' },
+                                    { src: mastercard, label: 'Mastercard accepted' },
+                                    { src: americanExpress, label: 'American Express accepted' },
+                                ].map((card) => (
+                                    <div key={card.label} className="flex h-12 items-center justify-center rounded-[16px] border border-black/[0.06] bg-white">
+                                        <img src={card.src} alt={card.label} className="max-h-7 w-auto object-contain" />
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </aside>
                 </div>

@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import './index.css';
 
 import App from './App.jsx';
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
 import PrivateRoute from './utilities/PrivateRoute.jsx';
 import UserContextProvider from './utilities/UserContextProvider.jsx';
 import AdminPrivateRoute from './utilities/AdminPrivateRoute.jsx';
@@ -36,6 +36,7 @@ const ReturnPolicy = lazy(() => import('./pages/Legal/ReturnPolicy/ReturnPolicy.
 const PrivacyPolicy = lazy(() => import('./pages/Legal/PrivacyPolicy/PrivacyPolicy.jsx'));
 const TermsConditions = lazy(() => import('./pages/Legal/TermsConditions/TermsConditions.jsx'));
 const DeliveryPolicy = lazy(() => import('./pages/Legal/DeliveryPolicy/DeliveryPolicy.jsx'));
+const Promotions = lazy(() => import('./pages/Legal/Promotions/Promotions.jsx'));
 const AboutUs = lazy(() => import('./pages/Legal/AboutUs/AboutUs.jsx'));
 const ThankYou = lazy(() => import('./pages/ThankYou/ThankYou.jsx'));
 const PaypalReturn = lazy(() => import('./pages/PaypalReturn/PaypalReturn.jsx'));
@@ -80,6 +81,10 @@ const router = createBrowserRouter([
         element: lazyElement(<ProductDetailPage />),
       },
       {
+        path: "checkout",
+        element: <Navigate to="/cart" replace />,
+      },
+      {
         path: "checkout/:id",
         element: lazyElement(<PrivateRoute><Checkout /></PrivateRoute>),
       },
@@ -122,6 +127,10 @@ const router = createBrowserRouter([
       {
         path: "delivery-policy",
         element: lazyElement(<DeliveryPolicy />),
+      },
+      {
+        path: "promotions",
+        element: lazyElement(<Promotions />),
       },
       {
         path: "about",

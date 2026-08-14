@@ -37,7 +37,8 @@ const TermsConditions = () => {
                     </p>
 
                     <h2>3. Orders &amp; Payment</h2>
-                    <p><strong>Accepted payment methods:</strong> card payment (processed securely through our bank&rsquo;s merchant services), bank transfer, or cash at pickup.</p>
+                    <p><strong>Accepted payment methods:</strong> card payment — Visa, Mastercard, and American Express — (processed securely through our bank&rsquo;s merchant services), bank transfer, or cash at pickup.</p>
+                    <p><strong>Payment security.</strong> Our Site is served over an encrypted HTTPS connection. Card payments are handled by a PCI DSS compliant payment processor. UpCell IT Inc. does not store your full card number or card security code on our systems.</p>
                     <p><strong>Order confirmation.</strong> Placing an order through the Site is an offer to purchase. An order is not confirmed until payment has been received and verified by UpCell IT. For card payments, this means the transaction has been authorized and settled through our bank&rsquo;s merchant services. For bank transfers, this means funds have cleared into our account. For cash at pickup, the sale is completed when payment is made in full at handover. We reserve the right to cancel any order prior to payment verification.</p>
                     <p><strong>Pricing.</strong> All prices are listed in US dollars. We make every effort to keep pricing accurate, but if a product is listed at an incorrect price due to an error, we reserve the right to cancel the order and issue a full refund of any amount paid.</p>
                     <p><strong>Availability.</strong> All orders are subject to stock availability. If an item becomes unavailable after you order, we will contact you to offer an alternative or a full refund.</p>

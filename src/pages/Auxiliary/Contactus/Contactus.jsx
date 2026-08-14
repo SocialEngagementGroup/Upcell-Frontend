@@ -17,7 +17,7 @@ const faqs = [
     { q: 'How do I cancel an order?', a: 'Send your order ID as quickly as possible. If the order has not shipped, we can usually help before dispatch. Once an item is with our carrier, the standard return process applies.' },
     { q: 'Where can I find order details?', a: 'Signed-in customers can review past order information inside the account area after purchase. You will also receive automated tracking updates via email.' },
     { q: 'How do you grade device condition?', a: "Every unit undergoes a 40-point inspection. 'Pristine' indicates zero cosmetic wear, while 'Like New' may have a single, nearly invisible mark. We never sell units with cracked glass or structural damage." },
-    { q: 'What is the shipping timeline?', a: 'Most orders are processed within 1 business day. Standard shipping typically takes 3-5 days across the US, while expedited options are available at checkout for urgent needs.' },
+    { q: 'What is the shipping timeline?', a: 'Most orders are processed within 1 business day. Standard shipping typically takes 3-7 business days across the US, while expedited options are available at checkout for urgent needs.' },
     { q: 'Do products come with a warranty?', a: 'Yes. All UpCell IT Inc. devices include a comprehensive 12-month limited warranty covering internal hardware defects. We also offer extended protection plans for accidental damage.' },
 ];
 

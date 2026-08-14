@@ -86,7 +86,7 @@ const Cart = () => {
                             <div className="mt-6 border-t border-black/[0.06] pt-6">
                                 <div className="flex items-center justify-between">
                                     <span className="text-base font-bold text-apple-text">Estimated total</span>
-                                    <span className="text-2xl font-extrabold text-apple-text">${(total * 1.08).toFixed(2)}</span>
+                                    <span className="whitespace-nowrap text-2xl font-extrabold text-apple-text">${(total * 1.08).toFixed(2)} <span className="text-sm font-normal text-ink-soft">USD</span></span>
                                 </div>
                             </div>
                             <Link to="/checkout/cart" className="premium-button mt-8 w-full">
