@@ -37,6 +37,7 @@ const PrivacyPolicy = lazy(() => import('./pages/Legal/PrivacyPolicy/PrivacyPoli
 const TermsConditions = lazy(() => import('./pages/Legal/TermsConditions/TermsConditions.jsx'));
 const DeliveryPolicy = lazy(() => import('./pages/Legal/DeliveryPolicy/DeliveryPolicy.jsx'));
 const Promotions = lazy(() => import('./pages/Legal/Promotions/Promotions.jsx'));
+const PaymentInfo = lazy(() => import('./pages/Legal/PaymentInfo/PaymentInfo.jsx'));
 const AboutUs = lazy(() => import('./pages/Legal/AboutUs/AboutUs.jsx'));
 const ThankYou = lazy(() => import('./pages/ThankYou/ThankYou.jsx'));
 const PaypalReturn = lazy(() => import('./pages/PaypalReturn/PaypalReturn.jsx'));
@@ -131,6 +132,10 @@ const router = createBrowserRouter([
       {
         path: "promotions",
         element: lazyElement(<Promotions />),
+      },
+      {
+        path: "payment-info",
+        element: lazyElement(<PaymentInfo />),
       },
       {
         path: "about",
