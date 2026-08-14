@@ -116,6 +116,7 @@ const MyFooter = () => {
                             <div className="flex flex-col gap-3 text-[15px] text-ink-soft">
                                 <Link to="/return-policy">Warranty & Returns</Link>
                                 <Link to="/delivery-policy">Delivery Policy</Link>
+                                <Link to="/payment-info">Payment & Security</Link>
                                 <Link to="/promotions">Promotions & Offer Terms</Link>
                                 <Link to="/privacy-policy">Privacy Policy</Link>
                                 <Link to="/terms-conditions">Terms & Conditions</Link>
