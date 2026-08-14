@@ -30,7 +30,7 @@ const CartProduct = ({ product, setCart, cart }) => {
             </div>
 
             <div className="flex flex-col gap-4 md:items-end">
-                <div className="text-2xl font-extrabold text-apple-text">${(price * unit).toFixed(2)}</div>
+                <div className="whitespace-nowrap text-2xl font-extrabold text-apple-text">${(price * unit).toFixed(2)} <span className="text-sm font-normal text-ink-soft">USD</span></div>
                 <div className="flex items-center rounded-full border border-black/[0.08] bg-white px-3 py-2">
                     <button className="h-10 w-10 rounded-full text-xl text-apple-gray hover:bg-surface-alt" onClick={removeSingleItem}>-</button>
                     <span className="min-w-[40px] text-center text-sm font-bold text-apple-text">{unit}</span>

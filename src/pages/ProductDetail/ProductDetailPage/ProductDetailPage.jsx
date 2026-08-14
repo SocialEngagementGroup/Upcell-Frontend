@@ -33,6 +33,27 @@ const ESSENTIAL_ADDONS = [
     { id: 'addon_protector', name: 'Ultra-Glass Protector', price: 19, description: 'Edge-to-edge scratch and impact defense.' },
 ];
 
+// Plain-English explanation of each condition grade shown on the listing.
+const GRADE_EXPLANATIONS = {
+    New: 'Brand new and unused, in factory-sealed packaging.',
+    Excellent: 'Minimal to no visible wear. Looks close to new under normal use.',
+    Good: 'Light, normal signs of use with minor cosmetic marks. Fully functional.',
+    Fair: 'Noticeable cosmetic wear such as light scratches or scuffs. Fully tested and functional.',
+    Refurbished: 'Professionally restored and tested to full working condition.',
+    Refubrished: 'Professionally restored and tested to full working condition.',
+};
+
+// What our certified-premium program includes on every device. These are
+// program-wide standards; anything specific to a single unit is noted on its
+// listing.
+const CERTIFICATION_DETAILS = [
+    { label: 'Certification', value: '40-point technician inspection covering hardware, battery health, and cosmetics before every device is listed.' },
+    { label: 'Battery health', value: 'Battery performance is verified as part of our inspection. Batteries that fall below our certified threshold are replaced.' },
+    { label: 'Unlocked', value: 'Sold unlocked and compatible with all major US carriers, unless the listing states otherwise.' },
+    { label: 'Warranty', value: 'Backed by a 12-month UpCell IT Inc. limited warranty from the date of delivery or pickup.' },
+    { label: "What's in the box", value: 'Ships in UpCell certified packaging with a compatible charging cable. Original retail box and extra accessories are not guaranteed unless stated on the listing.' },
+];
+
 const getStorageSortValue = (storageLabel = '') => {
     const match = storageLabel.trim().match(/^(\d+(?:\.\d+)?)\s*(TB|GB)$/i);
     if (!match) return Number.MAX_SAFE_INTEGER;
@@ -176,7 +197,12 @@ const ProductDetailPage = () => {
                     <div className="premium-card rounded-[28px] p-6 sm:rounded-[40px] sm:p-8 md:p-10">
                     <div className="md:mt-0">
                         <h1 className="text-[clamp(2rem,4vw,4.3rem)] leading-[1] sm:leading-[0.95]">{product.productName}</h1>
-                        <div className="mt-3 text-3xl font-extrabold text-apple-text sm:text-4xl">${product.price}</div>
+                        <div className="mt-3 text-3xl font-extrabold text-apple-text sm:text-4xl">${product.price} <span className="text-lg font-semibold text-ink-soft">USD</span></div>
+                        {product.condition && (
+                            <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-black/[0.08] bg-surface-alt px-4 py-1.5 text-[13px] font-bold text-apple-text">
+                                Condition grade: {product.condition}
+                            </div>
+                        )}
 
                         {/* ─── Color Selection ─── */}
                         <div className="mt-10">
@@ -290,6 +316,63 @@ const ProductDetailPage = () => {
                             {product.outOfStock ? 'Out of stock' : `Add to cart · $${grandTotal}`}
                         </button>
 
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section className="page-container pb-10">
+                <div className="premium-card rounded-[28px] p-6 sm:rounded-[40px] sm:p-8 md:p-10">
+                    <h2 className="text-[clamp(1.7rem,3vw,2.6rem)]">Product details</h2>
+
+                    {product.description && (
+                        <p className="mt-4 max-w-[760px] text-base leading-7 text-ink-soft">{product.description}</p>
+                    )}
+
+                    <div className="mt-8 grid gap-8 lg:grid-cols-2">
+                        <div>
+                            <h3 className="text-xl font-bold text-apple-text">Specifications</h3>
+                            <dl className="mt-4 divide-y divide-black/[0.06] border-t border-black/[0.06]">
+                                <div className="flex justify-between gap-4 py-3">
+                                    <dt className="text-sm font-semibold text-apple-gray">Model</dt>
+                                    <dd className="text-sm font-bold text-apple-text text-right">{product.productName}</dd>
+                                </div>
+                                {product.storage && (
+                                    <div className="flex justify-between gap-4 py-3">
+                                        <dt className="text-sm font-semibold text-apple-gray">Storage</dt>
+                                        <dd className="text-sm font-bold text-apple-text text-right">{product.storage}</dd>
+                                    </div>
+                                )}
+                                {product.color?.name && (
+                                    <div className="flex justify-between gap-4 py-3">
+                                        <dt className="text-sm font-semibold text-apple-gray">Finish</dt>
+                                        <dd className="text-sm font-bold text-apple-text text-right">{product.color.name}</dd>
+                                    </div>
+                                )}
+                                {product.condition && (
+                                    <div className="flex justify-between gap-4 py-3">
+                                        <dt className="text-sm font-semibold text-apple-gray">Condition grade</dt>
+                                        <dd className="text-sm font-bold text-apple-text text-right">
+                                            {product.condition}
+                                            {GRADE_EXPLANATIONS[product.condition] && (
+                                                <span className="mt-1 block text-xs font-normal text-ink-soft">{GRADE_EXPLANATIONS[product.condition]}</span>
+                                            )}
+                                        </dd>
+                                    </div>
+                                )}
+                            </dl>
+                        </div>
+
+                        <div>
+                            <h3 className="text-xl font-bold text-apple-text">Certified &amp; included</h3>
+                            <dl className="mt-4 divide-y divide-black/[0.06] border-t border-black/[0.06]">
+                                {CERTIFICATION_DETAILS.map((detail) => (
+                                    <div key={detail.label} className="py-3">
+                                        <dt className="text-sm font-bold text-apple-text">{detail.label}</dt>
+                                        <dd className="mt-1 text-sm leading-6 text-ink-soft">{detail.value}</dd>
+                                    </div>
+                                ))}
+                            </dl>
                         </div>
                     </div>
                 </div>
