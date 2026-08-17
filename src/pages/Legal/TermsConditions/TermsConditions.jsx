@@ -25,7 +25,7 @@ const TermsConditions = () => {
                     </p>
 
                     <h2>1. About Our Products</h2>
-                    <p>UpCell IT sells certified, used, brand-new devices, including iPhone, iPad, and MacBook models. Every device we sell is inspected and verified before it is listed. All devices come sealed and unused unless explicitly stated otherwise on the product page.</p>
+                    <p>UpCell IT sells certified pre-owned devices, including iPhone, iPad, and MacBook models. Every device we sell is inspected and verified before it is listed, and every listing carries a condition grade. The grade shown on a product page describes that device&rsquo;s battery health, screen and cosmetic condition — see the condition details on the product page before ordering.</p>
                     <p>Product images are for illustration. Minor variations in packaging or included accessories may occur where noted on the listing.</p>
 
                     <h2>2. Eligibility &amp; Accounts</h2>
@@ -81,10 +81,10 @@ const TermsConditions = () => {
                         with your order number and a description of the issue. If a warranty claim is accepted, we will repair the device whenever possible; if repair is not economically feasible, we will replace it with an equivalent model, or provide store credit or another remedy permitted under these warranty terms.
                     </p>
                     <p><strong>Shipping for warranty service.</strong> You pay shipping to send the device to us; UpCell IT pays return shipping on approved claims. Average turnaround is 3–7 business days after we receive the device.</p>
-                    <p>Hardware problems reported after the 14-day return period (Section 6) are handled under this warranty.</p>
+                    <p>Hardware problems reported after the 30-day return period (Section 6) are handled under this warranty.</p>
 
                     <h2 id="returns-refunds">6. Returns &amp; Refunds</h2>
-                    <p>We want you to be satisfied with your purchase. Eligible products may be returned within 14 calendar days of delivery or in-store purchase, subject to the requirements below. A return based on preference or a change of mind must be made within this 14-day period.</p>
+                    <p>We want you to be satisfied with your purchase. Eligible products may be returned within 30 calendar days of delivery or in-store purchase, subject to the requirements below. A return based on preference or a change of mind must be made within this 30-day period.</p>
                     <p><strong>Return eligibility.</strong> To qualify for a return:</p>
                     <ul>
                         <li>The device must be returned in the same condition in which it was sold</li>

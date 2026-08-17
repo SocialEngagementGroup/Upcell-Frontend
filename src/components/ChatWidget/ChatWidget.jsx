@@ -10,6 +10,7 @@ import SwapHorizRoundedIcon from '@mui/icons-material/SwapHorizRounded';
 import SupportAgentRoundedIcon from '@mui/icons-material/SupportAgentRounded';
 import PersonRoundedIcon from '@mui/icons-material/PersonRounded';
 import { useChat } from './useChat';
+import { productsInReply, stripPaths } from './replyProducts';
 import { useAutoCarousel } from './useAutoCarousel';
 import quickQuestions from './quickQuestions';
 import { useProductsQuery } from '../../queries/products';
@@ -47,14 +48,116 @@ const UserAvatar = () => (
     </div>
 );
 
-// Renders **bold** spans within a single line of text.
-const formatInlineText = (line) => {
+// The assistant answers product, trade-in and policy questions by pointing at a
+// page ("...on the Shop page at /shop"), so those paths are worth being
+// clickable. SEG F-08: this is an allowlist of exact internal routes, never an
+// href taken from model output — the model can only select from this map, so a
+// reply cannot introduce a destination, an external host, or a javascript: URL.
+const LINKABLE_PATHS = {
+    '/shop': 'Shop',
+    '/trade-in': 'Trade-in',
+    '/support': 'Support',
+    '/return-policy': 'Return Policy',
+    '/delivery-policy': 'Delivery Policy',
+    '/privacy-policy': 'Privacy Policy',
+    '/terms-conditions': 'Terms & Conditions',
+    '/blogs': 'Blog',
+    '/cart': 'Cart',
+    '/about': 'About',
+};
+// Captures a whole path-shaped token, then membership in LINKABLE_PATHS decides
+// whether it becomes a link. Matching the full token rather than a prefix is
+// what keeps "/shopping-cart" from being rendered as a link to /shop followed by
+// stray text.
+// Product pages are the one dynamic route the assistant may link to. The shape
+// is fixed — /iphone/<24-hex parent>/<24-hex variation>, exactly what
+// ModernProductCard builds — so it can be validated rather than allowlisted,
+// and nothing else about the URL is under the model's control.
+const PRODUCT_PATH_PATTERN = /^\/iphone\/[a-f\d]{24}\/[a-f\d]{24}$/i;
+const PATH_TOKEN_PATTERN = /(\/iphone\/[a-f\d]{24}\/[a-f\d]{24}|\/[a-z][a-z-]*)/gi;
+const isLinkablePath = (segment) => (
+    Object.prototype.hasOwnProperty.call(LINKABLE_PATHS, segment) || PRODUCT_PATH_PATTERN.test(segment)
+);
+
+// The prompt asks for bare paths, but models reach for markdown links anyway,
+// and a raw "[Shop page](/shop)" in a chat bubble looks broken. This unwraps
+// them to the link text plus the path, which the allowlist below then handles —
+// the href is still ours, never the one the model wrote.
+const MARKDOWN_LINK_PATTERN = /\[([^\]\n]+)\]\((https?:\/\/[^\s)]*?)?(\/iphone\/[a-f\d]{24}\/[a-f\d]{24}|\/[a-z][a-z-]*)?[^\s)]*\)/gi;
+const unwrapMarkdownLinks = (line) => line.replace(
+    MARKDOWN_LINK_PATTERN,
+    (match, label, _origin, path) => (path ? `${label} (${path})` : label)
+);
+
+// A product the assistant just mentioned, shown as something buyable rather
+// than a sentence about a thing. Price comes from the same product record the
+// Shop page renders, so the card and the shop can never disagree.
+const ChatProductCard = ({ product, onNavigate }) => (
+    <Link
+        to={`/iphone/${getProductRouteParent(product)}/${product._id}`}
+        onClick={onNavigate}
+        draggable={false}
+        className="group flex w-40 flex-shrink-0 flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition hover:border-brand-red/50 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-red"
+    >
+        <div className="aspect-square w-full bg-gray-50">
+            <img
+                src={product.image}
+                alt={product.productName}
+                draggable={false}
+                loading="lazy"
+                className="pointer-events-none h-full w-full select-none object-contain p-2"
+            />
+        </div>
+        <div className="flex flex-1 flex-col gap-0.5 px-2.5 pb-2.5 pt-2">
+            <p className="truncate text-[12px] font-semibold leading-tight text-gray-900">{product.productName}</p>
+            <p className="text-[11px] leading-tight text-gray-500">
+                {[product.storage, product.condition].filter(Boolean).join(' · ')}
+            </p>
+            <p className="mt-1 text-[13px] font-bold text-brand-red">
+                {String(product.price).startsWith('$') ? product.price : `$${product.price}`}
+            </p>
+            <span className="mt-1.5 rounded-lg bg-gray-900 px-2 py-1 text-center text-[11px] font-semibold text-white transition group-hover:bg-brand-red">
+                View product
+            </span>
+        </div>
+    </Link>
+);
+
+// Renders **bold** spans and allowlisted internal links within a single line.
+const formatInlineText = (rawLine) => {
+    const line = unwrapMarkdownLinks(rawLine);
     const parts = line.split(/(\*\*[^*]+\*\*)/g).filter(Boolean);
-    return parts.map((part, index) => (
-        part.startsWith('**') && part.endsWith('**')
-            ? <strong key={index}>{part.slice(2, -2)}</strong>
-            : <span key={index}>{part}</span>
-    ));
+    return parts.map((part, index) => {
+        if (part.startsWith('**') && part.endsWith('**')) {
+            return <strong key={index}>{part.slice(2, -2)}</strong>;
+        }
+        const segments = part.split(PATH_TOKEN_PATTERN).filter(Boolean);
+        // A path only counts when it starts a word — otherwise the tail of a URL
+        // like "https://example.test/shop" would render as a link to our own
+        // /shop, which is misleading even though the destination is still ours.
+        const startsWord = (segmentIndex) => (
+            segmentIndex === 0 || /[\s([]$/.test(segments[segmentIndex - 1])
+        );
+        return (
+            <span key={index}>
+                {segments.map((segment, segmentIndex) => (
+                    isLinkablePath(segment) && startsWord(segmentIndex)
+                        ? (
+                            <Link
+                                key={segmentIndex}
+                                to={segment}
+                                className="font-semibold text-brand-red underline underline-offset-2"
+                            >
+                                {/* A raw product path is 50 characters of hex — show the
+                                    page's name instead, and keep the destination intact. */}
+                                {LINKABLE_PATHS[segment] ? segment : 'View product'}
+                            </Link>
+                        )
+                        : <span key={segmentIndex}>{segment}</span>
+                ))}
+            </span>
+        );
+    });
 };
 
 // Turns plain-text/markdown-lite replies (paragraphs, "- " / "1. " lists, **bold**)
@@ -128,6 +231,10 @@ const ChatWidget = () => {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
     const [escalate, setEscalate] = useState(false);
+    // Issued by the server alongside an escalation and posted to the support
+    // space at the same moment, so the customer can open with "I'm UP-4F2A1"
+    // and the person already knows the conversation.
+    const [reference, setReference] = useState(null);
 
     const toggleButtonRef = useRef(null);
     const inputRef = useRef(null);
@@ -149,6 +256,14 @@ const ChatWidget = () => {
         });
         withRank.sort((a, b) => b._generationRank - a._generationRank);
         return withRank.slice(0, MAX_LATEST_IPHONES);
+    }, [allProducts]);
+
+    // Lets a reply's product paths be turned into cards without another fetch —
+    // this is the same list the carousel above already uses.
+    const productsById = useMemo(() => {
+        const index = new Map();
+        for (const product of allProducts) index.set(product._id, product);
+        return index;
     }, [allProducts]);
 
     const showEmptyState = isOpen && messages.length === 0;
@@ -188,6 +303,7 @@ const ChatWidget = () => {
             const data = await mutateAsync(trimmed);
             setMessages((prev) => [...prev, { role: 'assistant', text: data.reply }]);
             setEscalate(Boolean(data.escalate));
+            setReference(data.reference || null);
         } catch (error) {
             setMessages((prev) => [...prev, {
                 role: 'assistant',
@@ -204,6 +320,9 @@ const ChatWidget = () => {
             { role: 'assistant', text: item.answer },
         ]);
         setEscalate(Boolean(item.escalate));
+        // A canned answer never went through the server, so there is no
+        // reference and nobody has been notified.
+        setReference(null);
         setInput('');
     };
 
@@ -326,9 +445,15 @@ const ChatWidget = () => {
                                 </div>
                             </div>
                         )}
-                        {messages.map((msg, index) => (
+                        {messages.map((msg, index) => {
+                        const cards = msg.role === 'assistant' ? productsInReply(msg.text, productsById) : [];
+                        const bodyText = cards.length > 0
+                            ? stripPaths(msg.text, cards.map((card) => card.path))
+                            : msg.text;
+
+                        return (
+                            <div key={index} className="space-y-2">
                             <div
-                                key={index}
                                 className={`flex items-end gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                             >
                                 {msg.role === 'assistant' && <BotAvatar />}
@@ -339,11 +464,25 @@ const ChatWidget = () => {
                                             : 'rounded-bl-sm bg-surface text-apple-text'
                                     }`}
                                 >
-                                    {msg.role === 'assistant' ? renderMessageText(msg.text) : <p>{msg.text}</p>}
+                                    {msg.role === 'assistant' ? renderMessageText(bodyText) : <p>{msg.text}</p>}
                                 </div>
                                 {msg.role === 'user' && <UserAvatar />}
                             </div>
-                        ))}
+
+                            {cards.length > 0 && (
+                                <div className="no-scrollbar flex gap-2 overflow-x-auto pl-12 pr-1 pb-1">
+                                    {cards.map(({ product }) => (
+                                        <ChatProductCard
+                                            key={product._id}
+                                            product={product}
+                                            onNavigate={closePanel}
+                                        />
+                                    ))}
+                                </div>
+                            )}
+                            </div>
+                        );
+                        })}
                         {isPending && (
                             <div className="flex items-end justify-start gap-2" aria-hidden="true">
                                 <BotAvatar />
@@ -354,13 +493,49 @@ const ChatWidget = () => {
                                 </div>
                             </div>
                         )}
+                        {/* The handoff. Three real routes rather than one link
+                            buried in a sentence — this appears at the moment a
+                            customer is most likely to give up. */}
                         {escalate && (
-                            <p className="text-sm text-gray-600">
-                                Need a person?{' '}
-                                <Link to="/support" className="underline" onClick={closePanel}>
-                                    Contact our support team
-                                </Link>.
-                            </p>
+                            <div className="rounded-xl border border-gray-200 bg-white p-3 shadow-sm">
+                                <p className="text-[13px] font-semibold text-gray-900">Talk to a person</p>
+                                <p className="mt-0.5 text-[12px] text-gray-500">
+                                    {reference
+                                        ? 'Our team has been notified. Quote this reference and they will already have your question.'
+                                        : 'Our team can pick this up from here.'}
+                                </p>
+                                {reference && (
+                                    <p className="mt-1.5 inline-block rounded-md bg-gray-900 px-2 py-1 font-mono text-[12px] font-semibold tracking-wider text-white">
+                                        {reference}
+                                    </p>
+                                )}
+                                <div className="mt-2.5 flex flex-wrap gap-1.5">
+                                    {SUPPORT_PHONE_HREF && (
+                                        <a
+                                            href={SUPPORT_PHONE_HREF}
+                                            className="flex items-center gap-1 rounded-lg border border-gray-300 px-2.5 py-1.5 text-[12px] font-semibold text-gray-800 transition hover:border-gray-900 hover:bg-gray-900 hover:text-white"
+                                        >
+                                            <LocalPhoneRoundedIcon className="!text-[15px]" />
+                                            Call
+                                        </a>
+                                    )}
+                                    <a
+                                        href={`mailto:${SUPPORT_EMAIL}${reference ? `?subject=Chat%20${reference}` : ''}`}
+                                        className="flex items-center gap-1 rounded-lg border border-gray-300 px-2.5 py-1.5 text-[12px] font-semibold text-gray-800 transition hover:border-gray-900 hover:bg-gray-900 hover:text-white"
+                                    >
+                                        <MailOutlineRoundedIcon className="!text-[15px]" />
+                                        Email
+                                    </a>
+                                    <Link
+                                        to="/support"
+                                        onClick={closePanel}
+                                        className="flex items-center gap-1 rounded-lg border border-gray-300 px-2.5 py-1.5 text-[12px] font-semibold text-gray-800 transition hover:border-gray-900 hover:bg-gray-900 hover:text-white"
+                                    >
+                                        <SupportAgentRoundedIcon className="!text-[15px]" />
+                                        Support page
+                                    </Link>
+                                </div>
+                            </div>
                         )}
                         <div ref={messagesEndRef} />
                     </div>
@@ -395,6 +570,9 @@ const ChatWidget = () => {
                             onChange={(event) => setInput(event.target.value)}
                             placeholder="Type a message…"
                             autoComplete="off"
+                            // Matches the server's chatMessageSchema limit, so a long
+                            // message is stopped while typing instead of failing on send.
+                            maxLength={1000}
                             className="flex-1 rounded-full border border-gray-200 px-3.5 py-2.5 text-[15px] font-normal focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-red"
                         />
                         <button

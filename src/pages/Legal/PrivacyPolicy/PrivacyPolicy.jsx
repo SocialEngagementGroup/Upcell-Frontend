@@ -13,7 +13,7 @@ const PrivacyPolicy = () => {
                     </nav>
                     <h1 className="text-[clamp(2.1rem,5vw,5rem)] leading-[0.96] sm:leading-[0.92]">Privacy Policy</h1>
                     <p className="mt-4 max-w-[640px] text-base leading-7 text-ink-soft sm:mt-5 sm:text-lg sm:leading-8">
-                        UpCell IT Inc. — upcellit.com. Last updated: Aug 1, 2026.
+                        UpCell IT Inc. — upcellit.com. Last updated: Aug 14, 2026.
                     </p>
                 </div>
             </section>
@@ -34,6 +34,7 @@ const PrivacyPolicy = () => {
                         <li><strong>Return requests</strong> — your order number, device details, and reason for return.</li>
                         <li><strong>Wholesale inquiries</strong> — business name, contact details, and the contents of your inquiry.</li>
                         <li><strong>Correspondence</strong> — anything you send us by email.</li>
+                        <li><strong>Chat assistant messages</strong> — the messages you send in the on-site chat window, and the assistant&rsquo;s replies. See Section 7.</li>
                     </ul>
                     <p><strong>Information collected automatically:</strong></p>
                     <ul>
@@ -98,6 +99,11 @@ const PrivacyPolicy = () => {
                                     <td>Usage data, ad-click identifiers</td>
                                 </tr>
                                 <tr>
+                                    <td>AI chat assistant (Google, Gemini API)</td>
+                                    <td>Generating replies in the on-site chat window (Section 7)</td>
+                                    <td>The messages exchanged in that chat, after card and ID numbers are filtered out</td>
+                                </tr>
+                                <tr>
                                     <td>Payment processing (our bank&rsquo;s merchant services)</td>
                                     <td>Processing card payments</td>
                                     <td>Card payment details (handled by the bank&rsquo;s payment processor, not stored by UpCell IT)</td>
@@ -125,20 +131,32 @@ const PrivacyPolicy = () => {
                     </ul>
                     <p>You can control cookies through your browser settings. Blocking cookies may affect Site features such as staying signed in.</p>
 
-                    <h2>7. How We Protect Your Information</h2>
+                    <h2>7. AI Chat Assistant</h2>
+                    <p>The chat window on the Site is an <strong>AI assistant, not a human agent</strong>. This is stated in the chat window before you send your first message, and you can ask to be connected to our support team at any point.</p>
+                    <ul>
+                        <li><strong>What we store:</strong> the messages you send and the assistant&rsquo;s replies, linked to a session identifier we issue (or to your account, if you are signed in).</li>
+                        <li><strong>How long:</strong> chat transcripts are automatically deleted 90 days after they are created.</li>
+                        <li><strong>Who processes them:</strong> messages are sent to Google (Gemini API) to generate a reply. They are not used to identify you, and we do not use them for marketing.</li>
+                        <li><strong>What we filter out:</strong> card numbers, security codes, and government ID numbers are automatically removed before a message is stored or sent for processing. Please never share card, bank, password, or ID details in chat — our team will never ask for them there.</li>
+                        <li><strong>Accuracy:</strong> the assistant cannot see your account or order and does not quote prices, payout figures, stock, or delivery dates. For anything specific to your order, it will route you to a person.</li>
+                    </ul>
+                    <p>If you are signed in, you can ask us to delete your chat transcripts using the contact details in Section 13.</p>
+
+                    <h2>8. How We Protect Your Information</h2>
                     <p>We use commercially reasonable safeguards to protect your information, including encrypted connections (HTTPS) across the Site, access controls limiting who can view customer data, and authentication handled by a dedicated identity provider rather than passwords stored by us.</p>
                     <p>No method of transmission or storage is completely secure, so we cannot guarantee absolute security but we review our security practices on an ongoing basis. If a breach affecting your personal information occurs, we will notify you as required by applicable law.</p>
 
-                    <h2>8. How Long We Keep Information</h2>
+                    <h2>9. How Long We Keep Information</h2>
                     <p>We keep personal information only as long as needed for the purposes above:</p>
                     <ul>
                         <li><strong>Order, return, and trade-in records</strong> (including IMEI/serial records): retained for as long as needed to support warranty claims (at least 12 months), returns, fraud prevention, accounting, and legal requirements</li>
                         <li><strong>Account information:</strong> retained while your account is active; deleted upon verified account deletion request</li>
                         <li><strong>Bank payout details:</strong> retained only as long as needed to complete your payout and satisfy record-keeping requirements, then removed</li>
                         <li><strong>Inquiries and correspondence:</strong> retained for as long as needed to handle your inquiry and for a reasonable period afterward</li>
+                        <li><strong>Chat assistant transcripts:</strong> automatically deleted 90 days after the conversation (Section 7)</li>
                     </ul>
 
-                    <h2>9. Your Rights &amp; Choices</h2>
+                    <h2>10. Your Rights &amp; Choices</h2>
                     <p>You may:</p>
                     <ul>
                         <li>Access or correct the personal information we hold about you</li>
@@ -152,13 +170,13 @@ const PrivacyPolicy = () => {
                         We will verify your identity before acting on a request and respond within a reasonable timeframe. Depending on where you live, you may have additional rights under state law; we honor applicable rights for all customers.
                     </p>
 
-                    <h2>10. Third-Party Links</h2>
+                    <h2>11. Third-Party Links</h2>
                     <p>The Site may link to third-party websites or services. This Policy does not cover those sites, and we are not responsible for their privacy practices.</p>
 
-                    <h2>11. Changes to This Policy</h2>
+                    <h2>12. Changes to This Policy</h2>
                     <p>We may update this Policy from time to time. The current version will always be posted on the Site with its &ldquo;Last updated&rdquo; date. Material changes will be highlighted on the Site or communicated by email where appropriate.</p>
 
-                    <h2>12. Contact Us</h2>
+                    <h2>13. Contact Us</h2>
                     <p>Questions or requests about your personal information:</p>
                     <p>
                         UpCell IT Inc.<br />
