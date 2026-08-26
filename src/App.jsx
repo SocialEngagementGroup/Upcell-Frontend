@@ -1,13 +1,15 @@
 import { Outlet, ScrollRestoration } from 'react-router-dom'
-import HeaderComponent from './components/layout/Header/HeaderComponent'
-import MyFooter from './components/layout/Footer/MyFooter'
 
-import { ToastContainer} from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { createContext, useEffect, useState } from 'react'
 export const CartContext = createContext([])
 
+// The old Header and Footer were deleted with the rest of the previous design.
+// Rebuild them as src/components/layout/Header/HeaderComponent.jsx and
+// src/components/layout/Footer/MyFooter.jsx, then mount them around <Outlet />
+// below — the shell keeps that slot ready.
 function App() {
   const [cart, setCart] = useState(() => {
     const savedCart = localStorage.getItem('cart');
@@ -21,12 +23,12 @@ function App() {
   return (
     <CartContext.Provider value={{ cart, setCart }}>
       <ScrollRestoration />
-      <div className="flex min-h-screen flex-col bg-transparent">
-        <HeaderComponent />
-        <main className="flex-1">
+      <div>
+        {/* TODO(redesign): <HeaderComponent /> */}
+        <main>
           <Outlet />
         </main>
-        <MyFooter />
+        {/* TODO(redesign): <MyFooter /> */}
         <ToastContainer position="top-center" autoClose={1000} />
       </div>
     </CartContext.Provider>

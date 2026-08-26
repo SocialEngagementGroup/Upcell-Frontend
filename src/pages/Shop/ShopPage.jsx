@@ -3,11 +3,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { CartContext } from '../../App';
 import ScrollToTop from '../../utilities/ScrollToTop';
 import { toast } from 'react-toastify';
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
-import KeyboardArrowLeftRoundedIcon from '@mui/icons-material/KeyboardArrowLeftRounded';
-import ModernProductCard from '../../components/ModernProductCard/ModernProductCard';
 import SearchWithSuggestions from '../../components/SearchWithSuggestions/SearchWithSuggestions';
+import RouteLoadingScreen from '../../components/RouteLoadingScreen/RouteLoadingScreen';
 import { groupProductsByParent } from '../../utilities/catalog';
 import { useProductsQuery } from '../../queries/products';
 import { EMPTY_ARRAY } from '../../queries/keys';
@@ -90,51 +87,6 @@ const getPageWindow = (currentPage, totalPages) => {
     return Array.from({ length: end - start + 1 }, (_, i) => start + i);
 };
 
-
-const ShopProductPreloader = () => (
-    <div className="space-y-6" aria-live="polite" aria-busy="true">
-        <div className="premium-card overflow-hidden rounded-[32px] p-6">
-            <div className="flex items-center gap-4">
-                <div className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[linear-gradient(180deg,#ffffff_0%,#f1f3f6_100%)] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06)]">
-                    <div className="h-8 w-8 animate-spin rounded-full border-[3px] border-black/10 border-t-brand-red" />
-                </div>
-                <div className="min-w-0">
-                    <div className="text-xs font-black uppercase tracking-[0.22em] text-brand-red">UpCell IT Inc.</div>
-                    <h2 className="mt-1 text-[24px] leading-tight text-apple-text sm:text-[30px]">Preparing certified devices</h2>
-                    <p className="mt-2 text-sm text-apple-gray">Loading the latest available iPhones, iPads, and MacBooks.</p>
-                </div>
-            </div>
-        </div>
-
-        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {Array.from({ length: 6 }).map((_, index) => (
-                <div
-                    key={index}
-                    className="overflow-hidden rounded-[40px] border border-black/[0.06] bg-white p-7 shadow-[0_18px_60px_rgba(15,23,42,0.05)]"
-                >
-                    <div className="flex h-[240px] items-center justify-center rounded-[28px] bg-[linear-gradient(180deg,#f8f9fb_0%,#edf0f4_100%)]">
-                        <div className="h-28 w-20 animate-pulse rounded-[24px] bg-white/80 shadow-[0_18px_46px_rgba(15,23,42,0.10)]" />
-                    </div>
-                    <div className="mt-8 h-3 w-20 animate-pulse rounded-full bg-black/10" />
-                    <div className="mt-4 h-6 w-4/5 animate-pulse rounded-full bg-black/10" />
-                    <div className="mt-3 flex gap-2">
-                        {[0, 1, 2].map((swatch) => (
-                            <span key={swatch} className="h-4 w-4 animate-pulse rounded-full bg-black/10" />
-                        ))}
-                    </div>
-                    <div className="mt-8 flex items-end justify-between">
-                        <div>
-                            <div className="h-2 w-10 animate-pulse rounded-full bg-black/10" />
-                            <div className="mt-3 h-8 w-24 animate-pulse rounded-full bg-black/10" />
-                        </div>
-                        <div className="h-4 w-24 animate-pulse rounded-full bg-black/10" />
-                    </div>
-                </div>
-            ))}
-        </div>
-        <span className="sr-only">Loading products</span>
-    </div>
-);
 const ShopPage = () => {
     const location = useLocation();
     const navigate = useNavigate();
@@ -346,8 +298,6 @@ const ShopPage = () => {
         productGridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
 
-    const sliderPercentage = (priceRange / 3500) * 100;
-
     const handleAddToCart = (event, productId) => {
         event.preventDefault();
         event.stopPropagation();
@@ -365,248 +315,172 @@ const ShopPage = () => {
     };
 
     const activeSortOption = sortOptions.find((option) => option.value === sortBy) || sortOptions[0];
+
+    // TODO(redesign): build the new shop page UI here. All filter, sort, search
+    // and pagination state above is wired and ready for the new layout.
     return (
-        <div className="page-shell">
+        <div>
             <ScrollToTop />
 
-            <section className="page-container pb-10 pt-6">
-                <div className="premium-card overflow-hidden rounded-[28px] bg-[linear-gradient(180deg,#ffffff_0%,#f3f5f8_100%)] px-6 py-8 sm:rounded-[40px] sm:px-8 sm:py-10 md:px-12 md:py-14">
-                    <nav className="mb-6 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-apple-gray sm:mb-8">
-                        <Link to="/">Home</Link>
-                        <KeyboardArrowRightIcon className="!text-sm" />
-                        <span>Shop</span>
-                    </nav>
-                    <h1 className="max-w-[1100px] text-[clamp(2.1rem,5vw,5rem)] leading-[0.96] sm:leading-[0.94]">Shop Certified Premium <br className='hidden md:block' /> iPhones, iPads & MacBooks</h1>
-                    <p className="mt-4 max-w-[640px] text-base leading-7 text-ink-soft sm:mt-5 sm:text-lg sm:leading-8">
-                        Every certified premium Apple device is graded for condition, priced honestly, and backed by a 12-month warranty. Save up to 40% vs. buying new.
-                    </p>
-                </div>
-            </section>
+            <nav>
+                <Link to="/">Home</Link>
+                <span>Shop</span>
+            </nav>
+            <h1>Shop Certified Premium iPhones, iPads &amp; MacBooks</h1>
+            <p>
+                Every certified premium Apple device is graded for condition, priced honestly, and
+                backed by a 12-month warranty. Save up to 40% vs. buying new.
+            </p>
 
-            <section className="page-container pb-16">
-                <div className="mb-10 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-                    <div className="flex flex-wrap gap-2 md:gap-3">
-                        {topCategories.map((category) => (
-                            <button
-                                key={category}
-                                className={activeCategory === category ? 'premium-button' : 'premium-button-secondary'}
-                                onClick={() => setActiveCategory(category)}
-                            >
-                                {category}
-                            </button>
-                        ))}
-                    </div>
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                        <div className="min-w-0 sm:w-[320px]">
-                            <SearchWithSuggestions
-                                value={searchQuery}
-                                onChange={setSearchQuery}
-                                placeholder="Search products"
-                                suggestions={suggestions}
-                                isLoading={productsLoading}
-                                onSelect={handleSuggestionSelect}
-                                getSuggestionKey={(suggestion) => suggestion._id}
-                                renderSuggestion={(suggestion, focused) => (
-                                    <>
-                                        <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] transition-colors ${focused ? 'bg-white/20' : 'bg-surface-alt group-hover:bg-white/20'}`}>
-                                            {suggestion.image && (
-                                                <img src={suggestion.image} alt={suggestion.productName} className="max-h-[80%] w-auto object-contain" />
-                                            )}
-                                        </span>
-                                        <span className="min-w-0 flex-1">
-                                            <span className={`block truncate text-sm font-bold ${focused ? 'text-white' : 'text-apple-text'}`}>{suggestion.productName}</span>
-                                            {suggestion.categoryName && (
-                                                <span className={`block truncate text-xs ${focused ? 'text-white/80' : 'text-apple-gray'}`}>{suggestion.categoryName}</span>
-                                            )}
-                                        </span>
-                                        <span className={`shrink-0 text-sm font-extrabold ${focused ? 'text-white' : 'text-apple-text'}`}>${suggestion.price}</span>
-                                    </>
-                                )}
-                            />
-                        </div>
+            {/* Family tabs */}
+            <div>
+                {topCategories.map((category) => (
+                    <button
+                        key={category}
+                        type="button"
+                        aria-pressed={activeCategory === category}
+                        onClick={() => setActiveCategory(category)}
+                    >
+                        {category}
+                    </button>
+                ))}
+            </div>
 
-                        <div ref={sortMenuRef} className="relative">
-                            <button
-                                type="button"
-                                onClick={() => setSortMenuOpen((current) => !current)}
-                                className="flex h-12 min-w-[220px] items-center justify-between rounded-full border border-black/[0.08] bg-white px-5 text-sm font-bold text-apple-text transition-all hover:border-black/15 hover:shadow-[0_10px_24px_rgba(15,23,42,0.08)]"
-                            >
-                                <span>{activeSortOption.label}</span>
-                                <KeyboardArrowDownRoundedIcon className={`!text-[20px] text-apple-gray transition-transform duration-200 ${sortMenuOpen ? 'rotate-180' : ''}`} />
-                            </button>
+            {/* Search */}
+            <SearchWithSuggestions
+                value={searchQuery}
+                onChange={setSearchQuery}
+                placeholder="Search devices"
+                suggestions={suggestions}
+                onSelect={handleSuggestionSelect}
+                renderSuggestion={(suggestion) => (
+                    <>
+                        <img src={suggestion.image} alt="" width="32" height="32" />
+                        <span>{suggestion.productName}</span>
+                        <span>${suggestion.price}</span>
+                    </>
+                )}
+            />
 
-                            {sortMenuOpen && (
-                                <div className="absolute right-0 z-20 mt-3 w-[240px] overflow-hidden rounded-[24px] border border-black/[0.08] bg-white/95 p-2 shadow-[0_24px_60px_rgba(15,23,42,0.16)] backdrop-blur">
-                                    {sortOptions.map((option) => {
-                                        const selected = option.value === sortBy;
-                                        return (
-                                            <button
-                                                key={option.value}
-                                                type="button"
-                                                onClick={() => {
-                                                    setSortBy(option.value);
-                                                    setSortMenuOpen(false);
-                                                }}
-                                                className={`flex w-full items-center justify-between rounded-[18px] px-4 py-3 text-left text-sm font-bold transition-all ${selected
-                                                    ? 'bg-[#d20b0f] text-white shadow-[0_12px_24px_rgba(210,11,15,0.28)]'
-                                                    : 'text-apple-text hover:bg-surface-alt'
-                                                    }`}
-                                            >
-                                                <span>{option.label}</span>
-                                                {selected && <span className="text-xs font-black uppercase tracking-[0.16em] text-white/70">On</span>}
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-
-                <button
-                    type="button"
-                    onClick={() => setFiltersOpen((current) => !current)}
-                    className="mb-4 flex h-12 w-full items-center justify-center gap-2 rounded-full border border-black/[0.08] bg-white text-sm font-bold text-apple-text transition-all hover:border-black/15 lg:hidden"
-                >
-                    <span>{filtersOpen ? 'Hide filters' : 'Show filters'}</span>
-                    <KeyboardArrowDownRoundedIcon className={`!text-[20px] text-apple-gray transition-transform duration-200 ${filtersOpen ? 'rotate-180' : ''}`} />
+            {/* Sort */}
+            <div ref={sortMenuRef}>
+                <button type="button" onClick={() => setSortMenuOpen((open) => !open)}>
+                    Sort: {activeSortOption.label}
                 </button>
+                {sortMenuOpen && (
+                    <ul>
+                        {sortOptions.map((option) => (
+                            <li key={option.value}>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setSortBy(option.value);
+                                        setSortMenuOpen(false);
+                                    }}
+                                >
+                                    {option.label}
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </div>
 
-                <div className="grid gap-8 lg:grid-cols-[300px_1fr]">
-                    <aside className={`premium-card h-fit rounded-[32px] p-6 lg:sticky lg:top-28 lg:block ${filtersOpen ? 'block' : 'hidden'}`}>
-                        <div className="flex items-center justify-between">
-                            <h3 className="text-xl">Refine</h3>
-                            <button className="text-sm font-bold text-apple-gray hover:text-apple-text" onClick={resetFilters}>
-                                Reset
+            {/* Filters */}
+            <button type="button" onClick={() => setFiltersOpen((open) => !open)}>
+                {filtersOpen ? 'Hide filters' : 'Show filters'}
+            </button>
+
+            {filtersOpen && (
+                <aside>
+                    <label>
+                        Max price: ${priceRange}
+                        <input
+                            type="range"
+                            min="0"
+                            max="3500"
+                            value={priceRange}
+                            onChange={(event) => setPriceRange(Number(event.target.value))}
+                        />
+                    </label>
+
+                    <fieldset>
+                        <legend>Model</legend>
+                        {availableCategories.map((category) => (
+                            <label key={category}>
+                                <input
+                                    type="checkbox"
+                                    checked={selectedModels.includes(category)}
+                                    onChange={() => toggleValue(category, selectedModels, setSelectedModels)}
+                                />
+                                {category}
+                            </label>
+                        ))}
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>Storage</legend>
+                        {availableStorages.map((storage) => (
+                            <label key={storage}>
+                                <input
+                                    type="checkbox"
+                                    checked={selectedStorages.includes(storage)}
+                                    onChange={() => toggleValue(storage, selectedStorages, setSelectedStorages)}
+                                />
+                                {storage}
+                            </label>
+                        ))}
+                    </fieldset>
+
+                    <button type="button" onClick={resetFilters}>Reset filters</button>
+                </aside>
+            )}
+
+            {/* Product grid */}
+            <div ref={productGridRef}>
+                {productsLoading ? (
+                    <RouteLoadingScreen compact />
+                ) : paginatedProducts.length > 0 ? (
+                    /* TODO(redesign): ModernProductCard was deleted with the old design.
+                       Rebuild it under src/components/ and render it here. This bare list
+                       keeps the catalog wiring verifiable in the meantime. */
+                    paginatedProducts.map((product) => (
+                        <article key={product._id}>
+                            <h3>{product.productName}</h3>
+                            <p>${product.price}</p>
+                            <button type="button" onClick={(event) => handleAddToCart(event, product._id)}>
+                                Add to cart
                             </button>
-                        </div>
+                        </article>
+                    ))
+                ) : (
+                    <p>No devices match these filters.</p>
+                )}
+            </div>
 
-                        <div className="mt-8">
-                            <div className="text-sm font-bold uppercase tracking-[0.2em] text-ink-soft">Category</div>
-                            <div className="mt-4 flex flex-col gap-3">
-                                {availableCategories.map((category) => (
-                                    <label key={category} className="flex items-center gap-3 text-sm text-ink-soft">
-                                        <input
-                                            type="checkbox"
-                                            className="h-4 w-4 rounded-[4px] border border-black/20 accent-apple-text"
-                                            checked={selectedModels.includes(category)}
-                                            onChange={() => toggleValue(category, selectedModels, setSelectedModels)}
-                                        />
-                                        <span>{category}</span>
-                                    </label>
-                                ))}
-                            </div>
-                        </div>
-
-                        <div className="mt-8">
-                            <div className="text-sm font-bold uppercase tracking-[0.2em] text-ink-soft">Storage</div>
-                            <div className="mt-4 grid grid-cols-3 gap-3">
-                                {availableStorages.map((storage) => (
-                                    <button
-                                        key={storage}
-                                        className={selectedStorages.includes(storage)
-                                            ? 'flex items-center justify-center rounded-[18px] border border-apple-text bg-apple-text px-1 py-3 text-[13px] font-bold text-white shadow-[0_12px_24px_rgba(29,29,31,0.16)]'
-                                            : 'flex items-center justify-center rounded-[18px] border border-black/[0.06] bg-white px-1 py-3 text-[13px] font-bold text-apple-text transition-all hover:border-black/12 hover:bg-surface-alt'}
-                                        onClick={() => toggleValue(storage, selectedStorages, setSelectedStorages)}
-                                    >
-                                        {storage}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        <div className="mt-8">
-                            <div className="text-sm font-bold uppercase tracking-[0.2em] text-ink-soft">Max price</div>
-                            <input
-                                type="range"
-                                min="0"
-                                max="3500"
-                                step="50"
-                                value={priceRange}
-                                onChange={(event) => setPriceRange(Number(event.target.value))}
-                                className="mt-4 h-1 w-full appearance-none rounded-full"
-                                style={{
-                                    accentColor: '#d90b0f',
-                                    background: `linear-gradient(to right, #d90b0f 0%, #d90b0f ${sliderPercentage}%, #d7dbe1 ${sliderPercentage}%, #d7dbe1 100%)`,
-                                }}
-                            />
-                            <div className="mt-3 flex justify-between text-sm text-apple-gray">
-                                <span>$0</span>
-                                <span className="font-bold text-apple-text">Up to ${priceRange}</span>
-                            </div>
-                        </div>
-                    </aside>
-
-                    <main>
-                        {productsLoading ? (
-                            <ShopProductPreloader />
-                        ) : (
-                            <div ref={productGridRef} className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                                {paginatedProducts.map((product) => (
-                                    <ModernProductCard key={product._id} product={product} />
-                                ))}
-                            </div>
-                        )}
-
-                        {!productsLoading && filteredProducts.length === 0 && (
-                            <div className="premium-card mt-6 rounded-[32px] px-8 py-12 text-center">
-                                <h3>No premium devices match those filters.</h3>
-                                <p className="mt-3 text-base text-ink-soft">Reset the filters to browse the full certified premium Apple collection.</p>
-                                <button className="premium-button mt-6" onClick={resetFilters}>
-                                    Reset filters
-                                </button>
-                            </div>
-                        )}
-
-                        {!productsLoading && totalPages > 1 && (
-                            <nav className="mt-10 flex items-center justify-center gap-2" aria-label="Product pagination">
-                                <button
-                                    type="button"
-                                    onClick={() => goToPage(currentPage - 1)}
-                                    disabled={currentPage === 1}
-                                    className="flex h-11 w-11 items-center justify-center rounded-full border border-black/[0.08] bg-white text-apple-text transition-all hover:border-black/15 disabled:cursor-not-allowed disabled:opacity-40"
-                                    aria-label="Previous page"
-                                >
-                                    <KeyboardArrowLeftRoundedIcon />
-                                </button>
-
-                                {getPageWindow(currentPage, totalPages).map((page) => (
-                                    <button
-                                        key={page}
-                                        type="button"
-                                        onClick={() => goToPage(page)}
-                                        aria-current={page === currentPage ? 'page' : undefined}
-                                        className={page === currentPage
-                                            ? 'flex h-11 w-11 items-center justify-center rounded-full bg-brand-red text-sm font-bold text-white shadow-[0_12px_24px_rgba(217,11,15,0.28)]'
-                                            : 'flex h-11 w-11 items-center justify-center rounded-full border border-black/[0.08] bg-white text-sm font-bold text-apple-text transition-all hover:border-black/15'}
-                                    >
-                                        {page}
-                                    </button>
-                                ))}
-
-                                <button
-                                    type="button"
-                                    onClick={() => goToPage(currentPage + 1)}
-                                    disabled={currentPage === totalPages}
-                                    className="flex h-11 w-11 items-center justify-center rounded-full border border-black/[0.08] bg-white text-apple-text transition-all hover:border-black/15 disabled:cursor-not-allowed disabled:opacity-40"
-                                    aria-label="Next page"
-                                >
-                                    <KeyboardArrowRightIcon />
-                                </button>
-                            </nav>
-                        )}
-                    </main>
-                </div>
-            </section>
+            {/* Pagination */}
+            {totalPages > 1 && (
+                <nav aria-label="Pagination">
+                    <button type="button" onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1}>
+                        Previous
+                    </button>
+                    {getPageWindow(currentPage, totalPages).map((page) => (
+                        <button
+                            key={page}
+                            type="button"
+                            aria-current={page === currentPage ? 'page' : undefined}
+                            onClick={() => goToPage(page)}
+                        >
+                            {page}
+                        </button>
+                    ))}
+                    <button type="button" onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages}>
+                        Next
+                    </button>
+                </nav>
+            )}
         </div>
     );
 };
 
 export default ShopPage;
-
-
-
-
-
-
-

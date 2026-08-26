@@ -4,6 +4,13 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ==========================================================================
+   BRAND FOUNDATION — do not change during the redesign.
+   Colours, fonts and the type scale come from the brand guideline and stay
+   fixed. Structural/visual changes belong in components, not here.
+   Colour + spacing tokens live in tailwind.config.js.
+   ========================================================================== */
+
 @layer base {
     :root {
         color-scheme: light;
@@ -19,9 +26,6 @@
 
     body {
         @apply bg-white text-apple-text font-sans m-0 p-0 overflow-x-hidden antialiased;
-        background:
-            radial-gradient(circle at top center, rgba(244, 245, 248, 0.95), rgba(255, 255, 255, 0) 36%),
-            linear-gradient(180deg, #fbfbfd 0%, #ffffff 28%, #f7f7f9 100%);
     }
 
     h1, h2, h3, h4, h5, h6 {
@@ -55,35 +59,27 @@
     background-color: transparent !important;
 }
 
+/* ==========================================================================
+   NEW UI LAYER — intentionally empty.
+   The old storefront design system (.page-shell, .page-container,
+   .premium-card, .premium-input, .glass-panel, .surface-panel,
+   .section-heading, .kicker-link and the storefront keyframes) was removed
+   for the redesign. Build the new component classes here, against the brand
+   tokens above.
+   ========================================================================== */
+
 @layer components {
-    .page-shell {
-        @apply min-h-full pt-[72px];
-    }
-
-    .page-container {
-        @apply w-full px-8 md:px-16 lg:px-24;
-    }
-
-    .glass-panel {
-        @apply border border-white/60 bg-white/70 backdrop-blur-2xl;
-        box-shadow: 0 20px 80px rgba(15, 23, 42, 0.10);
-    }
-
-    .surface-panel {
-        @apply border border-black/[0.06] bg-white;
-        box-shadow: 0 18px 60px rgba(15, 23, 42, 0.06);
-    }
+    /* ---------------------------------------------------------------------
+       LEGACY — kept only because non-redesigned areas still depend on it.
+       Do NOT use these in new storefront UI.
+         * .eyebrow / .premium-button* → src/pages/Admin
+         * .legal-prose               → src/pages/Legal (compliance copy)
+         * .admin-*                   → src/pages/Admin
+       Expected to shrink once Admin and Legal are redesigned.
+       --------------------------------------------------------------------- */
 
     .eyebrow {
         @apply inline-flex items-center rounded-full border border-black/[0.08] bg-white/80 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.24em] text-apple-gray;
-    }
-
-    .section-heading {
-        @apply text-[clamp(2.4rem,4vw,4.8rem)] leading-[0.95];
-    }
-
-    .kicker-link {
-        @apply text-sm font-bold tracking-[0.02em] text-apple-text hover:text-brand-red;
     }
 
     .premium-button {
@@ -97,15 +93,6 @@
     .premium-button-secondary:hover {
         border-color: #d90b0f;
         background-color: rgba(217, 11, 15, 0.06);
-    }
-
-    .premium-input {
-        @apply h-14 w-full rounded-[20px] border border-black/[0.08] bg-white px-5 text-[15px] text-apple-text outline-none transition-all duration-200 placeholder:text-apple-gray/80 focus:border-apple-text/25 focus:shadow-[0_0_0_4px_rgba(29,29,31,0.05)];
-    }
-
-    .premium-card {
-        @apply rounded-[32px] border border-black/[0.06] bg-white;
-        box-shadow: 0 18px 60px rgba(15, 23, 42, 0.06);
     }
 
     .legal-prose {
@@ -193,23 +180,9 @@
     }
 }
 
-/* Keyframe Animations */
-@keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fadeInRight {
-    from { opacity: 0; transform: translateX(40px); }
-    to { opacity: 1; transform: translateX(0); }
-}
-
-@keyframes floatSoft {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-}
-
-/* Search suggestions dropdown */
+/* LEGACY — search suggestions dropdown.
+   Kept because SearchWithSuggestions is shared with Admin Products and
+   Admin Categories (src/pages/Admin), not storefront-only. */
 @keyframes suggestReveal {
     from { opacity: 0; transform: translateY(-6px) scale(0.985); }
     to { opacity: 1; transform: translateY(0) scale(1); }
@@ -220,7 +193,6 @@
     transform-origin: top center;
 }
 
-/* Thin gray scrollbar */
 .suggest-scroll {
     scrollbar-width: thin;
     scrollbar-color: rgba(0, 0, 0, 0.25) transparent;

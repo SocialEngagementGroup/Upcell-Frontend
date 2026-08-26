@@ -1,22 +1,15 @@
 import React from "react";
-import ModernHero from "./ModernHero";
-import FeaturedUnits from "../../components/FeaturedUnits/FeaturedUnits";
-import CategoryShelf from "../../components/CategoryShelf/CategoryShelf";
-import TradeInAction from "../../components/TradeInAction/TradeInAction";
-import HomeTrustFeatures from "../../components/HomeTrustFeatures/HomeTrustFeatures";
-import JournalInsights from "../../components/JournalInsights/JournalInsights";
 import ScrollToTop from "../../utilities/ScrollToTop";
 
+// The previous home page composed six section components (hero, featured units,
+// category shelf, trade-in CTA, trust features, journal). All were deleted with
+// the old design. Rebuild the new sections under src/components/<Name>/ and
+// compose them here.
 const Home = () => {
     return (
-        <div className="page-shell w-full overflow-x-hidden">
+        <div>
             <ScrollToTop />
-            <ModernHero />
-            <FeaturedUnits />
-            <CategoryShelf />
-            <TradeInAction />
-            <HomeTrustFeatures />
-            <JournalInsights />
+            {/* TODO(redesign): build the new home page sections here. */}
         </div>
     );
 };

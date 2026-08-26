@@ -4,15 +4,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import ScrollToTop from '../../../utilities/ScrollToTop';
 import { CartContext } from '../../../App';
 import { toast } from 'react-toastify';
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import FavoriteIcon from '@mui/icons-material/Favorite';
 
 import { groupProductsByParent } from '../../../utilities/catalog';
 import { useProductsQuery } from '../../../queries/products';
 import { EMPTY_ARRAY } from '../../../queries/keys';
-import ModernProductCard from '../../../components/ModernProductCard/ModernProductCard';
-
-
 
 const featureCards = [
     {
@@ -28,6 +23,7 @@ const featureCards = [
         body: 'Every order is backed by UpCell IT Inc. support and practical coverage designed for peace of mind.',
     },
 ];
+
 const ESSENTIAL_ADDONS = [
     { id: 'addon_case', name: 'Clear Case (MagSafe)', price: 39, description: 'Crystal clear, yellowing-resistant protection.' },
     { id: 'addon_protector', name: 'Ultra-Glass Protector', price: 19, description: 'Edge-to-edge scratch and impact defense.' },
@@ -143,275 +139,134 @@ const ProductDetailPage = () => {
         setAddonQtys(prev => ({ ...prev, [id]: Math.max(0, (prev[id] || 0) + delta) }));
     };
 
-
-
     if (!product) {
         return (
-            <div className="page-shell">
-                <div className="page-container py-24">
-                    <div className="premium-card rounded-[36px] px-8 py-16 text-center">
-                        <h2>Product not found</h2>
-                        <p className="mt-4 text-ink-soft">This product variation is no longer available.</p>
-                        <Link to="/shop" className="premium-button mt-6">Back to shop</Link>
-                    </div>
-                </div>
+            <div>
+                <h2>Product not found</h2>
+                <p>This product variation is no longer available.</p>
+                <Link to="/shop">Back to shop</Link>
             </div>
         );
     }
 
+    // TODO(redesign): build the new product detail UI here. Variant selection,
+    // add-ons, quantity and cart wiring above are all live.
     return (
-        <div className="page-shell">
+        <div>
             <ScrollToTop />
 
-            <section className="page-container pb-10 pt-6">
-                <nav className="mb-8 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-apple-gray">
-                    <Link to="/">Home</Link>
-                    <KeyboardArrowRightIcon className="!text-sm" />
-                    <Link to="/shop">Shop</Link>
-                    <KeyboardArrowRightIcon className="!text-sm" />
-                    <span>{product.productName}</span>
-                </nav>
+            <nav>
+                <Link to="/">Home</Link>
+                <Link to="/shop">Shop</Link>
+                <span>{product.productName}</span>
+            </nav>
 
-                <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
-                    <div className="premium-card rounded-[28px] p-4 sm:rounded-[40px] sm:p-6 md:p-8">
-                        <div className="flex gap-4">
-                            <div className="hidden w-[92px] flex-col gap-3 md:flex">
-                                {[1, 2, 3].map((item) => (
-                                    <div key={item} className="flex h-[92px] items-center justify-center rounded-[24px] border border-black/[0.06] bg-[linear-gradient(180deg,#f8f8fa_0%,#eef1f5_100%)]">
-                                        <img src={product.image} alt={product.productName} className="h-[72%] w-auto object-contain" />
-                                    </div>
-                                ))}
-                            </div>
+            <img src={product.image} alt={product.productName} />
+            <h1>{product.productName}</h1>
+            <p>${product.price}</p>
+            {product.outOfStock && <p>Out of stock</p>}
 
-                            <div className="relative flex min-h-[340px] flex-1 items-center justify-center overflow-hidden rounded-[24px] bg-[linear-gradient(180deg,#fbfbfd_0%,#edf0f5_100%)] px-4 py-8 sm:min-h-[460px] sm:rounded-[34px] sm:px-6 sm:py-10 lg:min-h-[560px]">
-                                <div className="absolute inset-x-[18%] top-[12%] h-[70%] rounded-full bg-[radial-gradient(circle,_rgba(255,255,255,0.92),_rgba(220,225,232,0.35)_55%,_transparent_72%)] blur-2xl" />
-                                <img
-                                    src={product.image}
-                                    alt={product.productName}
-                                    className="relative z-[2] max-h-[280px] w-auto object-contain drop-shadow-[0_35px_80px_rgba(15,23,42,0.18)] sm:max-h-[460px]"
-                                />
-                            </div>
-                        </div>
+            {/* Colour */}
+            <fieldset>
+                <legend>Colour</legend>
+                {availableColors.map((color) => (
+                    <button
+                        key={color.name}
+                        type="button"
+                        aria-pressed={selectedColor?.name === color.name}
+                        onClick={() => handleColorSelect(color)}
+                    >
+                        {color.name}
+                    </button>
+                ))}
+            </fieldset>
+
+            {/* Storage */}
+            <fieldset>
+                <legend>Storage</legend>
+                {availableStorages.map((storage) => (
+                    <button
+                        key={storage}
+                        type="button"
+                        aria-pressed={selectedStorage === storage}
+                        onClick={() => handleStorageSelect(storage)}
+                    >
+                        {storage}
+                    </button>
+                ))}
+            </fieldset>
+
+            {/* Condition grade */}
+            {product.grade && (
+                <p>
+                    <strong>{product.grade}</strong> {GRADE_EXPLANATIONS[product.grade]}
+                </p>
+            )}
+
+            {/* Quantity */}
+            <div>
+                <button type="button" onClick={() => setQuantity((q) => Math.max(1, q - 1))}>-</button>
+                <span>{quantity}</span>
+                <button type="button" onClick={() => setQuantity((q) => q + 1)}>+</button>
+            </div>
+
+            {/* Add-ons */}
+            <div>
+                <h2>Essential add-ons</h2>
+                {ESSENTIAL_ADDONS.map((addon) => (
+                    <div key={addon.id}>
+                        <h3>{addon.name}</h3>
+                        <p>{addon.description}</p>
+                        <span>${addon.price}</span>
+                        <button type="button" onClick={() => setAddonQty(addon.id, -1)}>-</button>
+                        <span>{addonQtys[addon.id] || 0}</span>
+                        <button type="button" onClick={() => setAddonQty(addon.id, 1)}>+</button>
                     </div>
+                ))}
+            </div>
 
-                    <div className="premium-card rounded-[28px] p-6 sm:rounded-[40px] sm:p-8 md:p-10">
-                    <div className="md:mt-0">
-                        <h1 className="text-[clamp(2rem,4vw,4.3rem)] leading-[1] sm:leading-[0.95]">{product.productName}</h1>
-                        <div className="mt-3 text-3xl font-extrabold text-apple-text sm:text-4xl">${product.price} <span className="text-lg font-semibold text-ink-soft">USD</span></div>
-                        {product.condition && (
-                            <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-black/[0.08] bg-surface-alt px-4 py-1.5 text-[13px] font-bold text-apple-text">
-                                Condition grade: {product.condition}
-                            </div>
-                        )}
+            <p>Total: ${grandTotal.toFixed(2)}</p>
+            <button type="button" onClick={handleAddToCart} disabled={product.outOfStock}>
+                Add to cart
+            </button>
 
-                        {/* ─── Color Selection ─── */}
-                        <div className="mt-10">
-                            <div className="text-[13px] font-extrabold uppercase tracking-[0.1em] text-apple-text">
-                                Color: <span className="font-black">{selectedColor?.name || 'Default'}</span>
-                            </div>
-                            <div className="mt-4 flex flex-wrap gap-4">
-                                {availableColors.map((color) => (
-                                    <button
-                                        key={color.name}
-                                        className={`group relative flex h-14 w-14 items-center justify-center transition-all duration-200`}
-                                        onClick={() => handleColorSelect(color)}
-                                    >
-                                        {/* Selection Ring */}
-                                        <div className={`absolute -inset-1 rounded-[18px] border-2 transition-opacity duration-200 ${
-                                            selectedColor?.name === color.name ? 'border-[#eb0000] opacity-100' : 'border-transparent opacity-0 group-hover:opacity-30 group-hover:border-black/20'
-                                        }`} />
-                                        
-                                        {/* The Swatch */}
-                                        <div 
-                                            className="h-11 w-11 rounded-[12px] shadow-sm ring-1 ring-inset ring-black/5" 
-                                            style={{ backgroundColor: color.value }}
-                                        />
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
+            {/* Certification */}
+            <dl>
+                {CERTIFICATION_DETAILS.map((detail) => (
+                    <React.Fragment key={detail.label}>
+                        <dt>{detail.label}</dt>
+                        <dd>{detail.value}</dd>
+                    </React.Fragment>
+                ))}
+            </dl>
 
-                        {/* ─── Storage Selection ─── */}
-                        <div className="mt-10">
-                            <div className="text-[13px] font-extrabold uppercase tracking-[0.1em] text-apple-text">Storage</div>
-                            <div className="mt-4 flex flex-wrap gap-3">
-                                {availableStorages.map((storage) => {
-                                    // Find product for this storage in current color to get the price
-                                    const variantForStorage = allProducts.find(
-                                        (p) => p.color?.name === selectedColor?.name && p.storage === storage
-                                    );
-                                    const variantPrice = variantForStorage?.price;
-                                    const isAvailable = !!variantForStorage && !variantForStorage.outOfStock;
-
-                                    return (
-                                        <button
-                                            key={storage}
-                                            disabled={!isAvailable}
-                                            className={`relative flex h-20 min-w-[110px] flex-1 basis-[120px] flex-col items-center justify-center rounded-[18px] border px-6 py-4 transition-all duration-200 ${
-                                                selectedStorage === storage
-                                                    ? 'border-[#eb0000] bg-white text-black shadow-[0_0_0_3px_rgba(235,0,0,0.08)]'
-                                                    : isAvailable
-                                                        ? 'border-black/[0.06] bg-white/50 text-apple-gray hover:border-black/10'
-                                                        : 'cursor-not-allowed border-black/[0.04] bg-apple-text/[0.03] text-apple-text/20 opacity-40'
-                                            }`}
-                                            onClick={() => handleStorageSelect(storage)}
-                                        >
-                                            {selectedStorage === storage && (
-                                                <div className="pointer-events-none absolute -inset-1 rounded-[22px] border-2 border-[#eb0000]" />
-                                            )}
-                                            <div className="text-base font-black">{storage}</div>
-                                            {variantPrice && (
-                                                <div className={`mt-1 text-[11px] font-bold ${selectedStorage === storage ? 'text-apple-text/60' : 'text-apple-gray'}`}>
-                                                    ${variantPrice}
-                                                </div>
-                                            )}
-                                            {!isAvailable && (
-                                                <div className="mt-1 text-[10px] font-bold uppercase tracking-wider">Out of stock</div>
-                                            )}
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                        </div>
-
-                        {/* ─── Quantity & Protection ─── */}
-                        <div className="mt-10 rounded-[24px] border border-black/[0.06] bg-white/60 p-5">
-                            <div className="flex items-center justify-between">
-                                <div className="text-[13px] font-extrabold uppercase tracking-[0.1em] text-apple-text">Quantity</div>
-                                <div className="flex h-11 items-center gap-1 rounded-full border border-black/[0.08] bg-white px-2">
-                                    <button className="flex h-8 w-8 items-center justify-center rounded-full text-lg text-apple-gray transition-colors hover:text-black" onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}>−</button>
-                                    <span className="min-w-[28px] text-center text-sm font-bold text-apple-text">{quantity}</span>
-                                    <button className="flex h-8 w-8 items-center justify-center rounded-full text-lg text-apple-gray transition-colors hover:text-black" onClick={() => setQuantity((prev) => prev + 1)}>+</button>
-                                </div>
-                            </div>
-
-                            <div className="my-4 border-t border-black/[0.06]" />
-
-                            <div className="text-[13px] font-extrabold uppercase tracking-[0.1em] text-apple-text">Add protection</div>
-                            <div className="mt-3 space-y-2">
-                                {ESSENTIAL_ADDONS.map((addon) => {
-                                    const qty = addonQtys[addon.id] || 0;
-                                    return (
-                                        <div key={addon.id} className={`flex items-center justify-between rounded-[16px] px-4 py-3 transition-all duration-200 ${qty > 0 ? 'bg-black/[0.04]' : 'bg-transparent hover:bg-black/[0.02]'}`}>
-                                            <div className="mr-4 flex-1">
-                                                <div className="text-[14px] font-bold text-apple-text">{addon.name} <span className="font-extrabold text-apple-gray">· ${addon.price}</span></div>
-                                                <div className="text-[11px] font-medium text-apple-gray">{addon.description}</div>
-                                            </div>
-                                            <div className="flex h-9 items-center gap-1 rounded-full border border-black/[0.08] bg-white px-1.5">
-                                                <button className="flex h-6 w-6 items-center justify-center rounded-full text-sm text-apple-gray transition-colors hover:text-black" onClick={() => setAddonQty(addon.id, -1)}>−</button>
-                                                <span className="min-w-[20px] text-center text-xs font-bold text-apple-text">{qty}</span>
-                                                <button className="flex h-6 w-6 items-center justify-center rounded-full text-sm text-apple-gray transition-colors hover:text-black" onClick={() => setAddonQty(addon.id, 1)}>+</button>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-
-                        <button
-                            className="premium-button mt-5 h-[56px] w-full text-base shadow-[0_16px_32px_rgba(0,0,0,0.10)] active:scale-[0.98]"
-                            onClick={handleAddToCart}
-                            disabled={product.outOfStock}
-                        >
-                            {product.outOfStock ? 'Out of stock' : `Add to cart · $${grandTotal}`}
-                        </button>
-
-                        </div>
+            {/* Feature cards */}
+            <div>
+                {featureCards.map((card) => (
+                    <div key={card.title}>
+                        <h3>{card.title}</h3>
+                        <p>{card.body}</p>
                     </div>
-                </div>
-            </section>
+                ))}
+            </div>
 
-            <section className="page-container pb-10">
-                <div className="premium-card rounded-[28px] p-6 sm:rounded-[40px] sm:p-8 md:p-10">
-                    <h2 className="text-[clamp(1.7rem,3vw,2.6rem)]">Product details</h2>
-
-                    {product.description && (
-                        <p className="mt-4 max-w-[760px] text-base leading-7 text-ink-soft">{product.description}</p>
-                    )}
-
-                    <div className="mt-8 grid gap-8 lg:grid-cols-2">
-                        <div>
-                            <h3 className="text-xl font-bold text-apple-text">Specifications</h3>
-                            <dl className="mt-4 divide-y divide-black/[0.06] border-t border-black/[0.06]">
-                                <div className="flex justify-between gap-4 py-3">
-                                    <dt className="text-sm font-semibold text-apple-gray">Model</dt>
-                                    <dd className="text-sm font-bold text-apple-text text-right">{product.productName}</dd>
-                                </div>
-                                {product.storage && (
-                                    <div className="flex justify-between gap-4 py-3">
-                                        <dt className="text-sm font-semibold text-apple-gray">Storage</dt>
-                                        <dd className="text-sm font-bold text-apple-text text-right">{product.storage}</dd>
-                                    </div>
-                                )}
-                                {product.color?.name && (
-                                    <div className="flex justify-between gap-4 py-3">
-                                        <dt className="text-sm font-semibold text-apple-gray">Finish</dt>
-                                        <dd className="text-sm font-bold text-apple-text text-right">{product.color.name}</dd>
-                                    </div>
-                                )}
-                                {product.condition && (
-                                    <div className="flex justify-between gap-4 py-3">
-                                        <dt className="text-sm font-semibold text-apple-gray">Condition grade</dt>
-                                        <dd className="text-sm font-bold text-apple-text text-right">
-                                            {product.condition}
-                                            {GRADE_EXPLANATIONS[product.condition] && (
-                                                <span className="mt-1 block text-xs font-normal text-ink-soft">{GRADE_EXPLANATIONS[product.condition]}</span>
-                                            )}
-                                        </dd>
-                                    </div>
-                                )}
-                            </dl>
-                        </div>
-
-                        <div>
-                            <h3 className="text-xl font-bold text-apple-text">Certified &amp; included</h3>
-                            <dl className="mt-4 divide-y divide-black/[0.06] border-t border-black/[0.06]">
-                                {CERTIFICATION_DETAILS.map((detail) => (
-                                    <div key={detail.label} className="py-3">
-                                        <dt className="text-sm font-bold text-apple-text">{detail.label}</dt>
-                                        <dd className="mt-1 text-sm leading-6 text-ink-soft">{detail.value}</dd>
-                                    </div>
-                                ))}
-                            </dl>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section className="page-container pb-10">
-                <div className="rounded-[28px] bg-[linear-gradient(135deg,#0f1012_0%,#1b1d22_55%,#2c3138_100%)] px-6 py-8 text-white shadow-medium sm:rounded-[40px] sm:px-8 sm:py-10 md:px-12 md:py-14">
-                    <div className="grid gap-6 sm:mt-2 md:grid-cols-3">
-                        {featureCards.map((card) => (
-                            <div key={card.title} className="rounded-[28px] border border-white/10 bg-white/5 p-6 backdrop-blur">
-                                <h3 className="text-2xl text-white">{card.title}</h3>
-                                <p className="mt-3 text-sm leading-7 text-white/72">{card.body}</p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            <section className="page-container pb-16 pt-12 md:pt-20">
-                <div className="mb-8 text-center md:mb-10 md:text-left">
-                    <h2 className="text-[clamp(2rem,3vw,3.2rem)]">Continue the collection.</h2>
-                </div>
-                <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            {/* Recommendations */}
+            {/* TODO(redesign): ModernProductCard was deleted with the old design.
+                Rebuild it under src/components/ and render it here. */}
+            <section>
+                <h2>You may also like</h2>
+                <ul>
                     {recommendedProducts.map((item) => (
-                        <ModernProductCard key={item._id} product={item} />
+                        <li key={item._id}>
+                            <Link to={`/iphone/${item.parentCatagory}/${item._id}`}>
+                                {item.productName} &mdash; ${item.price}
+                            </Link>
+                        </li>
                     ))}
-                </div>
-                <div className="mt-14 flex justify-center">
-                    <Link to="/shop" className="premium-button h-14 min-w-[220px] shadow-sm">
-                        View more
-                    </Link>
-                </div>
+                </ul>
             </section>
         </div>
     );
 };
 
 export default ProductDetailPage;
-
-
-
-

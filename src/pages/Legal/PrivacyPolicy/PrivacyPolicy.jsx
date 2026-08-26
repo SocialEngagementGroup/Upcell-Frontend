@@ -1,25 +1,24 @@
 import { Link } from 'react-router-dom';
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 
 const PrivacyPolicy = () => {
     return (
-        <div className="page-shell">
-            <section className="page-container pb-10 pt-6">
-                <div className="premium-card rounded-[28px] bg-[linear-gradient(180deg,#ffffff_0%,#f3f5f8_100%)] px-6 py-8 sm:rounded-[40px] sm:px-8 sm:py-10 md:px-12 md:py-14">
-                    <nav className="mb-6 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-apple-gray sm:mb-8">
-                        <Link to="/" className="hover:text-apple-text transition-colors">Home</Link>
-                        <KeyboardArrowRightIcon className="!text-sm" />
-                        <span className="text-apple-text">Privacy</span>
+        <div>
+            <section>
+                <div>
+                    <nav>
+                        <Link to="/">Home</Link>
+                        
+                        <span>Privacy</span>
                     </nav>
-                    <h1 className="text-[clamp(2.1rem,5vw,5rem)] leading-[0.96] sm:leading-[0.92]">Privacy Policy</h1>
-                    <p className="mt-4 max-w-[640px] text-base leading-7 text-ink-soft sm:mt-5 sm:text-lg sm:leading-8">
+                    <h1>Privacy Policy</h1>
+                    <p>
                         UpCell IT Inc. — upcellit.com. Last updated: Aug 1, 2026.
                     </p>
                 </div>
             </section>
 
-            <section className="page-container pb-16">
-                <article className="legal-prose premium-card rounded-[28px] px-6 py-8 sm:rounded-[36px] sm:px-8 sm:py-10 md:px-12 md:py-14">
+            <section>
+                <article className="legal-prose">
                     <p>
                         This Privacy Policy explains what personal information UpCell IT Inc. (&ldquo;UpCell IT,&rdquo; &ldquo;we,&rdquo; &ldquo;us&rdquo;) collects when you use upcellit.com (the &ldquo;Site&rdquo;), why we collect it, how we protect it, and the choices you have. By using the site, placing an order, or submitting a trade-in request, you agree to the practices described here.
                     </p>
@@ -63,7 +62,7 @@ const PrivacyPolicy = () => {
                     <h2>4. Who We Share Information With</h2>
                     <p>We share personal information only with service providers who help us operate the Site, and only as needed for them to do their job:</p>
                     <div className="legal-table-wrap">
-                        <table className="min-w-[560px]">
+                        <table>
                             <thead>
                                 <tr>
                                     <th>Provider type</th>
@@ -147,7 +146,7 @@ const PrivacyPolicy = () => {
                         <li>Control cookies through your browser (Section 6)</li>
                     </ul>
                     <p>
-                        If you have questions about this Privacy Policy, your rights, or how we handle your data, contact us at <a href="mailto:usa.Upcells@gmail.com" className="font-bold text-brand-red">usa.Upcells@gmail.com</a>.
+                        If you have questions about this Privacy Policy, your rights, or how we handle your data, contact us at <a href="mailto:usa.Upcells@gmail.com">usa.Upcells@gmail.com</a>.
                         We will verify your identity before acting on a request and respond within a reasonable timeframe. Depending on where you live, you may have additional rights under state law; we honor applicable rights for all customers.
                     </p>
 
@@ -162,7 +161,7 @@ const PrivacyPolicy = () => {
                     <p>
                         UpCell IT Inc.<br />
                         973 Harrisburg Pike, Columbus, OH 43223, United States<br />
-                        Email: <a href="mailto:usa.Upcells@gmail.com" className="font-bold text-brand-red">usa.Upcells@gmail.com</a>
+                        Email: <a href="mailto:usa.Upcells@gmail.com">usa.Upcells@gmail.com</a>
                     </p>
                 </article>
             </section>

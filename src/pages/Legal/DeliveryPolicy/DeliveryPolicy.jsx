@@ -1,25 +1,24 @@
 import { Link } from 'react-router-dom';
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 
 const DeliveryPolicy = () => {
     return (
-        <div className="page-shell">
-            <section className="page-container pb-10 pt-6">
-                <div className="premium-card rounded-[28px] bg-[linear-gradient(180deg,#ffffff_0%,#f3f5f8_100%)] px-6 py-8 sm:rounded-[40px] sm:px-8 sm:py-10 md:px-12 md:py-14">
-                    <nav className="mb-6 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-apple-gray sm:mb-8">
-                        <Link to="/" className="hover:text-apple-text transition-colors">Home</Link>
-                        <KeyboardArrowRightIcon className="!text-sm" />
-                        <span className="text-apple-text">Delivery</span>
+        <div>
+            <section>
+                <div>
+                    <nav>
+                        <Link to="/">Home</Link>
+                        
+                        <span>Delivery</span>
                     </nav>
-                    <h1 className="text-[clamp(2.1rem,5vw,5rem)] leading-[0.96] sm:leading-[0.92]">Delivery Policy</h1>
-                    <p className="mt-4 max-w-[640px] text-base leading-7 text-ink-soft sm:mt-5 sm:text-lg sm:leading-8">
+                    <h1>Delivery Policy</h1>
+                    <p>
                         UpCell IT Inc. — upcellit.com. Last updated: Aug 1, 2026.
                     </p>
                 </div>
             </section>
 
-            <section className="page-container pb-16">
-                <article className="legal-prose premium-card rounded-[28px] px-6 py-8 sm:rounded-[36px] sm:px-8 sm:py-10 md:px-12 md:py-14">
+            <section>
+                <article className="legal-prose">
                     <p>This policy explains how UpCell IT ships devices you purchase, how pickup works, and how shipping works for trade-in and return devices you send to us.</p>
 
                     <h2>1. Delivery Options</h2>
@@ -44,7 +43,7 @@ const DeliveryPolicy = () => {
 
                     <h2>4. Delivery Timeframes</h2>
                     <div className="legal-table-wrap">
-                        <table className="min-w-[480px]">
+                        <table>
                             <thead>
                                 <tr>
                                     <th>Option</th>
@@ -81,7 +80,7 @@ const DeliveryPolicy = () => {
                     </ul>
                     <p>
                         Original shipping charges are nonrefundable on returns, unless the return resulted from our error or a confirmed defect (see the{' '}
-                        <Link to="/terms-conditions#returns-refunds" className="font-bold text-brand-red">Return &amp; Refund Policy</Link>{' '}
+                        <Link to="/terms-conditions#returns-refunds">Return &amp; Refund Policy</Link>{' '}
                         in our Terms &amp; Conditions).
                     </p>
 
@@ -98,7 +97,7 @@ const DeliveryPolicy = () => {
                     </ul>
                     <p>
                         If anything is wrong — damaged packaging or a wrong item — contact us at{' '}
-                        <a href="mailto:usa.Upcells@gmail.com" className="font-bold text-brand-red">usa.Upcells@gmail.com</a>{' '}
+                        <a href="mailto:usa.Upcells@gmail.com">usa.Upcells@gmail.com</a>{' '}
                         within 48 hours of receipt. Devices damaged during shipping, or that do not function on first use, are covered under our Return &amp; Refund Policy without a restocking fee.
                     </p>
 
@@ -123,7 +122,7 @@ const DeliveryPolicy = () => {
                     <h2>10. Return Shipping (Sending a Purchase Back)</h2>
                     <p>
                         Before mailing anything back, contact us for return authorization and shipping instructions — unauthorized returns may be delayed or refused. Unless the return resulted from our error or a confirmed defect, you are responsible for return shipping costs. Use a trackable and insured service; UpCell IT Inc. is not responsible for merchandise lost or damaged during return shipping. Full details are in the{' '}
-                        <Link to="/terms-conditions#returns-refunds" className="font-bold text-brand-red">Return &amp; Refund Policy</Link>{' '}
+                        <Link to="/terms-conditions#returns-refunds">Return &amp; Refund Policy</Link>{' '}
                         in our Terms &amp; Conditions.
                     </p>
                     <p>For approved warranty claims, you pay shipping to us and UpCell IT pays the return shipping, with an average turnaround of 3–7 business days after we receive the device.</p>
@@ -133,7 +132,7 @@ const DeliveryPolicy = () => {
                     <p>
                         UpCell IT Inc.<br />
                         973 Harrisburg Pike, Columbus, OH 43223, United States<br />
-                        Email: <a href="mailto:usa.Upcells@gmail.com" className="font-bold text-brand-red">usa.Upcells@gmail.com</a>
+                        Email: <a href="mailto:usa.Upcells@gmail.com">usa.Upcells@gmail.com</a>
                     </p>
                 </article>
             </section>

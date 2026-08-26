@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { STATIC_IMAGES, staticImageUrl } from '../../../constants/staticImages';
 
 const values = [
@@ -13,50 +12,50 @@ const values = [
 
 const AboutUs = () => {
     return (
-        <div className="page-shell">
-            <section className="page-container py-8">
-                <div className="premium-card overflow-hidden rounded-[28px] bg-[linear-gradient(180deg,#ffffff_0%,#f3f5f8_100%)] px-6 py-8 sm:rounded-[40px] sm:px-8 sm:py-10 md:px-12 md:py-14">
-                    <nav className="mb-6 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-apple-gray sm:mb-8">
-                        <Link to="/" className="hover:text-apple-text transition-colors">Home</Link>
-                        <KeyboardArrowRightIcon className="!text-sm" />
-                        <span className="text-apple-text">About</span>
+        <div>
+            <section>
+                <div>
+                    <nav>
+                        <Link to="/">Home</Link>
+                        
+                        <span>About</span>
                     </nav>
-                    <h1 className="text-[clamp(2.1rem,5vw,5rem)] leading-[0.96] sm:leading-[0.92]">About UpCell IT Inc.: Certified Premium Apple Devices You Can Trust</h1>
-                    <p className="mt-4 max-w-[700px] text-base leading-7 text-ink-soft sm:mt-5 sm:text-lg sm:leading-8">
+                    <h1>About UpCell IT Inc.: Certified Premium Apple Devices You Can Trust</h1>
+                    <p>
                         UpCell IT Inc. is a certified reseller of premium Apple hardware. We source, inspect, and present every premium iPhone, iPad, and MacBook to a higher standard than the typical secondhand marketplace.
                     </p>
                 </div>
             </section>
 
-            <section className="page-container py-8">
-                <div className="grid gap-6 lg:grid-cols-[1fr_0.9fr] lg:gap-8">
-                    <div className="premium-card rounded-[28px] p-6 sm:rounded-[36px] sm:p-8 md:p-10">
+            <section>
+                <div>
+                    <div>
                         <h2>Our mission</h2>
-                        <p className="mt-5 text-lg leading-8 text-ink-soft">
+                        <p>
                             We source and certify premium Apple devices against a rigorous 40-point inspection standard covering hardware performance, battery health, and cosmetic condition. Every premium iPhone, iPad, and MacBook is graded honestly, so you know exactly what you're getting.
                         </p>
-                        <p className="mt-5 text-lg leading-8 text-ink-soft">
+                        <p>
                             That means transparent pricing, accurate condition grades, a 12-month warranty on every device, and an experience that respects both the product and the customer choosing it.
                         </p>
                     </div>
-                    <div className="premium-card overflow-hidden rounded-[28px] p-3 sm:rounded-[36px]">
-                        <img src={staticImageUrl(STATIC_IMAGES.ABOUT_US_BG, 900)} alt="About UpCell IT Inc." className="h-48 w-full rounded-[22px] object-cover sm:h-full sm:rounded-[28px]" />
+                    <div>
+                        <img src={staticImageUrl(STATIC_IMAGES.ABOUT_US_BG, 900)} alt="About UpCell IT Inc." />
                     </div>
                 </div>
             </section>
 
-            <section className="page-container pb-16 pt-8 sm:pb-24">
-                <div className="mb-8 sm:mb-12">
+            <section>
+                <div>
                     <h2>What guides UpCell.</h2>
                 </div>
-                <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                <div>
                     {values.map((value, index) => (
-                        <div key={index} className="premium-card rounded-[28px] p-6 sm:rounded-[32px] sm:p-8">
-                            <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-surface-alt">
-                                <span className="text-lg font-extrabold text-apple-text">{index + 1}</span>
+                        <div key={index}>
+                            <div>
+                                <span>{index + 1}</span>
                             </div>
-                            <h3 className="text-[24px] sm:text-[28px]">{value.title}</h3>
-                            <p className="mt-3 text-base leading-8 text-ink-soft">{value.desc}</p>
+                            <h3>{value.title}</h3>
+                            <p>{value.desc}</p>
                         </div>
                     ))}
                 </div>

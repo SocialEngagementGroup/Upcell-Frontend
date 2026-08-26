@@ -6,12 +6,21 @@ import axiosInstance from '../../utilities/axiosInstance';
 import visa from '../../assets/visa.svg';
 import mastercard from '../../assets/master.svg';
 import americanExpress from '../../assets/americanExpress.svg';
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { toast } from 'react-toastify';
 import { extractApiError, validateEmailAddress, validatePhoneNumber, validateRequiredText } from '../../utilities/formValidation';
 import useFormAnalytics from '../../utilities/useFormAnalytics';
+
+const CARD_NETWORKS = [
+    { src: visa, label: 'Visa accepted' },
+    { src: mastercard, label: 'Mastercard accepted' },
+    { src: americanExpress, label: 'American Express accepted' },
+];
+
+const SHIPPING_OPTIONS = [
+    { value: 'standard', label: 'Standard', cost: 0 },
+    { value: 'priority', label: 'Priority', cost: 10.5 },
+    { value: 'express', label: 'Express', cost: 25.0 },
+];
 
 const Checkout = () => {
     const params = useParams();
@@ -117,165 +126,84 @@ const Checkout = () => {
         }
     };
 
+    // TODO(redesign): build the new checkout UI here. Field names below are
+    // load-bearing — handleSubmit reads them off the form by name.
     return (
-        <div className="page-shell">
+        <div>
             <ScrollToTop />
 
-            <section className="page-container pb-10 pt-6">
-                <Link to="/cart" className="kicker-link inline-flex items-center gap-2">
-                    <ArrowBackIosNewIcon className="!text-sm" />
-                    Return to cart
-                </Link>
+            <Link to="/cart">Return to cart</Link>
 
-                <div className="mt-6 premium-card rounded-[28px] bg-[linear-gradient(180deg,#ffffff_0%,#f3f5f8_100%)] px-6 py-8 sm:rounded-[40px] sm:px-8 sm:py-10 md:px-12 md:py-14">
-                    <nav className="mb-6 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-apple-gray sm:mb-8">
-                        <Link to="/" className="hover:text-apple-text transition-colors">Home</Link>
-                        <KeyboardArrowRightIcon className="!text-sm" />
-                        <span className="text-apple-text">Checkout</span>
-                    </nav>
-                    <h1 className="text-[clamp(2.1rem,4.8vw,4.9rem)] leading-[0.96] sm:leading-[0.94]">Complete your order.</h1>
-                    <p className="mt-4 max-w-[620px] text-base leading-7 text-ink-soft sm:mt-5 sm:text-lg sm:leading-8">
-                        Submit your details and our team will contact you to complete secure payment.
-                    </p>
-                </div>
-            </section>
+            <nav>
+                <Link to="/">Home</Link>
+                <span>Checkout</span>
+            </nav>
+            <h1>Complete your order.</h1>
+            <p>Submit your details and our team will contact you to complete secure payment.</p>
 
-            <section className="page-container pb-16">
-                <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
-                    <main className="premium-card rounded-[28px] p-6 sm:rounded-[36px] sm:p-8 md:p-10">
-                        <form onSubmit={handleSubmit} onChangeCapture={markInteraction} className="space-y-8 sm:space-y-10">
-                            <section>
-                                <h3 className="text-[28px]">Contact information</h3>
-                                <div className="mt-5 grid gap-4 md:grid-cols-2">
-                                    <input className="premium-input" type="email" name="email" placeholder="Email address" required />
-                                    <input className="premium-input" type="tel" name="phone" placeholder="Phone number" required />
-                                </div>
-                            </section>
+            <form onSubmit={handleSubmit} onChangeCapture={markInteraction}>
+                <fieldset>
+                    <legend>Contact information</legend>
+                    <input type="email" name="email" placeholder="Email address" required />
+                    <input type="tel" name="phone" placeholder="Phone number" required />
+                </fieldset>
 
-                            <section>
-                                <h3 className="text-[28px]">Shipping address</h3>
-                                <p className="mt-2 text-sm text-ink-soft">We ship within the United States only.</p>
-                                <div className="mt-5 grid gap-4">
-                                    <input className="premium-input" type="text" name="name" placeholder="Full name" required />
-                                    <input className="premium-input" type="text" name="street" placeholder="Street address" required />
-                                    <div className="grid gap-4 md:grid-cols-2">
-                                        <input className="premium-input" type="text" name="city" placeholder="City" required />
-                                        <input className="premium-input" type="text" name="postalCode" placeholder="Postal code" required />
-                                    </div>
-                                    <input className="premium-input bg-black/[0.03] text-ink-soft" type="text" name="country" value="United States" readOnly aria-readonly="true" />
-                                </div>
-                            </section>
+                <fieldset>
+                    <legend>Shipping address</legend>
+                    <input type="text" name="name" placeholder="Full name" required />
+                    <input type="text" name="street" placeholder="Street address" required />
+                    <input type="text" name="city" placeholder="City" required />
+                    <input type="text" name="postalCode" placeholder="Postal code" required />
+                    <input type="text" name="country" placeholder="Country" required />
+                </fieldset>
 
-                            <section>
-                                <h3 className="text-[28px]">Delivery</h3>
-                                <div className="mt-5 grid gap-4">
-                                    {[
-                                        { id: 'standard', title: 'Standard Shipping', sub: '5-7 business days', price: 'Free' },
-                                        { id: 'priority', title: 'Priority Shipping', sub: '2-3 business days', price: '$10.50' },
-                                        { id: 'express', title: 'Express Shipping', sub: '1-2 business days', price: '$25.00' },
-                                    ].map((option) => (
-                                        <label key={option.id} className={`flex cursor-pointer items-center justify-between rounded-[24px] border p-5 ${shipping === option.id ? 'border-apple-text bg-surface-alt' : 'border-black/[0.08] bg-white'}`}>
-                                            <div>
-                                                <div className="font-bold text-apple-text">{option.title}</div>
-                                                <div className="mt-1 text-sm text-ink-soft">{option.sub}</div>
-                                            </div>
-                                            <div className="flex items-center gap-4">
-                                                <div className="font-bold text-apple-text">{option.price}</div>
-                                                <input type="radio" checked={shipping === option.id} onChange={() => {
-                                                    markInteraction();
-                                                    setShipping(option.id);
-                                                }} />
-                                            </div>
-                                        </label>
-                                    ))}
-                                </div>
-                            </section>
+                <fieldset>
+                    <legend>Shipping method</legend>
+                    {SHIPPING_OPTIONS.map((option) => (
+                        <label key={option.value}>
+                            <input
+                                type="radio"
+                                name="shippingMethod"
+                                value={option.value}
+                                checked={shipping === option.value}
+                                onChange={() => setShipping(option.value)}
+                            />
+                            {option.label} &mdash; {option.cost === 0 ? 'Free' : `$${option.cost.toFixed(2)}`}
+                        </label>
+                    ))}
+                </fieldset>
 
-                            <section>
-                                <h3 className="text-[28px]">Payment</h3>
-                                <div className="mt-5 grid gap-4">
-                                    <div className="flex items-center justify-between rounded-[24px] border border-apple-text bg-surface-alt p-5">
-                                        <div>
-                                            <div className="font-bold text-apple-text">Contact to order</div>
-                                            <div className="mt-1 text-sm text-ink-soft">Submit your details and our team will contact you to complete payment</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </section>
+                <fieldset>
+                    <legend>Payment method</legend>
+                    <label>
+                        <input
+                            type="radio"
+                            name="payment"
+                            value="manual"
+                            checked={paymentMethod === 'manual'}
+                            onChange={() => setPaymentMethod('manual')}
+                        />
+                        Manual &mdash; our team contacts you to complete payment
+                    </label>
+                    <div>
+                        {CARD_NETWORKS.map((card) => (
+                            <img key={card.label} src={card.src} alt={card.label} />
+                        ))}
+                    </div>
+                </fieldset>
 
-                            <div className="rounded-[24px] border border-black/[0.06] bg-surface-alt p-5">
-                                <p className="flex items-center gap-2 text-sm font-bold text-apple-text">
-                                    <LockOutlinedIcon className="!text-[18px]" />
-                                    Secure, encrypted checkout
-                                </p>
-                                <p className="mt-2 text-sm leading-6 text-ink-soft">
-                                    This page is served over an encrypted HTTPS connection. Card payments are processed through a PCI DSS compliant payment processor. UpCell IT Inc. never stores your full card number or security code.
-                                </p>
-                            </div>
+                <button type="submit" disabled={isLoading}>
+                    {isLoading ? 'Submitting...' : 'Place order'}
+                </button>
+            </form>
 
-                            <div className="flex flex-col gap-4 border-t border-black/[0.06] pt-6 md:flex-row md:items-center md:justify-between">
-                                <p className="text-sm text-ink-soft">
-                                    Prices shown in US dollars (USD). Ships to the United States only. See our{' '}
-                                    <Link to="/return-policy" className="font-bold text-brand-red">Refund Policy</Link>,{' '}
-                                    <Link to="/delivery-policy" className="font-bold text-brand-red">Delivery Policy</Link>, or contact{' '}
-                                    <a href="mailto:usa.Upcells@gmail.com" className="font-bold text-brand-red">usa.Upcells@gmail.com</a>.
-                                </p>
-                                <button type="submit" className="premium-button w-full md:w-auto md:min-w-[220px]" disabled={isLoading}>
-                                    {isLoading ? 'Submitting...' : 'Submit order request'}
-                                </button>
-                            </div>
-                        </form>
-                    </main>
-
-                    <aside className="premium-card h-fit rounded-[32px] p-6 lg:sticky lg:top-28">
-                        <div className="flex items-center justify-between">
-                            <h2 className="text-2xl">Order summary</h2>
-                            <span className="text-sm text-apple-gray">{productIds.length} items</span>
-                        </div>
-
-                        <div className="mt-6 space-y-4">
-                            {productIds.map((id, index) => {
-                                const product = products.find((item) => item._id === id);
-                                if (!product) return null;
-                                return (
-                                    <div key={`${id}-${index}`} className="flex gap-4 rounded-[24px] bg-surface-alt p-4">
-                                        <div className="flex h-16 w-16 items-center justify-center rounded-[18px] bg-white">
-                                            <img src={product.image} alt={product.productName} className="max-h-[80%] w-auto object-contain" />
-                                        </div>
-                                        <div className="flex-1">
-                                            <div className="font-bold text-apple-text">{product.productName}</div>
-                                            <div className="mt-1 text-sm text-ink-soft">{product.color?.name}, {product.storage}</div>
-                                        </div>
-                                        <div className="whitespace-nowrap font-bold text-apple-text">${product.price} USD</div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-
-                        <div className="mt-6 space-y-4 border-t border-black/[0.06] pt-6 text-sm text-ink-soft">
-                            <div className="flex justify-between"><span>Subtotal</span><strong className="text-apple-text">${subtotal.toFixed(2)}</strong></div>
-                            <div className="flex justify-between"><span>Estimated tax</span><strong className="text-apple-text">${estTax.toFixed(2)}</strong></div>
-                            <div className="flex justify-between"><span>Shipping</span><strong className="text-apple-text">{shippingCost === 0 ? 'Free' : `$${shippingCost.toFixed(2)}`}</strong></div>
-                            <div className="flex justify-between border-t border-black/[0.06] pt-4 text-base"><span className="font-bold text-apple-text">Total</span><strong className="whitespace-nowrap text-2xl text-apple-text">${total.toFixed(2)} <span className="text-sm font-normal text-ink-soft">USD</span></strong></div>
-                        </div>
-
-                        <div className="mt-6">
-                            <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-apple-gray">Cards accepted</p>
-                            <div className="mt-2 grid grid-cols-3 gap-3">
-                                {[
-                                    { src: visa, label: 'Visa accepted' },
-                                    { src: mastercard, label: 'Mastercard accepted' },
-                                    { src: americanExpress, label: 'American Express accepted' },
-                                ].map((card) => (
-                                    <div key={card.label} className="flex h-12 items-center justify-center rounded-[16px] border border-black/[0.06] bg-white">
-                                        <img src={card.src} alt={card.label} className="max-h-7 w-auto object-contain" />
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </aside>
-                </div>
-            </section>
+            <aside>
+                <h2>Order summary</h2>
+                <div>Subtotal: ${subtotal.toFixed(2)}</div>
+                <div>Estimated tax: ${estTax.toFixed(2)}</div>
+                <div>Shipping: ${shippingCost.toFixed(2)}</div>
+                <div>Total: ${total.toFixed(2)} USD</div>
+            </aside>
         </div>
     );
 };

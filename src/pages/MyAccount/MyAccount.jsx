@@ -1,12 +1,13 @@
 import { useContext, useEffect, useState } from "react";
 import { userContext } from "../../utilities/UserContextProvider";
 import { Link, useNavigate } from "react-router-dom";
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { UserProfile } from "@clerk/clerk-react";
 import SingleCustomerOrder from "./SingleCustomerOrder";
 import axiosInstance from "../../utilities/axiosInstance";
 
-// Brand-aligned styling for Clerk's embedded UserProfile (matches tailwind tokens).
+// Brand variables only. The old `elements` class overrides were part of the
+// previous design system and were removed; re-add element styling once the
+// new account UI exists.
 const clerkProfileAppearance = {
     variables: {
         colorPrimary: '#d90b0f',
@@ -17,22 +18,6 @@ const clerkProfileAppearance = {
         colorInputText: '#0c0c0c',
         fontFamily: 'Roboto, ui-sans-serif, system-ui, sans-serif',
         borderRadius: '14px',
-    },
-    elements: {
-        rootBox: 'w-full',
-        cardBox: 'w-full max-w-full mx-auto rounded-[28px] sm:rounded-[36px] border border-black/[0.06] shadow-premium overflow-hidden',
-        card: 'w-full max-w-full bg-white',
-        navbar: 'bg-surface/60 border-r border-black/[0.06]',
-        navbarButton: 'text-apple-gray font-semibold',
-        navbarButton__active: 'text-brand-red',
-        headerTitle: 'text-apple-text font-bold',
-        headerSubtitle: 'text-apple-gray',
-        formButtonPrimary: 'bg-brand-red hover:bg-[#b00a0d] text-white rounded-full font-bold normal-case shadow-none',
-        formFieldInput: 'rounded-2xl border border-black/[0.1] focus:border-brand-red focus:ring-1 focus:ring-brand-red',
-        formFieldLabel: 'text-apple-text font-bold',
-        profileSectionPrimaryButton: 'text-brand-red font-bold normal-case',
-        badge: 'bg-brand-red/10 text-brand-red',
-        footerActionLink: 'text-brand-red font-bold',
     },
 };
 
@@ -75,68 +60,53 @@ const MyAccount = () => {
             });
     }, [loading, navigate, user?.email, user?.role]);
 
-    const tabBaseClass = "rounded-full px-5 py-2.5 text-sm font-bold transition-all sm:px-6";
-    const tabActiveClass = "bg-apple-text text-white shadow-sm";
-    const tabInactiveClass = "text-apple-gray hover:text-apple-text";
-
+    // TODO(redesign): build the new account page UI here.
     return (
-        <div className="page-shell">
-            <section className="page-container pb-10 pt-6">
-                <div className="premium-card rounded-[28px] bg-[linear-gradient(180deg,#ffffff_0%,#f3f5f8_100%)] px-6 py-8 sm:rounded-[40px] sm:px-8 sm:py-10 md:px-12 md:py-14">
-                    <nav className="mb-6 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-apple-gray sm:mb-8">
-                        <Link to="/" className="hover:text-apple-text transition-colors">Home</Link>
-                        <KeyboardArrowRightIcon className="!text-sm" />
-                        <span className="text-apple-text">Account</span>
-                    </nav>
-                    <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-                        <div>
-                            <h1 className="text-[clamp(2.1rem,4.8vw,4.8rem)] leading-[0.96] sm:leading-[0.94]">Your orders and account details.</h1>
-                            <p className="mt-3 break-words text-base leading-7 text-ink-soft sm:mt-4 sm:text-lg sm:leading-8">{user?.email}</p>
-                        </div>
-                        <button className="premium-button-secondary w-full md:w-auto" onClick={handleSingOut}>Sign out</button>
-                    </div>
+        <div>
+            <nav>
+                <Link to="/">Home</Link>
+                <span>Account</span>
+            </nav>
 
-                    <div className="mt-8 inline-flex w-full gap-1 rounded-full bg-surface p-1 sm:w-auto">
-                        <button
-                            type="button"
-                            onClick={() => setActiveTab('orders')}
-                            className={`${tabBaseClass} flex-1 sm:flex-none ${activeTab === 'orders' ? tabActiveClass : tabInactiveClass}`}
-                        >
-                            Orders
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setActiveTab('account')}
-                            className={`${tabBaseClass} flex-1 sm:flex-none ${activeTab === 'account' ? tabActiveClass : tabInactiveClass}`}
-                        >
-                            Account settings
-                        </button>
-                    </div>
-                </div>
-            </section>
+            <h1>Your orders and account details.</h1>
+            <p>{user?.email}</p>
+            <button type="button" onClick={handleSingOut}>Sign out</button>
 
-            <section className="page-container pb-16">
-                {activeTab === 'orders' ? (
-                    isLoading ? (
-                        <div className="premium-card rounded-[36px] px-8 py-16 text-center">
-                            <p className="text-lg text-ink-soft">Fetching your orders...</p>
-                        </div>
-                    ) : orders.length ? (
-                        <div className="space-y-5">
-                            {orders.map((order) => <SingleCustomerOrder key={order._id} order={order} />)}
-                        </div>
-                    ) : (
-                        <div className="premium-card rounded-[36px] px-8 py-16 text-center">
-                            <h2>No orders yet.</h2>
-                            <p className="mt-4 text-lg text-ink-soft">When you place an order, it will appear here with its current status.</p>
-                        </div>
-                    )
+            <div role="tablist">
+                <button
+                    type="button"
+                    role="tab"
+                    aria-selected={activeTab === 'orders'}
+                    onClick={() => setActiveTab('orders')}
+                >
+                    Orders
+                </button>
+                <button
+                    type="button"
+                    role="tab"
+                    aria-selected={activeTab === 'account'}
+                    onClick={() => setActiveTab('account')}
+                >
+                    Account settings
+                </button>
+            </div>
+
+            {activeTab === 'orders' ? (
+                isLoading ? (
+                    <p>Fetching your orders...</p>
+                ) : orders.length ? (
+                    <div>
+                        {orders.map((order) => <SingleCustomerOrder key={order._id} order={order} />)}
+                    </div>
                 ) : (
-                    <div className="flex justify-center">
-                        <UserProfile routing="hash" appearance={clerkProfileAppearance} />
+                    <div>
+                        <h2>No orders yet.</h2>
+                        <p>When you place an order, it will appear here with its current status.</p>
                     </div>
-                )}
-            </section>
+                )
+            ) : (
+                <UserProfile routing="hash" appearance={clerkProfileAppearance} />
+            )}
         </div>
     );
 };

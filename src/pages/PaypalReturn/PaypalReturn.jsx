@@ -33,25 +33,22 @@ const PaypalReturn = () => {
             });
     }, []);
 
+    // TODO(redesign): build the new PayPal return UI here.
     return (
-        <div className="page-shell">
+        <div>
             <ScrollToTop />
-            <section className="page-container pb-16 pt-6">
-                <div className="premium-card rounded-[28px] bg-[linear-gradient(180deg,#ffffff_0%,#f3f5f8_100%)] px-6 py-16 text-center sm:rounded-[40px]">
-                    {status === 'capturing' ? (
-                        <>
-                            <h1 className="text-[clamp(1.8rem,4vw,3rem)]">Confirming your PayPal payment.</h1>
-                            <p className="mt-4 text-lg text-ink-soft">Please wait, this only takes a moment.</p>
-                        </>
-                    ) : (
-                        <>
-                            <h1 className="text-[clamp(1.8rem,4vw,3rem)]">We couldn't confirm this payment.</h1>
-                            <p className="mt-4 text-lg text-ink-soft">{errorMessage}</p>
-                            <Link to="/cart" className="premium-button mt-6 inline-flex">Return to cart</Link>
-                        </>
-                    )}
-                </div>
-            </section>
+            {status === 'capturing' ? (
+                <>
+                    <h1>Confirming your PayPal payment.</h1>
+                    <p>Please wait, this only takes a moment.</p>
+                </>
+            ) : (
+                <>
+                    <h1>We could not confirm this payment.</h1>
+                    <p>{errorMessage}</p>
+                    <Link to="/cart">Return to cart</Link>
+                </>
+            )}
         </div>
     );
 };

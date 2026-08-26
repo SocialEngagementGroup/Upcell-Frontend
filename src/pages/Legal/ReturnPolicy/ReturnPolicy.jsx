@@ -1,27 +1,26 @@
 import { Link } from 'react-router-dom';
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 
 const ReturnPolicy = () => {
     return (
-        <div className="page-shell">
-            <section className="page-container pb-10 pt-6">
-                <div className="premium-card rounded-[28px] bg-[linear-gradient(180deg,#ffffff_0%,#f3f5f8_100%)] px-6 py-8 sm:rounded-[40px] sm:px-8 sm:py-10 md:px-12 md:py-14">
-                    <nav className="mb-6 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-apple-gray sm:mb-8">
-                        <Link to="/" className="hover:text-apple-text transition-colors">Home</Link>
-                        <KeyboardArrowRightIcon className="!text-sm" />
-                        <span className="text-apple-text">Returns</span>
+        <div>
+            <section>
+                <div>
+                    <nav>
+                        <Link to="/">Home</Link>
+                        
+                        <span>Returns</span>
                     </nav>
-                    <h1 className="text-[clamp(2.1rem,5vw,5rem)] leading-[0.96] sm:leading-[0.92]">30-Day Return Policy on All Certified Premium Apple Devices</h1>
-                    <p className="mt-4 max-w-[640px] text-base leading-7 text-ink-soft sm:mt-5 sm:text-lg sm:leading-8">
+                    <h1>30-Day Return Policy on All Certified Premium Apple Devices</h1>
+                    <p>
                         Every certified premium iPhone, iPad, and MacBook purchased from UpCell IT Inc. is covered by a 30-day return window and a 12-month limited warranty. If something isn’t right, we’ll guide you through the process clearly.
                     </p>
                 </div>
             </section>
 
-            <section className="page-container pb-16">
-                <article className="legal-prose premium-card rounded-[28px] px-6 py-8 sm:rounded-[36px] sm:px-8 sm:py-10 md:px-12 md:py-14">
+            <section>
+                <article className="legal-prose">
                     <p>This is a summary of our return and refund rules. The full, governing version is in Section 6 of our{' '}
-                        <Link to="/terms-conditions#returns-refunds" className="font-bold text-brand-red">Terms &amp; Conditions</Link>. If anything here conflicts with the Terms, the Terms apply.</p>
+                        <Link to="/terms-conditions#returns-refunds">Terms &amp; Conditions</Link>. If anything here conflicts with the Terms, the Terms apply.</p>
 
                     <h2>30-day return window</h2>
                     <p>Eligible products may be returned within <strong>30 calendar days</strong> of delivery or in-store purchase. A return based on preference or a change of mind must be requested within this 30-day period.</p>
@@ -59,13 +58,13 @@ const ReturnPolicy = () => {
 
                     <h2>How to start a return</h2>
                     <ol>
-                        <li>Email <a href="mailto:usa.Upcells@gmail.com" className="font-bold text-brand-red">usa.Upcells@gmail.com</a> to request return authorization.</li>
+                        <li>Email <a href="mailto:usa.Upcells@gmail.com">usa.Upcells@gmail.com</a> to request return authorization.</li>
                         <li>Use a subject line like: <strong>Product Return Request - [Your Order ID]</strong>.</li>
                         <li>Include your name, address, order date, device model, IMEI or serial number, and reason for the request.</li>
                         <li>Attach any supporting photos or notes that help explain the request.</li>
                     </ol>
                     <p>Our team reviews the request and replies with the next steps, including packaging and shipping guidance. Hardware problems reported after the 30-day return period are handled under the{' '}
-                        <Link to="/terms-conditions" className="font-bold text-brand-red">12-month limited warranty</Link>.</p>
+                        <Link to="/terms-conditions">12-month limited warranty</Link>.</p>
                 </article>
             </section>
         </div>

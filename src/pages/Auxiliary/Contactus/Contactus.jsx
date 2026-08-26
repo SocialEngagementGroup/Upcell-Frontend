@@ -1,13 +1,5 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import InstagramIcon from '@mui/icons-material/Instagram';
-import FacebookOutlinedIcon from '@mui/icons-material/FacebookOutlined';
-import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
-import LocalPhoneOutlinedIcon from '@mui/icons-material/LocalPhoneOutlined';
-import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined';
-import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
 import axiosInstance from '../../../utilities/axiosInstance';
 import { extractApiError, validateEmailAddress, validateRequiredText } from '../../../utilities/formValidation';
 import useFormAnalytics from '../../../utilities/useFormAnalytics';
@@ -19,6 +11,15 @@ const faqs = [
     { q: 'How do you grade device condition?', a: "Every unit undergoes a 40-point inspection. 'Pristine' indicates zero cosmetic wear, while 'Like New' may have a single, nearly invisible mark. We never sell units with cracked glass or structural damage." },
     { q: 'What is the shipping timeline?', a: 'Most orders are processed within 1 business day. Standard shipping typically takes 3-7 business days across the US, while expedited options are available at checkout for urgent needs.' },
     { q: 'Do products come with a warranty?', a: 'Yes. All UpCell IT Inc. devices include a comprehensive 12-month limited warranty covering internal hardware defects. We also offer extended protection plans for accidental damage.' },
+];
+
+// Contact channels kept as content; the icons that fronted them were design.
+const CONTACT_CHANNELS = [
+    { title: 'Phone support', info: '+1 (380) 266-3942', href: 'tel:+13802663942' },
+    { title: 'Email support', info: 'usa.Upcells@gmail.com', href: 'mailto:usa.Upcells@gmail.com' },
+    { title: 'Facebook Messenger', info: 'facebook.com/usa.Upcells', href: 'https://www.facebook.com/usa.Upcells' },
+    { title: 'Instagram Direct', info: '@Upcells_usa', href: 'https://www.instagram.com/Upcells_usa/' },
+    { title: 'Our location', info: '973 Harrisburg Pike, Columbus, OH 43223', href: 'https://maps.google.com/?q=973+Harrisburg+Pike,+Columbus,+OH+43223' },
 ];
 
 const Contactus = () => {
@@ -72,109 +73,64 @@ const Contactus = () => {
         }
     };
 
+    // TODO(redesign): build the new support page UI here.
     return (
-        <div className="page-shell">
-            <section className="page-container pb-10 pt-6">
-                <div className="premium-card rounded-[28px] bg-[linear-gradient(180deg,#ffffff_0%,#f3f5f8_100%)] px-6 py-8 sm:rounded-[40px] sm:px-8 sm:py-10 md:px-12 md:py-14">
-                    <nav className="mb-6 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-apple-gray sm:mb-8">
-                        <Link to="/" className="hover:text-apple-text transition-colors">Home</Link>
-                        <KeyboardArrowRightIcon className="!text-sm" />
-                        <span className="text-apple-text">Support</span>
-                    </nav>
-                    <h1 className="text-[clamp(2.1rem,5vw,5rem)] leading-[0.96] sm:leading-[0.92]">Contact UpCell IT Inc.: Premium Apple Device Support</h1>
-                    <p className="mt-4 max-w-[680px] text-base leading-7 text-ink-soft sm:mt-5 sm:text-lg sm:leading-8">
-                        Questions about a certified premium iPhone, iPad, or MacBook? Need help with a trade-in quote, order update, or return? Our team responds within 24 hours. Reach us by phone, email, Facebook, or Instagram.
-                    </p>
-                </div>
-            </section>
+        <div>
+            <nav>
+                <Link to="/">Home</Link>
+                <span>Support</span>
+            </nav>
 
-            <section className="page-container pb-16 sm:pb-24">
-                <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:gap-12">
-                    <div className="flex flex-col justify-center space-y-8 py-2 sm:space-y-10 sm:py-6">
-                        <div className="grid gap-6">
-                            {[
-                                { icon: <LocalPhoneOutlinedIcon />, title: 'Phone support', info: '+1 (380) 266-3942', href: 'tel:+13802663942' },
-                                { icon: <EmailOutlinedIcon />, title: 'Email support', info: 'usa.Upcells@gmail.com', href: 'mailto:usa.Upcells@gmail.com' },
-                                { icon: <FacebookOutlinedIcon />, title: 'Facebook Messenger', info: 'facebook.com/usa.Upcells', href: 'https://www.facebook.com/usa.Upcells' },
-                                { icon: <InstagramIcon />, title: 'Instagram Direct', info: '@Upcells_usa', href: 'https://www.instagram.com/Upcells_usa/' },
-                                { icon: <PlaceOutlinedIcon />, title: 'Our location', info: '973 Harrisburg Pike, Columbus, OH 43223', href: 'https://maps.google.com/?q=973+Harrisburg+Pike,+Columbus,+OH+43223' },
-                            ].map((item) => (
-                                <a 
-                                    key={item.title} 
-                                    href={item.href} 
-                                    target={item.href.startsWith('http') ? '_blank' : undefined} 
-                                    rel="noreferrer" 
-                                    className="group flex items-center gap-5 transition-transform hover:translate-x-2"
-                                >
-                                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white shadow-sm border border-apple-gray/5 text-apple-text transition-all group-hover:bg-apple-text group-hover:text-white">
-                                        {item.icon}
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-[14px] font-black uppercase tracking-widest text-apple-gray group-hover:text-apple-text transition-colors">{item.title}</span>
-                                        <span className="text-lg text-apple-text">{item.info}</span>
-                                    </div>
-                                </a>
-                            ))}
-                        </div>
-                    </div>
+            <h1>Contact UpCell IT Inc.: Premium Apple Device Support</h1>
+            <p>
+                Questions about a certified premium iPhone, iPad, or MacBook? Need help with a
+                trade-in quote, order update, or return? Our team responds within 24 hours. Reach us
+                by phone, email, Facebook, or Instagram.
+            </p>
 
-                    <div className="premium-card rounded-[28px] bg-white p-6 sm:rounded-[48px] sm:p-10 md:p-14 shadow-medium transition-shadow hover:shadow-hover">
-                        <div className="mb-8 sm:mb-10">
-                            <h3 className="text-2xl font-black sm:text-3xl">Send us a message</h3>
-                            <p className="mt-3 text-apple-gray">Direct inquiries are monitored 6 days a week.</p>
-                        </div>
-                        <form className="grid gap-6" onSubmit={handleSubmit}>
-                            <div className="grid gap-6 md:grid-cols-2">
-                                <input className="premium-input bg-apple-gray/5 border-transparent focus:bg-white" placeholder="Full name" value={formData.name} onChange={handleChange('name')} required />
-                                <input className="premium-input bg-apple-gray/5 border-transparent focus:bg-white" type="email" placeholder="Email address" value={formData.email} onChange={handleChange('email')} required />
-                            </div>
-                            <input className="premium-input bg-apple-gray/5 border-transparent focus:bg-white" placeholder="Subject" value={formData.subject} onChange={handleChange('subject')} required />
-                            <textarea className="premium-input min-h-[220px] resize-none py-4 bg-apple-gray/5 border-transparent focus:bg-white" placeholder="Tell us how we can help." value={formData.message} onChange={handleChange('message')} required />
-                            {submitMessage && (
-                                <p className="text-sm text-apple-gray">{submitMessage}</p>
-                            )}
-                            <button type="submit" disabled={isSubmitting} className="h-[56px] px-10 rounded-full bg-apple-text text-white font-black text-lg transition-all hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70">
-                                {isSubmitting ? 'Sending...' : 'Send Message'}
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </section>
+            <ul>
+                {CONTACT_CHANNELS.map((item) => (
+                    <li key={item.title}>
+                        <a
+                            href={item.href}
+                            target={item.href.startsWith('http') ? '_blank' : undefined}
+                            rel="noreferrer"
+                        >
+                            <span>{item.title}</span>
+                            <span>{item.info}</span>
+                        </a>
+                    </li>
+                ))}
+            </ul>
 
-            <section className="page-container pb-16 sm:pb-24">
-                <div className="mx-auto max-w-[800px]">
-                    <div className="mb-8 text-center sm:mb-14">
-                        <h2 className="text-[clamp(2rem,4vw,3.6rem)] tracking-tight">Frequently asked questions.</h2>
+            <h2>Send us a message</h2>
+            <p>Direct inquiries are monitored 6 days a week.</p>
+            <form onSubmit={handleSubmit}>
+                <input placeholder="Full name" value={formData.name} onChange={handleChange('name')} required />
+                <input type="email" placeholder="Email address" value={formData.email} onChange={handleChange('email')} required />
+                <input placeholder="Subject" value={formData.subject} onChange={handleChange('subject')} required />
+                <textarea placeholder="Tell us how we can help." value={formData.message} onChange={handleChange('message')} required />
+                {submitMessage && <p>{submitMessage}</p>}
+                <button type="submit" disabled={isSubmitting}>
+                    {isSubmitting ? 'Sending...' : 'Send Message'}
+                </button>
+            </form>
+
+            <h2>Frequently asked questions.</h2>
+            <div>
+                {faqs.map((item, index) => (
+                    <div key={index}>
+                        <button
+                            type="button"
+                            aria-expanded={openIndex === index}
+                            onClick={() => setOpenIndex(openIndex === index ? -1 : index)}
+                        >
+                            {item.q}
+                        </button>
+                        {openIndex === index && <p>{item.a}</p>}
                     </div>
-                    
-                    <div className="grid gap-4">
-                        {faqs.map((item, index) => (
-                            <div 
-                                key={index} 
-                                className={`overflow-hidden rounded-[32px] border transition-all duration-500 ${openIndex === index ? 'border-apple-text bg-white shadow-medium' : 'border-apple-gray/10 bg-apple-gray/5 hover:border-apple-gray/30'}`}
-                            >
-                                <button
-                                    onClick={() => setOpenIndex(openIndex === index ? -1 : index)}
-                                    className="flex w-full items-center justify-between p-5 text-left sm:p-8"
-                                >
-                                    <h3 className="pr-4 text-lg font-black tracking-tight sm:pr-8 sm:text-xl md:text-2xl">{item.q}</h3>
-                                    <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-all duration-500 ${openIndex === index ? 'bg-apple-text text-white rotate-180' : 'bg-white text-apple-text'}`}>
-                                        {openIndex === index ? <RemoveIcon className="!text-lg" /> : <AddIcon className="!text-lg" />}
-                                    </div>
-                                </button>
-                                
-                                <div 
-                                    className={`transition-all duration-500 ease-in-out ${openIndex === index ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}
-                                >
-                                    <div className="px-5 pb-5 text-base leading-relaxed text-ink-soft opacity-80 sm:px-8 sm:pb-8 sm:text-lg">
-                                        {item.a}
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
+                ))}
+            </div>
         </div>
     );
 };

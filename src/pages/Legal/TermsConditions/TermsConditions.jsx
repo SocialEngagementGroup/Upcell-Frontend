@@ -1,25 +1,24 @@
 import { Link } from 'react-router-dom';
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 
 const TermsConditions = () => {
     return (
-        <div className="page-shell">
-            <section className="page-container pb-10 pt-6">
-                <div className="premium-card rounded-[28px] bg-[linear-gradient(180deg,#ffffff_0%,#f3f5f8_100%)] px-6 py-8 sm:rounded-[40px] sm:px-8 sm:py-10 md:px-12 md:py-14">
-                    <nav className="mb-6 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-apple-gray sm:mb-8">
-                        <Link to="/" className="hover:text-apple-text transition-colors">Home</Link>
-                        <KeyboardArrowRightIcon className="!text-sm" />
-                        <span className="text-apple-text">Terms</span>
+        <div>
+            <section>
+                <div>
+                    <nav>
+                        <Link to="/">Home</Link>
+                        
+                        <span>Terms</span>
                     </nav>
-                    <h1 className="text-[clamp(2.1rem,5vw,5rem)] leading-[0.96] sm:leading-[0.92]">Terms &amp; Conditions</h1>
-                    <p className="mt-4 max-w-[640px] text-base leading-7 text-ink-soft sm:mt-5 sm:text-lg sm:leading-8">
+                    <h1>Terms &amp; Conditions</h1>
+                    <p>
                         UpCell IT Inc. — upcellit.com. Last updated: Aug 1, 2026.
                     </p>
                 </div>
             </section>
 
-            <section className="page-container pb-16">
-                <article className="legal-prose premium-card rounded-[28px] px-6 py-8 sm:rounded-[36px] sm:px-8 sm:py-10 md:px-12 md:py-14">
+            <section>
+                <article className="legal-prose">
                     <p>
                         Welcome to UpCell IT. These Terms &amp; Conditions (&ldquo;Terms&rdquo;) govern your use of upcellit.com (the &ldquo;Site&rdquo;) and your purchase of products or use of services offered by UpCell IT Inc. (&ldquo;UpCell IT,&rdquo; &ldquo;we,&rdquo; &ldquo;us&rdquo;), located at 973 Harrisburg Pike, Columbus, OH 43223, United States. By using the Site, placing an order, or submitting a trade-in request, you agree to these Terms. If you do not agree, please do not use the site.
                     </p>
@@ -33,7 +32,7 @@ const TermsConditions = () => {
                     <p>We accept orders for delivery to addresses within the United States only. We do not accept orders for export outside the United States. We reserve the right to cancel any order we reasonably believe is intended for export, and to issue a full refund before the order is dispatched.</p>
                     <p>
                         You are responsible for keeping your account information secure. Contact us immediately at{' '}
-                        <a href="mailto:usa.Upcells@gmail.com" className="font-bold text-brand-red">usa.Upcells@gmail.com</a> if you suspect unauthorized use of your account.
+                        <a href="mailto:usa.Upcells@gmail.com">usa.Upcells@gmail.com</a> if you suspect unauthorized use of your account.
                     </p>
 
                     <h2>3. Orders &amp; Payment</h2>
@@ -44,7 +43,7 @@ const TermsConditions = () => {
                     <p><strong>Availability.</strong> All orders are subject to stock availability. If an item becomes unavailable after you order, we will contact you to offer an alternative or a full refund.</p>
                     <p>
                         <strong>Shipping.</strong> Orders are shipped as described in our{' '}
-                        <Link to="/delivery-policy" className="font-bold text-brand-red">Delivery Policy</Link>. Standard shipping (3–7 business days) is free; priority and priority overnight options are available at an additional cost shown at checkout.
+                        <Link to="/delivery-policy">Delivery Policy</Link>. Standard shipping (3–7 business days) is free; priority and priority overnight options are available at an additional cost shown at checkout.
                     </p>
 
                     <h2>4. Trade-In / Buyback Program</h2>
@@ -79,7 +78,7 @@ const TermsConditions = () => {
                     </ul>
                     <p>
                         <strong>Making a claim.</strong> Contact us at{' '}
-                        <a href="mailto:usa.Upcells@gmail.com" className="font-bold text-brand-red">usa.Upcells@gmail.com</a>{' '}
+                        <a href="mailto:usa.Upcells@gmail.com">usa.Upcells@gmail.com</a>{' '}
                         with your order number, a description of the problem, and photos/video if applicable. We will provide troubleshooting steps or return instructions.
                     </p>
                     <p><strong>Shipping for warranty service.</strong> You pay shipping to send the device to us; UpCell IT pays return shipping on approved claims. Average turnaround is 3–7 business days after we receive the device.</p>
@@ -129,7 +128,7 @@ const TermsConditions = () => {
                     <h2>11. Privacy</h2>
                     <p>
                         Your personal information is handled in accordance with our{' '}
-                        <Link to="/privacy-policy" className="font-bold text-brand-red">Privacy Policy</Link>. By using the Site you consent to that handling.
+                        <Link to="/privacy-policy">Privacy Policy</Link>. By using the Site you consent to that handling.
                     </p>
 
                     <h2>12. Changes to These Terms</h2>
@@ -142,7 +141,7 @@ const TermsConditions = () => {
                     <p>
                         UpCell IT Inc.<br />
                         973 Harrisburg Pike, Columbus, OH 43223, United States<br />
-                        Email: <a href="mailto:usa.Upcells@gmail.com" className="font-bold text-brand-red">usa.Upcells@gmail.com</a>
+                        Email: <a href="mailto:usa.Upcells@gmail.com">usa.Upcells@gmail.com</a>
                     </p>
                     <p>To request a return, provide your name, order number, device model, IMEI or serial number, and reason for the return.</p>
                 </article>
