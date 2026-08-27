@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 
 import { UTILITY_LINKS } from './navigationData';
 
@@ -17,11 +18,12 @@ const UtilityBar = () => (
                     the pills keep their hover target. */}
                 <ul className="-mx-3 flex items-center gap-1">
                     {UTILITY_LINKS.map((link) => (
-                        <li key={link.to}>
+                        <li key={link.label}>
                             <Link
                                 to={link.to}
-                                className="rounded-full px-3 py-1 text-[12px] font-medium text-apple-gray outline-none transition-colors duration-200 ease-smooth hover:text-apple-text focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-1 focus-visible:ring-offset-apple-bg"
+                                className="flex items-center gap-1.5 rounded-full px-3 py-1 text-[13px] font-bold text-apple-text outline-none transition-colors duration-200 ease-smooth hover:text-brand-red focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-1 focus-visible:ring-offset-apple-bg [&_svg]:!text-[16px]"
                             >
+                                {link.withShield && <VerifiedUserOutlinedIcon aria-hidden="true" />}
                                 {link.label}
                             </Link>
                         </li>

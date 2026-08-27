@@ -52,11 +52,18 @@ const MODEL_GROUP_BLURBS = {
 // Utility row (row 1)
 // ---------------------------------------------------------------------------
 
+// Mirrors the reference row, with each label pointed at the UpCell page that
+// actually carries that content:
+//   Promise      -> /about, which is where the warranty and grading story lives
+//   Repair & Care-> /return-policy, returns plus warranty claims
+//   End fast tech-> the longevity piece; UpCell has no campaign page, and this
+//                   is the closest real content about keeping a device longer
+//   Tech Journal -> the journal index
 export const UTILITY_LINKS = [
-    { label: 'About', to: '/about' },
-    { label: 'Blogs', to: '/blogs' },
-    { label: 'Support', to: '/support' },
-    { label: 'Return Policy', to: '/return-policy' },
+    { label: 'The UpCellIT Promise', to: '/about', withShield: true },
+    { label: 'Repair & Care', to: '/return-policy' },
+    { label: 'End fast tech', to: '/blogs/battery-health-guide' },
+    { label: 'Tech Journal', to: '/blogs' },
 ];
 
 // ---------------------------------------------------------------------------
@@ -151,6 +158,15 @@ export const TRADE_IN_LINK = { label: 'Trade in', to: '/trade-in' };
 export const MAIN_ROW_LINKS = [
     { label: 'Need help?', to: '/support' },
     { label: 'For business', to: '/support' },
+];
+
+// The drawer's secondary list. It is the utility row plus "Need help?",
+// because the utility row carries no support link and MAIN_ROW_LINKS is
+// desktop-only — without this, /support is unreachable from the header on a
+// phone. "For business" is left out rather than repeating the same target.
+export const DRAWER_SECONDARY_LINKS = [
+    ...UTILITY_LINKS,
+    { label: 'Need help?', to: '/support' },
 ];
 
 // ---------------------------------------------------------------------------

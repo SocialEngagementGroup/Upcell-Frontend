@@ -10,7 +10,7 @@ import {
     DRAWER_FAMILIES,
     DRAWER_PRIMARY_LINKS,
     SIGN_IN_LINK,
-    UTILITY_LINKS,
+    DRAWER_SECONDARY_LINKS,
 } from './navigationData';
 import DrawerAccordion from './DrawerAccordion';
 
@@ -177,8 +177,8 @@ const MobileDrawer = ({ isOpen, onClose }) => {
                     </div>
 
                     <ul className="pt-2">
-                        {UTILITY_LINKS.map((link) => (
-                            <li key={link.to}>
+                        {DRAWER_SECONDARY_LINKS.map((link) => (
+                            <li key={link.label}>
                                 <Link
                                     to={link.to}
                                     onClick={() => onClose({ restoreFocus: false })}
