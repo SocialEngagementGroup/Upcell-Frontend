@@ -92,7 +92,7 @@
        "there is more", rather than as a rendering mistake. */
     .nav-edge-fade {
         @apply pointer-events-none absolute inset-y-0 right-0 w-10;
-        background: linear-gradient(to right, rgba(255, 255, 255, 0), #ffffff 70%);
+        background: linear-gradient(to right, transparent, theme('colors.white') 70%);
     }
 
     /* SearchWithSuggestions is shared with Admin, so its dropdown cannot be
@@ -104,11 +104,14 @@
         @apply fixed left-0 right-0 mt-0 rounded-none border-x-0 md:absolute md:top-auto md:mt-2 md:rounded-[15px] md:border-x;
     }
 
-    /* Toasts are transient and the header is not: keep them under it rather
-       than letting react-toastify's z-index 9999 cover the nav. Offset so a
-       top-center toast still lands in view instead of behind the bars. */
+    /* A top-center toast would otherwise open behind the sticky header. Push
+       it clear of the bars instead of lowering its z-index: react-toastify
+       sits at 9999 for a reason, and dropping it below the drawer (z-60) or
+       the admin modal (z-100) would hide toasts fired while either is open.
+       --app-header-height is measured by HeaderComponent; the fallback covers
+       the first paint and any route that renders without the header. */
     .app-toast-container {
-        @apply !z-40 !top-[124px] md:!top-[152px];
+        top: calc(var(--app-header-height, 124px) + 8px) !important;
     }
 
     /* ---------------------------------------------------------------------

@@ -1,3 +1,5 @@
+import { useLayoutEffect, useRef } from 'react';
+
 import UtilityBar from './UtilityBar';
 import PrimaryBar from './PrimaryBar';
 import CategoryBar from './CategoryBar';
@@ -34,9 +36,49 @@ const HeaderComponent = () => {
 
     const activeItem = CATEGORY_NAV.find((item) => item.id === openPanelId && item.panel);
 
+    // Publish the rendered header height so anything that has to clear the
+    // bars can read it instead of hardcoding one. Currently that is the toast
+    // container in index.css. Measured rather than assumed, because the height
+    // changes across two breakpoints and again when the search line wraps.
+    const headerRef = useRef(null);
+
+    useLayoutEffect(() => {
+        const node = headerRef.current;
+        if (!node) return undefined;
+
+        const publish = () => {
+            const { height } = node.getBoundingClientRect();
+            if (!height) return;
+            document.documentElement.style.setProperty('--app-header-height', `${Math.round(height)}px`);
+        };
+
+        publish();
+
+        // The layout-effect measurement can land before the stylesheet and
+        // Roboto have applied, which reports a much taller header. Timers are
+        // used to correct it rather than requestAnimationFrame, because a
+        // backgrounded or non-compositing tab never runs a frame callback and
+        // the wrong value would stick there.
+        const timers = [setTimeout(publish, 0), setTimeout(publish, 300)];
+        document.fonts?.ready.then(publish).catch(() => {});
+
+        // Resize covers the breakpoint changes; the observer covers the search
+        // line wrapping, which changes the height without the window moving.
+        window.addEventListener('resize', publish);
+
+        const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(publish);
+        observer?.observe(node);
+
+        return () => {
+            timers.forEach(clearTimeout);
+            window.removeEventListener('resize', publish);
+            observer?.disconnect();
+        };
+    }, []);
+
     return (
         <>
-            <header className="sticky top-0 z-50 bg-white">
+            <header ref={headerRef} className="sticky top-0 z-50 bg-white">
                 <UtilityBar />
 
                 <PrimaryBar

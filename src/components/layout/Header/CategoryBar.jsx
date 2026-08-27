@@ -40,7 +40,11 @@ const CategoryBar = ({
 
         if (!item.panel) return undefined;
 
-        if (event.key === 'ArrowDown' || event.key === 'Enter' || event.key === ' ') {
+        // ArrowDown only ever opens. Enter and Space are deliberately left to
+        // the button's native click, which runs onTriggerToggle — preventing
+        // the default here would make them open-only, and aria-expanded
+        // promises a toggle.
+        if (event.key === 'ArrowDown') {
             event.preventDefault();
             onOpenPanel(item.id, { immediate: true });
         }
