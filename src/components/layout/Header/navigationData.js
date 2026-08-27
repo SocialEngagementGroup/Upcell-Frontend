@@ -108,7 +108,7 @@ const ASIDE_BY_FAMILY = {
 // product manifest — these are real catalogue images, not stock art, so the
 // tiles show the actual device a shopper is about to filter to. Cloudinary
 // public_ids; the URL is built at render time like every other image here.
-const MODEL_GROUP_IMAGES = {
+export const MODEL_GROUP_IMAGES = {
     'iPhone': 'upcell/products/iphone/iphone-13-base-variant-blue-59d0ab89c7--fc480107',
     'iPhone Plus': 'upcell/products/iphone/iphone-14-plus-blue-e7f73732d8--b5ba7a6e',
     'iPhone Pro': 'upcell/products/iphone/iphone-14-pro-deep-purple-ab38596d4a--0dada363',
