@@ -70,6 +70,48 @@
 
 @layer components {
     /* ---------------------------------------------------------------------
+       NEW UI — storefront header.
+       Only the handful of things Tailwind utilities cannot express: hiding a
+       scrollbar, a gradient edge fade, and re-anchoring the shared search
+       dropdown on mobile. Everything else about the header is utilities in
+       the components themselves.
+       --------------------------------------------------------------------- */
+
+    /* The category row scrolls horizontally on narrow screens; the scrollbar
+       itself is noise on a 44px-tall strip. */
+    .scrollbar-hidden {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    .scrollbar-hidden::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Sits over the right edge of that scroller so a cut-off item reads as
+       "there is more", rather than as a rendering mistake. */
+    .nav-edge-fade {
+        @apply pointer-events-none absolute inset-y-0 right-0 w-10;
+        background: linear-gradient(to right, rgba(255, 255, 255, 0), #ffffff 70%);
+    }
+
+    /* SearchWithSuggestions is shared with Admin, so its dropdown cannot be
+       changed at the source. Under the header it becomes a full-bleed overlay
+       pinned below the search line on mobile, and reverts to the shared
+       dropdown at md. `--header-suggest-top` is measured by HeaderSearch. */
+    .header-search .suggest-dropdown {
+        top: var(--header-suggest-top, 7.25rem);
+        @apply fixed left-0 right-0 mt-0 rounded-none border-x-0 md:absolute md:top-auto md:mt-2 md:rounded-[15px] md:border-x;
+    }
+
+    /* Toasts are transient and the header is not: keep them under it rather
+       than letting react-toastify's z-index 9999 cover the nav. Offset so a
+       top-center toast still lands in view instead of behind the bars. */
+    .app-toast-container {
+        @apply !z-40 !top-[124px] md:!top-[152px];
+    }
+
+    /* ---------------------------------------------------------------------
        LEGACY — kept only because non-redesigned areas still depend on it.
        Do NOT use these in new storefront UI.
          * .eyebrow / .premium-button* → src/pages/Admin

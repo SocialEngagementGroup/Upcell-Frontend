@@ -6,10 +6,11 @@ import 'react-toastify/dist/ReactToastify.css';
 import { createContext, useEffect, useState } from 'react'
 export const CartContext = createContext([])
 
-// The old Header and Footer were deleted with the rest of the previous design.
-// Rebuild them as src/components/layout/Header/HeaderComponent.jsx and
-// src/components/layout/Footer/MyFooter.jsx, then mount them around <Outlet />
-// below — the shell keeps that slot ready.
+import HeaderComponent from './components/layout/Header/HeaderComponent'
+
+// The old Footer was deleted with the rest of the previous design. Rebuild it
+// as src/components/layout/Footer/MyFooter.jsx, then mount it below <Outlet />
+// — the shell keeps that slot ready.
 function App() {
   const [cart, setCart] = useState(() => {
     const savedCart = localStorage.getItem('cart');
@@ -24,12 +25,14 @@ function App() {
     <CartContext.Provider value={{ cart, setCart }}>
       <ScrollRestoration />
       <div>
-        {/* TODO(redesign): <HeaderComponent /> */}
+        <HeaderComponent />
+        {/* No top offset: the header is sticky, so it sits in flow and does
+            not overlap what follows it. */}
         <main>
           <Outlet />
         </main>
         {/* TODO(redesign): <MyFooter /> */}
-        <ToastContainer position="top-center" autoClose={1000} />
+        <ToastContainer position="top-center" autoClose={1000} className="app-toast-container" />
       </div>
     </CartContext.Provider>
   )

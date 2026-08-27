@@ -103,6 +103,7 @@ const ShopPage = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const sortMenuRef = useRef(null);
     const productGridRef = useRef(null);
+    const pendingUrlModelsRef = useRef(null);
 
     // Suggestions are derived from the already-loaded catalog -> instant, no network call.
     const suggestions = useMemo(() => {
@@ -213,6 +214,38 @@ const ShopPage = () => {
         setSelectedModels((current) => current.filter((category) => availableCategories.includes(category)));
         setSelectedStorages((current) => current.filter((storage) => availableStorages.includes(storage)));
     }, [availableCategories, availableStorages]);
+
+    // `?q=` and `?model=` arrive from the header search box and the mega menu
+    // tiles. `?category=` keeps its own effect above, untouched.
+    useEffect(() => {
+        const queryParams = new URLSearchParams(location.search);
+
+        const nextModels = (queryParams.get('model') || '')
+            .split(',')
+            .map((value) => value.trim())
+            .filter((value) => modelGroupOrder.includes(value));
+
+        // Anything unrecognised is dropped rather than filtered on: a stale or
+        // hand-edited `?model=` should show the unfiltered shop, not an empty
+        // grid the user cannot explain.
+        pendingUrlModelsRef.current = { models: nextModels, applied: false };
+
+        setSearchQuery(queryParams.get('q')?.trim() || '');
+        setSelectedModels(nextModels);
+    }, [location.search]);
+
+    // The availability filter above runs before the catalogue has loaded, and
+    // at that point `availableCategories` is empty, so it wipes whatever the
+    // URL just asked for. Re-apply once the real categories are known — once
+    // only, so a later manual deselect sticks.
+    useEffect(() => {
+        const pending = pendingUrlModelsRef.current;
+        if (!pending || pending.applied || pending.models.length === 0) return;
+        if (!pending.models.every((model) => availableCategories.includes(model))) return;
+
+        pending.applied = true;
+        setSelectedModels(pending.models);
+    }, [availableCategories]);
 
     useEffect(() => {
         if (!sortMenuOpen) return undefined;
