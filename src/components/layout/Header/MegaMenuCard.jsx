@@ -30,7 +30,7 @@ const MegaMenuCard = ({ tile }) => (
             )}
         </span>
 
-        <span className="mt-3 block text-[15px] font-bold leading-tight text-apple-text transition-colors duration-200 ease-smooth group-hover:text-brand-red">
+        <span className="mt-3 block text-[16px] font-bold leading-tight text-apple-text transition-colors duration-200 ease-smooth group-hover:text-brand-red">
             {tile.label}
         </span>
     </Link>
