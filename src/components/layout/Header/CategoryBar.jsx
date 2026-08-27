@@ -54,7 +54,7 @@ const CategoryBar = ({
 
     return (
         <nav aria-label="Product categories" className="relative hidden bg-white md:block">
-            <div className="mx-auto max-w-site px-6 lg:px-10">
+            <div className="header-shell relative">
                 <ul className="scrollbar-hidden flex items-center gap-1 overflow-x-auto">
                     {CATEGORY_NAV.map((item, index) => {
                         const isOpen = openPanelId === item.id;
@@ -110,9 +110,12 @@ const CategoryBar = ({
                         );
                     })}
                 </ul>
-            </div>
 
-            <span aria-hidden="true" className="nav-edge-fade" />
+                {/* Inside the container, not the full-width nav: once the rows
+                    are capped at 1200px the fade has to sit at the scroller's
+                    right edge, not the viewport's. */}
+                <span aria-hidden="true" className="nav-edge-fade" />
+            </div>
         </nav>
     );
 };

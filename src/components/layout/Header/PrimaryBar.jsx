@@ -14,7 +14,7 @@ import CartButton from './CartButton';
 // logo or the cart.
 const PrimaryBar = ({ menuButtonRef, onOpenDrawer, isDrawerOpen }) => (
     <div className="border-b border-black/[0.06] bg-white">
-        <div className="mx-auto flex max-w-site flex-wrap items-center gap-x-3 px-4 pb-3 pt-0 md:flex-nowrap md:gap-x-5 md:px-6 md:pb-0 lg:gap-x-8 lg:px-10">
+        <div className="header-shell flex flex-wrap items-center gap-x-3 pb-3 pt-0 md:flex-nowrap md:gap-x-5 md:pb-0 lg:gap-x-8">
             <button
                 ref={menuButtonRef}
                 type="button"

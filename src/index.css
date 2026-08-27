@@ -77,6 +77,14 @@
        the components themselves.
        --------------------------------------------------------------------- */
 
+    /* One container governs every header row — utility, primary, category and
+       the mega-menu panel — so the links, the logo and the category strip all
+       sit on the same left edge. The navbar width lives here and nowhere
+       else: change this line to change all four rows together. */
+    .header-shell {
+        @apply mx-auto w-full max-w-[1200px] px-4 md:px-6 lg:px-8;
+    }
+
     /* The category row scrolls horizontally on narrow screens; the scrollbar
        itself is noise on a 44px-tall strip. */
     .scrollbar-hidden {

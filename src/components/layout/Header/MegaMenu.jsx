@@ -16,7 +16,7 @@ const MegaMenu = ({ panel, onPointerEnter, onPointerLeave }) => (
         onMouseEnter={onPointerEnter}
         onMouseLeave={onPointerLeave}
     >
-        <div className="mx-auto flex max-w-site gap-6 px-6 py-8 lg:gap-10 lg:px-10">
+        <div className="header-shell flex gap-6 py-8 lg:gap-10">
             <MegaMenuAside aside={panel.aside} />
 
             <div className="min-w-0 flex-1">
