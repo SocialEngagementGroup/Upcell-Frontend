@@ -155,8 +155,13 @@ const buildPanel = (family) => ({
 // Category row (row 3) — "Shop all" plus one mega-panel trigger per family
 // ---------------------------------------------------------------------------
 
+// "Great deals" leads, accented and with its own mark, as in the reference —
+// and it replaces "Shop all" rather than sitting beside it, since both would
+// land on the same page. /shop is the honest destination: UpCell has no deals
+// listing, and /promotions is the offer *terms*, not a set of products. Point
+// this at a discount filter the day the shop grows one.
 export const CATEGORY_NAV = [
-    { id: 'shop-all', label: 'Shop all', to: '/shop' },
+    { id: 'deals', label: 'Great deals', to: '/shop', accent: true },
     { id: 'iphone', label: 'iPhone', family: 'iPhone', to: shopFamilyPath('iPhone'), panel: buildPanel('iPhone') },
     { id: 'ipad', label: 'iPad', family: 'iPad', to: shopFamilyPath('iPad'), panel: buildPanel('iPad') },
     { id: 'macbook', label: 'MacBook', family: 'MacBook', to: shopFamilyPath('MacBook'), panel: buildPanel('MacBook') },

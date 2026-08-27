@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
 
 import { CATEGORY_NAV } from './navigationData';
 
@@ -68,8 +69,11 @@ const CategoryBar = ({
                                         to={item.to}
                                         onKeyDown={(event) => handleKeyDown(event, index, item)}
                                         onMouseEnter={() => onClosePanel({ immediate: true })}
-                                        className={`${sharedClass} text-apple-text hover:bg-apple-bg`}
+                                        className={`${sharedClass} ${item.accent ? 'font-bold text-brand-red hover:bg-brand-red/[0.08]' : 'text-apple-text hover:bg-apple-bg'}`}
                                     >
+                                        {item.accent && (
+                                            <AutoAwesomeRoundedIcon aria-hidden="true" className="!text-[17px]" />
+                                        )}
                                         {item.label}
                                     </Link>
                                 </li>

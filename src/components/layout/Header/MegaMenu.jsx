@@ -23,7 +23,10 @@ const MegaMenu = ({ panel, onPointerEnter, onPointerLeave }) => (
         <div className="flex items-stretch">
             <MegaMenuAside aside={panel.aside} />
 
-            <div className="min-w-0 flex-1 px-6 py-7 lg:px-10 lg:py-8">
+            {/* No left padding: the rail's column is always at least 32px
+                wider than its grey band, so that difference is the gutter.
+                Adding padding here would push the grid off the logo's line. */}
+            <div className="mega-main min-w-0 flex-1 py-7 lg:py-8">
                 <div className="flex items-baseline justify-between gap-4">
                     <p className="text-[16px] font-medium text-ink-soft">
                         {panel.heading}
@@ -37,11 +40,11 @@ const MegaMenu = ({ panel, onPointerEnter, onPointerLeave }) => (
                     </Link>
                 </div>
 
-                {/* The cap is sized so a four-group family fills the row at
-                    1440 rather than trailing off into dead space, while
-                    auto-fill still stops MacBook's two tiles from stretching
-                    to twice the width of iPhone's four. */}
-                <div className="mt-5 grid grid-cols-[repeat(auto-fill,minmax(200px,250px))] gap-x-5 gap-y-6">
+                {/* A fixed four, not auto-fill. Every panel now carries four
+                    tiles, and auto-fill was sizing tracks off the maximum —
+                    which left a fifth empty track and 552px of dead space at
+                    1920. Four columns simply divide whatever the row is. */}
+                <div className="mt-5 grid grid-cols-2 gap-x-5 gap-y-6 lg:grid-cols-4">
                     {panel.tiles.map((tile) => (
                         <MegaMenuCard key={tile.to} tile={tile} />
                     ))}

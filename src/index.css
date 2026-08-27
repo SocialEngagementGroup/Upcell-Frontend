@@ -85,6 +85,23 @@
         @apply mx-auto w-full max-w-[1200px] px-4 md:px-6 lg:px-8;
     }
 
+    /* The mega panel's promo rail bleeds to the viewport's left edge, but its
+       COLUMN widens with the viewport so the grid beside it begins exactly
+       under the logo — the same 1200px container edge every row above uses.
+       The grey band inside stays a fixed width, which leaves the white gutter
+       between rail and grid that the reference has. Below that width the
+       column falls back to its minimum and the grid simply follows it. */
+    .mega-rail {
+        width: max(300px, calc(50vw - 600px + 2rem));
+    }
+
+    /* And it stops at the container's right edge, so the last tile lines up
+       with the cart icon rather than running on toward the viewport. Without
+       this the grid sprawled: 552px of dead space at 1920. */
+    .mega-main {
+        padding-right: max(2.5rem, calc(50vw - 600px + 2rem));
+    }
+
     /* The category row scrolls horizontally on narrow screens; the scrollbar
        itself is noise on a 44px-tall strip. */
     .scrollbar-hidden {
