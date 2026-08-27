@@ -21,7 +21,7 @@ const UtilityBar = () => (
                         <li key={link.label}>
                             <Link
                                 to={link.to}
-                                className="flex items-center gap-1.5 rounded-full px-3 py-1 text-[14px] font-bold text-apple-text outline-none transition-colors duration-200 ease-smooth hover:text-brand-red focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-1 focus-visible:ring-offset-white [&_svg]:!text-[16px]"
+                                className="flex items-center gap-1.5 rounded-full px-3 py-1 text-[0.75rem] font-bold text-apple-text underline-offset-4 outline-none transition-colors duration-200 ease-smooth hover:text-brand-red hover:underline focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-1 focus-visible:ring-offset-white [&_svg]:!text-[16px]"
                             >
                                 {link.withShield && <VerifiedUserOutlinedIcon aria-hidden="true" />}
                                 {link.label}

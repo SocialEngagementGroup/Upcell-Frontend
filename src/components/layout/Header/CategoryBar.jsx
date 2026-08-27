@@ -58,7 +58,12 @@ const CategoryBar = ({
                 <ul className="scrollbar-hidden flex items-center gap-1 overflow-x-auto">
                     {CATEGORY_NAV.map((item, index) => {
                         const isOpen = openPanelId === item.id;
-                        const sharedClass = 'flex h-11 shrink-0 items-center gap-1 whitespace-nowrap rounded-full px-4 text-[15px] font-medium outline-none transition-colors duration-200 ease-smooth focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-1 focus-visible:ring-offset-white';
+                        // A 3px rule under the item rather than a pill: it is the indicator the
+                        // reference uses. border-solid is explicit because the locked base
+                        // layer sets `button { border-none }`, which would otherwise collapse
+                        // the width to zero. Carried transparent at rest so hover never
+                        // shifts the row by three pixels.
+                        const sharedClass = 'flex h-11 shrink-0 items-center gap-1.5 whitespace-nowrap border-b-[3px] border-solid px-3 text-[0.875rem] font-medium outline-none transition-colors duration-200 ease-smooth focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-1 focus-visible:ring-offset-white';
 
                         if (!item.panel) {
                             return (
@@ -68,7 +73,7 @@ const CategoryBar = ({
                                         to={item.to}
                                         onKeyDown={(event) => handleKeyDown(event, index, item)}
                                         onMouseEnter={() => onClosePanel({ immediate: true })}
-                                        className={`${sharedClass} ${item.accent ? 'font-bold text-brand-red hover:bg-brand-red/[0.08]' : 'text-apple-text hover:bg-apple-bg'}`}
+                                        className={`${sharedClass} ${item.accent ? 'font-bold text-brand-red' : 'text-apple-text'} border-transparent hover:border-brand-red`}
                                     >
                                         {item.accent && (
                                             <AutoAwesomeRoundedIcon aria-hidden="true" className="!text-[17px]" />
@@ -101,7 +106,7 @@ const CategoryBar = ({
                                         }
                                     }}
                                     onKeyDown={(event) => handleKeyDown(event, index, item)}
-                                    className={`${sharedClass} ${isOpen ? 'bg-apple-bg text-apple-text' : 'text-apple-text hover:bg-apple-bg'}`}
+                                    className={`${sharedClass} ${isOpen ? 'border-brand-red' : 'border-transparent hover:border-brand-red'} text-apple-text`}
                                 >
                                     {item.label}
                                 </button>

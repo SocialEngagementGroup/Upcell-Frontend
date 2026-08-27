@@ -153,7 +153,7 @@ const HeaderSearch = ({ className = '' }) => {
                 minChars={MIN_CHARS}
                 onSelect={(suggestion) => navigate(`/iphone/${suggestion.parentCatagory}/${suggestion._id}`)}
                 getSuggestionKey={(suggestion) => suggestion._id}
-                inputClassName="!h-11 !text-[14px] !font-medium placeholder:!text-transparent md:!h-10"
+                inputClassName="!h-11 !border-transparent !bg-surface-alt !text-[14px] !font-medium placeholder:!text-transparent md:!h-10"
                 renderSuggestion={(suggestion, focused) => (
                     <>
                         <span className={`min-w-0 flex-1 truncate text-[13px] font-bold ${focused ? 'text-white' : 'text-apple-text'}`}>

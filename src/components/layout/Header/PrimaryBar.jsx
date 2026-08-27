@@ -69,7 +69,7 @@ const PrimaryBar = ({ menuButtonRef, onOpenDrawer, isDrawerOpen }) => (
                     <Link
                         key={link.label}
                         to={link.to}
-                        className="hidden h-10 items-center rounded-full px-3 text-[14px] font-bold text-apple-text outline-none transition-colors duration-200 ease-smooth hover:text-brand-red focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 focus-visible:ring-offset-white lg:inline-flex"
+                        className="hidden h-10 items-center rounded-full px-3 text-[14px] font-bold text-apple-text underline-offset-4 outline-none transition-colors duration-200 ease-smooth hover:text-brand-red hover:underline focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 focus-visible:ring-offset-white lg:inline-flex"
                     >
                         {link.label}
                     </Link>
