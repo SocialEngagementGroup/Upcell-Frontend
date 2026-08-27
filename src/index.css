@@ -102,6 +102,13 @@
         padding-right: max(2.5rem, calc(50vw - 600px + 2rem));
     }
 
+    /* One hero slide is mounted at a time and re-keyed on change, so the fade
+       runs on mount. Reduced motion is handled in the component, which stops
+       autoplay outright rather than only softening it. */
+    .hero-fade {
+        animation: heroFade 450ms theme('transitionTimingFunction.smooth') both;
+    }
+
     /* The category row scrolls horizontally on narrow screens; the scrollbar
        itself is noise on a 44px-tall strip. */
     .scrollbar-hidden {
@@ -275,6 +282,15 @@
 /* LEGACY — search suggestions dropdown.
    Kept because SearchWithSuggestions is shared with Admin Products and
    Admin Categories (src/pages/Admin), not storefront-only. */
+@keyframes heroFade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hero-fade { animation: none; }
+}
+
 @keyframes gradientReveal {
     from { background-position: 100% 0; }
     to { background-position: 0 0; }
