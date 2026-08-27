@@ -107,9 +107,31 @@
        changed at the source. Under the header it becomes a full-bleed overlay
        pinned below the search line on mobile, and reverts to the shared
        dropdown at md. `--header-suggest-top` is measured by HeaderSearch. */
-    .header-search .suggest-dropdown {
+    .header-search .suggest-dropdown,
+    .header-search .popular-panel {
         top: var(--header-suggest-top, 7.25rem);
         @apply fixed left-0 right-0 mt-0 rounded-none border-x-0 md:absolute md:top-auto md:mt-2 md:rounded-[15px] md:border-x;
+    }
+
+    /* The resting placeholder's trailing word cycles on a timer and sweeps in
+       rather than blinking. background-clip: text paints the gradient onto the
+       glyphs themselves, and the gradient runs from transparent through brand
+       red into the body ink, so the word arrives coloured and settles dark. */
+    .gradient-reveal {
+        background-image: linear-gradient(
+            to left,
+            transparent 0%,
+            transparent 33%,
+            theme('colors.brand-red') 50%,
+            theme('colors.apple-text') 66%,
+            theme('colors.apple-text') 100%
+        );
+        background-size: 300% 100%;
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        -webkit-text-fill-color: transparent;
+        animation: gradientReveal 900ms theme('transitionTimingFunction.smooth') both;
     }
 
     /* A top-center toast would otherwise open behind the sticky header. Push
@@ -236,6 +258,21 @@
 /* LEGACY — search suggestions dropdown.
    Kept because SearchWithSuggestions is shared with Admin Products and
    Admin Categories (src/pages/Admin), not storefront-only. */
+@keyframes gradientReveal {
+    from { background-position: 100% 0; }
+    to { background-position: 0 0; }
+}
+
+/* Reduced motion still needs a readable word — just not an animated one. */
+@media (prefers-reduced-motion: reduce) {
+    .gradient-reveal {
+        animation: none;
+        background-image: none;
+        color: #0c0c0c;
+        -webkit-text-fill-color: currentColor;
+    }
+}
+
 @keyframes suggestReveal {
     from { opacity: 0; transform: translateY(-6px) scale(0.985); }
     to { opacity: 1; transform: translateY(0) scale(1); }

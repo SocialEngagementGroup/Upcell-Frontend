@@ -88,13 +88,31 @@ const GOOD_TO_KNOW = [
     },
 ];
 
+// One representative shot per model group, picked out of the generated
+// product manifest — these are real catalogue images, not stock art, so the
+// tiles show the actual device a shopper is about to filter to. Cloudinary
+// public_ids; the URL is built at render time like every other image here.
+const MODEL_GROUP_IMAGES = {
+    'iPhone': 'upcell/products/iphone/iphone-13-base-variant-blue-59d0ab89c7--fc480107',
+    'iPhone Plus': 'upcell/products/iphone/iphone-14-plus-blue-e7f73732d8--b5ba7a6e',
+    'iPhone Pro': 'upcell/products/iphone/iphone-14-pro-deep-purple-ab38596d4a--0dada363',
+    'iPhone Pro Max': 'upcell/products/iphone/iphone-17-pro-max-cosmic-orange-05086f1--20d2d38a',
+    'iPad': 'upcell/products/ipad/ipad-11th-gen-61ces1mvlhl-ac-sl1500-6af70e90d8--5d783728',
+    'iPad mini': 'upcell/products/ipad/ipad-mini-7th-gen-blue-61qza-d1jcl-ac--3e09eb2b',
+    'iPad Air': 'upcell/products/ipad/ipad-air-4th-gen-green-71z4o1tak-l-ac--64dc0e79',
+    'iPad Pro': 'upcell/products/ipad/ipad-11th-gen-pro-11-13-m5-silver--922cfe75',
+    'MacBook Air': 'upcell/products/macbook/macbook-air-13-m1-silver-2-55576b3889--cf41d438',
+    'MacBook Pro': 'upcell/products/macbook/macbook-mackbook-pro-m2-13-14-silver-61zsd7--b804f339',
+};
+
 const buildPanel = (family) => ({
     id: `header-panel-${family.toLowerCase()}`,
-    heading: `Shop ${family}`,
-    seeAll: { label: `See all ${family}`, to: shopFamilyPath(family) },
+    heading: 'Categories',
+    seeAll: { label: 'See all', to: shopFamilyPath(family) },
     tiles: MODEL_GROUPS_BY_FAMILY[family].map((modelGroup) => ({
         label: modelGroup,
         copy: MODEL_GROUP_BLURBS[modelGroup] || '',
+        image: MODEL_GROUP_IMAGES[modelGroup] || '',
         to: shopModelPath(family, modelGroup),
     })),
     aside: {
@@ -155,6 +173,22 @@ export const TRADE_IN_LINK = { label: 'Trade in', to: '/trade-in' };
 // inquiries clause in PrivacyPolicy.jsx and the admin Wholesale inbox). It
 // therefore shares a destination with "Need help?" until a wholesale page
 // exists — change the `to` here the day one does.
+// Shown the moment the search field takes focus, before anything is typed.
+// "Shop all devices" rather than the reference's "Shop all deals": UpCell has
+// no deals listing, and a label promising one would be a lie.
+export const POPULAR_SEARCHES = [
+    { label: 'iPhone', to: shopFamilyPath('iPhone') },
+    { label: 'iPad', to: shopFamilyPath('iPad') },
+    { label: 'MacBook', to: shopFamilyPath('MacBook') },
+    { label: 'Trade in your tech', to: '/trade-in' },
+    { label: 'Shop all devices', to: '/shop' },
+];
+
+// The trailing word of the resting placeholder, cycled on a timer.
+export const SEARCH_PLACEHOLDER_WORDS = ['iPhone', 'iPad', 'MacBook'];
+
+export const SEARCH_PLACEHOLDER_INTERVAL = 3000;
+
 export const MAIN_ROW_LINKS = [
     { label: 'Need help?', to: '/support' },
     { label: 'For business', to: '/support' },

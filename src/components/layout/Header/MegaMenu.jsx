@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
 
 import MegaMenuCard from './MegaMenuCard';
 import MegaMenuAside from './MegaMenuAside';
@@ -7,6 +6,11 @@ import MegaMenuAside from './MegaMenuAside';
 // The hover panel. Rendered inside the sticky header so it can be full-bleed
 // under the bars without measuring anything, and so it inherits the header's
 // stacking context — the scrim that dims the page sits between the two.
+//
+// Deliberately NOT inside .header-shell: the other three rows are capped at
+// 1200px, but this panel spans the viewport, with the promo rail running to
+// the left edge exactly as in the reference. Capping it here would leave the
+// rail floating in the middle of a white band.
 const MegaMenu = ({ panel, onPointerEnter, onPointerLeave }) => (
     <div
         id={panel.id}
@@ -16,31 +20,28 @@ const MegaMenu = ({ panel, onPointerEnter, onPointerLeave }) => (
         onMouseEnter={onPointerEnter}
         onMouseLeave={onPointerLeave}
     >
-        <div className="header-shell flex gap-6 py-8 lg:gap-10">
+        <div className="flex items-stretch">
             <MegaMenuAside aside={panel.aside} />
 
-            <div className="min-w-0 flex-1">
+            <div className="min-w-0 flex-1 px-6 py-7 lg:px-10 lg:py-8">
                 <div className="flex items-baseline justify-between gap-4">
-                    <p className="text-[18px] font-bold tracking-tight text-apple-text">
+                    <p className="text-[15px] font-medium text-ink-soft">
                         {panel.heading}
                     </p>
 
                     <Link
                         to={panel.seeAll.to}
-                        className="group flex shrink-0 items-center gap-1 rounded-full text-[13px] font-bold text-brand-red outline-none transition-colors duration-200 ease-smooth hover:text-[#b00a0d] focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+                        className="shrink-0 rounded-sm text-[14px] font-bold text-apple-text underline underline-offset-4 outline-none transition-colors duration-200 ease-smooth hover:text-brand-red focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 focus-visible:ring-offset-white"
                     >
                         {panel.seeAll.label}
-                        <ArrowForwardRoundedIcon
-                            aria-hidden="true"
-                            className="!text-[16px] transition-transform duration-200 ease-smooth group-hover:translate-x-0.5"
-                        />
                     </Link>
                 </div>
 
-                {/* auto-fill with a capped track, not 1fr: MacBook has two
-                    model groups and iPhone has four, and stretched tiles would
-                    make the two panels look like different components. */}
-                <div className="mt-5 grid grid-cols-[repeat(auto-fill,minmax(200px,220px))] gap-3">
+                {/* Five across at lg, as in the reference. auto-fill with a
+                    capped track rather than 1fr: MacBook has two model groups
+                    and iPhone has four, and stretching two tiles across the
+                    full width would make the panels look unrelated. */}
+                <div className="mt-5 grid grid-cols-[repeat(auto-fill,minmax(180px,236px))] gap-x-5 gap-y-6">
                     {panel.tiles.map((tile) => (
                         <MegaMenuCard key={tile.to} tile={tile} />
                     ))}

@@ -5,7 +5,12 @@ import SearchWithSuggestions from '../../../components/SearchWithSuggestions/Sea
 import { useProductsQuery } from '../../../queries/products';
 import { EMPTY_ARRAY } from '../../../queries/keys';
 import useDebouncedValue from '../../../utilities/useDebouncedValue';
-import { shopSearchPath } from './navigationData';
+import {
+    POPULAR_SEARCHES,
+    SEARCH_PLACEHOLDER_INTERVAL,
+    SEARCH_PLACEHOLDER_WORDS,
+    shopSearchPath,
+} from './navigationData';
 
 const MIN_CHARS = 2;
 const MAX_SUGGESTIONS = 8;
@@ -17,8 +22,26 @@ const MAX_SUGGESTIONS = 8;
 const HeaderSearch = ({ className = '' }) => {
     const navigate = useNavigate();
     const [term, setTerm] = useState('');
+    const [isFocused, setIsFocused] = useState(false);
+    const [wordIndex, setWordIndex] = useState(0);
     const debouncedTerm = useDebouncedValue(term, 250);
     const wrapRef = useRef(null);
+
+    // The resting placeholder is an overlay, not the input's own placeholder
+    // text, because a placeholder attribute cannot be animated. The real
+    // placeholder stays set for the accessible name and is painted
+    // transparent. Both are hidden the moment the field is used.
+    const showPlaceholder = !isFocused && term === '';
+    const showPopular = isFocused && term.trim() === '';
+
+    useEffect(() => {
+        if (!showPlaceholder) return undefined;
+        const id = setInterval(
+            () => setWordIndex((current) => (current + 1) % SEARCH_PLACEHOLDER_WORDS.length),
+            SEARCH_PLACEHOLDER_INTERVAL,
+        );
+        return () => clearInterval(id);
+    }, [showPlaceholder]);
 
     const trimmed = debouncedTerm.trim();
     const shouldSearch = trimmed.length >= MIN_CHARS;
@@ -99,13 +122,23 @@ const HeaderSearch = ({ className = '' }) => {
         navigate(shopSearchPath(query));
     };
 
+    // focus/blur bubble, so one pair on the form covers the input and every
+    // button inside the panel. The relatedTarget check keeps the panel open
+    // while focus moves between them.
+    const handleBlur = (event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setIsFocused(false);
+    };
+
     return (
         <form
             role="search"
             aria-label="Search products"
             onSubmit={handleSubmit}
+            onFocus={() => setIsFocused(true)}
+            onBlur={handleBlur}
+            onKeyDown={(event) => { if (event.key === 'Escape') setIsFocused(false); }}
             ref={wrapRef}
-            className={`header-search ${className}`}
+            className={`header-search relative ${className}`}
         >
             {/* No wrapping <label>: SearchWithSuggestions renders its
                 suggestion list as sibling <button>s, and a label would forward
@@ -120,7 +153,7 @@ const HeaderSearch = ({ className = '' }) => {
                 minChars={MIN_CHARS}
                 onSelect={(suggestion) => navigate(`/iphone/${suggestion.parentCatagory}/${suggestion._id}`)}
                 getSuggestionKey={(suggestion) => suggestion._id}
-                inputClassName="!h-11 !text-[14px] !font-medium md:!h-10"
+                inputClassName="!h-11 !text-[14px] !font-medium placeholder:!text-transparent md:!h-10"
                 renderSuggestion={(suggestion, focused) => (
                     <>
                         <span className={`min-w-0 flex-1 truncate text-[13px] font-bold ${focused ? 'text-white' : 'text-apple-text'}`}>
@@ -132,6 +165,45 @@ const HeaderSearch = ({ className = '' }) => {
                     </>
                 )}
             />
+
+            {showPlaceholder && (
+                <span
+                    aria-hidden="true"
+                    className="pointer-events-none absolute left-12 top-1/2 z-10 flex -translate-y-1/2 items-center gap-1.5 whitespace-nowrap text-[14px] font-medium text-apple-gray"
+                >
+                    Search for
+                    {/* The key restarts the sweep each time the word changes. */}
+                    <span key={wordIndex} className="gradient-reveal font-bold">
+                        {SEARCH_PLACEHOLDER_WORDS[wordIndex]}
+                    </span>
+                </span>
+            )}
+
+            {showPopular && (
+                <div className="popular-panel absolute left-0 right-0 z-30 overflow-hidden border border-black/10 bg-white shadow-[0_24px_60px_rgba(15,23,42,0.16)]">
+                    <p id="header-popular-label" className="px-4 pt-4 text-[13px] font-medium text-apple-gray">
+                        Popular searches
+                    </p>
+                    <ul aria-labelledby="header-popular-label" className="py-2">
+                        {POPULAR_SEARCHES.map((item) => (
+                            <li key={item.label}>
+                                {/* onMouseDown is where the navigation is
+                                    cancelled from: without it the field blurs
+                                    on press, the panel unmounts, and the click
+                                    never lands on anything. */}
+                                <button
+                                    type="button"
+                                    onMouseDown={(event) => event.preventDefault()}
+                                    onClick={() => { setIsFocused(false); navigate(item.to); }}
+                                    className="flex min-h-[44px] w-full items-center px-4 text-left text-[15px] font-bold text-apple-text outline-none transition-colors duration-200 ease-smooth hover:bg-apple-bg focus-visible:bg-apple-bg"
+                                >
+                                    {item.label}
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
 
             {/* An explicit submit button so Enter reliably runs the search.
                 Implicit submission on a lone type="search" field is not

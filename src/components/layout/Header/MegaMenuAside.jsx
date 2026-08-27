@@ -1,38 +1,56 @@
 import { Link } from 'react-router-dom';
-import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
+import AutorenewRoundedIcon from '@mui/icons-material/AutorenewRounded';
+import LocalShippingOutlinedIcon from '@mui/icons-material/LocalShippingOutlined';
+import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 
 // The promo rail down the left of the panel. It answers the questions that
 // stop a refurb purchase — what happens to my old device, when does it arrive,
 // what if it is wrong — next to the products rather than three clicks away.
+//
+// Runs to the viewport's left edge and stretches to the panel's full height,
+// which is what gives the menu the two-band look of the reference rather than
+// a card floating on white.
+const ICONS = {
+    '/trade-in': AutorenewRoundedIcon,
+    '/delivery-policy': LocalShippingOutlinedIcon,
+    '/return-policy': VerifiedUserOutlinedIcon,
+};
+
 const MegaMenuAside = ({ aside }) => {
     if (!aside) return null;
 
     return (
-        <aside className="w-[200px] shrink-0 rounded-2xl bg-surface-alt p-5 lg:w-[220px]">
-            <h2 className="text-[11px] font-bold uppercase tracking-[0.16em] text-apple-gray">
+        <aside className="w-[240px] shrink-0 bg-surface-alt px-6 py-7 lg:w-[268px] lg:py-8">
+            <h2 className="text-[15px] font-medium text-ink-soft">
                 {aside.heading}
             </h2>
 
-            <ul className="mt-4 space-y-1">
-                {aside.items.map((item) => (
-                    <li key={item.to}>
-                        <Link
-                            to={item.to}
-                            className="group -mx-2 block rounded-xl px-2 py-2 outline-none transition-colors duration-200 ease-smooth hover:bg-white focus-visible:ring-2 focus-visible:ring-brand-red"
-                        >
-                            <span className="flex items-center gap-1 text-[13px] font-bold text-apple-text">
-                                {item.title}
-                                <ChevronRightRoundedIcon
-                                    aria-hidden="true"
-                                    className="!text-[16px] text-apple-gray transition-transform duration-200 ease-smooth group-hover:translate-x-0.5 group-hover:text-brand-red"
-                                />
-                            </span>
-                            <span className="mt-0.5 block text-[12px] font-normal leading-snug text-apple-gray">
-                                {item.copy}
-                            </span>
-                        </Link>
-                    </li>
-                ))}
+            <ul className="mt-5 space-y-2">
+                {aside.items.map((item) => {
+                    const Icon = ICONS[item.to] || VerifiedUserOutlinedIcon;
+
+                    return (
+                        <li key={item.to}>
+                            <Link
+                                to={item.to}
+                                className="group -mx-2 flex items-start gap-3 rounded-xl px-2 py-2 outline-none transition-colors duration-200 ease-smooth hover:bg-white focus-visible:ring-2 focus-visible:ring-brand-red"
+                            >
+                                <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-apple-text transition-colors duration-200 ease-smooth group-hover:text-brand-red [&_svg]:!text-[20px]">
+                                    <Icon aria-hidden="true" />
+                                </span>
+
+                                <span className="min-w-0">
+                                    <span className="block text-[13px] font-bold leading-tight text-apple-text">
+                                        {item.title}
+                                    </span>
+                                    <span className="mt-1 block text-[12px] font-normal leading-snug text-apple-gray">
+                                        {item.copy}
+                                    </span>
+                                </span>
+                            </Link>
+                        </li>
+                    );
+                })}
             </ul>
         </aside>
     );
