@@ -9,7 +9,8 @@ const Home = () => {
     return (
         <div>
             <ScrollToTop />
-            {/* TODO(redesign): build the new home page sections here. */}
+            {/* TODO(redesign): replace this placeholder with the new home page sections. */}
+            <h1>hello world</h1>
         </div>
     );
 };
