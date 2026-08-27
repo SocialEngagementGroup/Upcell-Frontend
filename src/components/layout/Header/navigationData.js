@@ -59,8 +59,6 @@ export const UTILITY_LINKS = [
     { label: 'Return Policy', to: '/return-policy' },
 ];
 
-export const UTILITY_TAGLINE = 'Certified pre-owned Apple, graded and tested.';
-
 // ---------------------------------------------------------------------------
 // Mega menu asides ("Good to know")
 // ---------------------------------------------------------------------------
