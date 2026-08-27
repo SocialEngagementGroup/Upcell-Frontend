@@ -58,7 +58,7 @@ const AccountMenu = () => {
                 aria-controls={MENU_ID}
                 aria-label="Account menu"
                 onClick={() => setIsOpen((open) => !open)}
-                className="flex h-11 items-center rounded-full px-2.5 text-apple-text outline-none transition-colors duration-200 ease-smooth hover:bg-black/[0.05] focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 focus-visible:ring-offset-white [&_svg]:!text-[22px]"
+                className="flex h-11 items-center rounded-full px-2 md:h-12 md:px-3 text-apple-text outline-none transition-colors duration-200 ease-smooth hover:bg-black/[0.05] focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 focus-visible:ring-offset-white [&_svg]:!text-[26px]"
             >
                 <PersonOutlineIcon aria-hidden="true" />
             </button>

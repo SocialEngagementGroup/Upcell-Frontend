@@ -176,11 +176,51 @@ const buildPanel = (family) => ({
 // land on the same page. /shop is the honest destination: UpCell has no deals
 // listing, and /promotions is the offer *terms*, not a set of products. Point
 // this at a discount filter the day the shop grows one.
+// The "More" panel: every model group that does not have its own entry in the
+// row above, so nothing in the catalogue is more than two clicks away. Built
+// from the same art map and the same ?model= filter as the family panels.
+const MORE_MODEL_GROUPS = [
+    ['iPhone', 'iPhone Plus'],
+    ['iPhone', 'iPhone Pro Max'],
+    ['iPad', 'iPad mini'],
+    ['iPad', 'iPad Air'],
+    ['iPad', 'iPad Pro'],
+    ['MacBook', 'MacBook Pro'],
+];
+
+const MORE_PANEL = {
+    id: 'header-panel-more',
+    heading: 'More models',
+    seeAll: { label: 'See all', to: '/shop' },
+    tiles: MORE_MODEL_GROUPS.map(([family, modelGroup]) => ({
+        label: modelGroup,
+        copy: MODEL_GROUP_BLURBS[modelGroup] || '',
+        image: MODEL_GROUP_IMAGES[modelGroup] || '',
+        to: shopModelPath(family, modelGroup),
+    })),
+    aside: {
+        heading: 'Good to know',
+        items: [GOOD_TO_KNOW.tradeIn, GOOD_TO_KNOW.returns],
+    },
+};
+
+// Eight entries, "More" last, as in the reference.
+//
+// UpCell sells three families, not the reference's ten, so entries 5 and 6 are
+// the two best-selling model groups rather than invented categories — they use
+// the same ?model= filter the mega-menu tiles do, and they resolve. Nothing
+// here repeats a destination already in the utility row above.
 export const CATEGORY_NAV = [
     { id: 'deals', label: 'Great deals', to: '/shop', accent: true },
     { id: 'iphone', label: 'iPhone', family: 'iPhone', to: shopFamilyPath('iPhone'), panel: buildPanel('iPhone') },
     { id: 'ipad', label: 'iPad', family: 'iPad', to: shopFamilyPath('iPad'), panel: buildPanel('iPad') },
     { id: 'macbook', label: 'MacBook', family: 'MacBook', to: shopFamilyPath('MacBook'), panel: buildPanel('MacBook') },
+    { id: 'iphone-pro', label: 'iPhone Pro', to: shopModelPath('iPhone', 'iPhone Pro') },
+    { id: 'macbook-air', label: 'MacBook Air', to: shopModelPath('MacBook', 'MacBook Air') },
+    { id: 'trade-in', label: 'Trade in', to: '/trade-in' },
+    // No `to`: an entry with a panel renders as a button, not a link, so a
+    // path here would be dead data. Its panel's "See all" is the way out.
+    { id: 'more', label: 'More', panel: MORE_PANEL },
 ];
 
 // ---------------------------------------------------------------------------
@@ -189,6 +229,7 @@ export const CATEGORY_NAV = [
 
 export const DRAWER_PRIMARY_LINKS = [
     { label: 'Shop', to: '/shop' },
+    { label: '"Obsolete"', to: '/shop' },
     { label: 'Trade in', to: '/trade-in' },
 ];
 
@@ -232,7 +273,7 @@ export const POPULAR_SEARCHES = [
     { label: 'iPad', to: shopFamilyPath('iPad') },
     { label: 'MacBook', to: shopFamilyPath('MacBook') },
     { label: 'Trade in your tech', to: '/trade-in' },
-    { label: 'Shop all devices', to: '/shop' },
+    { label: 'Shop all deals', to: '/shop' },
 ];
 
 // The trailing word of the resting placeholder, cycled on a timer.

@@ -1,46 +1,106 @@
-import { useLayoutEffect, useRef } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import UtilityBar from './UtilityBar';
 import PrimaryBar from './PrimaryBar';
 import CategoryBar from './CategoryBar';
 import MegaMenu from './MegaMenu';
 import MobileDrawer from './MobileDrawer';
+import SearchMegaPanel from './SearchMegaPanel';
 import useHeaderNav from './useHeaderNav';
 import { CATEGORY_NAV } from './navigationData';
+import { useProductsQuery } from '../../../queries/products';
+import { EMPTY_ARRAY } from '../../../queries/keys';
+import useDebouncedValue from '../../../utilities/useDebouncedValue';
 
-// Storefront header: a sticky three-row shell.
+const MIN_CHARS = 2;
+const MAX_SUGGESTIONS = 8;
+
+// Storefront header: a sticky three-row shell with integrated search mega-panel.
 //
 //   row 1  utility links          md and up, 32px
 //   row 2  logo / search / actions  56 -> 64 -> 72px
-//   row 3  categories + mega menu  md and up
-//
-// Below md rows 1 and 3 collapse into the drawer and the search moves onto its
-// own line under row 2.
+//   row 3  categories + mega menu (or SearchMegaPanel when search is active)
 //
 // The header is sticky rather than fixed, so it occupies flow space and the
-// page below needs no compensating top padding — the reason <main> in App.jsx
-// is left alone.
+// page below needs no compensating top padding. When search opens, the header
+// expands downward naturally, shifting the hero down smoothly in normal flow.
 const HeaderComponent = () => {
+    const headerRef = useRef(null);
+    const searchInputRef = useRef(null);
+    const navigate = useNavigate();
+
     const {
         openPanelId,
         isDrawerOpen,
+        isSearchOpen,
         navRef,
         menuButtonRef,
+        openSearch,
+        closeSearch,
         openPanel,
         closePanel,
         togglePanel,
         registerTrigger,
         openDrawer,
         closeDrawer,
-    } = useHeaderNav();
+    } = useHeaderNav({ headerRef });
 
-    const activeItem = CATEGORY_NAV.find((item) => item.id === openPanelId && item.panel);
+    const [searchTerm, setSearchTerm] = useState('');
+    const debouncedTerm = useDebouncedValue(searchTerm, 250);
 
-    // Publish the rendered header height so anything that has to clear the
-    // bars can read it instead of hardcoding one. Currently that is the toast
-    // container in index.css. Measured rather than assumed, because the height
-    // changes across two breakpoints and again when the search line wraps.
-    const headerRef = useRef(null);
+    const activeItem = !isSearchOpen && CATEGORY_NAV.find((item) => item.id === openPanelId && item.panel);
+
+    const trimmed = debouncedTerm.trim();
+    const shouldSearch = trimmed.length >= MIN_CHARS;
+
+    const { data: products = EMPTY_ARRAY, isFetching } = useProductsQuery({
+        enabled: shouldSearch,
+    });
+
+    const suggestions = useMemo(() => {
+        if (!shouldSearch) return EMPTY_ARRAY;
+
+        const needle = trimmed.toLowerCase();
+        const byParent = new Map();
+
+        for (const product of products) {
+            const name = (product.productName || '').toLowerCase();
+            const category = (product.categoryName || '').toLowerCase();
+            if (!name.includes(needle) && !category.includes(needle)) continue;
+
+            const key = String(product.parentCatagory || product.parentId || '');
+            if (!key) continue;
+
+            const existing = byParent.get(key);
+            if (!existing) {
+                byParent.set(key, product);
+                continue;
+            }
+
+            const isBetter = (!product.outOfStock && existing.outOfStock)
+                || (product.outOfStock === existing.outOfStock
+                    && Number(product.price || 0) < Number(existing.price || 0));
+
+            if (isBetter) byParent.set(key, product);
+        }
+
+        return Array.from(byParent.values())
+            .sort((left, right) => Number(left.price || 0) - Number(right.price || 0))
+            .slice(0, MAX_SUGGESTIONS)
+            .map((product) => ({
+                _id: product._id,
+                parentCatagory: product.parentCatagory || product.parentId,
+                productName: product.productName,
+                categoryName: product.categoryName,
+                price: product.price,
+            }));
+    }, [products, shouldSearch, trimmed]);
+
+    const handleSelectSuggestion = (suggestion) => {
+        closeSearch();
+        navigate(`/iphone/${suggestion.parentCatagory}/${suggestion._id}`);
+    };
 
     useLayoutEffect(() => {
         const node = headerRef.current;
@@ -54,16 +114,9 @@ const HeaderComponent = () => {
 
         publish();
 
-        // The layout-effect measurement can land before the stylesheet and
-        // Roboto have applied, which reports a much taller header. Timers are
-        // used to correct it rather than requestAnimationFrame, because a
-        // backgrounded or non-compositing tab never runs a frame callback and
-        // the wrong value would stick there.
         const timers = [setTimeout(publish, 0), setTimeout(publish, 300)];
         document.fonts?.ready.then(publish).catch(() => {});
 
-        // Resize covers the breakpoint changes; the observer covers the search
-        // line wrapping, which changes the height without the window moving.
         window.addEventListener('resize', publish);
 
         const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(publish);
@@ -74,7 +127,7 @@ const HeaderComponent = () => {
             window.removeEventListener('resize', publish);
             observer?.disconnect();
         };
-    }, []);
+    }, [isSearchOpen, openPanelId]);
 
     return (
         <>
@@ -85,41 +138,56 @@ const HeaderComponent = () => {
                     menuButtonRef={menuButtonRef}
                     onOpenDrawer={openDrawer}
                     isDrawerOpen={isDrawerOpen}
+                    searchTerm={searchTerm}
+                    onSearchChange={setSearchTerm}
+                    isSearchOpen={isSearchOpen}
+                    onOpenSearch={openSearch}
+                    onCloseSearch={closeSearch}
+                    searchInputRef={searchInputRef}
                 />
 
-                {/* Row 3 and the panel share one positioned wrapper: the panel
-                    anchors to it, and the hook treats it as a single region for
-                    outside-click purposes so travelling from a trigger down
-                    into the panel never counts as leaving. */}
-                <div ref={navRef} className="relative hidden pb-3 pt-3 md:block">
-                    <CategoryBar
-                        openPanelId={openPanelId}
-                        registerTrigger={registerTrigger}
-                        onTriggerEnter={(id) => openPanel(id)}
-                        onTriggerLeave={() => closePanel()}
-                        onTriggerToggle={togglePanel}
-                        onOpenPanel={openPanel}
-                        onClosePanel={closePanel}
+                {/* When Search is active: render full-width SearchMegaPanel */}
+                {isSearchOpen ? (
+                    <SearchMegaPanel
+                        searchTerm={searchTerm}
+                        onClose={closeSearch}
+                        suggestions={suggestions}
+                        isLoading={isFetching}
+                        onSelectSuggestion={handleSelectSuggestion}
                     />
-
-                    {activeItem && (
-                        <MegaMenu
-                            panel={activeItem.panel}
-                            onPointerEnter={() => openPanel(activeItem.id, { immediate: true })}
-                            onPointerLeave={() => closePanel()}
+                ) : (
+                    /* Normal Row 3: CategoryBar + MegaMenu */
+                    <div ref={navRef} className="relative hidden md:block">
+                        <CategoryBar
+                            openPanelId={openPanelId}
+                            registerTrigger={registerTrigger}
+                            onTriggerEnter={(id) => openPanel(id)}
+                            onTriggerLeave={() => closePanel()}
+                            onTriggerToggle={togglePanel}
+                            onOpenPanel={openPanel}
+                            onClosePanel={closePanel}
                         />
-                    )}
-                </div>
+
+                        {activeItem && (
+                            <MegaMenu
+                                panel={activeItem.panel}
+                                onPointerEnter={() => openPanel(activeItem.id, { immediate: true })}
+                                onPointerLeave={() => closePanel()}
+                            />
+                        )}
+                    </div>
+                )}
             </header>
 
-            {/* Dims the page behind an open panel. A sibling at z-40 rather
-                than a child of the header, so it lands above the page and
-                below the header's own z-50 without any negative-z trickery. */}
-            {activeItem && (
+            {/* Dims the page behind an open panel or search */}
+            {(activeItem || isSearchOpen) && (
                 <div
                     aria-hidden="true"
-                    onClick={() => closePanel({ immediate: true })}
-                    className="fixed inset-0 z-40 hidden bg-apple-text/25 md:block"
+                    onClick={() => {
+                        if (activeItem) closePanel({ immediate: true });
+                        if (isSearchOpen) closeSearch();
+                    }}
+                    className="fixed inset-0 z-40 hidden bg-apple-text/20 md:block"
                 />
             )}
 

@@ -15,7 +15,7 @@ const CartButton = () => {
         <Link
             to="/cart"
             aria-label={label}
-            className="relative flex h-11 w-11 items-center justify-center rounded-full text-apple-text outline-none transition-colors duration-200 ease-smooth hover:bg-black/[0.05] focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 focus-visible:ring-offset-white [&_svg]:!text-[22px]"
+            className="relative flex h-11 w-11 md:h-12 md:w-12 items-center justify-center rounded-full text-apple-text outline-none transition-colors duration-200 ease-smooth hover:bg-black/[0.05] focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 focus-visible:ring-offset-white [&_svg]:!text-[26px]"
         >
             <ShoppingCartOutlinedIcon aria-hidden="true" />
             {count > 0 && (

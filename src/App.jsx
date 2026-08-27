@@ -1,6 +1,7 @@
 import { Outlet, ScrollRestoration } from 'react-router-dom'
 
 import { ToastContainer } from 'react-toastify';
+import MyFooter from './components/layout/Footer/MyFooter';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { createContext, useEffect, useState } from 'react'
@@ -31,7 +32,7 @@ function App() {
         <main>
           <Outlet />
         </main>
-        {/* TODO(redesign): <MyFooter /> */}
+        <MyFooter />
         <ToastContainer position="top-center" autoClose={1000} className="app-toast-container" />
       </div>
     </CartContext.Provider>

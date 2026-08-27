@@ -13,6 +13,7 @@ export default {
         'apple-text': '#0c0c0c',
         'apple-gray': '#86868b',
         'apple-bg': '#ededed',
+        'brand-lime': '#e3f87f',
         'ink-soft': '#302f2f',
         'surface': '#f7f7f7',
         'surface-alt': '#ededed',

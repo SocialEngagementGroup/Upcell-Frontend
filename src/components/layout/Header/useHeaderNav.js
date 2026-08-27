@@ -14,11 +14,12 @@ import { useLocation } from 'react-router-dom';
 const OPEN_DELAY = 120;
 const CLOSE_DELAY = 180;
 
-const useHeaderNav = () => {
+const useHeaderNav = ({ headerRef } = {}) => {
     const location = useLocation();
 
     const [openPanelId, setOpenPanelId] = useState(null);
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
 
     const openTimerRef = useRef(null);
     const closeTimerRef = useRef(null);
@@ -27,11 +28,12 @@ const useHeaderNav = () => {
     // The hamburger, so the drawer can hand focus back to it.
     const menuButtonRef = useRef(null);
     const triggerNodesRef = useRef(new Map());
-    // Mirrors openPanelId so the document-level listeners can read it without
-    // being torn down and rebound on every open/close.
+    // Mirrors openPanelId and isSearchOpen so document listeners read current values.
     const openPanelIdRef = useRef(null);
+    const isSearchOpenRef = useRef(false);
 
     openPanelIdRef.current = openPanelId;
+    isSearchOpenRef.current = isSearchOpen;
 
     const clearOpenTimer = useCallback(() => {
         if (openTimerRef.current) {
@@ -58,9 +60,25 @@ const useHeaderNav = () => {
         triggerNodesRef.current.get(id)?.focus();
     }, []);
 
+    const openSearch = useCallback(() => {
+        clearCloseTimer();
+        clearOpenTimer();
+        setOpenPanelId(null);
+        setIsSearchOpen(true);
+    }, [clearCloseTimer, clearOpenTimer]);
+
+    const closeSearch = useCallback(() => {
+        setIsSearchOpen(false);
+    }, []);
+
+    const toggleSearch = useCallback(() => {
+        setIsSearchOpen((prev) => !prev);
+    }, []);
+
     const openPanel = useCallback((id, { immediate = false } = {}) => {
         clearCloseTimer();
         clearOpenTimer();
+        setIsSearchOpen(false);
 
         if (immediate) {
             setOpenPanelId(id);
@@ -97,6 +115,7 @@ const useHeaderNav = () => {
     const togglePanel = useCallback((id) => {
         clearOpenTimer();
         clearCloseTimer();
+        setIsSearchOpen(false);
         setOpenPanelId((current) => (current === id ? null : id));
     }, [clearCloseTimer, clearOpenTimer]);
 
@@ -104,6 +123,7 @@ const useHeaderNav = () => {
         clearOpenTimer();
         clearCloseTimer();
         setOpenPanelId(null);
+        setIsSearchOpen(false);
         setIsDrawerOpen(true);
     }, [clearCloseTimer, clearOpenTimer]);
 
@@ -112,12 +132,15 @@ const useHeaderNav = () => {
         if (restoreFocus) menuButtonRef.current?.focus();
     }, []);
 
-    // Escape closes the panel and hands focus back to its trigger. The drawer
-    // runs its own Escape handler because it also has to restore focus to the
-    // hamburger and trap Tab, and having both fire would double-close.
+    // Escape closes the search or mega-panel.
     useEffect(() => {
         const handleKeyDown = (event) => {
             if (event.key !== 'Escape') return;
+            if (isSearchOpenRef.current) {
+                event.stopPropagation();
+                setIsSearchOpen(false);
+                return;
+            }
             if (!openPanelIdRef.current) return;
             event.stopPropagation();
             closePanel({ immediate: true, restoreFocus: true });
@@ -130,6 +153,12 @@ const useHeaderNav = () => {
     // Outside click.
     useEffect(() => {
         const handlePointerDown = (event) => {
+            if (isSearchOpenRef.current) {
+                if (headerRef?.current && !headerRef.current.contains(event.target)) {
+                    setIsSearchOpen(false);
+                }
+                return;
+            }
             if (!openPanelIdRef.current) return;
             if (navRef.current && navRef.current.contains(event.target)) return;
             closePanel({ immediate: true });
@@ -137,7 +166,7 @@ const useHeaderNav = () => {
 
         document.addEventListener('mousedown', handlePointerDown);
         return () => document.removeEventListener('mousedown', handlePointerDown);
-    }, [closePanel]);
+    }, [closePanel, headerRef]);
 
     // Body scroll lock while the drawer is open. The scrollbar width is added
     // back as padding so the page does not jump sideways on lock/unlock.
@@ -165,6 +194,7 @@ const useHeaderNav = () => {
         clearCloseTimer();
         setOpenPanelId(null);
         setIsDrawerOpen(false);
+        setIsSearchOpen(false);
     }, [location.pathname, location.search, clearCloseTimer, clearOpenTimer]);
 
     useEffect(() => () => {
@@ -175,8 +205,12 @@ const useHeaderNav = () => {
     return {
         openPanelId,
         isDrawerOpen,
+        isSearchOpen,
         navRef,
         menuButtonRef,
+        openSearch,
+        closeSearch,
+        toggleSearch,
         openPanel,
         closePanel,
         togglePanel,

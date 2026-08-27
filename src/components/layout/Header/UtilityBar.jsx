@@ -10,7 +10,7 @@ import { UTILITY_LINKS } from './navigationData';
 // Hidden entirely below md — on a phone these belong in the drawer, and 32px
 // of chrome is 32px the product grid does not get.
 const UtilityBar = () => (
-    <div className="hidden bg-white pb-3 pt-3 md:block">
+    <div className="hidden bg-white md:block">
         <div className="header-shell flex h-8 items-center">
             <nav aria-label="Utility">
                 {/* The negative inset cancels the first pill's padding so the

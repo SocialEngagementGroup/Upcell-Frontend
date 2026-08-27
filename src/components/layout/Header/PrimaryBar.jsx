@@ -8,13 +8,30 @@ import HeaderSearch from './HeaderSearch';
 import AccountMenu from './AccountMenu';
 import CartButton from './CartButton';
 
-// Row 2. Flex-wraps on purpose: below md the search drops onto its own
-// full-width line under the bar (order-last / basis-full), which is the only
-// way to give it a usable hit area on a 375px screen without shrinking the
-// logo or the cart.
-const PrimaryBar = ({ menuButtonRef, onOpenDrawer, isDrawerOpen }) => (
+// Row 2, and two different layouts held in one flex container.
+//
+// Below md it wraps to two lines: hamburger / centred logo / account+cart on
+// the first, then Trade-in and the search sharing the second. That second line
+// is a real wrapper element with basis-full, so the two stay together and the
+// search still gets a usable hit area on a 375px screen.
+//
+// From md the wrapper becomes `display: contents` and dissolves, putting
+// Trade-in and the search back into the bar as direct children. Order classes
+// then run logo -> search -> Trade-in -> account+cart, which is the reference's
+// desktop arrangement rather than the mobile one.
+const PrimaryBar = ({
+    menuButtonRef,
+    onOpenDrawer,
+    isDrawerOpen,
+    searchTerm,
+    onSearchChange,
+    isSearchOpen,
+    onOpenSearch,
+    onCloseSearch,
+    searchInputRef,
+}) => (
     <div className="bg-white">
-        <div className="header-shell flex flex-wrap items-center gap-x-3 pb-3 pt-0 md:flex-nowrap md:gap-x-5 md:pb-0 lg:gap-x-8">
+        <div className="header-shell flex flex-wrap items-center gap-x-3 pb-3 pt-0 md:flex-nowrap md:gap-x-3 md:pb-0 lg:gap-x-6">
             <button
                 ref={menuButtonRef}
                 type="button"
@@ -22,7 +39,7 @@ const PrimaryBar = ({ menuButtonRef, onOpenDrawer, isDrawerOpen }) => (
                 aria-label="Open menu"
                 aria-expanded={isDrawerOpen}
                 aria-haspopup="dialog"
-                className="-ml-2.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-apple-text outline-none transition-colors duration-200 ease-smooth hover:bg-black/[0.05] focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 focus-visible:ring-offset-white md:hidden [&_svg]:!text-[24px]"
+                className="order-1 -ml-2.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-apple-text outline-none transition-colors duration-200 ease-smooth hover:bg-black/[0.05] focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 focus-visible:ring-offset-white md:hidden [&_svg]:!text-[24px]"
             >
                 <MenuIcon aria-hidden="true" />
             </button>
@@ -34,7 +51,7 @@ const PrimaryBar = ({ menuButtonRef, onOpenDrawer, isDrawerOpen }) => (
             <Link
                 to="/"
                 aria-label="UpCell home"
-                className="flex h-14 shrink-0 items-center rounded-lg outline-none transition-none focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 focus-visible:ring-offset-white md:h-16 lg:h-[72px]"
+                className="order-2 mx-auto flex h-14 shrink-0 items-center rounded-lg outline-none transition-none focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 focus-visible:ring-offset-white md:order-1 md:mx-0 md:h-16 lg:h-[72px]"
             >
                 {/* The logo PNG carries transparent padding on all four sides.
                     The box below is the artwork's own aspect ratio and clips an
@@ -54,22 +71,37 @@ const PrimaryBar = ({ menuButtonRef, onOpenDrawer, isDrawerOpen }) => (
                 </span>
             </Link>
 
-            <HeaderSearch className="order-last mt-3 basis-full md:order-none md:mt-0 md:max-w-[520px] md:flex-1 md:basis-auto" />
-
-            <nav aria-label="Primary" className="ml-auto flex shrink-0 items-center gap-1 md:gap-2">
+            {/* Below md this wrapper is the second line: Trade-in first, then
+                the search filling the rest. `md:contents` dissolves it from md
+                up so both become direct children of the bar again and take
+                their own order — search before Trade-in, as the reference has
+                it on desktop. */}
+            <div className="order-4 mt-3 flex w-full basis-full items-center gap-2 md:contents">
                 <Link
                     to={TRADE_IN_LINK.to}
-                    className="hidden h-10 items-center gap-1.5 rounded-full border border-brand-red px-4 text-[14px] font-bold text-brand-red outline-none transition-colors duration-200 ease-smooth hover:bg-brand-red/[0.08] focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 focus-visible:ring-offset-white md:inline-flex [&_svg]:!text-[18px]"
+                    className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full border border-solid border-brand-red px-4 text-[14px] font-bold text-brand-red outline-none transition-colors duration-200 ease-smooth hover:bg-brand-red/[0.08] focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 focus-visible:ring-offset-white md:order-3 [&_svg]:!text-[18px]"
                 >
                     <AutorenewRoundedIcon aria-hidden="true" />
                     {TRADE_IN_LINK.label}
                 </Link>
 
+                <HeaderSearch
+                    searchTerm={searchTerm}
+                    onSearchChange={onSearchChange}
+                    isSearchOpen={isSearchOpen}
+                    onOpenSearch={onOpenSearch}
+                    onCloseSearch={onCloseSearch}
+                    inputRef={searchInputRef}
+                    className="min-w-0 flex-1 md:order-2 md:min-w-[180px] lg:max-w-[520px]"
+                />
+            </div>
+
+            <nav aria-label="Primary" className="order-3 flex shrink-0 items-center gap-1 md:order-4 md:ml-auto md:gap-2">
                 {MAIN_ROW_LINKS.map((link) => (
                     <Link
                         key={link.label}
                         to={link.to}
-                        className="hidden h-10 items-center rounded-full px-3 text-[14px] font-bold text-apple-text underline-offset-4 outline-none transition-colors duration-200 ease-smooth hover:text-brand-red hover:underline focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 focus-visible:ring-offset-white lg:inline-flex"
+                        className="hidden h-10 items-center rounded-full px-2 text-[14px] font-bold text-apple-text underline-offset-4 outline-none transition-colors duration-200 ease-smooth hover:text-brand-red hover:underline focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 focus-visible:ring-offset-white md:inline-flex lg:px-3"
                     >
                         {link.label}
                     </Link>

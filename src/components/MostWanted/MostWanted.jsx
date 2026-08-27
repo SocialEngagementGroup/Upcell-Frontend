@@ -67,7 +67,7 @@ const MostWanted = () => {
 
     return (
         <section aria-labelledby="most-wanted-heading" className="bg-surface py-10 md:py-12">
-            <div className="mx-auto max-w-[1200px] px-4 md:px-6 lg:px-8">
+            <div className="site-shell">
                 <div className="flex items-center justify-between gap-4">
                     <h2 id="most-wanted-heading" className="text-[1.125rem] font-bold tracking-[-0.01em] text-apple-text md:text-[1.25rem]">
                         Shop our most wanted

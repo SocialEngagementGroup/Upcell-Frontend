@@ -1,47 +1,51 @@
+import React from 'react';
 import { Link } from 'react-router-dom';
-
-import { cloudinaryUrl } from '../../utilities/cloudinary';
 import { HERO } from './heroContent';
 
-// The home banner: copy on the left, product on the right, one coloured band
-// behind both. Static by design — it was a carousel, and the dots and autoplay
-// came out because a single message reads better than three rotating ones.
-//
-// Near edge-to-edge like the reference: a 4% inset rather than the navbar's
-// 1200px container, so the headline sits well outboard of the logo above it.
+// The home hero banner: Back Market styled vibrant lime background (#e3f87f),
+// bold headline with italic emphasis, spacious copy, black rounded CTA,
+// and the 5-color iPhone lineup cleanly presented on the right.
 const HeroBanner = () => (
-    <section aria-label="Featured" className="bg-apple-bg">
-        <div className="mx-auto flex max-w-[125rem] flex-col items-center gap-8 px-[4%] py-10 md:min-h-[420px] md:flex-row md:gap-6 md:py-12">
-            <div className="order-2 w-full text-center md:order-1 md:w-1/2 md:text-left">
-                {/* font-bold rather than the base layer's extrabold: Roboto is
-                    loaded at 400/500/700, so 800 resolves to 700 regardless. */}
-                <h1 className="text-[2rem] font-bold leading-[1.04] tracking-[-0.035em] text-apple-text md:text-[3rem] lg:text-[4rem]">
-                    {HERO.title}
-                    <span className="block italic">{HERO.emphasis}</span>
+    <section
+        aria-label="Featured Promotion"
+        className="w-full bg-brand-lime transition-colors duration-300"
+        style={{ backgroundColor: '#e3f87f' }}
+    >
+        <div className="mx-auto flex max-w-[1800px] flex-col items-center justify-between gap-8 px-6 py-10 sm:px-10 sm:py-12 md:flex-row md:gap-10 md:py-14 lg:px-16 lg:py-16">
+            {/* Left side: 50% width on md+ */}
+            <div className="order-2 flex w-full flex-col items-start text-left md:order-1 md:w-1/2">
+                <h1 className="text-[2.5rem] font-extrabold leading-[1.04] tracking-[-0.035em] text-[#0c0c0c] sm:text-[3.25rem] md:text-[4.25rem] lg:text-[5.5rem]">
+                    {HERO.title}{' '}
+                    <span className="block font-serif italic font-normal tracking-tight md:inline lg:block">
+                        {HERO.emphasis}
+                    </span>
                 </h1>
 
-                <p className="mx-auto mt-5 max-w-[42ch] text-[1rem] font-normal leading-snug text-ink-soft md:mx-0 md:text-[1.25rem]">
+                <p className="mt-5 text-[1.15rem] font-normal leading-snug text-[#111111] sm:text-[1.35rem] md:text-[1.5rem] lg:text-[1.7rem] md:max-w-[48ch]">
                     {HERO.copy}
                 </p>
 
                 <Link
                     to={HERO.cta.to}
-                    className="mt-7 inline-flex h-12 items-center rounded-lg bg-apple-text px-8 text-[1rem] font-bold text-white outline-none transition-colors duration-200 ease-smooth hover:bg-black focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 md:h-14"
+                    className="mt-6 inline-flex h-12 items-center justify-center rounded-lg bg-black px-8 text-[1rem] font-bold text-white shadow-sm outline-none transition-all duration-200 ease-smooth hover:bg-neutral-800 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-[#e3f87f] sm:mt-8 md:h-13 md:px-9 md:text-[1.05rem]"
                 >
                     {HERO.cta.label}
                 </Link>
             </div>
 
-            <div className="order-1 w-full md:order-2 md:w-1/2">
-                <img
-                    src={cloudinaryUrl(HERO.image, { width: 1200 })}
-                    alt=""
-                    width="1200"
-                    height="600"
-                    fetchpriority="high"
-                    decoding="async"
-                    className="mx-auto block h-[160px] w-auto max-w-full object-contain md:ml-auto md:mr-0 md:h-[300px] lg:h-[340px]"
-                />
+            {/* Right side: 50% width on md+ */}
+            <div className="order-1 flex w-full items-center justify-center md:order-2 md:w-1/2 md:justify-end">
+                <div className="relative flex w-full items-center justify-center md:justify-end">
+                    <img
+                        src={HERO.image}
+                        alt="Apple iPhone lineup"
+                        width="695"
+                        height="359"
+                        fetchpriority="high"
+                        decoding="async"
+                        className="block h-auto w-full max-w-[480px] object-contain drop-shadow-[0_12px_24px_rgba(0,0,0,0.06)] transition-transform duration-500 ease-smooth hover:scale-[1.02] sm:max-w-[560px] md:max-w-[640px] lg:max-w-[720px] xl:max-w-[800px]"
+                    />
+                </div>
             </div>
         </div>
     </section>

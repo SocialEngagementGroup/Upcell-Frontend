@@ -85,29 +85,32 @@ body {
        the components themselves.
        --------------------------------------------------------------------- */
 
-    /* One container governs every header row — utility, primary, category and
-       the mega-menu panel — so the links, the logo and the category strip all
-       sit on the same left edge. The navbar width lives here and nowhere
-       else: change this line to change all four rows together. */
-    .header-shell {
-        @apply mx-auto w-full max-w-[1200px] px-4 md:px-6 lg:px-8;
+    /* THE container. Every header row and every page section sits on it, so
+       the logo, the category strip, the product rails and the footer columns
+       all share one left and right edge. The site width lives on this line
+       and nowhere else — change it here and the whole page follows.
+       .mega-rail and .mega-main below derive from it too; if this width
+       changes, their 700px halves must change with it. */
+    .header-shell,
+    .site-shell {
+        @apply mx-auto w-full max-w-[1400px] px-4 md:px-6 lg:px-8;
     }
 
     /* The mega panel's promo rail bleeds to the viewport's left edge, but its
        COLUMN widens with the viewport so the grid beside it begins exactly
-       under the logo — the same 1200px container edge every row above uses.
+       under the logo — the same 1400px container edge every row above uses.
        The grey band inside stays a fixed width, which leaves the white gutter
        between rail and grid that the reference has. Below that width the
        column falls back to its minimum and the grid simply follows it. */
     .mega-rail {
-        width: max(300px, calc(50vw - 600px + 2rem));
+        width: max(300px, calc(50vw - 700px + 2rem));
     }
 
     /* And it stops at the container's right edge, so the last tile lines up
        with the cart icon rather than running on toward the viewport. Without
        this the grid sprawled: 552px of dead space at 1920. */
     .mega-main {
-        padding-right: max(2.5rem, calc(50vw - 600px + 2rem));
+        padding-right: max(2.5rem, calc(50vw - 700px + 2rem));
     }
 
     /* The category row scrolls horizontally on narrow screens; the scrollbar
@@ -128,12 +131,8 @@ body {
         background: linear-gradient(to right, transparent, theme('colors.white') 70%);
     }
 
-    /* SearchWithSuggestions is shared with Admin, so its dropdown cannot be
-       changed at the source. Under the header it becomes a full-bleed overlay
-       pinned below the search line on mobile, and reverts to the shared
-       dropdown at md. `--header-suggest-top` is measured by HeaderSearch. */
-    .header-search .suggest-dropdown,
-    .header-search .popular-panel {
+    /* SearchWithSuggestions is shared with Admin. */
+    .header-search .suggest-dropdown {
         top: var(--header-suggest-top, 7.25rem);
         @apply fixed left-0 right-0 mt-0 rounded-none border-x-0 md:absolute md:top-auto md:mt-2 md:rounded-[15px] md:border-x;
     }
@@ -296,6 +295,11 @@ body {
         color: #0c0c0c;
         -webkit-text-fill-color: currentColor;
     }
+}
+
+@keyframes searchPanelReveal {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes suggestReveal {
