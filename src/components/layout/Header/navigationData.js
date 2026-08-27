@@ -105,16 +105,46 @@ const MODEL_GROUP_IMAGES = {
     'MacBook Pro': 'upcell/products/macbook/macbook-mackbook-pro-m2-13-14-silver-61zsd7--b804f339',
 };
 
+// A family with fewer model groups than the row holds would leave half the
+// panel empty, so it is topped up with real catalogue variants. These filter
+// by search text rather than by model group: chip generations are not among
+// the ten groups the shop filters on, but `?q=` matches name, category and
+// description (ShopPage.jsx), and `?category=` keeps the match inside the
+// family. Images are deliberately different shots from the group tiles above
+// so no two tiles in a panel show the same picture.
+const FAMILY_EXTRA_TILES = {
+    MacBook: [
+        {
+            label: 'M3 models',
+            query: 'M3',
+            image: 'upcell/products/macbook/macbook-mackbook-pro-m3-max-silver-61bgq7ysaml-ac--9714fe2f',
+        },
+        {
+            label: 'M2 models',
+            query: 'M2',
+            image: 'upcell/products/macbook/macbook-air-13-m2-starlight-61brxr7sbul--1f9948bb',
+        },
+    ],
+};
+
 const buildPanel = (family) => ({
     id: `header-panel-${family.toLowerCase()}`,
     heading: 'Categories',
     seeAll: { label: 'See all', to: shopFamilyPath(family) },
-    tiles: MODEL_GROUPS_BY_FAMILY[family].map((modelGroup) => ({
-        label: modelGroup,
-        copy: MODEL_GROUP_BLURBS[modelGroup] || '',
-        image: MODEL_GROUP_IMAGES[modelGroup] || '',
-        to: shopModelPath(family, modelGroup),
-    })),
+    tiles: [
+        ...MODEL_GROUPS_BY_FAMILY[family].map((modelGroup) => ({
+            label: modelGroup,
+            copy: MODEL_GROUP_BLURBS[modelGroup] || '',
+            image: MODEL_GROUP_IMAGES[modelGroup] || '',
+            to: shopModelPath(family, modelGroup),
+        })),
+        ...(FAMILY_EXTRA_TILES[family] || []).map((tile) => ({
+            label: tile.label,
+            copy: '',
+            image: tile.image,
+            to: `${shopFamilyPath(family)}&q=${encodeURIComponent(tile.query)}`,
+        })),
+    ],
     aside: {
         heading: 'Good to know',
         items: GOOD_TO_KNOW,
