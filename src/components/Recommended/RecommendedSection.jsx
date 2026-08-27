@@ -97,7 +97,7 @@ const RecommendedSection = () => {
     return (
         <section aria-labelledby="recommended-heading" className="py-10 md:py-12">
             <div className="site-shell">
-                <h2 id="recommended-heading" className="text-[1.125rem] font-bold tracking-[-0.01em] text-apple-text md:text-[1.25rem]">
+                <h2 id="recommended-heading" className="text-[1.5rem] font-bold tracking-[-0.02em] text-apple-text md:text-[1.75rem]">
                     Recommended for you
                 </h2>
 

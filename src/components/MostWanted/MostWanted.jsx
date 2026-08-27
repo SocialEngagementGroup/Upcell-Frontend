@@ -69,7 +69,7 @@ const MostWanted = () => {
         <section aria-labelledby="most-wanted-heading" className="bg-surface py-10 md:py-12">
             <div className="site-shell">
                 <div className="flex items-center justify-between gap-4">
-                    <h2 id="most-wanted-heading" className="text-[1.125rem] font-bold tracking-[-0.01em] text-apple-text md:text-[1.25rem]">
+                    <h2 id="most-wanted-heading" className="text-[1.5rem] font-bold tracking-[-0.02em] text-apple-text md:text-[1.75rem]">
                         Shop our most wanted
                     </h2>
 
@@ -106,7 +106,7 @@ const MostWanted = () => {
                         <li key={item.id} className="shrink-0">
                             <Link
                                 to={item.to}
-                                className="group flex w-[132px] flex-col items-center gap-3 rounded-2xl px-2 py-3 outline-none transition-colors duration-200 ease-smooth hover:bg-white focus-visible:ring-2 focus-visible:ring-brand-red md:w-[150px]"
+                                className="group flex w-[150px] flex-col items-center gap-3 rounded-2xl px-2 py-3 outline-none transition-colors duration-200 ease-smooth hover:bg-white focus-visible:ring-2 focus-visible:ring-brand-red md:w-[172px]"
                             >
                                 <img
                                     src={cloudinaryUrl(item.image, { width: 260 })}
@@ -115,9 +115,9 @@ const MostWanted = () => {
                                     height="260"
                                     loading="lazy"
                                     decoding="async"
-                                    className="block h-[84px] w-auto object-contain transition-transform duration-300 ease-smooth group-hover:scale-105 md:h-[96px]"
+                                    className="block h-[104px] w-auto object-contain transition-transform duration-300 ease-smooth group-hover:scale-105 md:h-[120px]"
                                 />
-                                <span className="text-center text-[0.875rem] font-bold leading-tight text-apple-text group-hover:text-brand-red">
+                                <span className="text-center text-[0.9375rem] font-bold leading-tight text-apple-text group-hover:text-brand-red">
                                     {item.label}
                                 </span>
                             </Link>

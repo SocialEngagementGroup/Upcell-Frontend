@@ -12,8 +12,8 @@ const HeroBanner = () => (
         style={{ backgroundColor: '#e3f87f' }}
     >
         <div className="mx-auto flex max-w-[1800px] flex-col items-center justify-between gap-8 px-6 py-10 sm:px-10 sm:py-12 md:flex-row md:gap-10 md:py-14 lg:px-16 lg:py-16">
-            {/* Left side: 50% width on md+ */}
-            <div className="order-2 flex w-full flex-col items-start text-left md:order-1 md:w-1/2">
+            {/* Copy takes 45, the lineup 55 — the phones earn the extra. */}
+            <div className="order-2 flex w-full flex-col items-start text-left md:order-1 md:w-[45%]">
                 <h1 className="text-[2.5rem] font-extrabold leading-[1.04] tracking-[-0.035em] text-[#0c0c0c] sm:text-[3.25rem] md:text-[4.25rem] lg:text-[5.5rem]">
                     {HERO.title}{' '}
                     <span className="block font-serif italic font-normal tracking-tight md:inline lg:block">
@@ -33,8 +33,7 @@ const HeroBanner = () => (
                 </Link>
             </div>
 
-            {/* Right side: 50% width on md+ */}
-            <div className="order-1 flex w-full items-center justify-center md:order-2 md:w-1/2 md:justify-end">
+            <div className="order-1 flex w-full items-center justify-center md:order-2 md:w-[55%] md:justify-end">
                 <div className="relative flex w-full items-center justify-center md:justify-end">
                     <img
                         src={HERO.image}
@@ -43,7 +42,7 @@ const HeroBanner = () => (
                         height="359"
                         fetchpriority="high"
                         decoding="async"
-                        className="block h-auto w-full max-w-[480px] object-contain drop-shadow-[0_12px_24px_rgba(0,0,0,0.06)] transition-transform duration-500 ease-smooth hover:scale-[1.02] sm:max-w-[560px] md:max-w-[640px] lg:max-w-[720px] xl:max-w-[800px]"
+                        className="block h-auto w-full object-contain drop-shadow-[0_12px_24px_rgba(0,0,0,0.06)] transition-transform duration-500 ease-smooth hover:scale-[1.02]"
                     />
                 </div>
             </div>

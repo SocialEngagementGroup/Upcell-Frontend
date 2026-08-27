@@ -19,7 +19,7 @@ const PLACEHOLDER_COUNT = 3;
 const TopBrands = () => (
     <section aria-labelledby="top-brands-heading" className="pb-10 md:pb-12">
         <div className="site-shell">
-            <h2 id="top-brands-heading" className="text-[0.9375rem] font-bold tracking-[-0.01em] text-apple-text md:text-[1rem]">
+            <h2 id="top-brands-heading" className="text-[1.5rem] font-bold tracking-[-0.02em] text-apple-text md:text-[1.75rem]">
                 Top brands, refurbished
             </h2>
 

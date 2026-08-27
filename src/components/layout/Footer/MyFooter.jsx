@@ -182,21 +182,11 @@ const MyFooter = () => {
                     ))}
                 </div>
 
-                {/* Phone sits on its own now that the socials have moved into
-                    the About column. */}
-                <div className="mt-10 border-t border-solid border-black/[0.08] pt-8">
-                    <a
-                        href={FOOTER_PHONE.href}
-                        className="inline-flex items-center gap-2 text-[0.9375rem] font-bold text-apple-text outline-none transition-colors duration-200 ease-smooth hover:text-brand-red focus-visible:ring-2 focus-visible:ring-brand-red [&_svg]:!text-[20px]"
-                    >
-                        <CallOutlinedIcon aria-hidden="true" />
-                        {FOOTER_PHONE.label}
-                    </a>
-                </div>
-
-                {/* Legal strip */}
-                <div className="mt-8 flex flex-col items-center gap-4 border-t border-solid border-black/[0.08] pt-8 md:flex-row md:justify-between">
-                    <Link to="/" aria-label="UpCell home" className="flex items-center outline-none focus-visible:ring-2 focus-visible:ring-brand-red">
+                {/* One closing row: logo, phone, copyright. The phone used to
+                    have a band of its own, where a single short link held the
+                    full width open and read as a mistake. */}
+                <div className="mt-10 flex flex-col items-center gap-4 border-t border-solid border-black/[0.08] pt-8 md:flex-row md:justify-between md:gap-6">
+                    <Link to="/" aria-label="UpCell home" className="flex shrink-0 items-center outline-none focus-visible:ring-2 focus-visible:ring-brand-red">
                         <img
                             src={staticImageUrl(STATIC_IMAGES.LOGO, 240)}
                             alt="UpCell"
@@ -207,9 +197,19 @@ const MyFooter = () => {
                         />
                     </Link>
 
-                    <p className="text-[0.8125rem] font-normal text-apple-gray">
-                        © {new Date().getFullYear()} UpCell IT. All rights reserved.
-                    </p>
+                    <div className="flex flex-col items-center gap-3 md:flex-row md:gap-6">
+                        <a
+                            href={FOOTER_PHONE.href}
+                            className="inline-flex items-center gap-2 text-[0.875rem] font-bold text-apple-text outline-none transition-colors duration-200 ease-smooth hover:text-brand-red focus-visible:ring-2 focus-visible:ring-brand-red [&_svg]:!text-[18px]"
+                        >
+                            <CallOutlinedIcon aria-hidden="true" />
+                            {FOOTER_PHONE.label}
+                        </a>
+
+                        <p className="text-[0.8125rem] font-normal text-apple-gray">
+                            © {new Date().getFullYear()} UpCell IT. All rights reserved.
+                        </p>
+                    </div>
                 </div>
             </div>
         </footer>

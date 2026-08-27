@@ -48,7 +48,7 @@ const Reviews = () => {
         <section aria-labelledby="reviews-heading" className="pb-10 md:pb-12">
             <div className="site-shell">
                 <div className="flex items-center justify-between gap-4">
-                    <h2 id="reviews-heading" className="text-[1.125rem] font-bold tracking-[-0.01em] text-apple-text md:text-[1.25rem]">
+                    <h2 id="reviews-heading" className="text-[1.5rem] font-bold tracking-[-0.02em] text-apple-text md:text-[1.75rem]">
                         Don&rsquo;t just take our word for it
                     </h2>
 
