@@ -70,23 +70,39 @@ export const UTILITY_LINKS = [
 // Mega menu asides ("Good to know")
 // ---------------------------------------------------------------------------
 
-const GOOD_TO_KNOW = [
-    {
+const GOOD_TO_KNOW = {
+    tradeIn: {
         title: 'Trade in your old device',
         copy: 'Get a quote in minutes and put it towards this one.',
         to: '/trade-in',
     },
-    {
+    delivery: {
         title: 'Delivery',
         copy: 'How and when your order reaches you.',
         to: '/delivery-policy',
     },
-    {
+    returns: {
         title: 'Returns and warranty',
         copy: 'What is covered, and how to send something back.',
         to: '/return-policy',
     },
-];
+};
+
+// The rail is not the same three notes on every panel — the reference varies
+// it too. Trade-in leads everywhere, because it is the cross-sell that pays
+// for the device being looked at. What sits under it is the question that
+// family's buyers actually ask:
+//   iPhone  — the flagship and by far the most-traded device, so it carries
+//             the full set
+//   iPad    — mid-ticket and usually a gift or a second screen, where the
+//             question is when it turns up
+//   MacBook — the largest single spend on the site, where the question is
+//             what happens if it is wrong
+const ASIDE_BY_FAMILY = {
+    iPhone: ['tradeIn', 'delivery', 'returns'],
+    iPad: ['tradeIn', 'delivery'],
+    MacBook: ['tradeIn', 'returns'],
+};
 
 // One representative shot per model group, picked out of the generated
 // product manifest — these are real catalogue images, not stock art, so the
@@ -147,7 +163,7 @@ const buildPanel = (family) => ({
     ],
     aside: {
         heading: 'Good to know',
-        items: GOOD_TO_KNOW,
+        items: (ASIDE_BY_FAMILY[family] || ['tradeIn']).map((key) => GOOD_TO_KNOW[key]),
     },
 });
 

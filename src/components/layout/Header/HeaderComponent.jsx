@@ -91,7 +91,7 @@ const HeaderComponent = () => {
                     anchors to it, and the hook treats it as a single region for
                     outside-click purposes so travelling from a trigger down
                     into the panel never counts as leaving. */}
-                <div ref={navRef} className="relative hidden border-b border-black/[0.06] md:block">
+                <div ref={navRef} className="relative hidden pb-3 pt-3 md:block">
                     <CategoryBar
                         openPanelId={openPanelId}
                         registerTrigger={registerTrigger}

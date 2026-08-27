@@ -10,7 +10,7 @@ import { UTILITY_LINKS } from './navigationData';
 // Hidden entirely below md — on a phone these belong in the drawer, and 32px
 // of chrome is 32px the product grid does not get.
 const UtilityBar = () => (
-    <div className="hidden border-b border-black/[0.06] bg-apple-bg md:block">
+    <div className="hidden bg-white pb-3 pt-3 md:block">
         <div className="header-shell flex h-8 items-center">
             <nav aria-label="Utility">
                 {/* The negative inset cancels the first pill's padding so the
@@ -21,7 +21,7 @@ const UtilityBar = () => (
                         <li key={link.label}>
                             <Link
                                 to={link.to}
-                                className="flex items-center gap-1.5 rounded-full px-3 py-1 text-[13px] font-bold text-apple-text outline-none transition-colors duration-200 ease-smooth hover:text-brand-red focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-1 focus-visible:ring-offset-apple-bg [&_svg]:!text-[16px]"
+                                className="flex items-center gap-1.5 rounded-full px-3 py-1 text-[14px] font-bold text-apple-text outline-none transition-colors duration-200 ease-smooth hover:text-brand-red focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-1 focus-visible:ring-offset-white [&_svg]:!text-[16px]"
                             >
                                 {link.withShield && <VerifiedUserOutlinedIcon aria-hidden="true" />}
                                 {link.label}

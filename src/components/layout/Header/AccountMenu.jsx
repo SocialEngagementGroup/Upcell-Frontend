@@ -1,7 +1,6 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 
 import { userContext } from '../../../utilities/UserContextProvider';
@@ -59,13 +58,9 @@ const AccountMenu = () => {
                 aria-controls={MENU_ID}
                 aria-label="Account menu"
                 onClick={() => setIsOpen((open) => !open)}
-                className="flex h-11 items-center gap-0.5 rounded-full pl-2.5 pr-1.5 text-apple-text outline-none transition-colors duration-200 ease-smooth hover:bg-black/[0.05] focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 focus-visible:ring-offset-white [&_svg]:!text-[22px]"
+                className="flex h-11 items-center rounded-full px-2.5 text-apple-text outline-none transition-colors duration-200 ease-smooth hover:bg-black/[0.05] focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 focus-visible:ring-offset-white [&_svg]:!text-[22px]"
             >
                 <PersonOutlineIcon aria-hidden="true" />
-                <ExpandMoreIcon
-                    aria-hidden="true"
-                    className={`!text-[18px] transition-transform duration-200 ease-smooth ${isOpen ? 'rotate-180' : ''}`}
-                />
             </button>
 
             {isOpen && (

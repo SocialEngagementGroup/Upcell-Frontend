@@ -13,7 +13,7 @@ import CartButton from './CartButton';
 // way to give it a usable hit area on a 375px screen without shrinking the
 // logo or the cart.
 const PrimaryBar = ({ menuButtonRef, onOpenDrawer, isDrawerOpen }) => (
-    <div className="border-b border-black/[0.06] bg-white">
+    <div className="bg-white">
         <div className="header-shell flex flex-wrap items-center gap-x-3 pb-3 pt-0 md:flex-nowrap md:gap-x-5 md:pb-0 lg:gap-x-8">
             <button
                 ref={menuButtonRef}
@@ -59,7 +59,7 @@ const PrimaryBar = ({ menuButtonRef, onOpenDrawer, isDrawerOpen }) => (
             <nav aria-label="Primary" className="ml-auto flex shrink-0 items-center gap-1 md:gap-2">
                 <Link
                     to={TRADE_IN_LINK.to}
-                    className="hidden h-10 items-center gap-1.5 rounded-full border border-brand-red px-4 text-[13px] font-bold text-brand-red outline-none transition-colors duration-200 ease-smooth hover:bg-brand-red/[0.08] focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 focus-visible:ring-offset-white md:inline-flex [&_svg]:!text-[18px]"
+                    className="hidden h-10 items-center gap-1.5 rounded-full border border-brand-red px-4 text-[14px] font-bold text-brand-red outline-none transition-colors duration-200 ease-smooth hover:bg-brand-red/[0.08] focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 focus-visible:ring-offset-white md:inline-flex [&_svg]:!text-[18px]"
                 >
                     <AutorenewRoundedIcon aria-hidden="true" />
                     {TRADE_IN_LINK.label}
@@ -69,7 +69,7 @@ const PrimaryBar = ({ menuButtonRef, onOpenDrawer, isDrawerOpen }) => (
                     <Link
                         key={link.label}
                         to={link.to}
-                        className="hidden h-10 items-center rounded-full px-3 text-[13px] font-bold text-apple-text outline-none transition-colors duration-200 ease-smooth hover:text-brand-red focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 focus-visible:ring-offset-white lg:inline-flex"
+                        className="hidden h-10 items-center rounded-full px-3 text-[14px] font-bold text-apple-text outline-none transition-colors duration-200 ease-smooth hover:text-brand-red focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 focus-visible:ring-offset-white lg:inline-flex"
                     >
                         {link.label}
                     </Link>

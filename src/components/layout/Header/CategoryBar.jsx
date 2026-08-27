@@ -1,6 +1,5 @@
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
 
 import { CATEGORY_NAV } from './navigationData';
@@ -59,7 +58,7 @@ const CategoryBar = ({
                 <ul className="scrollbar-hidden flex items-center gap-1 overflow-x-auto">
                     {CATEGORY_NAV.map((item, index) => {
                         const isOpen = openPanelId === item.id;
-                        const sharedClass = 'flex h-11 shrink-0 items-center gap-1 whitespace-nowrap rounded-full px-4 text-[14px] font-medium outline-none transition-colors duration-200 ease-smooth focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-1 focus-visible:ring-offset-white';
+                        const sharedClass = 'flex h-11 shrink-0 items-center gap-1 whitespace-nowrap rounded-full px-4 text-[15px] font-medium outline-none transition-colors duration-200 ease-smooth focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-1 focus-visible:ring-offset-white';
 
                         if (!item.panel) {
                             return (
@@ -105,10 +104,6 @@ const CategoryBar = ({
                                     className={`${sharedClass} ${isOpen ? 'bg-apple-bg text-apple-text' : 'text-apple-text hover:bg-apple-bg'}`}
                                 >
                                     {item.label}
-                                    <ExpandMoreIcon
-                                        aria-hidden="true"
-                                        className={`!text-[18px] text-apple-gray transition-transform duration-200 ease-smooth ${isOpen ? 'rotate-180' : ''}`}
-                                    />
                                 </button>
                             </li>
                         );
