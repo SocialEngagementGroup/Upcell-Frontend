@@ -1,6 +1,6 @@
 import React from "react";
 import ScrollToTop from "../../utilities/ScrollToTop";
-import HeroCarousel from "../../components/Hero/HeroCarousel";
+import HeroBanner from "../../components/Hero/HeroBanner";
 import MostWanted from "../../components/MostWanted/MostWanted";
 
 // The previous home page composed six section components (hero, featured units,
@@ -11,7 +11,7 @@ const Home = () => {
     return (
         <div>
             <ScrollToTop />
-            <HeroCarousel />
+            <HeroBanner />
             <MostWanted />
             {/* TODO(redesign): the remaining home sections go here. */}
         </div>

@@ -54,6 +54,14 @@
     }
 }
 
+/* Page ground. Deliberately unlayered so it beats the base layer's
+   `body { bg-white }` without editing that block, which is brand foundation.
+   #f8f9fc is a shade off the palette's `surface` (#f7f7f7) — the one colour
+   in the storefront that is not a brand token, set here and nowhere else. */
+body {
+    background-color: #f8f9fc;
+}
+
 /* Global Navigation Resets */
 .active, .nav-link.active, a.active {
     background-color: transparent !important;
@@ -100,13 +108,6 @@
        this the grid sprawled: 552px of dead space at 1920. */
     .mega-main {
         padding-right: max(2.5rem, calc(50vw - 600px + 2rem));
-    }
-
-    /* One hero slide is mounted at a time and re-keyed on change, so the fade
-       runs on mount. Reduced motion is handled in the component, which stops
-       autoplay outright rather than only softening it. */
-    .hero-fade {
-        animation: heroFade 450ms theme('transitionTimingFunction.smooth') both;
     }
 
     /* The category row scrolls horizontally on narrow screens; the scrollbar
@@ -282,15 +283,6 @@
 /* LEGACY — search suggestions dropdown.
    Kept because SearchWithSuggestions is shared with Admin Products and
    Admin Categories (src/pages/Admin), not storefront-only. */
-@keyframes heroFade {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .hero-fade { animation: none; }
-}
-
 @keyframes gradientReveal {
     from { background-position: 100% 0; }
     to { background-position: 0 0; }
