@@ -140,6 +140,19 @@ export const SIGN_IN_LINK = { label: 'Sign in', to: '/login' };
 
 export const TRADE_IN_LINK = { label: 'Trade in', to: '/trade-in' };
 
+// Text links sitting between the trade-in pill and the icons, mirroring the
+// reference. Hidden below md — on a phone they live in the drawer instead.
+//
+// "For business" points at the contact page because UpCell has no separate
+// B2B site: wholesale enquiries come in through that form (see the Wholesale
+// inquiries clause in PrivacyPolicy.jsx and the admin Wholesale inbox). It
+// therefore shares a destination with "Need help?" until a wholesale page
+// exists — change the `to` here the day one does.
+export const MAIN_ROW_LINKS = [
+    { label: 'Need help?', to: '/support' },
+    { label: 'For business', to: '/support' },
+];
+
 // ---------------------------------------------------------------------------
 // Logo geometry
 //

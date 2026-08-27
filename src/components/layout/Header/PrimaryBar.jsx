@@ -3,7 +3,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import AutorenewRoundedIcon from '@mui/icons-material/AutorenewRounded';
 
 import { STATIC_IMAGES, staticImageUrl } from '../../../constants/staticImages';
-import { LOGO_METRICS, TRADE_IN_LINK } from './navigationData';
+import { LOGO_METRICS, MAIN_ROW_LINKS, TRADE_IN_LINK } from './navigationData';
 import HeaderSearch from './HeaderSearch';
 import AccountMenu from './AccountMenu';
 import CartButton from './CartButton';
@@ -64,6 +64,16 @@ const PrimaryBar = ({ menuButtonRef, onOpenDrawer, isDrawerOpen }) => (
                     <AutorenewRoundedIcon aria-hidden="true" />
                     {TRADE_IN_LINK.label}
                 </Link>
+
+                {MAIN_ROW_LINKS.map((link) => (
+                    <Link
+                        key={link.label}
+                        to={link.to}
+                        className="hidden h-10 items-center rounded-full px-3 text-[13px] font-bold text-apple-text outline-none transition-colors duration-200 ease-smooth hover:text-brand-red focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 focus-visible:ring-offset-white lg:inline-flex"
+                    >
+                        {link.label}
+                    </Link>
+                ))}
 
                 <AccountMenu />
                 <CartButton />
