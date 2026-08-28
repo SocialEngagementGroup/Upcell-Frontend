@@ -5,16 +5,25 @@ import EventRepeatOutlinedIcon from '@mui/icons-material/EventRepeatOutlined';
 import AutoAwesomeOutlinedIcon from '@mui/icons-material/AutoAwesomeOutlined';
 import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
 
-// The promise block. One component for both sizes: a 2x2 grid of cards on
-// mobile, the same four in a row on desktop, with the button full width below
-// the grid on mobile and sized to its label on desktop.
+// The promise block, in the two shapes the reference gives it.
 //
-// The heading is the site's own — "The UpCellIT Promise" is already what the
+// Desktop: a large centred headline, a centred line under it carrying the
+// promise as an inline underlined link, then the four facts flat on the page
+// background as one row — icon tile with its label beside it, no cards and no
+// panel.
+//
+// Mobile: a left-aligned heading over a panel holding the same four as a 2x2
+// grid of cards, icon above label, with a full width button under it.
+//
+// So the two extras swap rather than stack: the subline is desktop only, the
+// button is mobile only, and each carries the same destination.
+//
+// The name is the site's own — "The UpCellIT Promise" is already what the
 // header's first utility link is called, and it already points at /about, so
-// this section and that link say the same thing and lead to the same place.
+// this block and that link say the same thing and lead to the same place.
 //
-// The four facts are UpCell's, not the reference's. Two differ from it and
-// both differences matter:
+// The four facts are UpCell's, not the reference's. Two differ, and both
+// differences are the reason for checking:
 //
 //   * The inspection is 40 points, not 100 (AboutUs, Contactus and the
 //     product page all say 40).
@@ -23,9 +32,9 @@ import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
 //     and the word "free" is not.
 const PROMISES = [
     {
-        id: 'warranty',
-        Icon: WorkspacePremiumOutlinedIcon,
-        label: '12-month warranty',
+        id: 'graded',
+        Icon: AutoAwesomeOutlinedIcon,
+        label: 'Professionally refurbished',
     },
     {
         id: 'inspection',
@@ -38,35 +47,53 @@ const PROMISES = [
         label: '30-day return window',
     },
     {
-        id: 'graded',
-        Icon: AutoAwesomeOutlinedIcon,
-        label: 'Professionally refurbished',
+        id: 'warranty',
+        Icon: WorkspacePremiumOutlinedIcon,
+        label: '12-month warranty',
     },
 ];
 
 const PromiseSection = () => (
-    <section aria-labelledby="promise-heading" className="py-8 md:py-12">
+    <section aria-labelledby="promise-heading" className="py-8 md:py-14">
         <div className="site-shell">
-            <div className="rounded-3xl border border-solid border-black/[0.06] bg-surface-alt p-5 md:p-8">
-                {/* The base layer sizes h2 at text-4xl/extrabold; both are
-                    overridden — Roboto has no 800 face loaded, and 36px is a
-                    page-title size, not a section one. */}
-                <h2
-                    id="promise-heading"
-                    className="max-w-[22ch] text-[1.25rem] font-bold leading-tight tracking-[-0.02em] text-apple-text md:text-[1.75rem]"
-                >
-                    The UpCellIT Promise: every device checked before it ships
-                </h2>
+            {/* The base layer sizes h2 at text-4xl and font-extrabold; both are
+                overridden — Roboto has no 800 face loaded, and the two sizes
+                here are set per breakpoint. */}
+            <h2
+                id="promise-heading"
+                className="text-[1.25rem] font-bold leading-tight tracking-[-0.02em] text-apple-text md:text-center md:text-[2.75rem] md:tracking-[-0.04em] lg:text-[3.25rem]"
+            >
+                <span className="md:hidden">The UpCellIT Promise: every device checked before it ships</span>
+                <span className="hidden md:inline">Apple hardware, without the new-device price.</span>
+            </h2>
 
-                <ul className="m-0 mt-5 grid list-none grid-cols-2 gap-3 p-0 md:mt-7 md:grid-cols-4 md:gap-4">
+            {/* Desktop only — on mobile the same destination is the button
+                under the grid, so showing both would be two routes to /about
+                sitting inches apart. */}
+            <p className="hidden text-center text-[1rem] font-normal leading-relaxed text-ink-soft md:mx-auto md:mt-4 md:block md:max-w-[64ch] md:text-[1.0625rem]">
+                Inspected, graded and warrantied before it reaches you. Backed by{' '}
+                <Link
+                    to="/about"
+                    className="font-medium text-apple-text underline underline-offset-2 outline-none hover:text-brand-red focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2"
+                >
+                    the UpCellIT Promise
+                </Link>
+                .
+            </p>
+
+            <div className="mt-5 rounded-3xl border border-solid border-black/[0.06] bg-surface-alt p-5 md:mt-10 md:rounded-none md:border-0 md:bg-transparent md:p-0">
+                <ul className="m-0 grid list-none grid-cols-2 gap-3 p-0 md:grid-cols-4 md:gap-8">
                     {PROMISES.map(({ id, Icon, label }) => (
                         <li key={id} className="h-full">
-                            <div className="flex h-full flex-col rounded-2xl border border-solid border-black/[0.06] bg-white p-4 md:p-5">
-                                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-surface-alt text-apple-text [&_svg]:!text-[22px]">
+                            {/* Card on mobile, flat row on desktop: the border,
+                                background and padding all go at md, and the
+                                stack becomes a horizontal pair. */}
+                            <div className="flex h-full flex-col rounded-2xl border border-solid border-black/[0.06] bg-white p-4 md:flex-row md:items-center md:gap-3 md:rounded-none md:border-0 md:bg-transparent md:p-0">
+                                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-surface-alt text-apple-text [&_svg]:!text-[22px]">
                                     <Icon aria-hidden="true" />
                                 </span>
 
-                                <p className="mt-8 text-[0.875rem] font-bold leading-snug text-apple-text md:mt-10 md:text-[0.9375rem]">
+                                <p className="mt-8 text-[0.875rem] font-bold leading-snug text-apple-text md:mt-0 md:text-[0.9375rem]">
                                     {label}
                                 </p>
                             </div>
@@ -74,9 +101,11 @@ const PromiseSection = () => (
                     ))}
                 </ul>
 
+                {/* Mobile only — the desktop route to /about is the link in the
+                    subline above. */}
                 <Link
                     to="/about"
-                    className="mt-5 inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-apple-text px-8 text-[0.9375rem] font-bold text-white outline-none transition-colors duration-200 ease-smooth hover:bg-brand-red focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 md:mt-7 md:w-auto [&_svg]:!text-[19px]"
+                    className="mt-5 inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-apple-text px-8 text-[0.9375rem] font-bold text-white outline-none transition-colors duration-200 ease-smooth hover:bg-brand-red focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 md:hidden [&_svg]:!text-[19px]"
                 >
                     Our commitment
                     <ArrowForwardRoundedIcon aria-hidden="true" />
