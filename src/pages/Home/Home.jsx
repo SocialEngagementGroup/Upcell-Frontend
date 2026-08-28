@@ -7,6 +7,7 @@ import RecommendedSection from "../../components/Recommended/RecommendedSection"
 import TradeInBanner from "../../components/TradeInBanner/TradeInBanner";
 import TopBrands from "../../components/TopBrands/TopBrands";
 import Reviews from "../../components/Reviews/Reviews";
+import PromiseSection from "../../components/Promise/PromiseSection";
 import MobileHero from "./mobile/MobileHero";
 import MobileCategories from "./mobile/MobileCategories";
 import MobileBottomNav from "./mobile/MobileBottomNav";
@@ -41,6 +42,7 @@ const Home = () => {
                 <HeroBanner />
             )}
 
+            <PromiseSection />
             <MostWanted />
             <RecommendedSection />
             <TradeInBanner />
