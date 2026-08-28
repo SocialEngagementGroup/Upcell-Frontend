@@ -91,14 +91,31 @@ export const DEMO_SAMSUNG = build([
     'Galaxy Z Flip 5 · Unlocked',
 ], PLACEHOLDER_IMAGE);
 
-export const DEMO_ANDROID = build([
+export const DEMO_GOOGLE = build([
     'Google Pixel 9 · Unlocked',
+    'Google Pixel 9 Pro · Unlocked',
     'Google Pixel 8 · Unlocked',
     'Google Pixel 8a · Unlocked',
     'Google Pixel 7 · Unlocked',
-    'Motorola Moto G · Unlocked',
-    'OnePlus 12 · Unlocked',
 ], PLACEHOLDER_IMAGE);
+
+export const DEMO_ONEPLUS = build([
+    'OnePlus 12 · Unlocked',
+    'OnePlus 11 · Unlocked',
+    'OnePlus Nord 3 · Unlocked',
+    'OnePlus 10 Pro · Unlocked',
+], PLACEHOLDER_IMAGE);
+
+export const DEMO_MOTOROLA = build([
+    'Motorola Edge 50 · Unlocked',
+    'Motorola Moto G 5G · Unlocked',
+    'Motorola Razr 40 · Unlocked',
+    'Motorola Moto G Power · Unlocked',
+], PLACEHOLDER_IMAGE);
+
+// The Android rail is the three non-Samsung brands together, which is how the
+// reference groups them.
+export const DEMO_ANDROID = [...DEMO_GOOGLE, ...DEMO_MOTOROLA, ...DEMO_ONEPLUS];
 
 // Deals demo set. Every entry has originalPrice above price, so the rail has
 // something to show before the catalogue is answering.
@@ -124,11 +141,13 @@ export const AUDIENCE_CHIPS = [
     { label: 'Shop good deals 💰', to: '/shop#deals' },
 ];
 
-// "Top brands, refurbished".
+// "Top brands, refurbished". The tiles select which brand the panel's rail
+// shows, which is what the reference's row does.
 //
-// Rendered as wordmarks rather than logos: the real marks are other companies'
-// trademarks and none of them are in this repo. Apple is the only one UpCell
-// actually stocks.
+// Only Apple has a real mark available — MUI ships an Apple glyph. The other
+// four are other companies' trademarks and no licensed asset for them exists in
+// this repo, so those tiles carry the brand's name set as a wordmark. Dropping
+// a real SVG in later is a per-tile change and nothing else moves.
 export const BRANDS = [
     { id: 'apple', label: 'Apple', stocked: true },
     { id: 'samsung', label: 'Samsung', stocked: false },

@@ -1,19 +1,16 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import ChevronLeftRoundedIcon from '@mui/icons-material/ChevronLeftRounded';
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
 
 import ProductCard from '../../components/Recommended/ProductCard';
+import { RAIL_ARROW_CLASS, railArrowTone, useRailScroll } from './useRailScroll';
 
 // One titled carousel of product cards — the shape the reference uses for
 // every product section on its listing page ("Shop our best deals", "Best
 // refurbished iPhone", and so on).
 //
-// A scroller rather than a slider: no slide index, no autoplay, just overflow
-// with the arrows nudging scrollLeft. Trackpad and touch swiping work for
-// free, and it degrades to a plain scrollable row if the script never runs.
-// Same approach as the home page's rails, so a rail behaves identically
-// wherever it appears.
+// The scrolling itself lives in useRailScroll, shared with the brand panel, so
+// every rail on the page behaves identically.
 const ProductRail = ({
     id,
     title,
@@ -26,37 +23,7 @@ const ProductRail = ({
     emptyMessage = 'Nothing to show here yet.',
     className = '',
 }) => {
-    const trackRef = useRef(null);
-    const [canScrollBack, setCanScrollBack] = useState(false);
-    const [canScrollOn, setCanScrollOn] = useState(false);
-
-    // A one-pixel tolerance: sub-pixel layout means scrollLeft rarely lands
-    // exactly on the maximum, which would leave the forward arrow enabled at
-    // the end of the rail forever.
-    const sync = useCallback(() => {
-        const node = trackRef.current;
-        if (!node) return;
-        const max = node.scrollWidth - node.clientWidth;
-        setCanScrollBack(node.scrollLeft > 1);
-        setCanScrollOn(node.scrollLeft < max - 1);
-    }, []);
-
-    useEffect(() => {
-        sync();
-        window.addEventListener('resize', sync);
-        return () => window.removeEventListener('resize', sync);
-    }, [sync, products.length]);
-
-    const nudge = (direction) => {
-        const node = trackRef.current;
-        if (!node) return;
-        node.scrollBy({ left: direction * Math.round(node.clientWidth * 0.9), behavior: 'smooth' });
-    };
-
-    const arrowClass = 'flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-none outline-none transition-colors duration-200 ease-smooth focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 [&_svg]:!text-[22px]';
-    const arrowTone = (enabled) => (enabled
-        ? 'bg-apple-text text-white hover:bg-black cursor-pointer'
-        : 'bg-apple-bg text-apple-gray cursor-not-allowed');
+    const { trackRef, canScrollBack, canScrollOn, sync, nudge } = useRailScroll(products.length);
 
     const headingId = `${id}-heading`;
 
@@ -90,7 +57,7 @@ const ProductRail = ({
                                     onClick={() => nudge(-1)}
                                     disabled={!canScrollBack}
                                     aria-label={`Scroll ${title} left`}
-                                    className={`${arrowClass} ${arrowTone(canScrollBack)}`}
+                                    className={`${RAIL_ARROW_CLASS} ${railArrowTone(canScrollBack)}`}
                                 >
                                     <ChevronLeftRoundedIcon aria-hidden="true" />
                                 </button>
@@ -99,7 +66,7 @@ const ProductRail = ({
                                     onClick={() => nudge(1)}
                                     disabled={!canScrollOn}
                                     aria-label={`Scroll ${title} right`}
-                                    className={`${arrowClass} ${arrowTone(canScrollOn)}`}
+                                    className={`${RAIL_ARROW_CLASS} ${railArrowTone(canScrollOn)}`}
                                 >
                                     <ChevronRightRoundedIcon aria-hidden="true" />
                                 </button>

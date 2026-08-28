@@ -16,14 +16,16 @@ import { cloudinaryUrl } from '../../utilities/cloudinary';
 import { useProductsQuery } from '../../queries/products';
 import { EMPTY_ARRAY } from '../../queries/keys';
 import { STATIC_IMAGES } from '../../constants/staticImages';
-import ProductCard from '../../components/Recommended/ProductCard';
 import ProductRail from './ProductRail';
+import TopBrandsPanel from './TopBrandsPanel';
 import {
     AUDIENCE_CHIPS,
-    BRANDS,
     DEMO_ANDROID,
     DEMO_DEALS,
+    DEMO_GOOGLE,
     DEMO_IPHONES,
+    DEMO_MOTOROLA,
+    DEMO_ONEPLUS,
     DEMO_SAMSUNG,
 } from './shopDemoData';
 
@@ -162,12 +164,15 @@ const ShopPage = () => {
         android: DEMO_ANDROID,
     }), [byFamily]);
 
-    // The brand panel's rail shows a spread rather than one brand: whatever is
-    // really stocked first, then the demo sets behind it.
-    const brandRail = useMemo(() => (
-        [...(byFamily.iPhone.length ? byFamily.iPhone : DEMO_IPHONES), ...DEMO_SAMSUNG, ...DEMO_ANDROID]
-            .slice(0, MAX_PER_RAIL)
-    ), [byFamily]);
+    // One set per tile in the brand panel. Apple is the only brand with a real
+    // catalogue behind it; the rest are demo until UpCell stocks them.
+    const productsByBrand = useMemo(() => ({
+        apple: byFamily.iPhone.length ? byFamily.iPhone : DEMO_IPHONES,
+        samsung: DEMO_SAMSUNG,
+        google: DEMO_GOOGLE,
+        oneplus: DEMO_ONEPLUS,
+        motorola: DEMO_MOTOROLA,
+    }), [byFamily]);
 
     // The header's search box sends people here with `?q=`. Without a filtered
     // index to land on, that would now be a dead end, so the term switches the
@@ -458,66 +463,7 @@ const ShopPage = () => {
                         variant="bestSeller"
                     />
 
-                    {/* =========================================================
-                        Top brands, refurbished. Two columns, as the reference
-                        has: a picture on one side, a rail on the other, with
-                        the brand row above it.
-                        ========================================================= */}
-                    <section aria-labelledby="brands-heading" className="py-8 md:py-10">
-                        <div className="site-shell">
-                            <h2 id="brands-heading" className="text-[1.5rem] font-bold leading-tight tracking-[-0.02em] text-apple-text md:text-[1.75rem]">
-                                Top brands, refurbished
-                            </h2>
-
-                            <div className="mt-5 overflow-hidden rounded-3xl border border-solid border-black/[0.06] bg-surface-alt">
-                                <div className="flex flex-col gap-6 p-5 md:flex-row md:items-stretch md:gap-8 md:p-6">
-                                    <div className="w-full md:w-[38%]">
-                                        <img
-                                            src={cloudinaryUrl(STATIC_IMAGES.HERO_IPHONE_15, { width: 900 })}
-                                            alt=""
-                                            width="900"
-                                            height="600"
-                                            decoding="async"
-                                            className="block h-[200px] w-full rounded-2xl bg-white object-contain p-4 md:h-full md:min-h-[300px]"
-                                        />
-                                    </div>
-
-                                    <div className="flex w-full min-w-0 flex-col md:w-[62%]">
-                                        {/* Wordmarks, not logos: the real marks
-                                            are other companies' trademarks and
-                                            none of them are in this repo. */}
-                                        <ul className="flex list-none flex-wrap items-center gap-2 p-0">
-                                            {BRANDS.map((brand) => (
-                                                <li key={brand.id}>
-                                                    <span
-                                                        className={`inline-flex h-9 items-center rounded-full px-4 text-[0.875rem] font-bold ${
-                                                            brand.stocked
-                                                                ? 'bg-apple-text text-white'
-                                                                : 'border border-dashed border-black/20 bg-white/60 text-apple-gray'
-                                                        }`}
-                                                    >
-                                                        {brand.label}
-                                                    </span>
-                                                </li>
-                                            ))}
-                                        </ul>
-
-                                        <ul className="scrollbar-hidden -mx-1 mt-5 flex list-none items-stretch gap-4 overflow-x-auto scroll-smooth px-1 pb-1">
-                                            {brandRail.map((product) => (
-                                                <li key={product._id} className="flex">
-                                                    <ProductCard
-                                                        product={product}
-                                                        onAddToCart={handleAddToCart}
-                                                        variant="bestSeller"
-                                                    />
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
+                    <TopBrandsPanel productsByBrand={productsByBrand} onAddToCart={handleAddToCart} />
                 </>
             )}
         </div>
