@@ -13,7 +13,18 @@ import { RAIL_ARROW_CLASS, railArrowTone, useRailScroll } from './useRailScroll'
 // content category there ("Samsung", "iPhone Articles and Guides"); UpCell's
 // posts carry no category field, and inventing a taxonomy to fill the slot
 // would be making up structure the journal does not have.
-const BlogRail = ({ id, title, posts = [], cta }) => {
+// Written out in full rather than built from `perView`, because Tailwind
+// scans the source for literal class names — an interpolated string would
+// produce a class that never gets generated.
+//
+// 4.5 leaves half a card showing at the right edge, which is the cue that the
+// rail scrolls. 5 fills the row exactly.
+const PER_VIEW_BASIS = {
+    4.5: 'md:basis-[calc((100%-4rem)/4.5)]',
+    5: 'md:basis-[calc((100%-4rem)/5)]',
+};
+
+const BlogRail = ({ id, title, posts = [], cta, perView = 5 }) => {
     const { trackRef, canScrollBack, canScrollOn, sync, nudge } = useRailScroll(posts.length);
 
     if (posts.length === 0) return null;
@@ -63,7 +74,7 @@ const BlogRail = ({ id, title, posts = [], cta }) => {
                         instead of leaving a gap where the missing ones would
                         be. */}
                     {posts.map((post) => (
-                        <li key={post.slug} className="flex w-[260px] shrink-0 md:w-auto md:grow md:basis-[calc((100%-4rem)/5)]">
+                        <li key={post.slug} className={`flex w-[260px] shrink-0 md:w-auto md:grow ${PER_VIEW_BASIS[perView] || PER_VIEW_BASIS[5]}`}>
                             <article className="flex w-full flex-col overflow-hidden rounded-2xl bg-white transition-shadow duration-200 ease-smooth hover:shadow-surface">
                                 {/* Placeholder entries carry an explicit
                                     linkTo, because they have no article route

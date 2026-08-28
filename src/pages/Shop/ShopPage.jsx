@@ -29,6 +29,7 @@ import {
     DEMO_ANDROID,
     DEMO_DEALS,
     DEMO_GUIDES,
+    DEMO_JOURNAL,
     DEMO_GOOGLE,
     DEMO_IPHONES,
     DEMO_MOTOROLA,
@@ -509,7 +510,11 @@ const ShopPage = () => {
                     <BlogRail
                         id="journal"
                         title="The more you know"
-                        posts={blogData}
+                        // Real articles first, then placeholders. Four and a
+                        // half cards need a fifth item for the half to exist,
+                        // and UpCell has written four.
+                        posts={[...blogData, ...DEMO_JOURNAL]}
+                        perView={4.5}
                         cta={{ label: 'Read the Tech Journal', to: '/blogs' }}
                     />
 

@@ -184,6 +184,29 @@ export const DEMO_GUIDES = [
     },
 ];
 
+// "The more you know" runs UpCell's four real articles. The rail is sized to
+// show four and a half, so it needs a fifth item for the half to exist — these
+// two stand in until there are more real posts. They carry the same "Draft —
+// placeholder" date as DEMO_GUIDES so they read as unfinished at a glance, and
+// they are separate entries rather than reused ones so the same card never
+// appears twice on the page.
+export const DEMO_JOURNAL = [
+    {
+        slug: 'demo-journal-buying-guide',
+        title: 'Choosing between this year’s model and last year’s',
+        date: 'Draft — placeholder',
+        image: staticImageUrl(STATIC_IMAGES.CATEGORY_IPHONE, 600),
+        linkTo: '/blogs',
+    },
+    {
+        slug: 'demo-journal-care',
+        title: 'Small habits that keep a device worth trading in',
+        date: 'Draft — placeholder',
+        image: staticImageUrl(STATIC_IMAGES.CATEGORY_MACBOOK, 600),
+        linkTo: '/blogs',
+    },
+];
+
 // "Your phone, your call" — the reference's audience chips.
 //
 // See the note at the top of this file: the two discount chips are not offers
