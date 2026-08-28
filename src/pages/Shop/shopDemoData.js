@@ -168,6 +168,20 @@ export const DEMO_GUIDES = [
         image: staticImageUrl(STATIC_IMAGES.BLOG_APPLE_PURCHASE, 600),
         linkTo: '/blogs',
     },
+    {
+        slug: 'demo-battery-life',
+        title: 'What battery health really means day to day',
+        date: 'Draft — placeholder',
+        image: staticImageUrl(STATIC_IMAGES.BLOG_BATTERY_HEALTH, 600),
+        linkTo: '/blogs',
+    },
+    {
+        slug: 'demo-trade-in-timing',
+        title: 'The best moment to trade your device in',
+        date: 'Draft — placeholder',
+        image: staticImageUrl(STATIC_IMAGES.BLOG_TRADE_IN_TIMING, 600),
+        linkTo: '/blogs',
+    },
 ];
 
 // "Your phone, your call" — the reference's audience chips.

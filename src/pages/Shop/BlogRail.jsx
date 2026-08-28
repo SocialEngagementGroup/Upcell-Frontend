@@ -55,9 +55,16 @@ const BlogRail = ({ id, title, posts = [], cta }) => {
                     onScroll={sync}
                     className="scrollbar-hidden -mx-1 mt-5 flex list-none items-stretch gap-4 overflow-x-auto scroll-smooth px-1 pb-1"
                 >
+                    {/* Card width sits on the li, not the article: a
+                        percentage on the article would resolve against the li
+                        rather than the track, and collapse to its content.
+                        grow + shrink-0 means five or more posts hold the basis
+                        and the rail scrolls, while fewer grow to fill the row
+                        instead of leaving a gap where the missing ones would
+                        be. */}
                     {posts.map((post) => (
-                        <li key={post.slug} className="flex">
-                            <article className="flex w-[260px] shrink-0 flex-col overflow-hidden rounded-2xl bg-white transition-shadow duration-200 ease-smooth hover:shadow-surface md:w-[280px]">
+                        <li key={post.slug} className="flex w-[260px] shrink-0 md:w-auto md:grow md:basis-[calc((100%-4rem)/5)]">
+                            <article className="flex w-full flex-col overflow-hidden rounded-2xl bg-white transition-shadow duration-200 ease-smooth hover:shadow-surface">
                                 {/* Placeholder entries carry an explicit
                                     linkTo, because they have no article route
                                     of their own to be built from a slug. */}
