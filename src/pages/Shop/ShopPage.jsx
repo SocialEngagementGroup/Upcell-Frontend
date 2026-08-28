@@ -18,6 +18,7 @@ import { EMPTY_ARRAY } from '../../queries/keys';
 import { STATIC_IMAGES } from '../../constants/staticImages';
 import ProductRail from './ProductRail';
 import Reviews from '../../components/Reviews/Reviews';
+import PromoRows from './PromoRows';
 import TopBrandsPanel from './TopBrandsPanel';
 import {
     AUDIENCE_CHIPS,
@@ -481,6 +482,13 @@ const ShopPage = () => {
                         heading="Loved by customers"
                         className="py-8 md:py-10"
                     />
+
+                    {/* =========================================================
+                        The reference's two promo rows — trade-in, then support.
+                        The BackUp protection banner that follows them there is
+                        the second section left out at the user's instruction.
+                        ========================================================= */}
+                    <PromoRows />
                 </>
             )}
         </div>
