@@ -2,7 +2,8 @@ import heroPhones from '../../assets/hero-phones.png';
 
 // The single home banner. Static — no carousel, no autoplay, no dots.
 //
-// Background: #e3f87f (vibrant lime green matching Back Market reference).
+// Background: Near Black (#0c0c0c), the brand's own dark ground — the
+// reference's lime is Back Market's colour, not UpCell's.
 // Product lineup on the right, bold tagline and CTA on the left.
 export const HERO = {
     title: 'Just as impressive',

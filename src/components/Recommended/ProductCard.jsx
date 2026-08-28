@@ -43,7 +43,7 @@ const Stars = ({ score }) => (
 // whatever a given product has not been given.
 //
 // Two presentations of the same card, as the reference has:
-//   priceDrop   — the discount is the story: lime badge, the saving spelled
+//   priceDrop   — the discount is the story: red badge, the saving spelled
 //                 out, and the previous price under it.
 //   bestSeller  — the product is the story: no badge, no saving, just the
 //                 price with the new-device price struck through beside it.
@@ -76,7 +76,7 @@ const ProductCard = ({ product, onAddToCart, variant = 'priceDrop' }) => {
                 </span>
 
                 {isPriceDrop && saving > 0 && (
-                    <span className="mt-3 inline-flex w-fit items-center gap-1 rounded-md bg-brand-lime px-2 py-1 text-[0.75rem] font-bold text-apple-text [&_svg]:!text-[14px]">
+                    <span className="mt-3 inline-flex w-fit items-center gap-1 rounded-md bg-brand-red px-2 py-1 text-[0.75rem] font-bold text-white [&_svg]:!text-[14px]">
                         <TrendingDownRoundedIcon aria-hidden="true" />
                         Price drop
                     </span>

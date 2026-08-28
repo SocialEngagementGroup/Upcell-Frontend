@@ -119,7 +119,7 @@ const RecommendedSection = () => {
                                 onClick={() => setTab(item.id)}
                                 className={`h-9 rounded-full px-4 text-[0.875rem] font-bold outline-none transition-colors duration-200 ease-smooth focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 ${
                                     selected
-                                        ? 'bg-brand-lime text-apple-text'
+                                        ? 'bg-apple-text text-white'
                                         : 'bg-apple-bg text-ink-soft hover:bg-black/[0.08]'
                                 }`}
                             >
