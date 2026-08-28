@@ -28,7 +28,7 @@ const MobileHero = () => (
         <section aria-labelledby="m-hero-heading" className="px-4 pt-4">
             <div className="overflow-hidden rounded-2xl bg-apple-text">
                 <div className="px-5 pt-6">
-                    <p className="text-[0.75rem] font-medium uppercase tracking-wide text-white/60">
+                    <p className="text-[0.8125rem] font-medium uppercase tracking-wide text-white/60">
                         {HERO_BANNER.eyebrow}
                     </p>
 
@@ -37,18 +37,18 @@ const MobileHero = () => (
                         far too large for a 375px screen. */}
                     <h1
                         id="m-hero-heading"
-                        className="mt-1.5 text-[1.625rem] font-bold leading-[1.15] tracking-[-0.03em] text-white"
+                        className="mt-1.5 text-[1.75rem] font-bold leading-[1.15] tracking-[-0.03em] text-white"
                     >
                         {HERO_BANNER.title}
                     </h1>
 
-                    <p className="mt-2 text-[0.875rem] font-normal leading-snug text-white/75">
+                    <p className="mt-2 text-[0.9375rem] font-normal leading-snug text-white/75">
                         {HERO_BANNER.copy}
                     </p>
 
                     <Link
                         to={HERO_BANNER.cta.to}
-                        className="mt-4 inline-flex h-11 items-center justify-center rounded-lg bg-brand-red px-6 text-[0.875rem] font-bold text-white outline-none transition-colors duration-200 ease-smooth hover:bg-[#b00a0d] focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-apple-text"
+                        className="mt-4 inline-flex h-11 items-center justify-center rounded-lg bg-brand-red px-6 text-[0.9375rem] font-bold text-white outline-none transition-colors duration-200 ease-smooth hover:bg-[#b00a0d] focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-apple-text"
                     >
                         {HERO_BANNER.cta.label}
                     </Link>
@@ -87,10 +87,10 @@ const MobileHero = () => (
                                 />
                             </span>
                             <span className="px-3 py-2.5">
-                                <span className="block text-[0.875rem] font-bold leading-tight text-apple-text">
+                                <span className="block text-[0.9375rem] font-bold leading-tight text-apple-text">
                                     {card.title}
                                 </span>
-                                <span className="mt-0.5 block text-[0.75rem] font-normal leading-snug text-apple-gray">
+                                <span className="mt-0.5 block text-[0.8125rem] font-normal leading-snug text-apple-gray">
                                     {card.copy}
                                 </span>
                             </span>
@@ -111,7 +111,7 @@ const MobileHero = () => (
                     return (
                         <li key={feature.id} className="flex items-center gap-2">
                             <Icon aria-hidden="true" className="shrink-0 !text-[20px] text-brand-red" />
-                            <span className="text-[0.75rem] font-medium leading-tight text-ink-soft">
+                            <span className="text-[0.8125rem] font-medium leading-tight text-ink-soft">
                                 {feature.label}
                             </span>
                         </li>

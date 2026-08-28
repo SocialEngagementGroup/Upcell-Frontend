@@ -42,7 +42,7 @@ const ROWS = [
 ];
 
 const PromoRows = () => (
-    <div className="py-8 md:py-10">
+    <div className="py-10 md:py-12">
         <div className="site-shell flex flex-col gap-10 md:gap-16">
             {ROWS.map((row) => (
                 <section
@@ -66,18 +66,18 @@ const PromoRows = () => (
                             text-4xl/extrabold, and Roboto has no 800 loaded. */}
                         <h2
                             id={`${row.id}-heading`}
-                            className="text-[1.375rem] font-bold leading-tight tracking-[-0.02em] text-apple-text md:text-[1.625rem]"
+                            className="text-[1.5rem] font-bold leading-tight tracking-[-0.02em] text-apple-text md:text-[1.75rem]"
                         >
                             {row.title}
                         </h2>
 
-                        <p className="mt-2.5 max-w-[58ch] text-[0.9375rem] font-normal leading-relaxed text-ink-soft md:text-[1rem]">
+                        <p className="mt-2.5 max-w-[58ch] text-[1rem] font-normal leading-relaxed text-ink-soft md:text-[1.0625rem]">
                             {row.copy}
                         </p>
 
                         <Link
                             to={row.cta.to}
-                            className="mt-5 inline-flex h-11 items-center justify-center rounded-lg bg-apple-text px-6 text-[0.9375rem] font-bold text-white outline-none transition-colors duration-200 ease-smooth hover:bg-brand-red focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2"
+                            className="mt-5 inline-flex h-11 items-center justify-center rounded-lg bg-apple-text px-6 text-[1rem] font-bold text-white outline-none transition-colors duration-200 ease-smooth hover:bg-brand-red focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2"
                         >
                             {row.cta.label}
                         </Link>

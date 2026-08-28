@@ -69,7 +69,7 @@ const MostWanted = () => {
         <section aria-labelledby="most-wanted-heading" className="bg-surface py-10 md:py-12">
             <div className="site-shell">
                 <div className="flex items-center justify-between gap-4">
-                    <h2 id="most-wanted-heading" className="text-[1.5rem] font-bold tracking-[-0.02em] text-apple-text md:text-[1.75rem]">
+                    <h2 id="most-wanted-heading" className="text-[1.625rem] font-bold tracking-[-0.02em] text-apple-text md:text-[2rem]">
                         Shop our most wanted
                     </h2>
 
@@ -117,7 +117,7 @@ const MostWanted = () => {
                                     decoding="async"
                                     className="block h-[104px] w-auto object-contain transition-transform duration-300 ease-smooth group-hover:scale-105 md:h-[120px]"
                                 />
-                                <span className="text-center text-[0.9375rem] font-bold leading-tight text-apple-text group-hover:text-brand-red">
+                                <span className="text-center text-[1rem] font-bold leading-tight text-apple-text group-hover:text-brand-red">
                                     {item.label}
                                 </span>
                             </Link>

@@ -54,14 +54,14 @@ const PROMISES = [
 ];
 
 const PromiseSection = () => (
-    <section aria-labelledby="promise-heading" className="py-8 md:py-14">
+    <section aria-labelledby="promise-heading" className="py-10 md:py-12">
         <div className="site-shell">
             {/* The base layer sizes h2 at text-4xl and font-extrabold; both are
                 overridden — Roboto has no 800 face loaded, and the two sizes
                 here are set per breakpoint. */}
             <h2
                 id="promise-heading"
-                className="text-[1.25rem] font-bold leading-tight tracking-[-0.02em] text-apple-text md:text-center md:text-[2.75rem] md:tracking-[-0.04em] lg:text-[3.25rem]"
+                className="text-[1.375rem] font-bold leading-tight tracking-[-0.02em] text-apple-text md:text-center md:text-[2.75rem] md:tracking-[-0.04em] lg:text-[3.25rem]"
             >
                 <span className="md:hidden">The UpCellIT Promise: every device checked before it ships</span>
                 <span className="hidden md:inline">Apple hardware, without the new-device price.</span>
@@ -70,7 +70,7 @@ const PromiseSection = () => (
             {/* Desktop only — on mobile the same destination is the button
                 under the grid, so showing both would be two routes to /about
                 sitting inches apart. */}
-            <p className="hidden text-center text-[1rem] font-normal leading-relaxed text-ink-soft md:mx-auto md:mt-4 md:block md:max-w-[64ch] md:text-[1.0625rem]">
+            <p className="hidden text-center text-[1.0625rem] font-normal leading-relaxed text-ink-soft md:mx-auto md:mt-4 md:block md:max-w-[64ch] md:text-[1.125rem]">
                 Inspected, graded and warrantied before it reaches you. Backed by{' '}
                 <Link
                     to="/about"
@@ -93,7 +93,7 @@ const PromiseSection = () => (
                                     <Icon aria-hidden="true" />
                                 </span>
 
-                                <p className="mt-8 text-[0.875rem] font-bold leading-snug text-apple-text md:mt-0 md:text-[0.9375rem]">
+                                <p className="mt-8 text-[0.9375rem] font-bold leading-snug text-apple-text md:mt-0 md:text-[1rem]">
                                     {label}
                                 </p>
                             </div>
@@ -105,7 +105,7 @@ const PromiseSection = () => (
                     subline above. */}
                 <Link
                     to="/about"
-                    className="mt-5 inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-apple-text px-8 text-[0.9375rem] font-bold text-white outline-none transition-colors duration-200 ease-smooth hover:bg-brand-red focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 md:hidden [&_svg]:!text-[19px]"
+                    className="mt-5 inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-apple-text px-8 text-[1rem] font-bold text-white outline-none transition-colors duration-200 ease-smooth hover:bg-brand-red focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 md:hidden [&_svg]:!text-[19px]"
                 >
                     Our commitment
                     <ArrowForwardRoundedIcon aria-hidden="true" />

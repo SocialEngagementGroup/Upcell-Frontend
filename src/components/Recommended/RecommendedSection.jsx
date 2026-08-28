@@ -97,7 +97,7 @@ const RecommendedSection = () => {
     return (
         <section aria-labelledby="recommended-heading" className="py-10 md:py-12">
             <div className="site-shell">
-                <h2 id="recommended-heading" className="text-[1.5rem] font-bold tracking-[-0.02em] text-apple-text md:text-[1.75rem]">
+                <h2 id="recommended-heading" className="text-[1.625rem] font-bold tracking-[-0.02em] text-apple-text md:text-[2rem]">
                     Recommended for you
                 </h2>
 
@@ -117,7 +117,7 @@ const RecommendedSection = () => {
                                 aria-selected={selected}
                                 aria-controls="rec-panel"
                                 onClick={() => setTab(item.id)}
-                                className={`h-9 rounded-full px-4 text-[0.875rem] font-bold outline-none transition-colors duration-200 ease-smooth focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 ${
+                                className={`h-9 rounded-full px-4 text-[0.9375rem] font-bold outline-none transition-colors duration-200 ease-smooth focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 ${
                                     selected
                                         ? 'bg-apple-text text-white'
                                         : 'bg-apple-bg text-ink-soft hover:bg-black/[0.08]'
@@ -131,9 +131,9 @@ const RecommendedSection = () => {
 
                 <div id="rec-panel" role="tabpanel" aria-labelledby={`rec-tab-${tab}`} className="mt-6">
                     {isLoading ? (
-                        <p className="py-8 text-[0.9375rem] text-apple-gray">Loading recommendations…</p>
+                        <p className="py-8 text-[1rem] text-apple-gray">Loading recommendations…</p>
                     ) : cards.length === 0 ? (
-                        <p className="py-8 text-[0.9375rem] text-apple-gray">
+                        <p className="py-8 text-[1rem] text-apple-gray">
                             {tab === 'price-drop'
                                 ? 'No price drops right now — check back soon.'
                                 : 'No products to show yet.'}

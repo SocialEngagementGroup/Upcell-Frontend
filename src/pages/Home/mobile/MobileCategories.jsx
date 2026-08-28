@@ -16,14 +16,14 @@ const MobileCategories = () => (
             <div className="flex items-center justify-between gap-3">
                 <h2
                     id="m-categories-heading"
-                    className="text-[1.125rem] font-bold leading-tight tracking-[-0.02em] text-apple-text"
+                    className="text-[1.1875rem] font-bold leading-tight tracking-[-0.02em] text-apple-text"
                 >
                     Shop by category
                 </h2>
 
                 <Link
                     to="/shop"
-                    className="inline-flex h-8 shrink-0 items-center gap-0.5 rounded-full border border-solid border-black/[0.12] bg-white pl-3.5 pr-2.5 text-[0.75rem] font-bold text-apple-text outline-none transition-colors duration-200 ease-smooth hover:border-apple-text focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 [&_svg]:!text-[16px]"
+                    className="inline-flex h-8 shrink-0 items-center gap-0.5 rounded-full border border-solid border-black/[0.12] bg-white pl-3.5 pr-2.5 text-[0.8125rem] font-bold text-apple-text outline-none transition-colors duration-200 ease-smooth hover:border-apple-text focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 [&_svg]:!text-[16px]"
                 >
                     See all
                     <ChevronRightRoundedIcon aria-hidden="true" />
@@ -47,7 +47,7 @@ const MobileCategories = () => (
                                     className="block h-[86px] w-auto object-contain transition-transform duration-300 ease-smooth group-hover:scale-105"
                                 />
                             </span>
-                            <span className="mt-2 text-[0.875rem] font-bold leading-tight text-apple-text group-hover:text-brand-red">
+                            <span className="mt-2 text-[0.9375rem] font-bold leading-tight text-apple-text group-hover:text-brand-red">
                                 {category.label}
                             </span>
                         </Link>

@@ -24,19 +24,19 @@ const TradeInBanner = () => (
                             text-4xl/extrabold, and Roboto has no 800 loaded. */}
                         <h2
                             id="trade-in-banner-heading"
-                            className="text-[1.75rem] font-bold leading-[1.1] tracking-[-0.02em] text-apple-text md:text-[2rem]"
+                            className="text-[2rem] font-bold leading-[1.1] tracking-[-0.02em] text-apple-text md:text-[2rem]"
                         >
                             Trade-in
                         </h2>
 
-                        <p className="mt-3 max-w-[46ch] text-[0.9375rem] font-normal leading-snug text-apple-text/80 md:text-[1rem]">
+                        <p className="mt-3 max-w-[46ch] text-[1rem] font-normal leading-snug text-apple-text/80 md:text-[1.0625rem]">
                             From like-new to well-worn, answer a few questions and get your
                             offer in minutes.
                         </p>
 
                         <Link
                             to="/trade-in"
-                            className="mt-6 inline-flex h-11 items-center rounded-lg bg-brand-red px-6 text-[0.9375rem] font-bold text-white outline-none transition-colors duration-200 ease-smooth hover:bg-[#b00a0d] focus-visible:ring-2 focus-visible:ring-apple-text focus-visible:ring-offset-2 focus-visible:ring-offset-surface-alt"
+                            className="mt-6 inline-flex h-11 items-center rounded-lg bg-brand-red px-6 text-[1rem] font-bold text-white outline-none transition-colors duration-200 ease-smooth hover:bg-[#b00a0d] focus-visible:ring-2 focus-visible:ring-apple-text focus-visible:ring-offset-2 focus-visible:ring-offset-surface-alt"
                         >
                             Trade in now
                         </Link>

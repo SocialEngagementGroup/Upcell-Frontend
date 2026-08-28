@@ -64,7 +64,7 @@ const MobileBottomNav = () => {
                                 // controls that are off screen.
                                 tabIndex={visible ? undefined : -1}
                                 className={({ isActive }) => [
-                                    'flex h-16 flex-col items-center justify-center gap-1 text-[0.6875rem] font-medium outline-none focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-inset [&_svg]:!text-[22px]',
+                                    'flex h-16 flex-col items-center justify-center gap-1 text-[0.75rem] font-medium outline-none focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-inset [&_svg]:!text-[22px]',
                                     isActive ? 'text-brand-red' : 'text-ink-soft',
                                 ].join(' ')}
                             >

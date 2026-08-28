@@ -13,21 +13,21 @@ const ShopSeoCopy = () => (
             <div className="mx-auto max-w-[900px]">
                 <h2
                     id="about-refurbished-heading"
-                    className="text-[1.5rem] font-bold leading-tight tracking-[-0.02em] text-apple-text md:text-[1.75rem]"
+                    className="text-[1.625rem] font-bold leading-tight tracking-[-0.02em] text-apple-text md:text-[2rem]"
                 >
                     Buying a Certified Premium Apple device
                 </h2>
 
                 {SEO_SECTIONS.map((block) => (
                     <div key={block.id} className="mt-8">
-                        <h3 className="text-[1.125rem] font-bold leading-snug tracking-[-0.01em] text-apple-text md:text-[1.25rem]">
+                        <h3 className="text-[1.1875rem] font-bold leading-snug tracking-[-0.01em] text-apple-text md:text-[1.375rem]">
                             {block.heading}
                         </h3>
 
                         {block.paragraphs.map((paragraph, index) => (
                             <p
                                 key={index}
-                                className="mt-3 text-[0.9375rem] font-normal leading-relaxed text-ink-soft md:text-[1rem]"
+                                className="mt-3 text-[1rem] font-normal leading-relaxed text-ink-soft md:text-[1.0625rem]"
                             >
                                 {paragraph}
                             </p>

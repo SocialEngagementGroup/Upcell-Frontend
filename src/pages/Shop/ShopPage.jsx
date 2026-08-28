@@ -231,7 +231,7 @@ const ShopPage = () => {
             <section className="bg-white pb-8 pt-4 md:pb-12 md:pt-6">
                 <div className="site-shell">
                     <nav aria-label="Breadcrumb">
-                        <ol className="m-0 flex list-none items-center gap-1.5 p-0 text-[0.8125rem] leading-none">
+                        <ol className="m-0 flex list-none items-center gap-1.5 p-0 text-[0.875rem] leading-none">
                             <li className="flex items-center gap-1.5">
                                 <Link
                                     to="/"
@@ -271,7 +271,7 @@ const ShopPage = () => {
                     </h1>
 
                     {!searchTerm && (
-                        <p className="mt-3 max-w-[62ch] text-[0.9375rem] font-normal leading-relaxed text-ink-soft md:text-[1rem]">
+                        <p className="mt-3 max-w-[62ch] text-[1rem] font-normal leading-relaxed text-ink-soft md:text-[1.0625rem]">
                             Every device is inspected, graded for condition, and backed by a 12-month
                             UpCell IT Inc. limited warranty.
                         </p>
@@ -301,7 +301,7 @@ const ShopPage = () => {
                     <div className="site-shell pb-10">
                         <Link
                             to="/shop"
-                            className="inline-flex h-12 items-center justify-center rounded-full border border-solid border-black/[0.08] bg-white px-6 text-[0.875rem] font-bold text-apple-text outline-none transition-colors duration-200 ease-smooth hover:border-apple-text focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2"
+                            className="inline-flex h-12 items-center justify-center rounded-full border border-solid border-black/[0.08] bg-white px-6 text-[0.9375rem] font-bold text-apple-text outline-none transition-colors duration-200 ease-smooth hover:border-apple-text focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2"
                         >
                             Browse all devices
                         </Link>
@@ -312,9 +312,9 @@ const ShopPage = () => {
                     {/* =========================================================
                         Shop our most wanted.
                         ========================================================= */}
-                    <section aria-labelledby="most-wanted-heading" className="py-8 md:py-10">
+                    <section aria-labelledby="most-wanted-heading" className="py-10 md:py-12">
                         <div className="site-shell">
-                            <h2 id="most-wanted-heading" className="text-[1.5rem] font-bold leading-tight tracking-[-0.02em] text-apple-text md:text-[1.75rem]">
+                            <h2 id="most-wanted-heading" className="text-[1.625rem] font-bold leading-tight tracking-[-0.02em] text-apple-text md:text-[2rem]">
                                 Shop our most wanted
                             </h2>
 
@@ -337,7 +337,7 @@ const ShopPage = () => {
                                                     className="block h-[92px] w-auto object-contain transition-transform duration-300 ease-smooth group-hover:scale-105 md:h-[116px]"
                                                 />
                                             </span>
-                                            <span className="px-4 py-3 text-[0.9375rem] font-bold leading-tight text-apple-text group-hover:text-brand-red md:text-[1rem]">
+                                            <span className="px-4 py-3 text-[1rem] font-bold leading-tight text-apple-text group-hover:text-brand-red md:text-[1.0625rem]">
                                                 {item.label}
                                             </span>
                                         </a>
@@ -353,9 +353,9 @@ const ShopPage = () => {
                     {/* =========================================================
                         Shop accessories.
                         ========================================================= */}
-                    <section aria-labelledby="accessories-heading" className="py-8 md:py-10">
+                    <section aria-labelledby="accessories-heading" className="py-10 md:py-12">
                         <div className="site-shell">
-                            <h2 id="accessories-heading" className="text-[1.5rem] font-bold leading-tight tracking-[-0.02em] text-apple-text md:text-[1.75rem]">
+                            <h2 id="accessories-heading" className="text-[1.625rem] font-bold leading-tight tracking-[-0.02em] text-apple-text md:text-[2rem]">
                                 Shop accessories
                             </h2>
 
@@ -364,7 +364,7 @@ const ShopPage = () => {
                                     <li key={item.label}>
                                         <Link
                                             to={`/shop?q=${encodeURIComponent(item.query)}`}
-                                            className="inline-flex h-11 items-center rounded-full bg-apple-text px-5 text-[0.875rem] font-bold text-white outline-none transition-colors duration-200 ease-smooth hover:bg-brand-red focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2"
+                                            className="inline-flex h-11 items-center rounded-full bg-apple-text px-5 text-[0.9375rem] font-bold text-white outline-none transition-colors duration-200 ease-smooth hover:bg-brand-red focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2"
                                         >
                                             {item.label}
                                         </Link>
@@ -390,15 +390,15 @@ const ShopPage = () => {
                     {/* =========================================================
                         The promise strip the reference runs under its deals.
                         ========================================================= */}
-                    <section aria-label="What every device comes with" className="bg-white py-8 md:py-10">
+                    <section aria-label="What every device comes with" className="bg-white py-10 md:py-12">
                         <div className="site-shell">
                             <ul className="grid list-none grid-cols-1 gap-6 p-0 md:grid-cols-3 md:gap-8">
                                 {PROMISES.map(({ id, Icon, title, copy, to }) => (
                                     <li key={id} className="flex items-start gap-3">
                                         <Icon aria-hidden="true" className="mt-0.5 shrink-0 !text-[26px] text-brand-red" />
                                         <div className="min-w-0">
-                                            <p className="text-[1rem] font-bold text-apple-text">{title}</p>
-                                            <p className="mt-1 text-[0.875rem] font-normal leading-snug text-ink-soft">
+                                            <p className="text-[1.0625rem] font-bold text-apple-text">{title}</p>
+                                            <p className="mt-1 text-[0.9375rem] font-normal leading-snug text-ink-soft">
                                                 {copy}
                                                 {to && (
                                                     <>
@@ -422,9 +422,9 @@ const ShopPage = () => {
                     {/* =========================================================
                         Your phone, your call.
                         ========================================================= */}
-                    <section aria-labelledby="audience-heading" className="py-8 md:py-10">
+                    <section aria-labelledby="audience-heading" className="py-10 md:py-12">
                         <div className="site-shell">
-                            <h2 id="audience-heading" className="text-[1.5rem] font-bold leading-tight tracking-[-0.02em] text-apple-text md:text-[1.75rem]">
+                            <h2 id="audience-heading" className="text-[1.625rem] font-bold leading-tight tracking-[-0.02em] text-apple-text md:text-[2rem]">
                                 Your phone, your call
                             </h2>
 
@@ -433,7 +433,7 @@ const ShopPage = () => {
                                     <li key={chip.label}>
                                         <Link
                                             to={chip.to}
-                                            className="inline-flex h-11 items-center rounded-full border border-solid border-black/[0.12] bg-white px-5 text-[0.875rem] font-bold text-apple-text outline-none transition-colors duration-200 ease-smooth hover:border-apple-text hover:bg-surface focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2"
+                                            className="inline-flex h-11 items-center rounded-full border border-solid border-black/[0.12] bg-white px-5 text-[0.9375rem] font-bold text-apple-text outline-none transition-colors duration-200 ease-smooth hover:border-apple-text hover:bg-surface focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2"
                                         >
                                             {chip.label}
                                         </Link>
@@ -486,7 +486,7 @@ const ShopPage = () => {
                     <Reviews
                         id="customers"
                         heading="Loved by customers"
-                        className="py-8 md:py-10"
+                        className="py-10 md:py-12"
                     />
 
                     {/* =========================================================

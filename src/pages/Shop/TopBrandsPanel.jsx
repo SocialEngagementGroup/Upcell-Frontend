@@ -28,9 +28,9 @@ const TopBrandsPanel = ({ productsByBrand, onAddToCart }) => {
     const activeLabel = BRANDS.find((brand) => brand.id === activeBrand)?.label || '';
 
     return (
-        <section aria-labelledby="brands-heading" className="py-8 md:py-10">
+        <section aria-labelledby="brands-heading" className="py-10 md:py-12">
             <div className="site-shell">
-                <h2 id="brands-heading" className="text-[1.5rem] font-bold leading-tight tracking-[-0.02em] text-apple-text md:text-[1.75rem]">
+                <h2 id="brands-heading" className="text-[1.625rem] font-bold leading-tight tracking-[-0.02em] text-apple-text md:text-[2rem]">
                     Top brands, refurbished
                 </h2>
 
@@ -91,7 +91,7 @@ const TopBrandsPanel = ({ productsByBrand, onAddToCart }) => {
                             </ul>
 
                             {products.length === 0 ? (
-                                <p className="mt-6 text-[0.9375rem] font-normal text-apple-gray">
+                                <p className="mt-6 text-[1rem] font-normal text-apple-gray">
                                     No {activeLabel} devices to show yet.
                                 </p>
                             ) : (

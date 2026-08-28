@@ -28,15 +28,15 @@ const ProductRail = ({
     const headingId = `${id}-heading`;
 
     return (
-        <section id={id} aria-labelledby={headingId} className={`scroll-mt-32 py-8 md:py-10 ${className}`}>
+        <section id={id} aria-labelledby={headingId} className={`scroll-mt-32 py-10 md:py-12 ${className}`}>
             <div className="site-shell">
                 <div className="flex items-end justify-between gap-4">
                     <div className="min-w-0">
-                        <h2 id={headingId} className="text-[1.5rem] font-bold leading-tight tracking-[-0.02em] text-apple-text md:text-[1.75rem]">
+                        <h2 id={headingId} className="text-[1.625rem] font-bold leading-tight tracking-[-0.02em] text-apple-text md:text-[2rem]">
                             {title}
                         </h2>
                         {subtitle && (
-                            <p className="mt-1 text-[0.9375rem] font-normal text-ink-soft">{subtitle}</p>
+                            <p className="mt-1 text-[1rem] font-normal text-ink-soft">{subtitle}</p>
                         )}
                     </div>
 
@@ -44,7 +44,7 @@ const ProductRail = ({
                         {seeAllTo && (
                             <Link
                                 to={seeAllTo}
-                                className="hidden text-[0.875rem] font-bold text-apple-text underline-offset-4 outline-none hover:text-brand-red hover:underline focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 md:inline"
+                                className="hidden text-[0.9375rem] font-bold text-apple-text underline-offset-4 outline-none hover:text-brand-red hover:underline focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 md:inline"
                             >
                                 {seeAllLabel}
                             </Link>
@@ -76,7 +76,7 @@ const ProductRail = ({
                 </div>
 
                 {products.length === 0 ? (
-                    <p className="mt-6 text-[0.9375rem] font-normal text-apple-gray">{emptyMessage}</p>
+                    <p className="mt-6 text-[1rem] font-normal text-apple-gray">{emptyMessage}</p>
                 ) : (
                     <ul
                         ref={trackRef}

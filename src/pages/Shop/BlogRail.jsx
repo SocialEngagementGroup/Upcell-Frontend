@@ -21,10 +21,10 @@ const BlogRail = ({ id, title, posts = [], cta }) => {
     const headingId = `${id}-heading`;
 
     return (
-        <section id={id} aria-labelledby={headingId} className="scroll-mt-32 py-8 md:py-10">
+        <section id={id} aria-labelledby={headingId} className="scroll-mt-32 py-10 md:py-12">
             <div className="site-shell">
                 <div className="flex items-center justify-between gap-4">
-                    <h2 id={headingId} className="text-[1.5rem] font-bold leading-tight tracking-[-0.02em] text-apple-text md:text-[1.75rem]">
+                    <h2 id={headingId} className="text-[1.625rem] font-bold leading-tight tracking-[-0.02em] text-apple-text md:text-[2rem]">
                         {title}
                     </h2>
 
@@ -81,10 +81,10 @@ const BlogRail = ({ id, title, posts = [], cta }) => {
                                     </span>
 
                                     <span className="flex flex-1 flex-col px-4 py-4">
-                                        <span className="text-[0.8125rem] font-normal text-apple-gray">
+                                        <span className="text-[0.875rem] font-normal text-apple-gray">
                                             {post.date}
                                         </span>
-                                        <span className="mt-1.5 line-clamp-2 text-[0.9375rem] font-bold leading-snug text-apple-text group-hover:text-brand-red">
+                                        <span className="mt-1.5 line-clamp-2 text-[1rem] font-bold leading-snug text-apple-text group-hover:text-brand-red">
                                             {post.title}
                                         </span>
                                     </span>
@@ -98,7 +98,7 @@ const BlogRail = ({ id, title, posts = [], cta }) => {
                     <div className="mt-8 flex justify-center">
                         <Link
                             to={cta.to}
-                            className="inline-flex h-12 items-center justify-center rounded-lg bg-apple-text px-8 text-[0.9375rem] font-bold text-white outline-none transition-colors duration-200 ease-smooth hover:bg-brand-red focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2"
+                            className="inline-flex h-12 items-center justify-center rounded-lg bg-apple-text px-8 text-[1rem] font-bold text-white outline-none transition-colors duration-200 ease-smooth hover:bg-brand-red focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2"
                         >
                             {cta.label}
                         </Link>

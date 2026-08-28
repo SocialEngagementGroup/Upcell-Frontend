@@ -54,7 +54,7 @@ const Reviews = ({
         <section id={id} aria-labelledby={`${id}-heading`} className={`scroll-mt-32 ${className}`}>
             <div className="site-shell">
                 <div className="flex items-center justify-between gap-4">
-                    <h2 id={`${id}-heading`} className="text-[1.5rem] font-bold tracking-[-0.02em] text-apple-text md:text-[1.75rem]">
+                    <h2 id={`${id}-heading`} className="text-[1.625rem] font-bold tracking-[-0.02em] text-apple-text md:text-[2rem]">
                         {heading}
                     </h2>
 
@@ -111,12 +111,12 @@ const Reviews = ({
                                         className="absolute inset-0 bg-gradient-to-t from-apple-text via-apple-text/60 to-apple-text/20"
                                     />
 
-                                    <figcaption className="absolute left-3 top-3 rounded-md bg-white/95 px-2.5 py-1 text-[0.8125rem] font-bold text-apple-text shadow-sm">
+                                    <figcaption className="absolute left-3 top-3 rounded-md bg-white/95 px-2.5 py-1 text-[0.875rem] font-bold text-apple-text shadow-sm">
                                         {review.name}
                                     </figcaption>
 
                                     <blockquote className="absolute inset-x-0 bottom-0 p-4">
-                                        <p className="text-[0.9375rem] font-normal leading-snug text-white">
+                                        <p className="text-[1rem] font-normal leading-snug text-white">
                                             &ldquo;{review.quote}&rdquo;
                                         </p>
 
@@ -128,7 +128,7 @@ const Reviews = ({
                                                         : <StarHalfRoundedIcon key={i} />
                                                 ))}
                                             </span>
-                                            <span className="text-[0.875rem] font-medium text-white">{review.score}/5</span>
+                                            <span className="text-[0.9375rem] font-medium text-white">{review.score}/5</span>
                                         </span>
                                     </blockquote>
                                 </div>
@@ -145,7 +145,7 @@ const Reviews = ({
                                         decoding="async"
                                         className="block h-10 w-10 shrink-0 object-contain"
                                     />
-                                    <p className="text-[0.8125rem] font-normal leading-tight text-ink-soft">
+                                    <p className="text-[0.875rem] font-normal leading-tight text-ink-soft">
                                         {review.productName}
                                     </p>
                                 </div>

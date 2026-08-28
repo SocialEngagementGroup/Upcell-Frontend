@@ -27,9 +27,9 @@ const TakeCareCard = () => {
     };
 
     return (
-        <section aria-labelledby="take-care-heading" className="py-8 md:py-10">
+        <section aria-labelledby="take-care-heading" className="py-10 md:py-12">
             <div className="site-shell">
-                <h2 id="take-care-heading" className="text-[1.5rem] font-bold leading-tight tracking-[-0.02em] text-apple-text md:text-[1.75rem]">
+                <h2 id="take-care-heading" className="text-[1.625rem] font-bold leading-tight tracking-[-0.02em] text-apple-text md:text-[2rem]">
                     Take care of your tech
                 </h2>
 
