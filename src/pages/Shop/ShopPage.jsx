@@ -1,16 +1,43 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
+import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import { CartContext } from '../../App';
 import ScrollToTop from '../../utilities/ScrollToTop';
 import { toast } from 'react-toastify';
 import SearchWithSuggestions from '../../components/SearchWithSuggestions/SearchWithSuggestions';
 import RouteLoadingScreen from '../../components/RouteLoadingScreen/RouteLoadingScreen';
 import { groupProductsByParent } from '../../utilities/catalog';
+import { MODEL_GROUP_IMAGES } from '../../components/layout/Header/navigationData';
+import { cloudinaryUrl } from '../../utilities/cloudinary';
 import { useProductsQuery } from '../../queries/products';
 import { EMPTY_ARRAY } from '../../queries/keys';
 
 const topCategories = ['All Devices', 'iPhone', 'iPad', 'MacBook'];
 const storageOrder = ['128GB', '256GB', '512GB', '1TB', '2TB', '4TB'];
+
+// Presentation for the family tabs. Keyed by the `topCategories` strings above
+// so the tabs stay derived from the one list the filter actually reads —
+// adding a family here without adding it there would render a dead tab.
+//
+// The art is the header's model-group map, so a device shown in the mega menu
+// and on this page is always the same shot. "All Devices" has no family of its
+// own, so it borrows the Pro shot, as the home rail's "Great deals" tile does.
+const FAMILY_TABS = {
+    'All Devices': { label: 'All devices', image: MODEL_GROUP_IMAGES['iPhone Pro'] },
+    'iPhone': { label: 'iPhone', image: MODEL_GROUP_IMAGES['iPhone'] },
+    'iPad': { label: 'iPad', image: MODEL_GROUP_IMAGES['iPad'] },
+    'MacBook': { label: 'MacBook', image: MODEL_GROUP_IMAGES['MacBook Air'] },
+};
+
+// The title names what is actually on screen. `?category=` arrives from the
+// mega menu, so someone landing from "iPad" in the header should read a page
+// about iPads rather than a generic shop heading.
+const pageTitle = (category) => (
+    category === 'All Devices'
+        ? 'All Certified Premium Apple devices'
+        : `All Certified Premium ${category === 'iPhone' ? 'iPhones' : category === 'iPad' ? 'iPads' : 'MacBooks'}`
+);
 
 const modelGroupOrder = [
     'iPhone',
@@ -348,6 +375,27 @@ const ShopPage = () => {
     };
 
     const activeSortOption = sortOptions.find((option) => option.value === sortBy) || sortOptions[0];
+    const isAllDevices = activeCategory === 'All Devices';
+
+    // What each family tab is worth, counted the way the grid counts: one entry
+    // per parent product, so a phone in eight colours is one model rather than
+    // eight. Deliberately not filtered by price/model/storage — the tab says
+    // how much of the catalogue that family holds, not how much survives the
+    // filters currently set.
+    const familyCounts = useMemo(() => {
+        const counts = { 'All Devices': 0, iPhone: 0, iPad: 0, MacBook: 0 };
+
+        for (const product of groupProductsByParent(products)) {
+            counts['All Devices'] += 1;
+            if (counts[product.family] !== undefined) counts[product.family] += 1;
+        }
+
+        return counts;
+    }, [products]);
+
+    // Still fetching, or the fetch came back with nothing. Either way the tabs
+    // have no count to state.
+    const catalogueEmpty = productsLoading || familyCounts['All Devices'] === 0;
 
     // TODO(redesign): build the new shop page UI here. All filter, sort, search
     // and pagination state above is wired and ready for the new layout.
@@ -355,29 +403,120 @@ const ShopPage = () => {
         <div>
             <ScrollToTop />
 
-            <nav>
-                <Link to="/">Home</Link>
-                <span>Shop</span>
-            </nav>
-            <h1>Shop Certified Premium iPhones, iPads &amp; MacBooks</h1>
-            <p>
-                Every certified premium Apple device is graded for condition, priced honestly, and
-                backed by a 12-month warranty. Save up to 40% vs. buying new.
-            </p>
+            {/* ===============================================================
+                SECTION 1 — page head.
+                Breadcrumb, title and the family tabs, on white so the whole
+                block reads as this page's own header above the grey ground.
+                =============================================================== */}
+            <section className="bg-white pb-8 pt-4 md:pb-10 md:pt-6">
+                <div className="site-shell">
+                    <nav aria-label="Breadcrumb">
+                        <ol className="m-0 flex list-none items-center gap-1.5 p-0 text-[0.8125rem] leading-none">
+                            <li className="flex items-center gap-1.5">
+                                <Link
+                                    to="/"
+                                    className="flex items-center gap-1 font-medium text-ink-soft outline-none hover:text-brand-red hover:underline focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 [&_svg]:!text-[16px]"
+                                >
+                                    <HomeRoundedIcon aria-hidden="true" />
+                                    Home
+                                </Link>
+                                <ChevronRightRoundedIcon aria-hidden="true" className="!text-[16px] text-apple-gray" />
+                            </li>
 
-            {/* Family tabs */}
-            <div>
-                {topCategories.map((category) => (
-                    <button
-                        key={category}
-                        type="button"
-                        aria-pressed={activeCategory === category}
-                        onClick={() => setActiveCategory(category)}
-                    >
-                        {category}
-                    </button>
-                ))}
-            </div>
+                            {/* "Shop" is the whole catalogue, so while a family
+                                is selected it stays a live control that clears
+                                back to it — the same thing the "All devices"
+                                tab does, where a breadcrumb user expects it. */}
+                            {isAllDevices ? (
+                                <li aria-current="page" className="font-normal text-apple-gray">Shop</li>
+                            ) : (
+                                <>
+                                    <li className="flex items-center gap-1.5">
+                                        <button
+                                            type="button"
+                                            onClick={() => setActiveCategory('All Devices')}
+                                            className="bg-transparent p-0 text-[0.8125rem] font-medium leading-none text-ink-soft outline-none hover:text-brand-red hover:underline focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2"
+                                        >
+                                            Shop
+                                        </button>
+                                        <ChevronRightRoundedIcon aria-hidden="true" className="!text-[16px] text-apple-gray" />
+                                    </li>
+                                    <li aria-current="page" className="font-normal text-apple-gray">{activeCategory}</li>
+                                </>
+                            )}
+                        </ol>
+                    </nav>
+
+                    {/* The base layer sizes h1 at text-5xl/6xl and font-extrabold;
+                        both are overridden here — 800 has no Roboto face loaded,
+                        and 60px is a home-page hero size, not a listing title. */}
+                    <h1 className="mt-4 text-[2rem] font-bold leading-[1.08] tracking-[-0.03em] text-apple-text md:mt-5 md:text-[2.625rem] lg:text-[3rem]">
+                        {pageTitle(activeCategory)}
+                    </h1>
+
+                    {/* No savings percentage: `originalPrice` is a list price,
+                        not a tracked market price, so a headline "save up to
+                        X%" is not something the catalogue can stand behind.
+                        Grading and the warranty are stated elsewhere on the
+                        site and are true of every unit. */}
+                    <p className="mt-3 max-w-[62ch] text-[0.9375rem] font-normal leading-relaxed text-ink-soft md:text-[1rem]">
+                        Every device is inspected, graded for condition, and backed by a 12-month
+                        UpCell IT Inc. limited warranty.
+                    </p>
+
+                    {/* Family tabs */}
+                    <div role="group" aria-label="Device family" className="mt-6 grid grid-cols-2 gap-3 md:mt-8 md:grid-cols-4 md:gap-4">
+                        {topCategories.map((category) => {
+                            const tab = FAMILY_TABS[category];
+                            const selected = activeCategory === category;
+                            const count = familyCounts[category] || 0;
+
+                            return (
+                                <button
+                                    key={category}
+                                    type="button"
+                                    aria-pressed={selected}
+                                    onClick={() => setActiveCategory(category)}
+                                    className={
+                                        selected
+                                            ? 'flex items-center gap-3 rounded-2xl border border-solid border-apple-text bg-brand-lime p-3 text-left outline-none transition-colors duration-200 ease-smooth focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2'
+                                            : 'flex items-center gap-3 rounded-2xl border border-solid border-black/[0.08] bg-white p-3 text-left outline-none transition-colors duration-200 ease-smooth hover:border-apple-text focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2'
+                                    }
+                                >
+                                    <span className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-xl md:h-16 md:w-16 ${selected ? 'bg-white/70' : 'bg-surface'}`}>
+                                        {/* Not lazy: these are the first thing
+                                            below the title, always in view. */}
+                                        <img
+                                            src={cloudinaryUrl(tab.image, { width: 160 })}
+                                            alt=""
+                                            width="160"
+                                            height="160"
+                                            decoding="async"
+                                            className="block h-10 w-auto object-contain md:h-12"
+                                        />
+                                    </span>
+
+                                    <span className="min-w-0">
+                                        <span className="block truncate text-[0.9375rem] font-bold leading-tight text-apple-text md:text-[1rem]">
+                                            {tab.label}
+                                        </span>
+                                        {/* A non-breaking space while the
+                                            catalogue loads, so the card does
+                                            not resize when the count lands —
+                                            and again if the catalogue came
+                                            back empty, since "0 models" on
+                                            every tab reads as a claim about
+                                            stock rather than a failed fetch. */}
+                                        <span className={`mt-0.5 block text-[0.8125rem] font-normal leading-tight ${selected ? 'text-apple-text/70' : 'text-apple-gray'}`}>
+                                            {catalogueEmpty ? ' ' : `${count} ${count === 1 ? 'model' : 'models'}`}
+                                        </span>
+                                    </span>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+            </section>
 
             {/* Search */}
             <SearchWithSuggestions
