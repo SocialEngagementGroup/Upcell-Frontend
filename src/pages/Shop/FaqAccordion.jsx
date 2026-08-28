@@ -20,7 +20,7 @@ const FaqAccordion = () => {
                     Popular searches
                 </h2>
 
-                <ul className="mx-auto mt-6 max-w-[900px] list-none p-0">
+                <ul className="mt-6 max-w-[900px] list-none p-0">
                     {FAQS.map((faq, index) => {
                         const open = index === openIndex;
                         const panelId = `faq-panel-${index}`;
@@ -35,7 +35,7 @@ const FaqAccordion = () => {
                                         aria-expanded={open}
                                         aria-controls={panelId}
                                         onClick={() => setOpenIndex(open ? -1 : index)}
-                                        className="flex w-full items-center justify-between gap-4 bg-transparent px-1 py-5 text-left text-[1rem] font-bold text-apple-text outline-none transition-colors duration-200 ease-smooth hover:text-brand-red focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 md:text-[1.0625rem] [&_svg]:!text-[22px]"
+                                        className="flex w-full items-center justify-between gap-4 bg-transparent py-5 text-left text-[1rem] font-bold text-apple-text outline-none transition-colors duration-200 ease-smooth hover:text-brand-red focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 md:text-[1.0625rem] [&_svg]:!text-[22px]"
                                     >
                                         {faq.q}
                                         {open
@@ -48,7 +48,7 @@ const FaqAccordion = () => {
                                     answer should not be reachable by tabbing
                                     into a link inside it. */}
                                 {open && (
-                                    <div id={panelId} role="region" aria-labelledby={buttonId} className="px-1 pb-5">
+                                    <div id={panelId} role="region" aria-labelledby={buttonId} className="pb-5">
                                         <p className="max-w-[76ch] text-[1rem] font-normal leading-relaxed text-ink-soft">
                                             {faq.a}
                                         </p>
