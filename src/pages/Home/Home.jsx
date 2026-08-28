@@ -7,36 +7,47 @@ import RecommendedSection from "../../components/Recommended/RecommendedSection"
 import TradeInBanner from "../../components/TradeInBanner/TradeInBanner";
 import TopBrands from "../../components/TopBrands/TopBrands";
 import Reviews from "../../components/Reviews/Reviews";
-import MobileHome from "./mobile/MobileHome";
+import MobileHero from "./mobile/MobileHero";
+import MobileCategories from "./mobile/MobileCategories";
+import MobileBottomNav from "./mobile/MobileBottomNav";
 
-// Two home pages, picked on the md breakpoint.
+// One home page, with two openings.
 //
-// They are separate components rather than one responsive tree because they
-// share no section order and no components — the mobile design is a banner,
-// two promo cards, a four-up strip and a category grid, none of which appear on
-// the desktop page. Expressing both in one tree would mean breakpoint classes
-// on every block, describing neither layout clearly.
+// Only the top of the page differs between mobile and desktop: the mobile
+// design opens with its own banner, promo cards and promise strip, then a
+// category grid, where the desktop opens with HeroBanner. Everything from
+// "Shop our most wanted" down is shared, and renders at both sizes.
 //
-// Only one mounts, so the other's images are never requested.
+// The swap is a matchMedia hook rather than breakpoint classes, so only the
+// opening that applies mounts and the other's images are never requested.
+//
+// The header is untouched — it already handles mobile. The tab bar at the
+// bottom is an addition beneath it, mobile only.
 const Home = () => {
     const isMobile = useIsMobile();
 
     return (
-        <div>
+        // Bottom padding on mobile clears the fixed tab bar, so the last
+        // section is never trapped underneath it.
+        <div className={isMobile ? "pb-24" : undefined}>
             <ScrollToTop />
 
             {isMobile ? (
-                <MobileHome />
-            ) : (
                 <>
-                    <HeroBanner />
-                    <MostWanted />
-                    <RecommendedSection />
-                    <TradeInBanner />
-                    <TopBrands />
-                    <Reviews />
+                    <MobileHero />
+                    <MobileCategories />
                 </>
+            ) : (
+                <HeroBanner />
             )}
+
+            <MostWanted />
+            <RecommendedSection />
+            <TradeInBanner />
+            <TopBrands />
+            <Reviews />
+
+            {isMobile && <MobileBottomNav />}
         </div>
     );
 };
