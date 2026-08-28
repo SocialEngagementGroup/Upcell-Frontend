@@ -3,6 +3,7 @@ import ChevronLeftRoundedIcon from '@mui/icons-material/ChevronLeftRounded';
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
 
 import ProductCard from '../../components/Recommended/ProductCard';
+import ProductCardSkeleton from '../../components/Recommended/ProductCardSkeleton';
 import { RAIL_ARROW_CLASS, railArrowTone, useRailScroll } from './useRailScroll';
 
 // One titled carousel of product cards — the shape the reference uses for
@@ -16,6 +17,7 @@ const ProductRail = ({
     title,
     subtitle,
     products = [],
+    loading = false,
     onAddToCart,
     variant = 'bestSeller',
     seeAllTo,
@@ -24,6 +26,11 @@ const ProductRail = ({
     className = '',
 }) => {
     const { trackRef, canScrollBack, canScrollOn, sync, nudge } = useRailScroll(products.length);
+
+    // How many placeholders to stand in for a rail that has not answered yet.
+    // Five is what fits on a wide screen, so the row looks full rather than
+    // half-built while it waits.
+    const SKELETON_COUNT = 5;
 
     const headingId = `${id}-heading`;
 
@@ -50,7 +57,7 @@ const ProductRail = ({
                             </Link>
                         )}
 
-                        {products.length > 0 && (
+                        {!loading && products.length > 0 && (
                             <div className="hidden items-center gap-3 md:flex">
                                 <button
                                     type="button"
@@ -75,7 +82,18 @@ const ProductRail = ({
                     </div>
                 </div>
 
-                {products.length === 0 ? (
+                {loading ? (
+                    // The heading, the section and its spacing are all already
+                    // on screen by this point — only the cards are pending. The
+                    // page never blanks and never reflows when they land.
+                    <ul aria-busy="true" className="scrollbar-hidden -mx-1 mt-5 flex list-none items-stretch gap-4 overflow-x-hidden px-1 pb-1">
+                        {Array.from({ length: SKELETON_COUNT }).map((_, index) => (
+                            <li key={index} className="flex">
+                                <ProductCardSkeleton />
+                            </li>
+                        ))}
+                    </ul>
+                ) : products.length === 0 ? (
                     <p className="mt-6 text-[1rem] font-normal text-apple-gray">{emptyMessage}</p>
                 ) : (
                     <ul

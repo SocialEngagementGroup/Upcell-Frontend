@@ -9,7 +9,6 @@ import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 
 import { CartContext } from '../../App';
 import ScrollToTop from '../../utilities/ScrollToTop';
-import RouteLoadingScreen from '../../components/RouteLoadingScreen/RouteLoadingScreen';
 import { groupProductsByParent } from '../../utilities/catalog';
 import { MODEL_GROUP_IMAGES } from '../../components/layout/Header/navigationData';
 import { cloudinaryUrl } from '../../utilities/cloudinary';
@@ -279,9 +278,7 @@ const ShopPage = () => {
                 </div>
             </section>
 
-            {productsLoading ? (
-                <RouteLoadingScreen compact />
-            ) : searchTerm ? (
+            {searchTerm ? (
                 /* =============================================================
                    Search results. Not part of the reference — added because the
                    header's search box points at `?q=` and, with the filtered
@@ -293,6 +290,7 @@ const ShopPage = () => {
                         title={`${searchResults.length} ${searchResults.length === 1 ? 'match' : 'matches'}`}
                         subtitle={searchResults.length ? undefined : 'Try a different model name, or browse the full catalogue below.'}
                         products={searchResults}
+                        loading={productsLoading}
                         onAddToCart={handleAddToCart}
                         variant="bestSeller"
                         emptyMessage={`Nothing in the catalogue matches “${searchTerm}”.`}
@@ -382,6 +380,7 @@ const ShopPage = () => {
                         id="deals"
                         title="Shop our best deals"
                         products={deals}
+                        loading={productsLoading}
                         onAddToCart={handleAddToCart}
                         variant="bestSeller"
                         emptyMessage="No price drops right now — check back soon."
@@ -451,6 +450,7 @@ const ShopPage = () => {
                         id="iphone"
                         title="Best refurbished iPhone"
                         products={railProducts.iPhone}
+                        loading={productsLoading}
                         onAddToCart={handleAddToCart}
                         variant="bestSeller"
                     />
@@ -459,6 +459,7 @@ const ShopPage = () => {
                         id="samsung"
                         title="Best refurbished Samsung"
                         products={railProducts.samsung}
+                        loading={productsLoading}
                         onAddToCart={handleAddToCart}
                         variant="bestSeller"
                     />
@@ -467,6 +468,7 @@ const ShopPage = () => {
                         id="android"
                         title="Best refurbished Android smartphones"
                         products={railProducts.android}
+                        loading={productsLoading}
                         onAddToCart={handleAddToCart}
                         variant="bestSeller"
                     />

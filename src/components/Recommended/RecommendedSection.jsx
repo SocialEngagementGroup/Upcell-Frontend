@@ -8,6 +8,7 @@ import { useProductsQuery } from '../../queries/products';
 import { EMPTY_ARRAY } from '../../queries/keys';
 import { groupProductsByParent, normalizeProduct } from '../../utilities/catalog';
 import ProductCard from './ProductCard';
+import ProductCardSkeleton from './ProductCardSkeleton';
 import { DEMO_PRODUCTS } from './demoProducts';
 
 const MAX_CARDS = 12;
@@ -131,7 +132,16 @@ const RecommendedSection = () => {
 
                 <div id="rec-panel" role="tabpanel" aria-labelledby={`rec-tab-${tab}`} className="mt-6">
                     {isLoading ? (
-                        <p className="py-8 text-[1rem] text-apple-gray">Loading recommendations…</p>
+                        // Card-shaped placeholders rather than a line of text:
+                        // the rail keeps its height, so the page below it does
+                        // not jump when the real cards arrive.
+                        <ul aria-busy="true" className="scrollbar-hidden -mx-1 flex list-none items-stretch gap-4 overflow-x-hidden px-1 pb-1">
+                            {Array.from({ length: 5 }).map((_, index) => (
+                                <li key={index} className="flex">
+                                    <ProductCardSkeleton />
+                                </li>
+                            ))}
+                        </ul>
                     ) : cards.length === 0 ? (
                         <p className="py-8 text-[1rem] text-apple-gray">
                             {tab === 'price-drop'
