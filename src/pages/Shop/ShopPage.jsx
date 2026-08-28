@@ -2,6 +2,9 @@ import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
+import TuneRoundedIcon from '@mui/icons-material/TuneRounded';
+import SwapVertRoundedIcon from '@mui/icons-material/SwapVertRounded';
+import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
 import { CartContext } from '../../App';
 import ScrollToTop from '../../utilities/ScrollToTop';
 import { toast } from 'react-toastify';
@@ -9,11 +12,15 @@ import SearchWithSuggestions from '../../components/SearchWithSuggestions/Search
 import RouteLoadingScreen from '../../components/RouteLoadingScreen/RouteLoadingScreen';
 import { groupProductsByParent } from '../../utilities/catalog';
 import { MODEL_GROUP_IMAGES } from '../../components/layout/Header/navigationData';
-import { cloudinaryUrl } from '../../utilities/cloudinary';
+import { cloudinaryUrl, resolveImageSrc } from '../../utilities/cloudinary';
 import { useProductsQuery } from '../../queries/products';
 import { EMPTY_ARRAY } from '../../queries/keys';
 
 const topCategories = ['All Devices', 'iPhone', 'iPad', 'MacBook'];
+
+// Top of the price slider, and therefore the value that means "no price
+// filter set" — the toolbar counts the filter as active only below it.
+const MAX_PRICE = 3500;
 const storageOrder = ['128GB', '256GB', '512GB', '1TB', '2TB', '4TB'];
 
 // Presentation for the family tabs. Keyed by the `topCategories` strings above
@@ -85,11 +92,14 @@ const sortByFamilyThenProductName = (left, right) => {
     return sortByProductName(left, right);
 };
 
+// Labels are display-only — `value` is what the sort reads. Commas rather
+// than colons because the trigger renders them after "Sort:", and
+// "Sort: Price: Low to High" reads as a typo.
 const sortOptions = [
     { value: 'featured', label: 'Featured' },
-    { value: 'price-low', label: 'Price: Low to High' },
-    { value: 'price-high', label: 'Price: High to Low' },
-    { value: 'name', label: 'Name' },
+    { value: 'price-low', label: 'Price, low to high' },
+    { value: 'price-high', label: 'Price, high to low' },
+    { value: 'name', label: 'Name, A to Z' },
 ];
 
 // 12 keeps every row full at all three grid widths (2 / 3 / 4 columns), so the
@@ -120,7 +130,7 @@ const ShopPage = () => {
     const { setCart } = useContext(CartContext);
     const { data: products = EMPTY_ARRAY, isLoading: productsLoading } = useProductsQuery();
     const [activeCategory, setActiveCategory] = useState('All Devices');
-    const [priceRange, setPriceRange] = useState(3500);
+    const [priceRange, setPriceRange] = useState(MAX_PRICE);
     const [selectedModels, setSelectedModels] = useState([]);
     const [selectedStorages, setSelectedStorages] = useState([]);
     const [sortBy, setSortBy] = useState('featured');
@@ -367,7 +377,7 @@ const ShopPage = () => {
 
     const resetFilters = () => {
         setActiveCategory('All Devices');
-        setPriceRange(3500);
+        setPriceRange(MAX_PRICE);
         setSelectedModels([]);
         setSelectedStorages([]);
         setSortBy('featured');
@@ -396,6 +406,18 @@ const ShopPage = () => {
     // Still fetching, or the fetch came back with nothing. Either way the tabs
     // have no count to state.
     const catalogueEmpty = productsLoading || familyCounts['All Devices'] === 0;
+
+    // Everything the toolbar states about the current result set. The family
+    // tab is not counted as a filter — it has its own control right above,
+    // and badging it here would double-report the same choice.
+    const activeFilterCount = (
+        selectedModels.length
+        + selectedStorages.length
+        + (priceRange < MAX_PRICE ? 1 : 0)
+    );
+    const resultCount = filteredProducts.length;
+    const rangeStart = resultCount === 0 ? 0 : (currentPage - 1) * PRODUCTS_PER_PAGE + 1;
+    const rangeEnd = Math.min(currentPage * PRODUCTS_PER_PAGE, resultCount);
 
     // TODO(redesign): build the new shop page UI here. All filter, sort, search
     // and pagination state above is wired and ready for the new layout.
@@ -518,50 +540,155 @@ const ShopPage = () => {
                 </div>
             </section>
 
-            {/* Search */}
-            <SearchWithSuggestions
-                value={searchQuery}
-                onChange={setSearchQuery}
-                placeholder="Search devices"
-                suggestions={suggestions}
-                onSelect={handleSuggestionSelect}
-                renderSuggestion={(suggestion) => (
-                    <>
-                        <img src={suggestion.image} alt="" width="32" height="32" />
-                        <span>{suggestion.productName}</span>
-                        <span>${suggestion.price}</span>
-                    </>
-                )}
-            />
+            {/* ===============================================================
+                SECTION 2 — toolbar.
+                Search, filters toggle and sort on one row, with what the
+                catalogue currently answers stated underneath.
 
-            {/* Sort */}
-            <div ref={sortMenuRef}>
-                <button type="button" onClick={() => setSortMenuOpen((open) => !open)}>
-                    Sort: {activeSortOption.label}
-                </button>
-                {sortMenuOpen && (
-                    <ul>
-                        {sortOptions.map((option) => (
-                            <li key={option.value}>
+                The reference has no equivalent: its /l/ pages are curated
+                landing pages with no filter or sort control at all. This row
+                is UpCell's own, built in the same language — pill controls at
+                the header's height, so the search here reads as the same
+                object as the search above it.
+                =============================================================== */}
+            <section aria-label="Search, filter and sort" className="pt-6 md:pt-8">
+                <div className="site-shell">
+                    <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
+                        <SearchWithSuggestions
+                            value={searchQuery}
+                            onChange={setSearchQuery}
+                            placeholder="Search devices"
+                            suggestions={suggestions}
+                            onSelect={handleSuggestionSelect}
+                            className="md:flex-1"
+                            renderSuggestion={(suggestion, focused) => (
+                                <>
+                                    <img
+                                        src={resolveImageSrc(suggestion.image, { width: 96 })}
+                                        alt=""
+                                        width="40"
+                                        height="40"
+                                        decoding="async"
+                                        className={`h-10 w-10 shrink-0 rounded-lg object-contain p-1 ${focused ? 'bg-white/15' : 'bg-surface'}`}
+                                    />
+                                    <span className={`min-w-0 flex-1 truncate text-[0.875rem] font-bold ${focused ? 'text-white' : 'text-apple-text'}`}>
+                                        {suggestion.productName}
+                                    </span>
+                                    {/* The shared component paints the row
+                                        brand red when it is hovered or arrowed
+                                        onto, so the row's own text has to go
+                                        white with it or it stops being
+                                        readable. `focused` covers both. */}
+                                    <span className={`shrink-0 text-[0.875rem] font-bold ${focused ? 'text-white' : 'text-ink-soft'}`}>
+                                        ${Number(suggestion.price || 0).toFixed(2)}
+                                    </span>
+                                </>
+                            )}
+                        />
+
+                        <div className="flex items-center gap-3 md:shrink-0">
+                            <button
+                                type="button"
+                                onClick={() => setFiltersOpen((open) => !open)}
+                                aria-expanded={filtersOpen}
+                                className={
+                                    filtersOpen
+                                        ? 'flex h-12 flex-1 items-center justify-center gap-2 rounded-full border border-solid border-apple-text bg-apple-text px-5 text-[0.875rem] font-bold text-white outline-none transition-colors duration-200 ease-smooth focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 md:flex-none [&_svg]:!text-[19px]'
+                                        : 'flex h-12 flex-1 items-center justify-center gap-2 rounded-full border border-solid border-black/[0.08] bg-white px-5 text-[0.875rem] font-bold text-apple-text outline-none transition-colors duration-200 ease-smooth hover:border-apple-text focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 md:flex-none [&_svg]:!text-[19px]'
+                                }
+                            >
+                                <TuneRoundedIcon aria-hidden="true" />
+                                Filters
+                                {/* The count is the point of the badge: with
+                                    the panel shut, this is the only thing on
+                                    screen saying the grid is narrowed. */}
+                                {activeFilterCount > 0 && (
+                                    <span className={`flex h-5 min-w-[1.25rem] items-center justify-center rounded-full px-1.5 text-[0.75rem] font-bold ${filtersOpen ? 'bg-white text-apple-text' : 'bg-brand-red text-white'}`}>
+                                        {activeFilterCount}
+                                    </span>
+                                )}
+                            </button>
+
+                            {/* Escape closes it as well as a click outside,
+                                which the existing pointer-down effect already
+                                handles. Keydown sits on the wrapper so it
+                                catches the trigger and the options alike. */}
+                            <div
+                                ref={sortMenuRef}
+                                onKeyDown={(event) => {
+                                    if (event.key === 'Escape' && sortMenuOpen) setSortMenuOpen(false);
+                                }}
+                                className="relative flex-1 md:flex-none"
+                            >
                                 <button
                                     type="button"
-                                    onClick={() => {
-                                        setSortBy(option.value);
-                                        setSortMenuOpen(false);
-                                    }}
+                                    onClick={() => setSortMenuOpen((open) => !open)}
+                                    aria-haspopup="true"
+                                    aria-expanded={sortMenuOpen}
+                                    className="flex h-12 w-full items-center justify-center gap-2 rounded-full border border-solid border-black/[0.08] bg-white px-5 text-[0.875rem] font-bold text-apple-text outline-none transition-colors duration-200 ease-smooth hover:border-apple-text focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 md:w-auto [&_svg]:!text-[19px]"
                                 >
-                                    {option.label}
+                                    <SwapVertRoundedIcon aria-hidden="true" />
+                                    <span className="truncate">
+                                        <span className="font-normal text-ink-soft">Sort: </span>
+                                        {activeSortOption.label}
+                                    </span>
                                 </button>
-                            </li>
-                        ))}
-                    </ul>
-                )}
-            </div>
 
-            {/* Filters */}
-            <button type="button" onClick={() => setFiltersOpen((open) => !open)}>
-                {filtersOpen ? 'Hide filters' : 'Show filters'}
-            </button>
+                                {sortMenuOpen && (
+                                    <ul className="absolute right-0 z-30 mt-2 w-full min-w-[220px] list-none overflow-hidden rounded-2xl border border-solid border-black/[0.08] bg-white p-1 shadow-surface md:w-auto">
+                                        {sortOptions.map((option) => {
+                                            const selected = option.value === sortBy;
+
+                                            return (
+                                                <li key={option.value}>
+                                                    <button
+                                                        type="button"
+                                                        aria-current={selected ? 'true' : undefined}
+                                                        onClick={() => {
+                                                            setSortBy(option.value);
+                                                            setSortMenuOpen(false);
+                                                        }}
+                                                        className={`flex w-full items-center justify-between gap-4 whitespace-nowrap rounded-xl px-3 py-2.5 text-left text-[0.875rem] outline-none transition-colors duration-150 ease-smooth focus-visible:ring-2 focus-visible:ring-brand-red ${
+                                                            selected
+                                                                ? 'bg-brand-lime font-bold text-apple-text'
+                                                                : 'bg-white font-medium text-ink-soft hover:bg-surface'
+                                                        } [&_svg]:!text-[18px]`}
+                                                    >
+                                                        {option.label}
+                                                        {selected && <CheckRoundedIcon aria-hidden="true" />}
+                                                    </button>
+                                                </li>
+                                            );
+                                        })}
+                                    </ul>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* What the controls above actually returned. aria-live so
+                        a screen reader hears the count change after a filter
+                        is toggled, rather than only on reaching the grid. */}
+                    <p aria-live="polite" className="mt-4 text-[0.875rem] font-normal text-ink-soft">
+                        {productsLoading ? (
+                            'Loading devices…'
+                        ) : resultCount === 0 ? (
+                            <>
+                                No matches
+                                {searchQuery.trim() && <> for &ldquo;<span className="font-bold text-apple-text">{searchQuery.trim()}</span>&rdquo;</>}
+                            </>
+                        ) : (
+                            <>
+                                Showing <span className="font-bold text-apple-text">{rangeStart}&ndash;{rangeEnd}</span>
+                                {' of '}
+                                <span className="font-bold text-apple-text">{resultCount}</span>
+                                {resultCount === 1 ? ' model' : ' models'}
+                                {searchQuery.trim() && <> for &ldquo;<span className="font-bold text-apple-text">{searchQuery.trim()}</span>&rdquo;</>}
+                            </>
+                        )}
+                    </p>
+                </div>
+            </section>
 
             {filtersOpen && (
                 <aside>
@@ -570,7 +697,7 @@ const ShopPage = () => {
                         <input
                             type="range"
                             min="0"
-                            max="3500"
+                            max={MAX_PRICE}
                             value={priceRange}
                             onChange={(event) => setPriceRange(Number(event.target.value))}
                         />
