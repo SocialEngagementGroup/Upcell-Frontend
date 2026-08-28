@@ -26,9 +26,7 @@ import ProductRail from './ProductRail';
 // instruction: the 100-point inspection scroller, and the BackUp protection
 // plan banner.
 //
-// Three more are absent because UpCell cannot back them:
-//   * "Shop accessories" — UpCell sells iPhone, iPad and MacBook, and no
-//     accessories at all, so the row would link to nothing.
+// Two more are absent because UpCell cannot back them:
 //   * "Your phone, your call" — the reference's audience chips (students,
 //     gamers, military discount) are offers UpCell does not run.
 //   * "Top brands, refurbished" — a brand rail needs more than one brand.
@@ -48,6 +46,22 @@ const MOST_WANTED = [
     { id: 'iPad', label: 'iPad', to: '#ipad', image: MODEL_GROUP_IMAGES['iPad'] },
     { id: 'MacBook', label: 'MacBook', to: '#macbook', image: MODEL_GROUP_IMAGES['MacBook Air'] },
     { id: 'deals', label: 'Best deals', to: '#deals', image: MODEL_GROUP_IMAGES['iPhone Pro'] },
+];
+
+// The reference's accessory row, built at the user's instruction.
+//
+// UpCell's catalogue is iPhone, iPad and MacBook — there are no accessory
+// products in it today. Each chip therefore searches rather than pretending to
+// be a category page: the term is real, and until accessories are stocked the
+// results view answers honestly that nothing matches, instead of a dead link
+// or an empty page with no explanation.
+const ACCESSORIES = [
+    { label: 'Cases', query: 'case' },
+    { label: 'Chargers', query: 'charger' },
+    { label: 'Screen protectors', query: 'screen protector' },
+    { label: 'AirPods', query: 'AirPods' },
+    { label: 'Apple Pencil', query: 'Apple Pencil' },
+    { label: 'Keyboards', query: 'keyboard' },
 ];
 
 // Every line here is a term UpCell actually publishes.
@@ -294,12 +308,40 @@ const ShopPage = () => {
                     {/* =========================================================
                         Shop our best deals.
                         ========================================================= */}
+                    {/* =========================================================
+                        Shop accessories.
+                        ========================================================= */}
+                    <section aria-labelledby="accessories-heading" className="py-8 md:py-10">
+                        <div className="site-shell">
+                            <h2 id="accessories-heading" className="text-[1.5rem] font-bold leading-tight tracking-[-0.02em] text-apple-text md:text-[1.75rem]">
+                                Shop accessories
+                            </h2>
+
+                            <ul className="mt-5 flex list-none flex-wrap gap-2.5 p-0 md:gap-3">
+                                {ACCESSORIES.map((item) => (
+                                    <li key={item.label}>
+                                        <Link
+                                            to={`/shop?q=${encodeURIComponent(item.query)}`}
+                                            className="inline-flex h-11 items-center rounded-full bg-apple-text px-5 text-[0.875rem] font-bold text-white outline-none transition-colors duration-200 ease-smooth hover:bg-brand-red focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2"
+                                        >
+                                            {item.label}
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </section>
+
+                    {/* The reference's deals cards carry no badge — just the
+                        price with the new-device price struck through beside
+                        it, which is ProductCard's bestSeller face. The rail is
+                        still ordered by biggest saving. */}
                     <ProductRail
                         id="deals"
                         title="Shop our best deals"
                         products={deals}
                         onAddToCart={handleAddToCart}
-                        variant="priceDrop"
+                        variant="bestSeller"
                         emptyMessage="No price drops right now — check back soon."
                     />
 
