@@ -1,64 +1,73 @@
-import { Link } from 'react-router-dom';
+import { useRef, useState } from 'react';
+import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded';
 
 import { STATIC_IMAGES, staticImageUrl } from '../../constants/staticImages';
 
-// "Take care of your tech".
+// "Take care of your tech" — the reference's video block: heading on the left,
+// a single portrait video centred under it with a play control over the poster.
 //
-// The reference runs a video here — a centred heading over a single media card
-// with a play control. UpCell has no video footage in the repo, so this is the
-// same block built around a still and a real guide instead.
+// UpCell has no footage yet, so VIDEO_SRC is empty. The card is built around a
+// real <video> anyway rather than faking one, so supplying a file is the only
+// change needed: drop a URL in below and the button plays it inline.
 //
-// Deliberately no play triangle. A control that looks like it plays a video and
-// instead opens an article is a broken promise, not a placeholder. When there
-// is footage, this card is where a <video> goes and nothing around it moves.
-const TakeCareCard = () => (
-    <section aria-labelledby="take-care-heading" className="py-8 md:py-10">
-        <div className="site-shell">
-            <h2
-                id="take-care-heading"
-                className="text-center text-[1.5rem] font-bold leading-tight tracking-[-0.02em] text-apple-text md:text-[1.75rem]"
-            >
-                Take care of your tech
-            </h2>
+// While the source is empty the button still renders — it is the design — but
+// it is marked aria-disabled and titled, so a screen reader and a hover both
+// say the video is not there yet instead of the control silently doing nothing.
+const VIDEO_SRC = '';
+const POSTER = STATIC_IMAGES.BLOG_TRADE_IN_TIMING;
 
-            <div className="mt-6 overflow-hidden rounded-3xl border border-solid border-black/[0.06] bg-white">
-                <div className="flex flex-col md:flex-row md:items-stretch">
-                    <div className="shrink-0 md:w-[46%]">
-                        <img
-                            src={staticImageUrl(STATIC_IMAGES.BLOG_BATTERY_HEALTH, 900)}
-                            alt=""
-                            width="900"
-                            height="600"
-                            decoding="async"
-                            className="block h-[220px] w-full object-cover md:h-full md:min-h-[300px]"
+const TakeCareCard = () => {
+    const videoRef = useRef(null);
+    const [playing, setPlaying] = useState(false);
+
+    const play = () => {
+        if (!VIDEO_SRC) return;
+        videoRef.current?.play();
+        setPlaying(true);
+    };
+
+    return (
+        <section aria-labelledby="take-care-heading" className="py-8 md:py-10">
+            <div className="site-shell">
+                <h2 id="take-care-heading" className="text-[1.5rem] font-bold leading-tight tracking-[-0.02em] text-apple-text md:text-[1.75rem]">
+                    Take care of your tech
+                </h2>
+
+                <div className="mt-6 flex justify-center">
+                    {/* Portrait, as the reference has it — the aspect ratio
+                        holds the box before the poster has decoded, so the
+                        section does not jump on load. */}
+                    <div className="relative aspect-[9/16] w-[255px] overflow-hidden rounded-2xl bg-apple-text md:w-[280px]">
+                        <video
+                            ref={videoRef}
+                            src={VIDEO_SRC || undefined}
+                            poster={staticImageUrl(POSTER, 700)}
+                            controls={playing}
+                            playsInline
+                            preload="none"
+                            onEnded={() => setPlaying(false)}
+                            className="absolute inset-0 h-full w-full object-cover"
                         />
-                    </div>
 
-                    <div className="flex min-w-0 flex-1 flex-col justify-center p-6 md:p-10">
-                        <p className="text-[0.8125rem] font-medium uppercase tracking-wide text-apple-gray">
-                            From the Tech Journal
-                        </p>
-
-                        <h3 className="mt-2 text-[1.25rem] font-bold leading-tight tracking-[-0.02em] text-apple-text md:text-[1.5rem]">
-                            Battery health and long-term value
-                        </h3>
-
-                        <p className="mt-2.5 max-w-[52ch] text-[0.9375rem] font-normal leading-relaxed text-ink-soft">
-                            A short guide to keeping performance up over time, and to reading what a
-                            battery condition figure actually means day to day.
-                        </p>
-
-                        <Link
-                            to="/blogs/battery-health-guide"
-                            className="mt-5 inline-flex h-11 w-fit items-center justify-center rounded-lg bg-apple-text px-6 text-[0.9375rem] font-bold text-white outline-none transition-colors duration-200 ease-smooth hover:bg-brand-red focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2"
-                        >
-                            Read the guide
-                        </Link>
+                        {!playing && (
+                            <button
+                                type="button"
+                                onClick={play}
+                                aria-disabled={!VIDEO_SRC}
+                                title={VIDEO_SRC ? undefined : 'Video coming soon'}
+                                aria-label={VIDEO_SRC ? 'Play video' : 'Video coming soon'}
+                                className="absolute inset-0 flex items-center justify-center bg-transparent outline-none focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-inset"
+                            >
+                                <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-surface transition-transform duration-200 ease-smooth hover:scale-105 [&_svg]:!text-[34px]">
+                                    <PlayArrowRoundedIcon aria-hidden="true" className="ml-0.5 text-apple-text" />
+                                </span>
+                            </button>
+                        )}
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-);
+        </section>
+    );
+};
 
 export default TakeCareCard;

@@ -524,7 +524,7 @@ const ShopPage = () => {
                         ========================================================= */}
                     <BlogRail
                         id="guides"
-                        title="Make the most of your device"
+                        title="Make the most of your smartphone"
                         posts={DEMO_GUIDES}
                     />
 
