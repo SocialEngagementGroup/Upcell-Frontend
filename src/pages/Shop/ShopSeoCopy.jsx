@@ -10,7 +10,7 @@ import { SEO_SECTIONS } from './shopContent';
 const ShopSeoCopy = () => (
     <section aria-labelledby="about-refurbished-heading" className="bg-white py-10 md:py-14">
         <div className="site-shell">
-            <div className="max-w-[900px]">
+            <div className="mx-auto max-w-[900px]">
                 <h2
                     id="about-refurbished-heading"
                     className="text-[1.625rem] font-bold leading-tight tracking-[-0.02em] text-apple-text md:text-[2rem]"
