@@ -58,8 +58,11 @@ const BlogRail = ({ id, title, posts = [], cta }) => {
                     {posts.map((post) => (
                         <li key={post.slug} className="flex">
                             <article className="flex w-[260px] shrink-0 flex-col overflow-hidden rounded-2xl bg-white transition-shadow duration-200 ease-smooth hover:shadow-surface md:w-[280px]">
+                                {/* Placeholder entries carry an explicit
+                                    linkTo, because they have no article route
+                                    of their own to be built from a slug. */}
                                 <Link
-                                    to={`/blogs/${post.slug}`}
+                                    to={post.linkTo || `/blogs/${post.slug}`}
                                     className="group flex flex-1 flex-col outline-none focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2"
                                 >
                                     <span className="block overflow-hidden bg-surface-alt">

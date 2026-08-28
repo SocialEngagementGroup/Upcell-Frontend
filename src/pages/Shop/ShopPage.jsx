@@ -20,12 +20,16 @@ import ProductRail from './ProductRail';
 import Reviews from '../../components/Reviews/Reviews';
 import { blogData } from '../../data/blogData';
 import BlogRail from './BlogRail';
+import FaqAccordion from './FaqAccordion';
+import ShopSeoCopy from './ShopSeoCopy';
+import TakeCareCard from './TakeCareCard';
 import PromoRows from './PromoRows';
 import TopBrandsPanel from './TopBrandsPanel';
 import {
     AUDIENCE_CHIPS,
     DEMO_ANDROID,
     DEMO_DEALS,
+    DEMO_GUIDES,
     DEMO_GOOGLE,
     DEMO_IPHONES,
     DEMO_MOTOROLA,
@@ -506,6 +510,27 @@ const ShopPage = () => {
                         posts={blogData}
                         cta={{ label: 'Read the Tech Journal', to: '/blogs' }}
                     />
+
+                    <TakeCareCard />
+
+                    {/* =========================================================
+                        Make the most of your device.
+
+                        The reference runs a second journal rail here with
+                        different posts. UpCell's journal has four articles in
+                        total and they are all used above, so these are
+                        placeholders — see DEMO_GUIDES. Swapping them for real
+                        posts is a change to that array and nothing else.
+                        ========================================================= */}
+                    <BlogRail
+                        id="guides"
+                        title="Make the most of your device"
+                        posts={DEMO_GUIDES}
+                    />
+
+                    <FaqAccordion />
+
+                    <ShopSeoCopy />
                 </>
             )}
         </div>

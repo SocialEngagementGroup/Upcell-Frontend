@@ -20,7 +20,7 @@
 // To retire: delete this file and the fallbacks in ShopPage.jsx that reference
 // it. Nothing else imports it.
 
-import { STATIC_IMAGES } from '../../constants/staticImages';
+import { STATIC_IMAGES, staticImageUrl } from '../../constants/staticImages';
 import { MODEL_GROUP_IMAGES } from '../../components/layout/Header/navigationData';
 
 // Non-Apple demo cards have no photography — UpCell has never stocked these
@@ -127,6 +127,48 @@ export const DEMO_DEALS = build([
     'iPhone 15 Plus · Unlocked',
     'iPhone 16 Pro Max · Unlocked',
 ], (_name, index) => APPLE_ART[index % APPLE_ART.length]);
+
+// "Make the most of your device" — the reference runs a second journal rail
+// here, with different posts from the one higher up the page.
+//
+// UpCell's journal has four posts in total, and they are all used by "The more
+// you know". Rather than repeat the same four cards twice on one page, this
+// rail is demo entries. They must be replaced with real articles — each one
+// links to /blogs rather than to an article route that does not exist, so
+// nothing here 404s in the meantime.
+//
+// `image` is a resolved delivery URL, matching what blogData exports, because
+// BlogRail renders the field directly.
+export const DEMO_GUIDES = [
+    {
+        slug: 'demo-storage-guide',
+        title: 'How much storage do you actually need?',
+        date: 'Draft — placeholder',
+        image: staticImageUrl(STATIC_IMAGES.CATEGORY_IPHONE, 600),
+        linkTo: '/blogs',
+    },
+    {
+        slug: 'demo-ipad-or-macbook',
+        title: 'iPad or MacBook: which one replaces your laptop?',
+        date: 'Draft — placeholder',
+        image: staticImageUrl(STATIC_IMAGES.CATEGORY_IPAD, 600),
+        linkTo: '/blogs',
+    },
+    {
+        slug: 'demo-first-week',
+        title: 'Setting up a pre-owned Mac in its first week',
+        date: 'Draft — placeholder',
+        image: staticImageUrl(STATIC_IMAGES.CATEGORY_MACBOOK, 600),
+        linkTo: '/blogs',
+    },
+    {
+        slug: 'demo-grades-explained',
+        title: 'What the condition grades actually look like',
+        date: 'Draft — placeholder',
+        image: staticImageUrl(STATIC_IMAGES.BLOG_APPLE_PURCHASE, 600),
+        linkTo: '/blogs',
+    },
+];
 
 // "Your phone, your call" — the reference's audience chips.
 //
