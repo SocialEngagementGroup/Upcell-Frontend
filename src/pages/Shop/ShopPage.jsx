@@ -18,6 +18,8 @@ import { EMPTY_ARRAY } from '../../queries/keys';
 import { STATIC_IMAGES } from '../../constants/staticImages';
 import ProductRail from './ProductRail';
 import Reviews from '../../components/Reviews/Reviews';
+import { blogData } from '../../data/blogData';
+import BlogRail from './BlogRail';
 import PromoRows from './PromoRows';
 import TopBrandsPanel from './TopBrandsPanel';
 import {
@@ -489,6 +491,21 @@ const ShopPage = () => {
                         the second section left out at the user's instruction.
                         ========================================================= */}
                     <PromoRows />
+
+                    {/* =========================================================
+                        The more you know.
+
+                        The reference's button here is "Compare smartphones",
+                        which is a tool it has and UpCell does not. The button
+                        points at the journal index instead — a page that
+                        exists — rather than at a comparison that would 404.
+                        ========================================================= */}
+                    <BlogRail
+                        id="journal"
+                        title="The more you know"
+                        posts={blogData}
+                        cta={{ label: 'Read the Tech Journal', to: '/blogs' }}
+                    />
                 </>
             )}
         </div>
