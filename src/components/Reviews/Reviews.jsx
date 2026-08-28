@@ -7,14 +7,20 @@ import StarHalfRoundedIcon from '@mui/icons-material/StarHalfRounded';
 import { cloudinaryUrl } from '../../utilities/cloudinary';
 import { DEMO_REVIEWS } from './reviewsDemo';
 
-// Customer reviews rail.
+// Customer reviews rail. Used on the home page and again on the shop page,
+// where the reference puts the same rail under a customer-count heading.
 //
-// The heading carries no count. The reference says "17M+ people"; that is
-// their number, and inventing one for UpCell would be a claim nobody could
-// stand behind. Add a real figure here once there are real reviews to count.
+// The heading is a prop, but no default here carries a count. The reference
+// says "Over 15M customers globally"; that is their number, and putting a
+// figure like it on UpCell would be a claim nobody could stand behind. Pass a
+// real figure once there is one to count.
 //
 // Everything rendered is demo content — see reviewsDemo.js.
-const Reviews = () => {
+const Reviews = ({
+    heading = 'Don’t just take our word for it',
+    id = 'reviews',
+    className = 'pb-10 md:pb-12',
+}) => {
     const trackRef = useRef(null);
     const [canScrollBack, setCanScrollBack] = useState(false);
     const [canScrollOn, setCanScrollOn] = useState(true);
@@ -45,11 +51,11 @@ const Reviews = () => {
         : 'bg-apple-bg text-apple-gray cursor-not-allowed');
 
     return (
-        <section aria-labelledby="reviews-heading" className="pb-10 md:pb-12">
+        <section id={id} aria-labelledby={`${id}-heading`} className={`scroll-mt-32 ${className}`}>
             <div className="site-shell">
                 <div className="flex items-center justify-between gap-4">
-                    <h2 id="reviews-heading" className="text-[1.5rem] font-bold tracking-[-0.02em] text-apple-text md:text-[1.75rem]">
-                        Don&rsquo;t just take our word for it
+                    <h2 id={`${id}-heading`} className="text-[1.5rem] font-bold tracking-[-0.02em] text-apple-text md:text-[1.75rem]">
+                        {heading}
                     </h2>
 
                     <div className="hidden items-center gap-3 md:flex">

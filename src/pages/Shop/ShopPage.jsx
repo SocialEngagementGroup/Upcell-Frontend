@@ -17,6 +17,7 @@ import { useProductsQuery } from '../../queries/products';
 import { EMPTY_ARRAY } from '../../queries/keys';
 import { STATIC_IMAGES } from '../../constants/staticImages';
 import ProductRail from './ProductRail';
+import Reviews from '../../components/Reviews/Reviews';
 import TopBrandsPanel from './TopBrandsPanel';
 import {
     AUDIENCE_CHIPS,
@@ -464,6 +465,22 @@ const ShopPage = () => {
                     />
 
                     <TopBrandsPanel productsByBrand={productsByBrand} onAddToCart={handleAddToCart} />
+
+                    {/* =========================================================
+                        The reference's customer wall. Same rail the home page
+                        runs; only the heading differs.
+
+                        Its heading there is "Over 15M customers globally". That
+                        count is Back Market's, and UpCell has no figure of its
+                        own to put in its place — so the rail keeps a heading
+                        that promises nothing. Swap in a real number the moment
+                        there is one.
+                        ========================================================= */}
+                    <Reviews
+                        id="customers"
+                        heading="Loved by customers"
+                        className="py-8 md:py-10"
+                    />
                 </>
             )}
         </div>
