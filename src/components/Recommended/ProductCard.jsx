@@ -95,7 +95,7 @@ const ProductCard = ({ product, onAddToCart, variant = 'priceDrop' }) => {
                 {score > 0 && (
                     <span className="mt-2 flex items-center gap-1.5">
                         <Stars score={score} />
-                        <span className="text-[0.8125rem] font-medium text-apple-text">{score}/5</span>
+                        <span className="text-[0.8125rem] font-medium text-apple-text">{score.toFixed(1)}/5</span>
                         {reviews > 0 && (
                             <span className="text-[0.8125rem] font-normal text-apple-gray">({reviews.toLocaleString()})</span>
                         )}

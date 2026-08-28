@@ -15,7 +15,17 @@ import { MODEL_GROUP_IMAGES } from '../../components/layout/Header/navigationDat
 import { cloudinaryUrl } from '../../utilities/cloudinary';
 import { useProductsQuery } from '../../queries/products';
 import { EMPTY_ARRAY } from '../../queries/keys';
+import { STATIC_IMAGES } from '../../constants/staticImages';
+import ProductCard from '../../components/Recommended/ProductCard';
 import ProductRail from './ProductRail';
+import {
+    AUDIENCE_CHIPS,
+    BRANDS,
+    DEMO_ANDROID,
+    DEMO_DEALS,
+    DEMO_IPHONES,
+    DEMO_SAMSUNG,
+} from './shopDemoData';
 
 // The shop page is a landing page, not a filtered index — the same shape as
 // the reference's /l/ pages: breadcrumb, title, then stacked rails. There is
@@ -26,10 +36,11 @@ import ProductRail from './ProductRail';
 // instruction: the 100-point inspection scroller, and the BackUp protection
 // plan banner.
 //
-// Two more are absent because UpCell cannot back them:
-//   * "Your phone, your call" — the reference's audience chips (students,
-//     gamers, military discount) are offers UpCell does not run.
-//   * "Top brands, refurbished" — a brand rail needs more than one brand.
+// Every other section of the reference is here, under the reference's own
+// headings and in its order. Where UpCell has no catalogue behind a section —
+// the Samsung and Android rails, the non-Apple brands — it renders demo data
+// from ./shopDemoData.js, which documents what has to be decided before any of
+// it is shown to a real visitor. Real products always win where there are any.
 
 const FAMILIES = ['iPhone', 'iPad', 'MacBook'];
 
@@ -38,14 +49,13 @@ const FAMILIES = ['iPhone', 'iPad', 'MacBook'];
 // section further down this one.
 const familyAnchor = (family) => family.toLowerCase();
 
-// The reference's "Shop our most wanted" is four image cards. UpCell has three
-// families, so the fourth is the deals rail — the same thing the home page's
-// rail does with its "Great deals" tile.
+// The reference's four "Shop our most wanted" cards, under its labels. Each
+// one anchors to the rail further down that carries those devices.
 const MOST_WANTED = [
-    { id: 'iPhone', label: 'iPhone', to: '#iphone', image: MODEL_GROUP_IMAGES['iPhone'] },
-    { id: 'iPad', label: 'iPad', to: '#ipad', image: MODEL_GROUP_IMAGES['iPad'] },
-    { id: 'MacBook', label: 'MacBook', to: '#macbook', image: MODEL_GROUP_IMAGES['MacBook Air'] },
-    { id: 'deals', label: 'Best deals', to: '#deals', image: MODEL_GROUP_IMAGES['iPhone Pro'] },
+    { id: 'iphone', label: 'iPhone', to: '#iphone', image: MODEL_GROUP_IMAGES['iPhone'] },
+    { id: 'samsung', label: 'Samsung Galaxy', to: '#samsung', image: STATIC_IMAGES.NOT_AVAILABLE },
+    { id: 'pixel', label: 'Google Pixel', to: '#android', image: STATIC_IMAGES.NOT_AVAILABLE },
+    { id: 'android', label: 'Android smartphones', to: '#android', image: STATIC_IMAGES.NOT_AVAILABLE },
 ];
 
 // The reference's accessory row, built at the user's instruction.
@@ -112,12 +122,14 @@ const ShopPage = () => {
     // Biggest saving first. Empty when nothing is discounted, which is the
     // honest answer rather than padding a "best deals" rail with full-price
     // stock.
-    const deals = useMemo(() => (
-        catalogue
+    const deals = useMemo(() => {
+        const real = catalogue
             .filter((product) => Number(product.originalPrice || 0) > Number(product.price || 0))
             .sort((a, b) => (b.originalPrice - b.price) - (a.originalPrice - a.price))
-            .slice(0, MAX_PER_RAIL)
-    ), [catalogue]);
+            .slice(0, MAX_PER_RAIL);
+
+        return real.length ? real : DEMO_DEALS;
+    }, [catalogue]);
 
     // "Best" here means most reviewed, ties broken by score — the same reading
     // the home page's "Best sellers" tab already uses, rather than an editorial
@@ -139,6 +151,23 @@ const ShopPage = () => {
 
         return groups;
     }, [catalogue]);
+
+    // What each of the reference's three rails renders. The iPhone rail has a
+    // real catalogue behind it; the Samsung and Android rails do not, because
+    // UpCell stocks Apple only — those two are demo until the shop sells them.
+    // Real products always win where there are any.
+    const railProducts = useMemo(() => ({
+        iPhone: byFamily.iPhone.length ? byFamily.iPhone : DEMO_IPHONES,
+        samsung: DEMO_SAMSUNG,
+        android: DEMO_ANDROID,
+    }), [byFamily]);
+
+    // The brand panel's rail shows a spread rather than one brand: whatever is
+    // really stocked first, then the demo sets behind it.
+    const brandRail = useMemo(() => (
+        [...(byFamily.iPhone.length ? byFamily.iPhone : DEMO_IPHONES), ...DEMO_SAMSUNG, ...DEMO_ANDROID]
+            .slice(0, MAX_PER_RAIL)
+    ), [byFamily]);
 
     // The header's search box sends people here with `?q=`. Without a filtered
     // index to land on, that would now be a dead end, so the term switches the
@@ -378,20 +407,117 @@ const ShopPage = () => {
                     </section>
 
                     {/* =========================================================
-                        One rail per family, in place of the reference's
-                        "Best refurbished iPhone / Samsung / Android".
+                        Your phone, your call.
                         ========================================================= */}
-                    {FAMILIES.map((family) => (
-                        <ProductRail
-                            key={family}
-                            id={familyAnchor(family)}
-                            title={`Best Certified Premium ${family}`}
-                            products={byFamily[family]}
-                            onAddToCart={handleAddToCart}
-                            variant="bestSeller"
-                            emptyMessage={`No ${family} in the catalogue right now.`}
-                        />
-                    ))}
+                    <section aria-labelledby="audience-heading" className="py-8 md:py-10">
+                        <div className="site-shell">
+                            <h2 id="audience-heading" className="text-[1.5rem] font-bold leading-tight tracking-[-0.02em] text-apple-text md:text-[1.75rem]">
+                                Your phone, your call
+                            </h2>
+
+                            <ul className="mt-5 flex list-none flex-wrap gap-2.5 p-0 md:gap-3">
+                                {AUDIENCE_CHIPS.map((chip) => (
+                                    <li key={chip.label}>
+                                        <Link
+                                            to={chip.to}
+                                            className="inline-flex h-11 items-center rounded-full border border-solid border-black/[0.12] bg-white px-5 text-[0.875rem] font-bold text-apple-text outline-none transition-colors duration-200 ease-smooth hover:border-apple-text hover:bg-surface focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2"
+                                        >
+                                            {chip.label}
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </section>
+
+                    {/* =========================================================
+                        The reference's three product rails, in its order and
+                        under its headings.
+                        ========================================================= */}
+                    <ProductRail
+                        id="iphone"
+                        title="Best refurbished iPhone"
+                        products={railProducts.iPhone}
+                        onAddToCart={handleAddToCart}
+                        variant="bestSeller"
+                    />
+
+                    <ProductRail
+                        id="samsung"
+                        title="Best refurbished Samsung"
+                        products={railProducts.samsung}
+                        onAddToCart={handleAddToCart}
+                        variant="bestSeller"
+                    />
+
+                    <ProductRail
+                        id="android"
+                        title="Best refurbished Android smartphones"
+                        products={railProducts.android}
+                        onAddToCart={handleAddToCart}
+                        variant="bestSeller"
+                    />
+
+                    {/* =========================================================
+                        Top brands, refurbished. Two columns, as the reference
+                        has: a picture on one side, a rail on the other, with
+                        the brand row above it.
+                        ========================================================= */}
+                    <section aria-labelledby="brands-heading" className="py-8 md:py-10">
+                        <div className="site-shell">
+                            <h2 id="brands-heading" className="text-[1.5rem] font-bold leading-tight tracking-[-0.02em] text-apple-text md:text-[1.75rem]">
+                                Top brands, refurbished
+                            </h2>
+
+                            <div className="mt-5 overflow-hidden rounded-3xl border border-solid border-black/[0.06] bg-surface-alt">
+                                <div className="flex flex-col gap-6 p-5 md:flex-row md:items-stretch md:gap-8 md:p-6">
+                                    <div className="w-full md:w-[38%]">
+                                        <img
+                                            src={cloudinaryUrl(STATIC_IMAGES.HERO_IPHONE_15, { width: 900 })}
+                                            alt=""
+                                            width="900"
+                                            height="600"
+                                            decoding="async"
+                                            className="block h-[200px] w-full rounded-2xl bg-white object-contain p-4 md:h-full md:min-h-[300px]"
+                                        />
+                                    </div>
+
+                                    <div className="flex w-full min-w-0 flex-col md:w-[62%]">
+                                        {/* Wordmarks, not logos: the real marks
+                                            are other companies' trademarks and
+                                            none of them are in this repo. */}
+                                        <ul className="flex list-none flex-wrap items-center gap-2 p-0">
+                                            {BRANDS.map((brand) => (
+                                                <li key={brand.id}>
+                                                    <span
+                                                        className={`inline-flex h-9 items-center rounded-full px-4 text-[0.875rem] font-bold ${
+                                                            brand.stocked
+                                                                ? 'bg-apple-text text-white'
+                                                                : 'border border-dashed border-black/20 bg-white/60 text-apple-gray'
+                                                        }`}
+                                                    >
+                                                        {brand.label}
+                                                    </span>
+                                                </li>
+                                            ))}
+                                        </ul>
+
+                                        <ul className="scrollbar-hidden -mx-1 mt-5 flex list-none items-stretch gap-4 overflow-x-auto scroll-smooth px-1 pb-1">
+                                            {brandRail.map((product) => (
+                                                <li key={product._id} className="flex">
+                                                    <ProductCard
+                                                        product={product}
+                                                        onAddToCart={handleAddToCart}
+                                                        variant="bestSeller"
+                                                    />
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
                 </>
             )}
         </div>
