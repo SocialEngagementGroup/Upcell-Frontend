@@ -101,7 +101,7 @@ const PrimaryBar = ({
                     <Link
                         key={link.label}
                         to={link.to}
-                        className="hidden h-10 items-center rounded-full px-2 text-[14px] font-bold text-apple-text underline-offset-4 outline-none transition-colors duration-200 ease-smooth hover:text-brand-red hover:underline focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 focus-visible:ring-offset-white md:inline-flex lg:px-3"
+                        className={`hidden h-10 items-center rounded-full px-2 text-[14px] font-bold text-apple-text underline-offset-4 outline-none transition-colors duration-200 ease-smooth hover:text-brand-red hover:underline focus-visible:ring-2 focus-visible:ring-brand-red focus-visible:ring-offset-2 focus-visible:ring-offset-white lg:px-3 ${link.fromLg ? 'lg:inline-flex' : 'md:inline-flex'}`}
                     >
                         {link.label}
                     </Link>

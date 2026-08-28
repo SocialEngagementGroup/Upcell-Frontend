@@ -281,9 +281,13 @@ export const SEARCH_PLACEHOLDER_WORDS = ['iPhone', 'iPad', 'MacBook'];
 
 export const SEARCH_PLACEHOLDER_INTERVAL = 3000;
 
+// `fromLg` holds a link back to the 1024px breakpoint. At exactly 768 the row
+// is logo + search + trade-in + these two + account + cart, and the search has
+// already shrunk to its 180px floor — carrying both here pushed the nav 15px
+// past the viewport and gave the whole document a horizontal scrollbar.
 export const MAIN_ROW_LINKS = [
     { label: 'Need help?', to: '/support' },
-    { label: 'For business', to: '/support' },
+    { label: 'For business', to: '/support', fromLg: true },
 ];
 
 // The drawer's secondary list. It is the utility row plus "Need help?",
