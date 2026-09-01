@@ -62,6 +62,7 @@ const Checkout = () => {
             email: form.email.value,
             phone: form.phone.value,
             city: form.city.value,
+            state: form.state.value.trim().toUpperCase(),
             postal: form.postalCode.value,
             street: form.street.value,
             country: form.country.value,
@@ -74,6 +75,7 @@ const Checkout = () => {
             validatePhoneNumber(data.phone) ||
             validateRequiredText('Street address', data.street, { min: 5, max: 200 }) ||
             validateRequiredText('City', data.city, { min: 2, max: 120 }) ||
+            validateRequiredText('State', data.state, { min: 2, max: 2 }) ||
             validateRequiredText('Postal code', data.postal, { min: 3, max: 20 }) ||
             validateRequiredText('Country', data.country, { min: 2, max: 120 });
 
@@ -100,17 +102,39 @@ const Checkout = () => {
             trackFailure(failureMessage, { phase: 'request', shipping, paymentMethod, itemCount: productIds.length });
         };
 
+        // The bank's gateway only accepts a real browser form POST — it reads
+        // the fields from the request body and replies with its own payment
+        // page. fetch/axios can't be used for the handover: the response is a
+        // page for the customer to see, not data for us to parse.
+        const postToGateway = (endpoint, fields) => {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = endpoint;
+
+            Object.entries(fields).forEach(([name, value]) => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = name;
+                input.value = value ?? '';
+                form.appendChild(input);
+            });
+
+            document.body.appendChild(form);
+            form.submit();
+        };
+
         try {
-            axiosInstance.post('orders', {
+            axiosInstance.post('boa/prepare-payment', {
                 ...data,
                 orders: data.orders,
                 shipping,
                 paymentMethod,
-                paidWith: 'Manual',
             }).then((res) => {
                 trackSuccess({ phase: 'request', shipping, paymentMethod, itemCount: productIds.length });
+                // Clear before handing over — this page is about to be replaced
+                // by the bank's, so there's no later moment to do it in.
                 clearCartIfNeeded();
-                window.location = `/succeed?order_id=${res.data._id}`;
+                postToGateway(res.data.endpoint, res.data.fields);
             }).catch(handleFailure);
         } catch (error) {
             handleFailure(error);
@@ -158,8 +182,11 @@ const Checkout = () => {
                                 <div className="mt-5 grid gap-4">
                                     <input className="premium-input" type="text" name="name" placeholder="Full name" required />
                                     <input className="premium-input" type="text" name="street" placeholder="Street address" required />
-                                    <div className="grid gap-4 md:grid-cols-2">
+                                    <div className="grid gap-4 md:grid-cols-3">
                                         <input className="premium-input" type="text" name="city" placeholder="City" required />
+                                        {/* Two-letter code — the bank checks this against the card
+                                            issuer's records, and a mismatch reverses the payment. */}
+                                        <input className="premium-input uppercase" type="text" name="state" placeholder="State (e.g. OH)" maxLength={2} required />
                                         <input className="premium-input" type="text" name="postalCode" placeholder="Postal code" required />
                                     </div>
                                     <input className="premium-input bg-black/[0.03] text-ink-soft" type="text" name="country" value="United States" readOnly aria-readonly="true" />
