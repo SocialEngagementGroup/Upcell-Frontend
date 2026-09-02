@@ -36,7 +36,7 @@ const AdminTradeIn = () => {
     const fetchRequests = async (filter = activeFilter, nextPage = page) => {
         setIsLoading(true);
         try {
-            const res = await axiosInstance.get(`admin-trade-in-requests/${filter}`, {
+            const res = await axiosInstance.get(`admin-trade-in-requests/${encodeURIComponent(filter)}`, {
                 params: { page: nextPage, limit: PAGE_LIMIT },
             });
             setRequests(res.data.items || []);

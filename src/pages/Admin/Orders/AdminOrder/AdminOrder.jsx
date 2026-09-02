@@ -29,7 +29,7 @@ const AdminOrder = () => {
     const fetchOrders = async (status = orderStatus, nextPage = page) => {
         setIsLoading(true);
         try {
-            const res = await axiosInstance.get(`admin-orders/${status}`, {
+            const res = await axiosInstance.get(`admin-orders/${encodeURIComponent(status)}`, {
                 params: { page: nextPage, limit: PAGE_LIMIT },
             });
             setOrders(res.data.items || []);

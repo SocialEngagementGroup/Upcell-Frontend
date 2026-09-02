@@ -16,7 +16,7 @@ const SingleTradeInPage = () => {
     const fetchRequest = async () => {
         setIsLoading(true);
         try {
-            const res = await axiosInstance.get(`admin-trade-in-requests/byRequestId:${id}`);
+            const res = await axiosInstance.get(`admin-trade-in-requests/${encodeURIComponent(`byRequestId:${id}`)}`);
             setRequest(res.data.items?.[0] || null);
         } catch (error) {
             console.log(error);

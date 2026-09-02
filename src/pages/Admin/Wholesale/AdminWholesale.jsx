@@ -27,7 +27,7 @@ const AdminWholesale = () => {
     const fetchSubmissions = async (nextFilter = filter, nextPage = page) => {
         setIsLoading(true);
         try {
-            const res = await axiosInstance.get(`add-run-form-submit/admin/${nextFilter}`, {
+            const res = await axiosInstance.get(`add-run-form-submit/admin/${encodeURIComponent(nextFilter)}`, {
                 params: { page: nextPage, limit: PAGE_LIMIT },
             });
             setSubmissions(res.data.items || []);

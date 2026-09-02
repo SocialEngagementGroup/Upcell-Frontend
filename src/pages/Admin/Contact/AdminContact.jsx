@@ -28,7 +28,7 @@ const AdminContact = () => {
     const fetchSubmissions = async (filter = activeFilter, nextPage = page) => {
         setIsLoading(true);
         try {
-            const res = await axiosInstance.get(`admin-contact-submissions/${filter}`, {
+            const res = await axiosInstance.get(`admin-contact-submissions/${encodeURIComponent(filter)}`, {
                 params: { page: nextPage, limit: PAGE_LIMIT },
             });
             setSubmissions(res.data.items || []);

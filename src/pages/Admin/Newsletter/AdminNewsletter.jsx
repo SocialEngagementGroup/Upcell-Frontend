@@ -28,7 +28,7 @@ const AdminNewsletter = () => {
     const fetchSubscribers = async (filter = activeFilter, nextPage = page) => {
         setIsLoading(true);
         try {
-            const res = await axiosInstance.get(`admin-newsletter-subscribers/${filter}`, {
+            const res = await axiosInstance.get(`admin-newsletter-subscribers/${encodeURIComponent(filter)}`, {
                 params: { page: nextPage, limit: PAGE_LIMIT },
             });
             setSubscribers(res.data.items || []);
