@@ -51,6 +51,7 @@ const AdminWholesale = lazy(() => import('./pages/Admin/Wholesale/AdminWholesale
 const AdminNotifications = lazy(() => import('./pages/Admin/Notifications/AdminNotifications.jsx'));
 const AdminEmailSettings = lazy(() => import('./pages/Admin/EmailSettings/AdminEmailSettings.jsx'));
 const AdminAuditLog = lazy(() => import('./pages/Admin/AuditLog/AdminAuditLog.jsx'));
+const AdminPayments = lazy(() => import('./pages/Admin/Payments/AdminPayments.jsx'));
 
 const lazyElement = (element) => (
   <Suspense fallback={<RouteLoadingScreen />}>
@@ -186,6 +187,10 @@ const router = createBrowserRouter([
           {
             path: "audit-log",
             element: lazyElement(<AdminAuditLog />),
+          },
+          {
+            path: "payments",
+            element: lazyElement(<AdminPayments />),
           },
           {
             path: "wholesale",
