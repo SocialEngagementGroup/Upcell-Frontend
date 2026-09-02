@@ -37,3 +37,6 @@ public/staticImages/*
 # The favicon is the one exception: index.html requests it before any JS runs,
 # so it must exist as a real file in the deployed build.
 !public/staticImages/faviconUpcell.png
+
+# Vite writes these while building and never cleans them up
+vite.config.js.timestamp-*
