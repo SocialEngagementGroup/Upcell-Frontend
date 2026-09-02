@@ -28,9 +28,30 @@ const Cart = () => {
         }
     }, [cart, products, productsLoading, setCart]);
 
+    // A device can sell while it sits in someone's cart — these are single
+    // units, so the second buyer can never be fulfilled. The server refuses
+    // that checkout, but a refusal at the payment step tells the customer
+    // nothing useful, so surface it here where they can act on it.
+    const soldOutItems = useMemo(
+        () => products.filter((product) => product.outOfStock),
+        [products]
+    );
+    const hasSoldOutItems = soldOutItems.length > 0;
+
+    // Sold items are excluded from the total. Showing a price that includes
+    // something they cannot buy makes the summary wrong.
     const total = useMemo(() => (
-        cart.reduce((sum, id) => sum + (products.find((item) => item._id === id)?.price || 0), 0)
+        cart.reduce((sum, id) => {
+            const product = products.find((item) => item._id === id);
+            if (!product || product.outOfStock) return sum;
+            return sum + (product.price || 0);
+        }, 0)
     ), [cart, products]);
+
+    const removeSoldOutItems = () => {
+        const soldIds = new Set(soldOutItems.map((product) => product._id));
+        setCart((current) => current.filter((id) => !soldIds.has(id)));
+    };
 
     const hasDisplayableProducts = products.length > 0;
 
@@ -62,6 +83,27 @@ const Cart = () => {
                 ) : hasDisplayableProducts ? (
                     <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
                         <div className="space-y-5">
+                            {hasSoldOutItems ? (
+                                <div className="rounded-[28px] border-2 border-brand-red/40 bg-brand-red/[0.04] p-5 sm:p-6">
+                                    <h2 className="text-xl text-apple-text">
+                                        {soldOutItems.length === 1
+                                            ? 'One item in your cart has sold'
+                                            : `${soldOutItems.length} items in your cart have sold`}
+                                    </h2>
+                                    <p className="mt-2 text-sm leading-6 text-ink-soft">
+                                        Every device we sell is a single unit, so once one is bought it is gone.
+                                        Remove {soldOutItems.length === 1 ? 'it' : 'them'} to continue to checkout.
+                                    </p>
+                                    <button
+                                        type="button"
+                                        onClick={removeSoldOutItems}
+                                        className="premium-button mt-5"
+                                    >
+                                        {soldOutItems.length === 1 ? 'Remove sold item' : 'Remove sold items'}
+                                    </button>
+                                </div>
+                            ) : null}
+
                             {products.map((product) => (
                                 <CartProduct key={product._id} product={product} cart={cart} setCart={setCart} />
                             ))}
@@ -89,9 +131,24 @@ const Cart = () => {
                                     <span className="text-2xl font-extrabold text-apple-text">${(total * 1.08).toFixed(2)}</span>
                                 </div>
                             </div>
-                            <Link to="/checkout/cart" className="premium-button mt-8 w-full">
-                                Proceed to checkout
-                            </Link>
+                            {hasSoldOutItems ? (
+                                <>
+                                    <button
+                                        type="button"
+                                        disabled
+                                        className="premium-button mt-8 w-full cursor-not-allowed opacity-40"
+                                    >
+                                        Proceed to checkout
+                                    </button>
+                                    <p className="mt-3 text-center text-xs font-bold text-brand-red">
+                                        Remove the sold {soldOutItems.length === 1 ? 'item' : 'items'} above to continue
+                                    </p>
+                                </>
+                            ) : (
+                                <Link to="/checkout/cart" className="premium-button mt-8 w-full">
+                                    Proceed to checkout
+                                </Link>
+                            )}
                         </aside>
                     </div>
                 ) : (
