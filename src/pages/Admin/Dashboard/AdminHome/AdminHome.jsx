@@ -14,20 +14,16 @@ const AdminHome = () => {
     useEffect(() => {
         axiosInstance.get('admin-orders-by-data')
             .then((res) => {
-                const totalOrders = res.data;
+                // The server now counts paid orders and returns the totals.
+                // It used to send every order for this page to filter and add
+                // up itself, which shipped customer details for abandoned
+                // checkouts that were then thrown away.
+                const empty = { amount: 0, money: 0 };
+                const { today, thisWeek, thisMonth } = res.data || {};
 
-                const sumOrders = (items) => items.reduce((acc, item) => {
-                    if (!item.paid) return acc;
-                    acc.amount += 1;
-                    item.line_items.forEach((line) => {
-                        acc.money += line.price_data.unit_amount / 100;
-                    });
-                    return acc;
-                }, { amount: 0, money: 0 });
-
-                setOrdersToday(sumOrders(totalOrders.today));
-                setOrdersWeek(sumOrders(totalOrders.thisWeek));
-                setOrdersMonth(sumOrders(totalOrders.thisMonth));
+                setOrdersToday(today || empty);
+                setOrdersWeek(thisWeek || empty);
+                setOrdersMonth(thisMonth || empty);
             })
             .catch((error) => console.log('error in adminHome.jsx', error))
             .finally(() => setIsLoading(false));
