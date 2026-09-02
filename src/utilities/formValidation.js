@@ -1,10 +1,15 @@
-import isEmail from 'validator/lib/isEmail';
-import isLength from 'validator/lib/isLength';
-import isMobilePhone from 'validator/lib/isMobilePhone';
-import isPostalCode from 'validator/lib/isPostalCode';
+import isEmail from 'validator/es/lib/isEmail';
+import isLength from 'validator/es/lib/isLength';
+import isMobilePhone from 'validator/es/lib/isMobilePhone';
+import isPostalCode from 'validator/es/lib/isPostalCode';
 
 // Imported one rule at a time rather than the whole `validator` package: the
 // full bundle is ~150kB and this needs four checks out of it.
+//
+// From es/lib, not lib. The CJS build at validator/lib exports isPostalCode and
+// isMobilePhone as { default, locales } — an object, not a function — so those
+// two would throw "is not a function" the first time a customer entered a ZIP.
+// A bundler does not catch it: the build succeeds either way.
 //
 // These replaced hand-written regexes. The email one in particular accepted
 // "a@b.c" and anything else vaguely shaped like an address, which meant an
@@ -61,6 +66,25 @@ export const validateUsZip = (value) => {
     if (!normalized) return 'ZIP code is required.';
     if (!isPostalCode(normalized, 'US')) {
         return 'Enter a 5-digit ZIP code, e.g. 94043.';
+    }
+    return '';
+};
+
+// The same list the server checks against. "FD" is two letters and used to pass
+// a length-only check, but it is not a state — the card issuer's address check
+// fails and the sale is lost, with nothing on screen explaining why.
+const US_STATE_CODES = new Set(
+    ('AL AK AZ AR CA CO CT DE FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO ' +
+     'MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY ' +
+     'DC AS GU MP PR VI AA AE AP').split(' ')
+);
+
+export const validateUsState = (value) => {
+    const normalized = String(value || '').trim().toUpperCase();
+
+    if (!normalized) return 'State is required.';
+    if (!US_STATE_CODES.has(normalized)) {
+        return 'Enter a valid 2-letter state code, e.g. OH.';
     }
     return '';
 };

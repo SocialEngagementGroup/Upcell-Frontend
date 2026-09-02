@@ -10,14 +10,39 @@ import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { toast } from 'react-toastify';
-import { extractApiError, validateEmailAddress, validatePhoneNumber, validateRequiredText } from '../../utilities/formValidation';
+import {
+    extractApiError,
+    validateEmailAddress,
+    validatePhoneNumber,
+    validateRequiredText,
+    validateUsState,
+    validateUsZip,
+    validateFields,
+} from '../../utilities/formValidation';
+import FormField from '../../components/FormField/FormField';
 import useFormAnalytics from '../../utilities/useFormAnalytics';
 import { normalizeProduct } from '../../utilities/catalog';
+
+// Every rule matches orderSchema on the server exactly. Drift between the two
+// is what produced the declines of 1 September: the form accepted a 6-digit
+// postal code and "FD" as a state, the server or the bank then rejected them,
+// and the customer saw "payment failed" with nothing pointing at the box to fix.
+const CHECKOUT_RULES = {
+    email: (value) => validateEmailAddress(value),
+    phone: (value) => validatePhoneNumber(value),
+    name: (value) => validateRequiredText('Full name', value, { min: 2, max: 120 }),
+    street: (value) => validateRequiredText('Street address', value, { min: 5, max: 200 }),
+    city: (value) => validateRequiredText('City', value, { min: 2, max: 120 }),
+    state: (value) => validateUsState(value),
+    postalCode: (value) => validateUsZip(value),
+};
 
 const Checkout = () => {
     const params = useParams();
     const { cart } = useContext(CartContext);
     const [products, setProducts] = useState([]);
+    const [fieldErrors, setFieldErrors] = useState({});
+    const [touched, setTouched] = useState({});
     const [shipping, setShipping] = useState('standard');
     const [isLoading, setIsLoading] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState('manual');
@@ -54,6 +79,22 @@ const Checkout = () => {
     const shippingCost = shippingCosts[shipping] || 0;
     const total = subtotal + estTax + shippingCost;
 
+    // Check when the customer leaves a field rather than as they type — a ZIP
+    // is invalid for most of the time it takes to enter one.
+    const handleFieldBlur = (field) => (event) => {
+        setTouched((prev) => ({ ...prev, [field]: true }));
+        setFieldErrors((prev) => ({ ...prev, [field]: CHECKOUT_RULES[field](event.target.value) }));
+    };
+
+    // Clear an error as soon as it stops being true, so the field stops looking
+    // wrong while the customer is busy correcting it.
+    const handleFieldChange = (field) => (event) => {
+        markInteraction();
+        if (fieldErrors[field]) {
+            setFieldErrors((prev) => ({ ...prev, [field]: CHECKOUT_RULES[field](event.target.value) }));
+        }
+    };
+
     const handleSubmit = (event) => {
         event.preventDefault();
         if (isLoading) return;
@@ -77,19 +118,26 @@ const Checkout = () => {
             orders: productIds,
         };
 
-        const validationMessage =
-            validateRequiredText('Full name', data.name, { min: 2, max: 120 }) ||
-            validateEmailAddress(data.email) ||
-            validatePhoneNumber(data.phone) ||
-            validateRequiredText('Street address', data.street, { min: 5, max: 200 }) ||
-            validateRequiredText('City', data.city, { min: 2, max: 120 }) ||
-            validateRequiredText('State', data.state, { min: 2, max: 2 }) ||
-            validateRequiredText('Postal code', data.postal, { min: 3, max: 20 }) ||
-            validateRequiredText('Country', data.country, { min: 2, max: 120 });
+        const errors = validateFields(
+            { ...data, postalCode: data.postal },
+            CHECKOUT_RULES
+        );
 
-        if (validationMessage) {
-            toast.error(validationMessage);
-            trackFailure(validationMessage, { phase: 'validation' });
+        if (Object.keys(errors).length) {
+            setFieldErrors(errors);
+            setTouched(Object.keys(CHECKOUT_RULES).reduce((all, f) => ({ ...all, [f]: true }), {}));
+            trackFailure(Object.values(errors).join(' '), {
+                phase: 'validation',
+                fields: Object.keys(errors).join(','),
+            });
+
+            // Take the customer to the first problem. On a form this long the
+            // broken field is often off screen, and a toast saying "State is
+            // required" does not say where State is.
+            const firstBad = Object.keys(CHECKOUT_RULES).find((field) => errors[field]);
+            const el = form.elements[firstBad];
+            el?.focus();
+            el?.scrollIntoView({ block: 'center', behavior: 'smooth' });
             return;
         }
 
@@ -175,12 +223,27 @@ const Checkout = () => {
             <section className="page-container pb-16">
                 <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
                     <main className="premium-card rounded-[28px] p-6 sm:rounded-[36px] sm:p-8 md:p-10">
-                        <form onSubmit={handleSubmit} onChangeCapture={markInteraction} className="space-y-8 sm:space-y-10">
+                        {/* noValidate: the browser's own bubble fires before ours and
+                            shows a message we cannot word or place. Every field below
+                            is checked in JS instead. */}
+                        <form onSubmit={handleSubmit} noValidate className="space-y-8 sm:space-y-10">
                             <section>
                                 <h3 className="text-[28px]">Contact information</h3>
                                 <div className="mt-5 grid gap-4 md:grid-cols-2">
-                                    <input className="premium-input" type="email" name="email" placeholder="Email address" required />
-                                    <input className="premium-input" type="tel" name="phone" placeholder="Phone number" required />
+                                    <FormField id="checkout-email" label="Email address" error={fieldErrors.email} touched={touched.email}>
+                                        {(fp) => (
+                                            <input {...fp} type="text" inputMode="email" autoComplete="email" name="email"
+                                                placeholder="you@example.com"
+                                                onBlur={handleFieldBlur('email')} onChange={handleFieldChange('email')} />
+                                        )}
+                                    </FormField>
+                                    <FormField id="checkout-phone" label="Phone number" error={fieldErrors.phone} touched={touched.phone}>
+                                        {(fp) => (
+                                            <input {...fp} type="tel" autoComplete="tel" name="phone"
+                                                placeholder="(313) 288-8312"
+                                                onBlur={handleFieldBlur('phone')} onChange={handleFieldChange('phone')} />
+                                        )}
+                                    </FormField>
                                 </div>
                             </section>
 
@@ -188,16 +251,51 @@ const Checkout = () => {
                                 <h3 className="text-[28px]">Shipping address</h3>
                                 <p className="mt-2 text-sm text-ink-soft">We ship within the United States only.</p>
                                 <div className="mt-5 grid gap-4">
-                                    <input className="premium-input" type="text" name="name" placeholder="Full name" required />
-                                    <input className="premium-input" type="text" name="street" placeholder="Street address" required />
+                                    <FormField id="checkout-name" label="Full name" error={fieldErrors.name} touched={touched.name}>
+                                        {(fp) => (
+                                            <input {...fp} type="text" autoComplete="name" name="name" placeholder="Full name"
+                                                onBlur={handleFieldBlur('name')} onChange={handleFieldChange('name')} />
+                                        )}
+                                    </FormField>
+                                    <FormField id="checkout-street" label="Street address" error={fieldErrors.street} touched={touched.street}>
+                                        {(fp) => (
+                                            <input {...fp} type="text" autoComplete="street-address" name="street"
+                                                placeholder="1295 Charleston Road"
+                                                onBlur={handleFieldBlur('street')} onChange={handleFieldChange('street')} />
+                                        )}
+                                    </FormField>
                                     <div className="grid gap-4 md:grid-cols-3">
-                                        <input className="premium-input" type="text" name="city" placeholder="City" required />
-                                        {/* Two-letter code — the bank checks this against the card
-                                            issuer's records, and a mismatch reverses the payment. */}
-                                        <input className="premium-input uppercase" type="text" name="state" placeholder="State (e.g. OH)" maxLength={2} required />
-                                        <input className="premium-input" type="text" name="postalCode" placeholder="Postal code" required />
+                                        <FormField id="checkout-city" label="City" error={fieldErrors.city} touched={touched.city}>
+                                            {(fp) => (
+                                                <input {...fp} type="text" autoComplete="address-level2" name="city" placeholder="Mountain View"
+                                                    onBlur={handleFieldBlur('city')} onChange={handleFieldChange('city')} />
+                                            )}
+                                        </FormField>
+                                        {/* The bank checks state and ZIP against the card issuer's
+                                            records. A wrong value here is not a form error the
+                                            customer ever sees — it is a declined payment they
+                                            cannot explain, so both are checked properly first. */}
+                                        <FormField id="checkout-state" label="State" error={fieldErrors.state} touched={touched.state}>
+                                            {(fp) => (
+                                                <input {...fp} type="text" autoComplete="address-level1" name="state"
+                                                    className={`${fp.className} uppercase`} maxLength={2} placeholder="CA"
+                                                    onBlur={handleFieldBlur('state')} onChange={handleFieldChange('state')} />
+                                            )}
+                                        </FormField>
+                                        <FormField id="checkout-postalCode" label="ZIP code" error={fieldErrors.postalCode} touched={touched.postalCode}>
+                                            {(fp) => (
+                                                <input {...fp} type="text" inputMode="numeric" autoComplete="postal-code" name="postalCode"
+                                                    maxLength={10} placeholder="94043"
+                                                    onBlur={handleFieldBlur('postalCode')} onChange={handleFieldChange('postalCode')} />
+                                            )}
+                                        </FormField>
                                     </div>
-                                    <input className="premium-input bg-black/[0.03] text-ink-soft" type="text" name="country" value="United States" readOnly aria-readonly="true" />
+                                    <FormField id="checkout-country" label="Country">
+                                        {(fp) => (
+                                            <input {...fp} type="text" name="country" value="United States" readOnly aria-readonly="true"
+                                                className={`${fp.className} bg-black/[0.03] text-ink-soft`} />
+                                        )}
+                                    </FormField>
                                 </div>
                             </section>
 
