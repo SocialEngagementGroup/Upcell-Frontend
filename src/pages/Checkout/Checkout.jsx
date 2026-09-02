@@ -12,6 +12,7 @@ import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { toast } from 'react-toastify';
 import { extractApiError, validateEmailAddress, validatePhoneNumber, validateRequiredText } from '../../utilities/formValidation';
 import useFormAnalytics from '../../utilities/useFormAnalytics';
+import { normalizeProduct } from '../../utilities/catalog';
 
 const Checkout = () => {
     const params = useParams();
@@ -27,8 +28,15 @@ const Checkout = () => {
 
     useEffect(() => {
         if (productIds.length > 0) {
+            // normalizeProduct, same as every other page that shows a product.
+            // The database stores an image as a path like
+            // "/product-images/product-photos/iphone-13-...png", which is not a
+            // file the site serves — resolveProductImage inside normalizeProduct
+            // turns it into a real URL. Using the raw API response here meant the
+            // order summary asked for a file that does not exist, so the browser
+            // fell back to showing the alt text where the photo should be.
             axiosInstance.post('cart', { ids: [...new Set(productIds)] })
-                .then((res) => setProducts(res.data))
+                .then((res) => setProducts((res.data || []).map(normalizeProduct)))
                 .catch((error) => console.log(error));
         }
     }, [params.id, cart]);
