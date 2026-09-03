@@ -22,7 +22,7 @@ import {
 import FormField from '../../components/FormField/FormField';
 import useFormAnalytics from '../../utilities/useFormAnalytics';
 import { normalizeProduct } from '../../utilities/catalog';
-import { groupCartItems } from '../../utilities/cartGrouping';
+import { groupCartItems, lineTotal, variantLabel } from '../../utilities/cartGrouping';
 
 // Every rule matches orderSchema on the server exactly. Drift between the two
 // is what produced the declines of 1 September: the form accepted a 6-digit
@@ -365,26 +365,35 @@ const Checkout = () => {
                         <div className="mt-6 space-y-4">
                             {summaryGroups.map((group) => (
                                 <div key={group.key} className="rounded-[24px] bg-surface-alt p-4">
-                                    {group.device ? (
+                                    {group.variants.length ? (
                                         <div className="flex gap-4">
                                             <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[18px] bg-white">
-                                                <img src={group.device.image} alt={group.device.productName} className="max-h-[80%] w-auto object-contain" />
+                                                <img src={group.image} alt={group.title} className="max-h-[80%] w-auto object-contain" />
                                             </div>
                                             <div className="flex-1">
-                                                <div className="font-bold text-apple-text">
-                                                    {group.device.productName}
-                                                    {group.deviceIndices.length > 1 ? ` × ${group.deviceIndices.length}` : ''}
+                                                <div className="font-bold text-apple-text">{group.title}</div>
+                                                {/* Each version on its own line with its own price.
+                                                    One line reading "$4076.00" gives the customer no
+                                                    way to check what they are about to pay for. */}
+                                                <div className="mt-1 space-y-1">
+                                                    {group.variants.map((entry) => (
+                                                        <div key={entry.product._id} className="flex gap-3 text-sm text-ink-soft">
+                                                            <span className="flex-1">
+                                                                {variantLabel(entry.product)}
+                                                                {entry.indices.length > 1 ? ` · ${entry.indices.length} × $${entry.product.price.toFixed(2)}` : ''}
+                                                            </span>
+                                                            <span className="font-bold text-apple-text">
+                                                                ${lineTotal(entry).toFixed(2)}
+                                                            </span>
+                                                        </div>
+                                                    ))}
                                                 </div>
-                                                <div className="mt-1 text-sm text-ink-soft">{group.device.color?.name}, {group.device.storage}</div>
-                                            </div>
-                                            <div className="font-bold text-apple-text">
-                                                ${(group.device.price * group.deviceIndices.length).toFixed(2)}
                                             </div>
                                         </div>
                                     ) : null}
 
                                     {group.accessories.length ? (
-                                        <div className={group.device ? 'mt-3 border-t border-black/[0.06] pt-3' : ''}>
+                                        <div className={group.variants.length ? 'mt-3 border-t border-black/[0.06] pt-3' : ''}>
                                             {group.accessories.map((entry) => (
                                                 <div key={entry.product._id} className="flex items-center gap-3 py-1 text-sm">
                                                     {/* Indented under the device, not listed beside it —
@@ -392,10 +401,10 @@ const Checkout = () => {
                                                     <span className="text-apple-gray">+</span>
                                                     <span className="flex-1 text-ink-soft">
                                                         {entry.product.productName}
-                                                        {entry.indices.length > 1 ? ` × ${entry.indices.length}` : ''}
+                                                        {entry.indices.length > 1 ? ` · ${entry.indices.length} × $${entry.product.price.toFixed(2)}` : ''}
                                                     </span>
                                                     <span className="font-bold text-apple-text">
-                                                        ${(entry.product.price * entry.indices.length).toFixed(2)}
+                                                        ${lineTotal(entry).toFixed(2)}
                                                     </span>
                                                 </div>
                                             ))}
