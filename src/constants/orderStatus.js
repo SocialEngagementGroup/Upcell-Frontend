@@ -55,6 +55,11 @@ export const ORDER_STATUS_OPTIONS = ORDER_STATUS_TABS;
 // order an admin has confirmed into Processing therefore still carries
 // paid:false, and must not be shown to them as "Failed".
 export const paymentDisplay = ({ paid, status }) => {
+    // Checked before the paid branch below: a refunded order still carries
+    // paid:true — the charge did happen, and that is deliberate so the order
+    // stays on the customer's own list — but showing it as "Completed" next
+    // to a status of Refunded tells the admin the opposite of what occurred.
+    if (status === ORDER_STATUS.REFUNDED) return { text: 'Refunded', className: 'text-apple-gray' };
     if (paid) return { text: 'Completed', className: 'text-green-600' };
     if (status === ORDER_STATUS.PENDING_PAYMENT) return { text: 'Awaiting confirmation', className: 'text-amber-600' };
     // The bank is checking this payment by hand. Not failed, not confirmed —
