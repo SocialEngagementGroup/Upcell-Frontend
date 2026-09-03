@@ -31,6 +31,19 @@ const PAYMENT_BANNERS = {
         heading: 'Your payment is being reviewed',
         body: "The bank is taking a closer look at this payment — this can take a little time. We'll email you as soon as it's resolved. Please don't check out again for the same order in the meantime.",
     },
+    // Separate from `declined` on purpose. The gateway distinguishes a card
+    // being refused from the payment never being properly attempted, and until
+    // now both landed on "your card was declined" — which sent a customer off
+    // to find another card for a problem no card would fix, and blamed their
+    // bank for something that was not their bank's doing. Same treatment as a
+    // decline because it still needs an action; different words because the
+    // action is "try again", not "try a different card".
+    error: {
+        tone: 'alert',
+        heading: "We couldn't complete your payment",
+        body: "Something went wrong before the payment went through, so you haven't been charged. This wasn't a problem with your card — please try again.",
+        cta: { label: 'Back to checkout', to: '/checkout/cart' },
+    },
 };
 
 const Cart = () => {
