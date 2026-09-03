@@ -5,7 +5,7 @@ import ScrollToTop from '../../utilities/ScrollToTop';
 import axiosInstance from '../../utilities/axiosInstance';
 import visa from '../../assets/visa.svg';
 import mastercard from '../../assets/master.svg';
-import americanExpress from '../../assets/americanExpress.svg';
+import discover from '../../assets/discover.svg';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
@@ -381,7 +381,10 @@ const Checkout = () => {
                         </div>
 
                         <div className="mt-6 grid grid-cols-3 gap-3">
-                            {[visa, mastercard, americanExpress].map((icon, index) => (
+                            {/* Amex removed: the logo was on the checkout but nobody had confirmed it
+    was on the merchant agreement, so it advertised a card we may not be
+    able to accept. Discover is on the bank's test card list. */}
+                            {[visa, mastercard, discover].map((icon, index) => (
                                 <div key={index} className="flex h-12 items-center justify-center rounded-[16px] border border-black/[0.06] bg-white">
                                     <img src={icon} alt="Card network accepted" className="max-h-7 w-auto object-contain" />
                                 </div>
