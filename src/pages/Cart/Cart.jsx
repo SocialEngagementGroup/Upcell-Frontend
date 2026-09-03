@@ -7,6 +7,7 @@ import { useProductsQuery } from "../../queries/products";
 import { EMPTY_ARRAY } from "../../queries/keys";
 import RouteLoadingScreen from "../../components/RouteLoadingScreen/RouteLoadingScreen";
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import { groupCartItems } from "../../utilities/cartGrouping";
 
 const Cart = () => {
     const { cart, setCart } = useContext(CartContext);
@@ -47,6 +48,9 @@ const Cart = () => {
             return sum + (product.price || 0);
         }, 0)
     ), [cart, products]);
+
+    // One entry per device, carrying the accessories bought to go with it.
+    const groups = useMemo(() => groupCartItems(cart, products), [cart, products]);
 
     const removeSoldOutItems = () => {
         const soldIds = new Set(soldOutItems.map((product) => product._id));
@@ -104,8 +108,8 @@ const Cart = () => {
                                 </div>
                             ) : null}
 
-                            {products.map((product) => (
-                                <CartProduct key={product._id} product={product} cart={cart} setCart={setCart} />
+                            {groups.map((group) => (
+                                <CartProduct key={group.key} group={group} setCart={setCart} />
                             ))}
                         </div>
 

@@ -22,6 +22,7 @@ import {
 import FormField from '../../components/FormField/FormField';
 import useFormAnalytics from '../../utilities/useFormAnalytics';
 import { normalizeProduct } from '../../utilities/catalog';
+import { groupCartItems } from '../../utilities/cartGrouping';
 
 // Every rule matches orderSchema on the server exactly. Drift between the two
 // is what produced the declines of 1 September: the form accepted a 6-digit
@@ -65,6 +66,13 @@ const Checkout = () => {
                 .catch((error) => console.log(error));
         }
     }, [params.id, cart]);
+
+    // Shown the same way as the cart: the device, with its add-ons indented
+    // underneath it, so the last screen before payment matches the one before it.
+    const summaryGroups = useMemo(
+        () => groupCartItems(productIds, products),
+        [productIds, products]
+    );
 
     const subtotal = useMemo(() => (
         productIds.reduce((acc, id) => acc + (products.find((product) => product._id === id)?.price || 0), 0)
@@ -355,22 +363,46 @@ const Checkout = () => {
                         </div>
 
                         <div className="mt-6 space-y-4">
-                            {productIds.map((id, index) => {
-                                const product = products.find((item) => item._id === id);
-                                if (!product) return null;
-                                return (
-                                    <div key={`${id}-${index}`} className="flex gap-4 rounded-[24px] bg-surface-alt p-4">
-                                        <div className="flex h-16 w-16 items-center justify-center rounded-[18px] bg-white">
-                                            <img src={product.image} alt={product.productName} className="max-h-[80%] w-auto object-contain" />
+                            {summaryGroups.map((group) => (
+                                <div key={group.key} className="rounded-[24px] bg-surface-alt p-4">
+                                    {group.device ? (
+                                        <div className="flex gap-4">
+                                            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[18px] bg-white">
+                                                <img src={group.device.image} alt={group.device.productName} className="max-h-[80%] w-auto object-contain" />
+                                            </div>
+                                            <div className="flex-1">
+                                                <div className="font-bold text-apple-text">
+                                                    {group.device.productName}
+                                                    {group.deviceIndices.length > 1 ? ` × ${group.deviceIndices.length}` : ''}
+                                                </div>
+                                                <div className="mt-1 text-sm text-ink-soft">{group.device.color?.name}, {group.device.storage}</div>
+                                            </div>
+                                            <div className="font-bold text-apple-text">
+                                                ${(group.device.price * group.deviceIndices.length).toFixed(2)}
+                                            </div>
                                         </div>
-                                        <div className="flex-1">
-                                            <div className="font-bold text-apple-text">{product.productName}</div>
-                                            <div className="mt-1 text-sm text-ink-soft">{product.color?.name}, {product.storage}</div>
+                                    ) : null}
+
+                                    {group.accessories.length ? (
+                                        <div className={group.device ? 'mt-3 border-t border-black/[0.06] pt-3' : ''}>
+                                            {group.accessories.map((entry) => (
+                                                <div key={entry.product._id} className="flex items-center gap-3 py-1 text-sm">
+                                                    {/* Indented under the device, not listed beside it —
+                                                        these were chosen to go on that device. */}
+                                                    <span className="text-apple-gray">+</span>
+                                                    <span className="flex-1 text-ink-soft">
+                                                        {entry.product.productName}
+                                                        {entry.indices.length > 1 ? ` × ${entry.indices.length}` : ''}
+                                                    </span>
+                                                    <span className="font-bold text-apple-text">
+                                                        ${(entry.product.price * entry.indices.length).toFixed(2)}
+                                                    </span>
+                                                </div>
+                                            ))}
                                         </div>
-                                        <div className="font-bold text-apple-text">${product.price}</div>
-                                    </div>
-                                );
-                            })}
+                                    ) : null}
+                                </div>
+                            ))}
                         </div>
 
                         <div className="mt-6 space-y-4 border-t border-black/[0.06] pt-6 text-sm text-ink-soft">
