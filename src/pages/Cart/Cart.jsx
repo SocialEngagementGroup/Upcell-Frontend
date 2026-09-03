@@ -1,6 +1,6 @@
-import { useContext, useEffect, useMemo } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { CartContext } from "../../App";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import ScrollToTop from "../../utilities/ScrollToTop";
 import CartProduct from "./CartProduct";
 import { useProductsQuery } from "../../queries/products";
@@ -9,10 +9,49 @@ import RouteLoadingScreen from "../../components/RouteLoadingScreen/RouteLoading
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { groupCartItems } from "../../utilities/cartGrouping";
 
+// What the bank's own redirect (?payment=…) means to a customer standing on
+// this page — cancel and decline are not the same event and must not read
+// the same. A cancel is something the customer chose; a decline is something
+// the bank refused. tone picks the visual treatment: an alarm reads wrong on
+// an action nobody did anything wrong to cause.
+const PAYMENT_BANNERS = {
+    cancelled: {
+        tone: 'neutral',
+        heading: 'Payment cancelled',
+        body: "You didn't complete the payment, so nothing was charged. Your cart is still here whenever you're ready.",
+    },
+    declined: {
+        tone: 'alert',
+        heading: 'Your card was declined',
+        body: 'The bank could not approve this card. Please check the card details and try again, or use a different card.',
+        cta: { label: 'Back to checkout', to: '/checkout/cart' },
+    },
+    review: {
+        tone: 'neutral',
+        heading: 'Your payment is being reviewed',
+        body: "The bank is taking a closer look at this payment — this can take a little time. We'll email you as soon as it's resolved. Please don't check out again for the same order in the meantime.",
+    },
+};
+
 const Cart = () => {
     const { cart, setCart } = useContext(CartContext);
     const { data: allProducts = EMPTY_ARRAY, isLoading: productsLoading } = useProductsQuery();
     const isLoading = Boolean(cart?.length) && productsLoading;
+
+    const [searchParams, setSearchParams] = useSearchParams();
+    // Read once, on the redirect that carries it, rather than on every render —
+    // clearing the param from the URL means refreshing the cart page later
+    // does not keep re-showing "your card was declined" forever.
+    const [paymentBanner] = useState(() => PAYMENT_BANNERS[searchParams.get('payment')] || null);
+
+    // Runs once, on the params the page loaded with — this only ever needs to
+    // strip the flag the redirect carried in, not react to it changing later.
+    useEffect(() => {
+        if (searchParams.has('payment')) {
+            searchParams.delete('payment');
+            setSearchParams(searchParams, { replace: true });
+        }
+    }, []);
 
     const products = useMemo(() => {
         const isObjectId = (id) => /^[0-9a-fA-F]{24}$/.test(id);
@@ -77,6 +116,24 @@ const Cart = () => {
 
                 </div>
             </section>
+
+            {paymentBanner ? (
+                <section className="page-container pb-6">
+                    <div className={`rounded-[28px] border-2 p-5 sm:p-6 ${
+                        paymentBanner.tone === 'alert'
+                            ? 'border-brand-red/40 bg-brand-red/[0.04]'
+                            : 'border-black/[0.08] bg-surface-alt'
+                    }`}>
+                        <h2 className="text-xl text-apple-text">{paymentBanner.heading}</h2>
+                        <p className="mt-2 text-sm leading-6 text-ink-soft">{paymentBanner.body}</p>
+                        {paymentBanner.cta ? (
+                            <Link to={paymentBanner.cta.to} className="premium-button mt-5 inline-flex">
+                                {paymentBanner.cta.label}
+                            </Link>
+                        ) : null}
+                    </div>
+                </section>
+            ) : null}
 
             <section className="page-container pb-16">
                 {isLoading ? (
