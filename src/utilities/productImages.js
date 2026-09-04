@@ -46,14 +46,54 @@ const FAMILY_SEGMENT = {
     macbook: 'macbook',
 };
 
+const ORDINAL_SUFFIXES = { 1: 'st', 2: 'nd', 3: 'rd' };
+const ordinalSuffixFor = (n) => (
+    (n % 100 >= 11 && n % 100 <= 13) ? 'th' : (ORDINAL_SUFFIXES[n % 10] || 'th')
+);
+
+// A manifest folder can name a *range* of generations it covers with one set
+// of photos (e.g. "iPad 7-9th Gen" — the 7th, 8th, and 9th gen look
+// identical). Tokenizing only keeps the two numbers actually written ("7"
+// and "9th"), so an 8th-gen product had nothing to match — and even 7th-gen
+// didn't, since a product asks for the token "7th", never bare "7". Expand
+// the range into every ordinal token it covers.
+const expandGenerationRangeTokens = (originalPath) => {
+    const match = originalPath.match(/(\d+)\s*-\s*(\d+)(st|nd|rd|th)/i);
+    if (!match) return [];
+    const start = Number(match[1]);
+    const end = Number(match[2]);
+    if (!Number.isFinite(start) || !Number.isFinite(end) || end < start || end - start > 10) return [];
+    const tokens = [];
+    for (let n = start; n <= end; n += 1) tokens.push(`${n}${ordinalSuffixFor(n)}`);
+    return tokens;
+};
+
+// iPhone 16e's photos live under ".../iPhone/16/e/...", i.e. the model
+// number and the "e" suffix are separate folder levels — so the path
+// tokenizes to "16" and "e" separately, never the single "16e" token a
+// product named "iPhone 16e" requires. Recombine an adjacent number+"e"
+// pair of path segments into that one token.
+const expandESuffixToken = (pathParts) => {
+    for (let i = 0; i < pathParts.length - 1; i += 1) {
+        if (/^\d+$/.test(pathParts[i]) && pathParts[i + 1] === 'e') {
+            return [`${pathParts[i]}e`];
+        }
+    }
+    return [];
+};
+
 const imageRecords = productImageManifest.map((image) => {
     const searchable = normalizeText(`${image.category} ${image.model} ${image.file} ${image.originalPath}`);
     const pathParts = image.originalPath.split('/').map((part) => normalizeText(part));
+    const extraTokens = [
+        ...expandGenerationRangeTokens(image.originalPath),
+        ...expandESuffixToken(pathParts),
+    ];
     return {
         ...image,
         searchable,
         pathParts,
-        tokens: new Set(tokenize(searchable)),
+        tokens: new Set([...tokenize(searchable), ...extraTokens]),
     };
 });
 
@@ -91,7 +131,11 @@ const getRequiredModelTokens = (product, family) => {
         }
 
         if (family === 'macbook') {
-            if (/^\d+$/.test(token)) required.push(token);
+            // Screen size is not required: the manifest already groups sizes
+            // that look identical under one folder (e.g. "M1 Pro 13+14"),
+            // and the Max-chip folders carry no size token at all. Requiring
+            // an exact digit match left every 16" Pro/Max variant with
+            // nothing to match and no fallback photo.
             if (['air', 'pro', 'max'].includes(token)) required.push(token);
         }
 
@@ -144,7 +188,11 @@ const getForbiddenModelTokens = (family, requiredTokens) => {
         return ['mini', 'air', 'pro'].filter((token) => !required.has(token));
     }
     if (family === 'macbook') {
-        return ['air', 'pro', 'max'].filter((token) => !required.has(token));
+        // 'max' is deliberately never forbidden: the MacBook Pro chassis is
+        // identical whether the chip is the Pro or Max variant, and the
+        // manifest photographs them together (folders like "M2 Pro Max").
+        // Only 'air' vs 'pro' distinguishes an actually different chassis.
+        return ['air', 'pro'].filter((token) => !required.has(token));
     }
     return [];
 };
