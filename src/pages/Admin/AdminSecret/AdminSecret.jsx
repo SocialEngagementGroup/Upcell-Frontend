@@ -1,7 +1,7 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { userContext } from '../../../utilities/UserContextProvider';
-import axiosInstance from '../../../utilities/axiosInstance';
+import { useUnreadNotificationsCountQuery } from '../../../queries/notifications';
 
 const links = [
     { to: '', label: 'Overview', end: true },
@@ -22,14 +22,7 @@ const links = [
 
 const AdminSecret = () => {
     const { logOut } = useContext(userContext);
-    const [unreadCount, setUnreadCount] = useState(0);
-
-    useEffect(() => {
-        axiosInstance
-            .get('admin-notifications-unread-count')
-            .then((res) => setUnreadCount(res.data.count || 0))
-            .catch((error) => console.log(error));
-    }, []);
+    const { data: unreadCount = 0 } = useUnreadNotificationsCountQuery();
 
     const handleSignOut = () => {
         logOut({ redirectUrl: '/' }).catch((error) => console.log(error));

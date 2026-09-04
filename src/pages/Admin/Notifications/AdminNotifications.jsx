@@ -7,6 +7,7 @@ import AdminPageHeader from '../../../components/AdminPageHeader/AdminPageHeader
 import AdminStatsGrid from '../../../components/AdminStatsGrid/AdminStatsGrid';
 import AdminLoadingState from '../../../components/AdminState/AdminLoadingState';
 import AdminEmptyState from '../../../components/AdminState/AdminEmptyState';
+import { useUnreadNotificationsCountQuery, useMarkNotificationReadMutation } from '../../../queries/notifications';
 
 const PAGE_LIMIT = 10;
 const defaultPagination = {
@@ -22,17 +23,9 @@ const AdminNotifications = () => {
     const [page, setPage] = useState(1);
     const [pagination, setPagination] = useState(defaultPagination);
     const [isLoading, setIsLoading] = useState(true);
-    const [unreadCount, setUnreadCount] = useState(0);
     const [markingId, setMarkingId] = useState(null);
-
-    const fetchUnreadCount = async () => {
-        try {
-            const res = await axiosInstance.get('admin-notifications-unread-count');
-            setUnreadCount(res.data.count || 0);
-        } catch (error) {
-            console.log(error);
-        }
-    };
+    const { data: unreadCount = 0 } = useUnreadNotificationsCountQuery();
+    const markNotificationRead = useMarkNotificationReadMutation();
 
     const fetchNotifications = async (filter = activeFilter, nextPage = page) => {
         setIsLoading(true);
@@ -52,7 +45,6 @@ const AdminNotifications = () => {
 
     useEffect(() => {
         fetchNotifications(activeFilter, page);
-        fetchUnreadCount();
     }, [activeFilter, page]);
 
     const applyFilter = (nextFilter) => {
@@ -72,9 +64,8 @@ const AdminNotifications = () => {
     const handleMarkRead = async (id) => {
         setMarkingId(id);
         try {
-            await axiosInstance.patch(`admin-notifications/${id}/read`);
+            await markNotificationRead.mutateAsync(id);
             setNotifications((prev) => prev.map((item) => (item._id === id ? { ...item, isRead: true } : item)));
-            setUnreadCount((prev) => Math.max(0, prev - 1));
         } catch (error) {
             console.log(error);
             toast.error('Failed to mark notification as read');
