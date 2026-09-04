@@ -9,6 +9,14 @@ const AddCatagory = () => {
         e.preventDefault();
         const modelName = e.target.categoryName.value.trim();
 
+        // `required` only checks the field is non-empty before trimming, so
+        // a name of all spaces passes it and would otherwise reach the
+        // backend as "".
+        if (!modelName) {
+            toast.error("Category name can't be blank");
+            return;
+        }
+
         createCategory.mutate({ modelName }, {
             onSuccess: () => {
                 e.target.categoryName.value = "";

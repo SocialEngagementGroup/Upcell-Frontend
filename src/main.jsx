@@ -134,7 +134,12 @@ const router = createBrowserRouter([
       },
       {
         path: "succeed",
-        element: lazyElement(<ThankYou />),
+        // Reached only after a real checkout, which is itself behind
+        // PrivateRoute — so the customer's session is already active by the
+        // time the bank redirects them here. Guarding it too costs nothing
+        // and closes off a bookmarked/shared link from showing even the
+        // PII-stripped order view to someone not signed in.
+        element: lazyElement(<PrivateRoute><ThankYou /></PrivateRoute>),
       },
       {
         path: "paypal-return",
