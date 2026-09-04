@@ -9,6 +9,7 @@ import AdminConfirmModal from '../../../../components/AdminConfirmModal/AdminCon
 import { useDeleteProductFamilyMutation, useDeleteProductVariantMutation, useUpdateProductVariantMutation } from '../../../../queries/products';
 import { STATIC_IMAGES, staticImageUrl } from '../../../../constants/staticImages';
 import { resolveImageSrc } from '../../../../utilities/cloudinary';
+import { extractApiError } from '../../../../utilities/formValidation';
 
 const currency = (value) => {
     if (value === '' || value === null || typeof value === 'undefined') return '-';
@@ -49,7 +50,7 @@ const SingleProductGroup = ({ productGroup, onDelete }) => {
             },
             onError: (error) => {
                 console.log(error);
-                toast.error('Failed to delete product family');
+                toast.error(extractApiError(error, 'Failed to delete product family'));
             },
             onSettled: () => {
                 setSavingVariantId('');
@@ -72,7 +73,7 @@ const SingleProductGroup = ({ productGroup, onDelete }) => {
             onSuccess: () => setEditingVariantId(''),
             onError: (error) => {
                 console.log(error);
-                toast.error('Failed to save variant');
+                toast.error(extractApiError(error, 'Failed to save variant'));
             },
             onSettled: () => setSavingVariantId(''),
         });
@@ -90,7 +91,7 @@ const SingleProductGroup = ({ productGroup, onDelete }) => {
                 },
                 onError: (error) => {
                     console.log(error);
-                    toast.error('Failed to delete variant');
+                    toast.error(extractApiError(error, 'Failed to delete variant'));
                 },
                 onSettled: () => {
                     setSavingVariantId('');
@@ -131,7 +132,7 @@ const SingleProductGroup = ({ productGroup, onDelete }) => {
             onError: (error) => {
                 console.log(error);
                 updateDraftVariant(variant._id, { outOfStock: variant.outOfStock });
-                toast.error('Failed to update stock status');
+                toast.error(extractApiError(error, 'Failed to update stock status'));
             },
             onSettled: () => setSavingVariantId(''),
         });

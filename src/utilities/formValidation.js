@@ -107,6 +107,17 @@ export const validateFields = (values, rules) =>
     }, {});
 
 export const extractApiError = (error, fallbackMessage) => {
+    // No `error.response` here means the request never got a reply at all —
+    // timeout or dropped connection — so there's no server payload to read.
+    // Without this check those cases fell through to fallbackMessage, which
+    // reads identically to a real server error and hides the real cause.
+    if (error?.code === 'ECONNABORTED') {
+        return 'The request took too long to reach the server. Please try again.';
+    }
+    if (!error?.response) {
+        return 'Could not reach the server. Please check your connection and try again.';
+    }
+
     const responseData = error?.response?.data;
 
     if (Array.isArray(responseData?.details) && responseData.details.length) {

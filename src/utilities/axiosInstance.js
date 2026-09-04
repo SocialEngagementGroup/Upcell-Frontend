@@ -2,8 +2,15 @@ import axios from "axios";
 import { trackAnalyticsEvent } from "./analytics";
 import { apiBaseUrl } from "./env";
 
+// No timeout meant a slow/hung MongoDB Atlas connection (seen taking well
+// over a minute from some network paths) left requests pending forever —
+// Add/Edit Product and Trade-In submit would sit on "Submitting..." with no
+// error, indistinguishable from the feature being broken. 30s is generous
+// enough for a normal write but still resolves to a visible, retryable error
+// instead of an infinite hang.
 const axiosInstance = axios.create({
-    baseURL: apiBaseUrl
+    baseURL: apiBaseUrl,
+    timeout: 30_000,
 })
 
 const getRequestUrl = (config = {}) => {

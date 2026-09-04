@@ -14,6 +14,7 @@ import {
     useCreateShopCategoryMutation,
 } from '../../../../queries/categories';
 import { EMPTY_ARRAY } from '../../../../queries/keys';
+import { extractApiError } from '../../../../utilities/formValidation';
 
 const buildGroupedProduct = (parent, variants = []) => ({
     parentId: parent._id,
@@ -89,7 +90,7 @@ const AddProduct = () => {
             setSearchParams({});
         } catch (error) {
             console.log(error);
-            toast.error("Failed to save product");
+            toast.error(extractApiError(error, "Failed to save product"));
         }
     }
 
