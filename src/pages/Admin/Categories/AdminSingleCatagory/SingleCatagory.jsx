@@ -151,13 +151,13 @@ const SingleCatagory = ({ catagory, productGroups }) => {
                                                     <div>
                                                         <span className="block font-semibold text-apple-text">{product.productName}</span>
                                                         <span className="block text-xs font-bold text-ink-soft">
-                                                            {product.variants.length} variant{product.variants.length === 1 ? '' : 's'}
+                                                            {product.variantCount} variant{product.variantCount === 1 ? '' : 's'}
                                                         </span>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 text-sm font-medium">
-                                                {product.variants[0]?.price ? `$${product.variants[0].price}` : '-'}
+                                                {product.samplePrice ? `$${product.samplePrice}` : '-'}
                                             </td>
                                             <td className="px-6 py-4 text-right">
                                                 <div className="flex justify-end gap-3">

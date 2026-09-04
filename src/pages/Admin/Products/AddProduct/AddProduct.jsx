@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import { useSearchParams } from 'react-router-dom';
 import {
     useProductsByParentQuery,
-    useProductsQuery,
+    useAdminProductsQuery,
     useSaveProductMutation,
 } from '../../../../queries/products';
 import {
@@ -51,7 +51,7 @@ const AddProduct = () => {
 
     const { data: shopCategories = EMPTY_ARRAY } = useShopCategoriesQuery();
     const { data: parents = EMPTY_ARRAY } = useParentCategoriesQuery();
-    const { data: variants = EMPTY_ARRAY } = useProductsQuery();
+    const { data: variants = EMPTY_ARRAY } = useAdminProductsQuery();
 
     // Fast path for "Edit product": fetch only the one product being edited
     // instead of waiting on the full catalog scan above, which can take a

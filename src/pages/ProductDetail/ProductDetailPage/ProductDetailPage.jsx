@@ -12,6 +12,7 @@ import { groupProductsByParent } from '../../../utilities/catalog';
 import { useProductsQuery } from '../../../queries/products';
 import { EMPTY_ARRAY } from '../../../queries/keys';
 import ModernProductCard from '../../../components/ModernProductCard/ModernProductCard';
+import RouteLoadingScreen from '../../../components/RouteLoadingScreen/RouteLoadingScreen';
 
 
 
@@ -43,7 +44,7 @@ const getStorageSortValue = (storageLabel = '') => {
 const ProductDetailPage = () => {
     const { parentId, productId } = useParams();
     const navigate = useNavigate();
-    const { data: products = EMPTY_ARRAY } = useProductsQuery();
+    const { data: products = EMPTY_ARRAY, isLoading: productsLoading } = useProductsQuery();
     const [product, setProduct] = useState();
     const [selectedColor, setSelectedColor] = useState();
     const [selectedStorage, setSelectedStorage] = useState();
@@ -137,6 +138,20 @@ const ProductDetailPage = () => {
     };
 
 
+
+    // Was never actually checked before — this page just happened to always
+    // have the catalog already cached, back when the shop page fetched from
+    // this exact same endpoint. Now that the shop page has its own lighter
+    // data source, a direct link or a slow connection can land here before
+    // the catalog has loaded, and "no product yet" must not be read as
+    // "product doesn't exist" while the real answer is still in flight.
+    if (productsLoading) {
+        return (
+            <div className="page-shell">
+                <RouteLoadingScreen />
+            </div>
+        );
+    }
 
     if (!product) {
         return (

@@ -9,7 +9,7 @@ import KeyboardArrowLeftRoundedIcon from '@mui/icons-material/KeyboardArrowLeftR
 import ModernProductCard from '../../components/ModernProductCard/ModernProductCard';
 import SearchWithSuggestions from '../../components/SearchWithSuggestions/SearchWithSuggestions';
 import { groupProductsByParent } from '../../utilities/catalog';
-import { useProductsQuery } from '../../queries/products';
+import { useShopProductsQuery } from '../../queries/products';
 import { EMPTY_ARRAY } from '../../queries/keys';
 
 const topCategories = ['All Devices', 'iPhone', 'iPad', 'MacBook'];
@@ -137,7 +137,7 @@ const ShopPage = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { setCart } = useContext(CartContext);
-    const { data: products = EMPTY_ARRAY, isLoading: productsLoading } = useProductsQuery();
+    const { data: products = EMPTY_ARRAY, isLoading: productsLoading } = useShopProductsQuery();
     const [activeCategory, setActiveCategory] = useState('All Devices');
     const [priceRange, setPriceRange] = useState(3500);
     const [selectedModels, setSelectedModels] = useState([]);

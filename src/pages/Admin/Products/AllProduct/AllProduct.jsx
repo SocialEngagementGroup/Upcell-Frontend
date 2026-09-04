@@ -7,7 +7,7 @@ import AdminPagination from '../../../../components/AdminPagination/AdminPaginat
 import AdminLoadingState from '../../../../components/AdminState/AdminLoadingState';
 import AdminEmptyState from '../../../../components/AdminState/AdminEmptyState';
 import SearchWithSuggestions from '../../../../components/SearchWithSuggestions/SearchWithSuggestions';
-import { useProductsQuery } from '../../../../queries/products';
+import { useAdminProductsQuery } from '../../../../queries/products';
 import { useParentCategoriesQuery } from '../../../../queries/categories';
 import { EMPTY_ARRAY } from '../../../../queries/keys';
 import { resolveImageRef } from '../../../../utilities/cloudinary';
@@ -50,7 +50,7 @@ const AllProduct = () => {
     // React Query keeps the catalog cached, so revisiting the page shows
     // products instantly (from cache) while it refreshes in the background.
     const { data: parents = EMPTY_ARRAY, isLoading: parentsLoading } = useParentCategoriesQuery();
-    const { data: variations = EMPTY_ARRAY, isLoading: variationsLoading } = useProductsQuery();
+    const { data: variations = EMPTY_ARRAY, isLoading: variationsLoading } = useAdminProductsQuery();
 
     const isLoading = parentsLoading || variationsLoading;
 

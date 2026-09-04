@@ -5,7 +5,12 @@ import { productKeys, categoryKeys } from './keys';
 
 const invalidateProductData = (queryClient) => {
     queryClient.invalidateQueries({ queryKey: productKeys.list() });
+    queryClient.invalidateQueries({ queryKey: productKeys.shopList() });
+    queryClient.invalidateQueries({ queryKey: productKeys.adminList() });
     queryClient.invalidateQueries({ queryKey: categoryKeys.parents() });
+    // A product being added/edited/removed changes the per-category variant
+    // counts shown on the admin categories page.
+    queryClient.invalidateQueries({ queryKey: categoryKeys.parentsWithCounts() });
 };
 
 // Hoisted so `select` has a stable identity across renders â€” an inline
@@ -16,6 +21,30 @@ const selectNormalizedProducts = (products) => products.map(normalizeProduct);
 export const useProductsQuery = (options = {}) => useQuery({
     queryKey: productKeys.list(),
     queryFn: () => axiosInstance.get('product').then((res) => res.data),
+    select: selectNormalizedProducts,
+    ...options,
+});
+
+// The shop page's data source. Same normalization as useProductsQuery
+// (family inference, image resolution, color fallback), but backed by
+// /products/shop — which returns only the fields a listing card needs
+// instead of every field of every SingleVariation document. Grouping,
+// filtering and search all stay client-side in ShopPage itself, exactly as
+// before; this only changes how much data it takes to get there.
+export const useShopProductsQuery = (options = {}) => useQuery({
+    queryKey: productKeys.shopList(),
+    queryFn: () => axiosInstance.get('products/shop').then((res) => res.data),
+    select: selectNormalizedProducts,
+    ...options,
+});
+
+// AllProduct and AddProduct's own data source — same full, ungrouped variant
+// list they've always needed (for instant client-side search and duplicate-
+// name detection while typing), just trimmed to the fields those two pages
+// actually render or edit, instead of every field of every document.
+export const useAdminProductsQuery = (options = {}) => useQuery({
+    queryKey: productKeys.adminList(),
+    queryFn: () => axiosInstance.get('admin-products').then((res) => res.data),
     select: selectNormalizedProducts,
     ...options,
 });
