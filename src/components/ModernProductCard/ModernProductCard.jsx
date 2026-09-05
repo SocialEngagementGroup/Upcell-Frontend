@@ -3,7 +3,11 @@ import { Link } from 'react-router-dom';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
 
-const ModernProductCard = ({ product }) => {
+// priority — the handful of cards that are on screen before any scrolling.
+// Those load eagerly, because lazy-loading an image the browser can already
+// see delays the largest thing on the page for no saving. Everything below
+// the fold stays lazy: a shop page renders 24 cards and a visitor sees four.
+const ModernProductCard = ({ product, priority = false }) => {
     // If productId/parentId are already strings in the props, use them. 
     // If we're passing the raw API object, we map them.
     const parentId = product.parentId || product.parentCatagory;
@@ -20,7 +24,18 @@ const ModernProductCard = ({ product }) => {
             className="group relative block overflow-hidden rounded-[24px] border border-black/[0.08] bg-white transition-all duration-500 hover:-translate-y-2 hover:border-brand-red hover:shadow-[0_14px_36px_rgba(217,11,15,0.15)]"
         >
             <div className="relative flex h-[310px] items-center justify-center overflow-hidden">
-                <img src={image} alt={title} className="max-h-full max-w-full w-auto h-auto object-contain transition-transform duration-700 group-hover:scale-105" />
+                <img
+                    src={image}
+                    alt={title}
+                    loading={priority ? 'eager' : 'lazy'}
+                    decoding="async"
+                    // Lowercase on purpose: React 18.2 does not know the
+                    // camelCase `fetchPriority` prop and warns on every render.
+                    // Lowercase passes straight through as a plain attribute,
+                    // which is what the browser reads either way.
+                    fetchpriority={priority ? 'high' : 'auto'}
+                    className="max-h-full max-w-full w-auto h-auto object-contain transition-transform duration-700 group-hover:scale-105"
+                />
 
                 <div className="absolute right-3 top-3 flex flex-col gap-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                     <button className="flex h-11 w-11 items-center justify-center rounded-full border border-white/30 bg-brand-red/80 text-white backdrop-blur-md transition-colors hover:bg-brand-red" onClick={(e) => e.preventDefault()}>

@@ -540,8 +540,10 @@ const ShopPage = () => {
                             <ShopProductPreloader />
                         ) : (
                             <div ref={productGridRef} className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                                {paginatedProducts.map((product) => (
-                                    <ModernProductCard key={product._id} product={product} />
+                                {paginatedProducts.map((product, index) => (
+                                    // The first row is on screen immediately, so those images
+                                    // load eagerly; the rest wait until they are scrolled to.
+                                    <ModernProductCard key={product._id} product={product} priority={index < 4} />
                                 ))}
                             </div>
                         )}

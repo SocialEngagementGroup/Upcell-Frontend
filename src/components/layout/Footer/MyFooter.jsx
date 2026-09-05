@@ -108,6 +108,14 @@ const MyFooter = () => {
                             <form className="flex flex-col gap-3" onSubmit={handleNewsletterSubmit}>
                                 <input
                                     type="email"
+                                    // id/name so the browser can autofill this, and
+                                    // aria-label because the only visible text is the
+                                    // placeholder, which screen readers do not treat
+                                    // as a name for the field.
+                                    id="newsletter-email"
+                                    name="email"
+                                    autoComplete="email"
+                                    aria-label="Email address for newsletter"
                                     placeholder="your@email.com"
                                     value={newsletterEmail}
                                     onChange={(event) => {

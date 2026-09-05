@@ -1,4 +1,5 @@
-﻿import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+﻿import { useEffect } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axiosInstance from '../utilities/axiosInstance';
 import { normalizeProduct } from '../utilities/catalog';
 import { productKeys, categoryKeys } from './keys';
@@ -37,6 +38,49 @@ export const useShopProductsQuery = (options = {}) => useQuery({
     select: selectNormalizedProducts,
     ...options,
 });
+
+// Warms the shop cache from a page the visitor is already on, so opening Shop
+// renders products straight away instead of showing the loading skeleton.
+//
+// Deliberately waits for the browser to go idle: the home page's own hero
+// image is what the visitor is actually looking at, and a prefetch that
+// competes with it for bandwidth would make the page they are on slower to
+// make a page they may never open faster.
+//
+// prefetchQuery is a no-op when the cache already holds fresh data, so
+// returning to the home page mid-session does not refetch.
+export const usePrefetchShopProducts = () => {
+    const queryClient = useQueryClient();
+
+    useEffect(() => {
+        let cancelled = false;
+
+        const run = () => {
+            if (cancelled) return;
+            queryClient.prefetchQuery({
+                queryKey: productKeys.shopList(),
+                queryFn: () => axiosInstance.get('products/shop').then((res) => res.data),
+            });
+        };
+
+        // requestIdleCallback is unsupported in Safari < 17, hence the fallback.
+        // Which one scheduled it decides which one cancels it — reading the
+        // pair independently would clear a timeout id with cancelIdleCallback.
+        const hasIdleCallback = typeof window.requestIdleCallback === 'function';
+        const handle = hasIdleCallback
+            ? window.requestIdleCallback(run, { timeout: 3000 })
+            : window.setTimeout(run, 1500);
+
+        return () => {
+            cancelled = true;
+            if (hasIdleCallback) {
+                window.cancelIdleCallback(handle);
+            } else {
+                window.clearTimeout(handle);
+            }
+        };
+    }, [queryClient]);
+};
 
 // AllProduct and AddProduct's own data source — same full, ungrouped variant
 // list they've always needed (for instant client-side search and duplicate-
