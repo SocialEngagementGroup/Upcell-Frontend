@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
+import { TOAST_ICONS } from '../../../../utilities/toastIcons';
 import AdminConfirmModal from '../../../../components/AdminConfirmModal/AdminConfirmModal';
 import { useUpdateShopCategoryMutation, useDeleteShopCategoryMutation } from '../../../../queries/categories';
 import { useDeleteProductFamilyMutation } from '../../../../queries/products';
@@ -38,7 +39,7 @@ const SingleCatagory = ({ catagory, productGroups }) => {
     const handleDeleteProduct = (parentId) => {
         deleteProductFamily.mutate(parentId, {
             onSuccess: () => {
-                toast.success('Product family deleted');
+                toast.success('Product family deleted', { icon: TOAST_ICONS.deleted });
             },
             onError: (error) => {
                 console.log(error);
@@ -51,7 +52,7 @@ const SingleCatagory = ({ catagory, productGroups }) => {
     const handleDeleteCategory = () => {
         deleteCategory.mutate(catagory._id, {
             onSuccess: () => {
-                toast.success('Category deleted');
+                toast.success('Category deleted', { icon: TOAST_ICONS.deleted });
             },
             onError: (error) => {
                 console.log(error);

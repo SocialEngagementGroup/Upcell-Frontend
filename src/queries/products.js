@@ -39,6 +39,51 @@ export const useShopProductsQuery = (options = {}) => useQuery({
     ...options,
 });
 
+// The cart's own products, fetched by id through the endpoint checkout already
+// uses. The page previously read useProductsQuery — every field of all 956
+// variations, 838 KB — to show the two or three items someone had added.
+//
+// A product that has since been deleted simply is not in the response, which is
+// the same signal the old approach gave (it was absent from the catalogue), so
+// the page's stale-id cleanup still works unchanged.
+export const useCartProductsQuery = (ids = [], options = {}) => useQuery({
+    queryKey: productKeys.cart(ids),
+    queryFn: () => axiosInstance.post('cart', { ids }).then((res) => res.data),
+    select: selectNormalizedProducts,
+    enabled: ids.length > 0,
+    ...options,
+});
+
+// A product page needs two things, and neither is the whole catalogue: the
+// variants of the product being viewed (for the colour and storage pickers)
+// and a few cards to recommend. It used to read useProductsQuery for both,
+// which fetches every field of all 956 variations — 838 KB — to render one
+// product.
+//
+// These two endpoints already existed on the backend and simply were not
+// being used here.
+export const useProductFamilyQuery = (parentId, options = {}) => useQuery({
+    queryKey: productKeys.byParent(parentId),
+    queryFn: () => axiosInstance.get(`allSameParentProducts/${parentId}`).then((res) => res.data),
+    select: selectNormalizedProducts,
+    enabled: Boolean(parentId),
+    ...options,
+});
+
+// limit is deliberately higher than the four cards that get rendered. The
+// server groups and slices before the client can drop families it does not
+// show (Watch, and anything inferFamily cannot place), so asking for exactly
+// four would sometimes render three.
+export const useRecommendedProductsQuery = (excludeParentId, options = {}) => useQuery({
+    queryKey: productKeys.recommended(excludeParentId),
+    queryFn: () => axiosInstance
+        .get('products/recommended', { params: { excludeParentId, limit: 8 } })
+        .then((res) => res.data),
+    select: selectNormalizedProducts,
+    enabled: Boolean(excludeParentId),
+    ...options,
+});
+
 // Warms the shop cache from a page the visitor is already on, so opening Shop
 // renders products straight away instead of showing the loading skeleton.
 //

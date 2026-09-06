@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axiosInstance from '../../../utilities/axiosInstance';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
+import { TOAST_ICONS } from '../../../utilities/toastIcons';
 import AdminConfirmModal from '../../../components/AdminConfirmModal/AdminConfirmModal';
 
 const SingleAddFormSubmission = ({ submission, onDeleted }) => {
@@ -12,7 +13,7 @@ const SingleAddFormSubmission = ({ submission, onDeleted }) => {
         try {
             await axiosInstance.delete(`add-run-form-submit/admin/${submission._id}`);
             onDeleted?.(submission._id);
-            toast.success('Wholesale submission deleted');
+            toast.success('Wholesale submission deleted', { icon: TOAST_ICONS.deleted });
         } catch (error) {
             console.log(error);
             toast.error('Failed to delete wholesale submission');

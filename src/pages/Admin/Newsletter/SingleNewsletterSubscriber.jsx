@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axiosInstance from '../../../utilities/axiosInstance';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
+import { TOAST_ICONS } from '../../../utilities/toastIcons';
 import AdminConfirmModal from '../../../components/AdminConfirmModal/AdminConfirmModal';
 
 const statuses = ["Active", "Unsubscribed"];
@@ -17,7 +18,7 @@ const SingleNewsletterSubscriber = ({ subscriber, onUpdated, onDeleted }) => {
         try {
             const response = await axiosInstance.patch(`newsletter-subscribers/${subscriber._id}/status`, { status: nextStatus });
             onUpdated?.(response.data);
-            toast.success(`Subscriber marked as ${nextStatus}`);
+            toast.success(`Subscriber marked as ${nextStatus}`, { icon: TOAST_ICONS.statusChanged });
         } catch (error) {
             setStatus(subscriber.status);
             console.log(error);
@@ -30,7 +31,7 @@ const SingleNewsletterSubscriber = ({ subscriber, onUpdated, onDeleted }) => {
         try {
             await axiosInstance.delete(`newsletter-subscribers/${subscriber._id}`);
             onDeleted?.(subscriber._id);
-            toast.success('Subscriber deleted');
+            toast.success('Subscriber deleted', { icon: TOAST_ICONS.deleted });
         } catch (error) {
             console.log(error);
             toast.error('Failed to delete subscriber');

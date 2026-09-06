@@ -1,5 +1,5 @@
 ﻿import productImageManifest from '../data/productImageManifest.js';
-import { cloudinaryUrl, resolveImageRef } from './cloudinary';
+import { cloudinarySrcSet, resolveImageRef } from './cloudinary';
 
 // Width the catalogue actually renders at. Applied here rather than in each
 // component because this is the single point every product image passes
@@ -227,14 +227,15 @@ const scoreImage = (image, productTokens, colorTokens, family) => {
 // /product-images/... path because the backfill was additive. Reading `image`
 // alone left those products pointing at local files that are no longer
 // deployed, so the public_id must be preferred.
-const fallbackImage = (product) => resolveImageRef(
-    { publicId: product?.imagePublicId, url: product?.image },
-    { width: CATALOG_IMAGE_WIDTH }
-);
+// The image ref a product resolves to, before any width is applied. Split out
+// of resolveProductImage so a caller that needs several widths of the same
+// photo — a srcset — picks the same photo the single-width path would, rather
+// than running this matching a second, subtly different way.
+const fallbackRef = (product) => ({ publicId: product?.imagePublicId, url: product?.image });
 
-export const resolveProductImage = (product) => {
+const resolveProductImageRef = (product) => {
     const productTokens = getProductTokens(product);
-    if (!productTokens.length) return fallbackImage(product);
+    if (!productTokens.length) return fallbackRef(product);
 
     const family = getFamily(product);
     const colorTokens = getColorTokens(product);
@@ -264,7 +265,7 @@ export const resolveProductImage = (product) => {
         scoringColorTokens = [];
     }
 
-    if (!candidates.length) return fallbackImage(product);
+    if (!candidates.length) return fallbackRef(product);
 
     const best = candidates.reduce((winner, image) => {
         const score = scoreImage(image, productTokens, scoringColorTokens, family);
@@ -273,8 +274,22 @@ export const resolveProductImage = (product) => {
     }, null);
 
     return best?.score >= 35
-        ? cloudinaryUrl(best.image.publicId, { width: CATALOG_IMAGE_WIDTH })
-        : fallbackImage(product);
+        ? { publicId: best.image.publicId }
+        : fallbackRef(product);
+};
+
+export const resolveProductImage = (product) => resolveImageRef(
+    resolveProductImageRef(product),
+    { width: CATALOG_IMAGE_WIDTH }
+);
+
+// Same photo as resolveProductImage, offered at several widths so a phone
+// downloads a phone-sized file instead of the 600px one every device gets
+// today. Returns an empty string for a legacy local path, which has no
+// Cloudinary id to resize — the browser then simply uses src, as before.
+export const resolveProductImageSrcSet = (product) => {
+    const { publicId } = resolveProductImageRef(product) || {};
+    return publicId ? cloudinarySrcSet(publicId) : '';
 };
 
 

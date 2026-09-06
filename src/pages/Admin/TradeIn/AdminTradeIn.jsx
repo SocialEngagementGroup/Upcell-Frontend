@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axiosInstance from '../../../utilities/axiosInstance';
 import SingleTradeInRequest from './SingleTradeInRequest';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import AdminPagination from '../../../components/AdminPagination/AdminPagination';
 import AdminPageHeader from '../../../components/AdminPageHeader/AdminPageHeader';
 import AdminStatsGrid from '../../../components/AdminStatsGrid/AdminStatsGrid';

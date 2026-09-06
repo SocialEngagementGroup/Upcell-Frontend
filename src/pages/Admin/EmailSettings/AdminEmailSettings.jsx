@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axiosInstance from '../../../utilities/axiosInstance';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import AdminPageHeader from '../../../components/AdminPageHeader/AdminPageHeader';
 import AdminLoadingState from '../../../components/AdminState/AdminLoadingState';
 

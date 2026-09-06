@@ -5,7 +5,7 @@ import AdminStatsGrid from '../../../components/AdminStatsGrid/AdminStatsGrid';
 import AdminLoadingState from '../../../components/AdminState/AdminLoadingState';
 import AdminEmptyState from '../../../components/AdminState/AdminEmptyState';
 import AdminPagination from '../../../components/AdminPagination/AdminPagination';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 
 const PAGE_LIMIT = 10;
 const defaultPagination = {

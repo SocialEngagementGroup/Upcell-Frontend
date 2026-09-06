@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import axiosInstance from "../../../../utilities/axiosInstance";
 import JsBarcode from "jsbarcode";
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
+import { TOAST_ICONS } from '../../../../utilities/toastIcons';
 import { ORDER_STATUS_OPTIONS, orderStatusLabel, paymentDisplay } from "../../../../constants/orderStatus";
 import RefundPanel from "./RefundPanel";
 
@@ -18,7 +19,7 @@ const SingleAdminOrder = ({ order, onStatusChanged }) => {
             try {
                 await axiosInstance.post("update-order-status", { orderId: order._id, status: nextStatus });
                 onStatusChanged?.();
-                toast.success(`Order marked as ${nextStatus}`);
+                toast.success(`Order marked as ${nextStatus}`, { icon: TOAST_ICONS.statusChanged });
             } catch (error) {
                 console.log(error);
                 setShippingStatus(status);

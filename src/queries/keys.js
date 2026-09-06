@@ -14,6 +14,14 @@ export const productKeys = {
     // getAdminProducts) — includes accessories and edit-form fields
     // (discountPrice/originalPrice) that the public shopList() doesn't.
     adminList: () => ['products', 'admin'],
+    // The four cards under a product page, grouped server-side (see Backend's
+    // getRecommendedProducts). Keyed by the parent it excludes, because the
+    // result differs per product page.
+    recommended: (excludeParentId) => ['products', 'recommended', excludeParentId],
+    // Just the products sitting in one cart (see Backend's getCartProducts).
+    // Sorted so that adding A then B and adding B then A are the same cache
+    // entry rather than two fetches of identical data.
+    cart: (ids = []) => ['products', 'cart', [...ids].sort().join(',')],
 };
 
 export const categoryKeys = {

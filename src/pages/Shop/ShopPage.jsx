@@ -2,7 +2,8 @@ import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { CartContext } from '../../App';
 import ScrollToTop from '../../utilities/ScrollToTop';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
+import { TOAST_ICONS } from '../../utilities/toastIcons';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 import KeyboardArrowLeftRoundedIcon from '@mui/icons-material/KeyboardArrowLeftRounded';
@@ -350,7 +351,7 @@ const ShopPage = () => {
         event.preventDefault();
         event.stopPropagation();
         setCart((prev) => [...prev, productId]);
-        toast.success('Product added to cart');
+        toast.success('Product added to cart', { icon: TOAST_ICONS.cart });
     };
 
     const resetFilters = () => {

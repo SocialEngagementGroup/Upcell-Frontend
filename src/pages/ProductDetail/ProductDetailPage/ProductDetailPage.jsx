@@ -3,13 +3,13 @@ import { useParams } from 'react-router';
 import { Link, useNavigate } from 'react-router-dom';
 import ScrollToTop from '../../../utilities/ScrollToTop';
 import { CartContext } from '../../../App';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
+import { TOAST_ICONS } from '../../../utilities/toastIcons';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 
 import axiosInstance from '../../../utilities/axiosInstance';
-import { groupProductsByParent } from '../../../utilities/catalog';
-import { useProductsQuery } from '../../../queries/products';
+import { useProductFamilyQuery, useRecommendedProductsQuery } from '../../../queries/products';
 import { EMPTY_ARRAY } from '../../../queries/keys';
 import ModernProductCard from '../../../components/ModernProductCard/ModernProductCard';
 import RouteLoadingScreen from '../../../components/RouteLoadingScreen/RouteLoadingScreen';
@@ -44,17 +44,16 @@ const getStorageSortValue = (storageLabel = '') => {
 const ProductDetailPage = () => {
     const { parentId, productId } = useParams();
     const navigate = useNavigate();
-    const { data: products = EMPTY_ARRAY, isLoading: productsLoading } = useProductsQuery();
+    // Only this product's own family, not the catalogue. The page reads it for
+    // the variant pickers and for switching between colour/storage combinations.
+    const { data: allProducts = EMPTY_ARRAY, isLoading: productsLoading } = useProductFamilyQuery(parentId);
+    const { data: recommendedPool = EMPTY_ARRAY } = useRecommendedProductsQuery(parentId);
     const [product, setProduct] = useState();
     const [selectedColor, setSelectedColor] = useState();
     const [selectedStorage, setSelectedStorage] = useState();
     const [quantity, setQuantity] = useState(1);
     const [addonQtys, setAddonQtys] = useState({});
     const { setCart } = useContext(CartContext);
-
-    const allProducts = useMemo(() => (
-        products.filter((item) => item.parentCatagory === parentId || item.parentId === parentId)
-    ), [products, parentId]);
 
     useEffect(() => {
         if (!allProducts.length) return;
@@ -64,11 +63,14 @@ const ProductDetailPage = () => {
         setSelectedStorage(selectedProduct?.storage);
     }, [allProducts, productId]);
 
+    // The server has already grouped these and excluded the current parent —
+    // all that is left is dropping families this section does not show and
+    // taking the first four.
     const recommendedProducts = useMemo(() => (
-        groupProductsByParent(products)
-            .filter((item) => item.parentCatagory !== parentId && ['iPhone', 'iPad', 'MacBook'].includes(item.family))
+        recommendedPool
+            .filter((item) => ['iPhone', 'iPad', 'MacBook'].includes(item.family))
             .slice(0, 4)
-    ), [products, parentId]);
+    ), [recommendedPool]);
 
     const availableColors = useMemo(() => {
         const colors = new Map();
@@ -129,7 +131,7 @@ const ProductDetailPage = () => {
             for (let i = 0; i < qty; i++) itemsToAdd.push(addon._id);
         });
         setCart((prev) => [...prev, ...itemsToAdd]);
-        toast.success(addonTotal > 0 ? 'Product and accessories added' : 'Product added to cart');
+        toast.success(addonTotal > 0 ? 'Product and accessories added' : 'Product added to cart', { icon: TOAST_ICONS.cart });
         setAddonQtys({});
     };
 

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import ProductBatchForm from '../../../../components/ProductForm/ProductBatchForm';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import { useSearchParams } from 'react-router-dom';
 import {
     useProductsByParentQuery,

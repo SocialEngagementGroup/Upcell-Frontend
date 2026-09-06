@@ -26,6 +26,14 @@ const ModernProductCard = ({ product, priority = false }) => {
             <div className="relative flex h-[310px] items-center justify-center overflow-hidden">
                 <img
                     src={image}
+                    // Cards sit in a 4-up grid on desktop, 2-up on tablet, full
+                    // width on a phone. sizes tells the browser that before
+                    // layout, so it can pick a width from srcSet on the first
+                    // pass instead of fetching the largest and discovering the
+                    // slot was 280px. Empty srcSet (a legacy local path) makes
+                    // React drop both attributes and fall back to src.
+                    srcSet={product.imageSrcSet || undefined}
+                    sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
                     alt={title}
                     loading={priority ? 'eager' : 'lazy'}
                     decoding="async"

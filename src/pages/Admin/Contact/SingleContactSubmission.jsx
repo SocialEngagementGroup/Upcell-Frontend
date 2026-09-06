@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axiosInstance from '../../../utilities/axiosInstance';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
+import { TOAST_ICONS } from '../../../utilities/toastIcons';
 import AdminConfirmModal from '../../../components/AdminConfirmModal/AdminConfirmModal';
 
 const statuses = ["New", "Resolved"];
@@ -18,7 +19,7 @@ const SingleContactSubmission = ({ submission, onUpdated, onDeleted }) => {
         try {
             const response = await axiosInstance.patch(`contact-submissions/${submission._id}/status`, { status: nextStatus });
             onUpdated?.(response.data);
-            toast.success(`Contact submission marked as ${nextStatus}`);
+            toast.success(`Contact submission marked as ${nextStatus}`, { icon: TOAST_ICONS.statusChanged });
         } catch (error) {
             setStatus(submission.status);
             console.log(error);
@@ -31,7 +32,7 @@ const SingleContactSubmission = ({ submission, onUpdated, onDeleted }) => {
         try {
             await axiosInstance.delete(`contact-submissions/${submission._id}`);
             onDeleted?.(submission._id);
-            toast.success('Contact submission deleted');
+            toast.success('Contact submission deleted', { icon: TOAST_ICONS.deleted });
         } catch (error) {
             console.log(error);
             toast.error('Failed to delete contact submission');

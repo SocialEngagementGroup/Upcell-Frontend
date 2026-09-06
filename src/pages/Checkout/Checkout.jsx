@@ -9,7 +9,8 @@ import discover from '../../assets/discover.svg';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
+import { TOAST_ICONS } from '../../utilities/toastIcons';
 import {
     extractApiError,
     validateEmailAddress,
@@ -108,7 +109,7 @@ const Checkout = () => {
         if (isLoading) return;
 
         if (!productIds.length) {
-            toast.error('Your cart is empty.');
+            toast.error('Your cart is empty.', { icon: TOAST_ICONS.cart });
             trackFailure('Your cart is empty.', { phase: 'validation' });
             return;
         }

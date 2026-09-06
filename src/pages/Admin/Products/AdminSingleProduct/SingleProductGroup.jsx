@@ -4,7 +4,8 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
+import { TOAST_ICONS } from '../../../../utilities/toastIcons';
 import AdminConfirmModal from '../../../../components/AdminConfirmModal/AdminConfirmModal';
 import { useDeleteProductFamilyMutation, useDeleteProductVariantMutation, useUpdateProductVariantMutation } from '../../../../queries/products';
 import { STATIC_IMAGES, staticImageUrl } from '../../../../constants/staticImages';
@@ -46,7 +47,7 @@ const SingleProductGroup = ({ productGroup, onDelete }) => {
         deleteProductFamily.mutate(productGroup.parentId, {
             onSuccess: () => {
                 onDelete(productGroup.parentId);
-                toast.success('Product family deleted');
+                toast.success('Product family deleted', { icon: TOAST_ICONS.deleted });
             },
             onError: (error) => {
                 console.log(error);
@@ -87,7 +88,7 @@ const SingleProductGroup = ({ productGroup, onDelete }) => {
             deleteProductFamily.mutate(productGroup.parentId, {
                 onSuccess: () => {
                     onDelete(productGroup.parentId);
-                    toast.success('Last variant deleted with product family');
+                    toast.success('Last variant deleted with product family', { icon: TOAST_ICONS.deleted });
                 },
                 onError: (error) => {
                     console.log(error);
@@ -107,7 +108,7 @@ const SingleProductGroup = ({ productGroup, onDelete }) => {
                 if (editingVariantId === variant._id) {
                     setEditingVariantId('');
                 }
-                toast.success('Variant deleted');
+                toast.success('Variant deleted', { icon: TOAST_ICONS.deleted });
             },
             onError: (error) => {
                 console.log(error);

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import axiosInstance from '../../../utilities/axiosInstance';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import AdminPagination from '../../../components/AdminPagination/AdminPagination';
 import AdminPageHeader from '../../../components/AdminPageHeader/AdminPageHeader';
 import AdminStatsGrid from '../../../components/AdminStatsGrid/AdminStatsGrid';
@@ -83,7 +83,7 @@ const AdminPayments = () => {
             const res = await axiosInstance.post('admin-payment-check');
             setCheckReport(res.data);
             const problems = (res.data.critical?.length || 0) + (res.data.warnings?.length || 0);
-            if (problems) toast.warn(`Check finished — ${problems} thing${problems === 1 ? '' : 's'} to look at`);
+            if (problems) toast.warning(`Check finished — ${problems} thing${problems === 1 ? '' : 's'} to look at`);
             else toast.success('Check finished — all payment records agree');
             fetchEvents();
         } catch (error) {

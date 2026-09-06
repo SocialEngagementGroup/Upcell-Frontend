@@ -3,7 +3,7 @@ import { CartContext } from "../../App";
 import { Link, useSearchParams } from "react-router-dom";
 import ScrollToTop from "../../utilities/ScrollToTop";
 import CartProduct from "./CartProduct";
-import { useProductsQuery } from "../../queries/products";
+import { useCartProductsQuery } from "../../queries/products";
 import { EMPTY_ARRAY } from "../../queries/keys";
 import RouteLoadingScreen from "../../components/RouteLoadingScreen/RouteLoadingScreen";
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
@@ -48,8 +48,22 @@ const PAYMENT_BANNERS = {
 
 const Cart = () => {
     const { cart, setCart } = useContext(CartContext);
-    const { data: allProducts = EMPTY_ARRAY, isLoading: productsLoading } = useProductsQuery();
-    const isLoading = Boolean(cart?.length) && productsLoading;
+
+    // Only real ObjectIds reach the server. localStorage is the cart's store and
+    // anything can end up in it — a hand-edited value, or an id left behind by
+    // an older version of the app — and the endpoint rejects the whole request
+    // if one entry fails its id check.
+    const cartIds = useMemo(() => {
+        const isObjectId = (id) => /^[0-9a-fA-F]{24}$/.test(id);
+        return [...new Set(cart || [])].filter(isObjectId);
+    }, [cart]);
+
+    const {
+        data: products = EMPTY_ARRAY,
+        isLoading: productsLoading,
+        isSuccess: productsLoaded,
+    } = useCartProductsQuery(cartIds);
+    const isLoading = Boolean(cartIds.length) && productsLoading;
 
     const [searchParams, setSearchParams] = useSearchParams();
     // Read once, on the redirect that carries it, rather than on every render —
@@ -66,20 +80,18 @@ const Cart = () => {
         }
     }, []);
 
-    const products = useMemo(() => {
-        const isObjectId = (id) => /^[0-9a-fA-F]{24}$/.test(id);
-        const uniqueIds = new Set([...new Set(cart)].filter(isObjectId));
-        return allProducts.filter((product) => uniqueIds.has(product._id));
-    }, [allProducts, cart]);
-
+    // Prunes ids the catalogue no longer has. Gated on a successful fetch, not
+    // merely on "not loading": a failed request also leaves products empty, and
+    // treating that as "every item was deleted" would empty a real customer's
+    // cart because their connection dropped for a moment.
     useEffect(() => {
-        if (!cart?.length || productsLoading) return;
+        if (!cart?.length || !productsLoaded) return;
         const validIds = new Set(products.map((product) => product._id));
         const hasStaleIds = cart.some((id) => !validIds.has(id));
         if (hasStaleIds) {
             setCart((current) => current.filter((id) => validIds.has(id)));
         }
-    }, [cart, products, productsLoading, setCart]);
+    }, [cart, products, productsLoaded, setCart]);
 
     // A device can sell while it sits in someone's cart — these are single
     // units, so the second buyer can never be fulfilled. The server refuses
