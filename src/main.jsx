@@ -38,7 +38,6 @@ const TermsConditions = lazy(() => import('./pages/Legal/TermsConditions/TermsCo
 const DeliveryPolicy = lazy(() => import('./pages/Legal/DeliveryPolicy/DeliveryPolicy.jsx'));
 const AboutUs = lazy(() => import('./pages/Legal/AboutUs/AboutUs.jsx'));
 const ThankYou = lazy(() => import('./pages/ThankYou/ThankYou.jsx'));
-const PaypalReturn = lazy(() => import('./pages/PaypalReturn/PaypalReturn.jsx'));
 const ContactThankYou = lazy(() => import('./pages/ThankYou/ContactThankYou.jsx'));
 const JournalPost = lazy(() => import('./pages/Auxiliary/Resources/JournalPost.jsx'));
 const NotFound = lazy(() => import('./pages/NotFound/NotFound.jsx'));
@@ -140,10 +139,6 @@ const router = createBrowserRouter([
         // and closes off a bookmarked/shared link from showing even the
         // PII-stripped order view to someone not signed in.
         element: lazyElement(<PrivateRoute><ThankYou /></PrivateRoute>),
-      },
-      {
-        path: "paypal-return",
-        element: lazyElement(<PaypalReturn />),
       },
       {
         path: "contact-thank-you",
