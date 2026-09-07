@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import JsBarcode from "jsbarcode";
+import RefundRequestPanel from "./RefundRequestPanel";
 
 const SingleCustomerOrder = ({ order }) => {
     const { line_items, name, email, phone, city, postal, street, country, shipping, paid, status, createdAt, updatedAt } = order;
@@ -77,6 +78,16 @@ const SingleCustomerOrder = ({ order }) => {
                             <p>Country: <strong className="text-apple-text">{country}</strong></p>
                         </div>
                     </div>
+
+                    {/* Full width under both columns: the return form needs the
+                        room, and it is an action on the order rather than more
+                        detail about it. Only offered on a paid order — the
+                        panel itself decides whether a return is possible. */}
+                    {paid ? (
+                        <div className="lg:col-span-2">
+                            <RefundRequestPanel order={order} />
+                        </div>
+                    ) : null}
                 </div>
             )}
         </div>

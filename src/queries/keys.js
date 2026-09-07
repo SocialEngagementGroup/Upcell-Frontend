@@ -34,6 +34,14 @@ export const categoryKeys = {
     parentsWithCounts: () => ['categories', 'withCounts'],
 };
 
+export const refundRequestKeys = {
+    // What the return form needs before it can be drawn: which items are still
+    // returnable on this order, and how long is left.
+    refundable: (orderId) => ['refundRequests', 'refundable', orderId],
+    mine: () => ['refundRequests', 'mine'],
+    adminList: (status) => ['refundRequests', 'admin', status],
+};
+
 export const notificationKeys = {
     // Shared between the sidebar badge (AdminSecret) and the Notifications
     // page itself — before this, each polled admin-notifications-unread-count

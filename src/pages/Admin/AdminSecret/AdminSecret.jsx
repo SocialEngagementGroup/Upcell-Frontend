@@ -10,6 +10,7 @@ const links = [
     { to: 'addproduct', label: 'Add Product' },
     { to: 'orders', label: 'Orders' },
     { to: 'payments', label: 'Payments' },
+    { to: 'refund-requests', label: 'Refund Requests' },
     { to: 'trade-in', label: 'Trade In' },
     { to: 'notifications', label: 'Notifications' },
     { to: 'email-settings', label: 'Email Settings' },
