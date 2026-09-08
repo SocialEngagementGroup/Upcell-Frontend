@@ -222,8 +222,7 @@ const CartProduct = ({ group, setCart }) => {
                     </div>
                 </div>
             ) : null}
-
-            {/* Only worth a total line when the card holds more than one thing to
+           {/* Only worth a total line when the card holds more than one thing to
                 add up. */}
             {variants.length + accessories.length > 1 ? (
                 <div className="mt-5 flex items-center justify-between border-t border-black/[0.06] pt-4">
