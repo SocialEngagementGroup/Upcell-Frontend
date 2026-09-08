@@ -2,14 +2,15 @@ import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { CartContext } from '../../App';
 import ScrollToTop from '../../utilities/ScrollToTop';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
+import { TOAST_ICONS } from '../../utilities/toastIcons';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 import KeyboardArrowLeftRoundedIcon from '@mui/icons-material/KeyboardArrowLeftRounded';
 import ModernProductCard from '../../components/ModernProductCard/ModernProductCard';
 import SearchWithSuggestions from '../../components/SearchWithSuggestions/SearchWithSuggestions';
 import { groupProductsByParent } from '../../utilities/catalog';
-import { useProductsQuery } from '../../queries/products';
+import { useShopProductsQuery } from '../../queries/products';
 import { EMPTY_ARRAY } from '../../queries/keys';
 
 const topCategories = ['All Devices', 'iPhone', 'iPad', 'MacBook'];
@@ -139,7 +140,7 @@ const ShopPage = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { setCart } = useContext(CartContext);
-    const { data: products = EMPTY_ARRAY, isLoading: productsLoading } = useProductsQuery();
+    const { data: products = EMPTY_ARRAY, isLoading: productsLoading } = useShopProductsQuery();
     const [activeCategory, setActiveCategory] = useState('All Devices');
     const [priceRange, setPriceRange] = useState(3500);
     const [selectedModels, setSelectedModels] = useState([]);
@@ -352,7 +353,7 @@ const ShopPage = () => {
         event.preventDefault();
         event.stopPropagation();
         setCart((prev) => [...prev, productId]);
-        toast.success('Product added to cart');
+        toast.success('Product added to cart', { icon: TOAST_ICONS.cart });
     };
 
     const resetFilters = () => {
@@ -542,8 +543,10 @@ const ShopPage = () => {
                             <ShopProductPreloader />
                         ) : (
                             <div ref={productGridRef} className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                                {paginatedProducts.map((product) => (
-                                    <ModernProductCard key={product._id} product={product} />
+                                {paginatedProducts.map((product, index) => (
+                                    // The first row is on screen immediately, so those images
+                                    // load eagerly; the rest wait until they are scrolled to.
+                                    <ModernProductCard key={product._id} product={product} priority={index < 4} />
                                 ))}
                             </div>
                         )}

@@ -5,18 +5,46 @@ import ScrollToTop from '../../utilities/ScrollToTop';
 import axiosInstance from '../../utilities/axiosInstance';
 import visa from '../../assets/visa.svg';
 import mastercard from '../../assets/master.svg';
-import americanExpress from '../../assets/americanExpress.svg';
+import discover from '../../assets/discover.svg';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import { toast } from 'react-toastify';
-import { extractApiError, validateEmailAddress, validatePhoneNumber, validateRequiredText } from '../../utilities/formValidation';
+import { toast } from 'sonner';
+import { TOAST_ICONS } from '../../utilities/toastIcons';
+import {
+    extractApiError,
+    validateEmailAddress,
+    validatePhoneNumber,
+    validateRequiredText,
+    validateUsState,
+    validateUsZip,
+    validateFields,
+} from '../../utilities/formValidation';
+import FormField from '../../components/FormField/FormField';
 import useFormAnalytics from '../../utilities/useFormAnalytics';
+import { normalizeProduct } from '../../utilities/catalog';
+import { groupCartItems, lineTotal, variantLabel } from '../../utilities/cartGrouping';
+
+// Every rule matches orderSchema on the server exactly. Drift between the two
+// is what produced the declines of 1 September: the form accepted a 6-digit
+// postal code and "FD" as a state, the server or the bank then rejected them,
+// and the customer saw "payment failed" with nothing pointing at the box to fix.
+const CHECKOUT_RULES = {
+    email: (value) => validateEmailAddress(value),
+    phone: (value) => validatePhoneNumber(value),
+    name: (value) => validateRequiredText('Full name', value, { min: 2, max: 120 }),
+    street: (value) => validateRequiredText('Street address', value, { min: 5, max: 200 }),
+    city: (value) => validateRequiredText('City', value, { min: 2, max: 120 }),
+    state: (value) => validateUsState(value),
+    postalCode: (value) => validateUsZip(value),
+};
 
 const Checkout = () => {
     const params = useParams();
     const { cart } = useContext(CartContext);
     const [products, setProducts] = useState([]);
+    const [fieldErrors, setFieldErrors] = useState({});
+    const [touched, setTouched] = useState({});
     const [shipping, setShipping] = useState('standard');
     const [isLoading, setIsLoading] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState('manual');
@@ -27,11 +55,25 @@ const Checkout = () => {
 
     useEffect(() => {
         if (productIds.length > 0) {
+            // normalizeProduct, same as every other page that shows a product.
+            // The database stores an image as a path like
+            // "/product-images/product-photos/iphone-13-...png", which is not a
+            // file the site serves — resolveProductImage inside normalizeProduct
+            // turns it into a real URL. Using the raw API response here meant the
+            // order summary asked for a file that does not exist, so the browser
+            // fell back to showing the alt text where the photo should be.
             axiosInstance.post('cart', { ids: [...new Set(productIds)] })
-                .then((res) => setProducts(res.data))
+                .then((res) => setProducts((res.data || []).map(normalizeProduct)))
                 .catch((error) => console.log(error));
         }
     }, [params.id, cart]);
+
+    // Shown the same way as the cart: the device, with its add-ons indented
+    // underneath it, so the last screen before payment matches the one before it.
+    const summaryGroups = useMemo(
+        () => groupCartItems(productIds, products),
+        [productIds, products]
+    );
 
     const subtotal = useMemo(() => (
         productIds.reduce((acc, id) => acc + (products.find((product) => product._id === id)?.price || 0), 0)
@@ -46,12 +88,28 @@ const Checkout = () => {
     const shippingCost = shippingCosts[shipping] || 0;
     const total = subtotal + estTax + shippingCost;
 
+    // Check when the customer leaves a field rather than as they type — a ZIP
+    // is invalid for most of the time it takes to enter one.
+    const handleFieldBlur = (field) => (event) => {
+        setTouched((prev) => ({ ...prev, [field]: true }));
+        setFieldErrors((prev) => ({ ...prev, [field]: CHECKOUT_RULES[field](event.target.value) }));
+    };
+
+    // Clear an error as soon as it stops being true, so the field stops looking
+    // wrong while the customer is busy correcting it.
+    const handleFieldChange = (field) => (event) => {
+        markInteraction();
+        if (fieldErrors[field]) {
+            setFieldErrors((prev) => ({ ...prev, [field]: CHECKOUT_RULES[field](event.target.value) }));
+        }
+    };
+
     const handleSubmit = (event) => {
         event.preventDefault();
         if (isLoading) return;
 
         if (!productIds.length) {
-            toast.error('Your cart is empty.');
+            toast.error('Your cart is empty.', { icon: TOAST_ICONS.cart });
             trackFailure('Your cart is empty.', { phase: 'validation' });
             return;
         }
@@ -62,24 +120,33 @@ const Checkout = () => {
             email: form.email.value,
             phone: form.phone.value,
             city: form.city.value,
+            state: form.state.value.trim().toUpperCase(),
             postal: form.postalCode.value,
             street: form.street.value,
             country: form.country.value,
             orders: productIds,
         };
 
-        const validationMessage =
-            validateRequiredText('Full name', data.name, { min: 2, max: 120 }) ||
-            validateEmailAddress(data.email) ||
-            validatePhoneNumber(data.phone) ||
-            validateRequiredText('Street address', data.street, { min: 5, max: 200 }) ||
-            validateRequiredText('City', data.city, { min: 2, max: 120 }) ||
-            validateRequiredText('Postal code', data.postal, { min: 3, max: 20 }) ||
-            validateRequiredText('Country', data.country, { min: 2, max: 120 });
+        const errors = validateFields(
+            { ...data, postalCode: data.postal },
+            CHECKOUT_RULES
+        );
 
-        if (validationMessage) {
-            toast.error(validationMessage);
-            trackFailure(validationMessage, { phase: 'validation' });
+        if (Object.keys(errors).length) {
+            setFieldErrors(errors);
+            setTouched(Object.keys(CHECKOUT_RULES).reduce((all, f) => ({ ...all, [f]: true }), {}));
+            trackFailure(Object.values(errors).join(' '), {
+                phase: 'validation',
+                fields: Object.keys(errors).join(','),
+            });
+
+            // Take the customer to the first problem. On a form this long the
+            // broken field is often off screen, and a toast saying "State is
+            // required" does not say where State is.
+            const firstBad = Object.keys(CHECKOUT_RULES).find((field) => errors[field]);
+            const el = form.elements[firstBad];
+            el?.focus();
+            el?.scrollIntoView({ block: 'center', behavior: 'smooth' });
             return;
         }
 
@@ -100,17 +167,39 @@ const Checkout = () => {
             trackFailure(failureMessage, { phase: 'request', shipping, paymentMethod, itemCount: productIds.length });
         };
 
+        // The bank's gateway only accepts a real browser form POST — it reads
+        // the fields from the request body and replies with its own payment
+        // page. fetch/axios can't be used for the handover: the response is a
+        // page for the customer to see, not data for us to parse.
+        const postToGateway = (endpoint, fields) => {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = endpoint;
+
+            Object.entries(fields).forEach(([name, value]) => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = name;
+                input.value = value ?? '';
+                form.appendChild(input);
+            });
+
+            document.body.appendChild(form);
+            form.submit();
+        };
+
         try {
-            axiosInstance.post('orders', {
+            axiosInstance.post('boa/prepare-payment', {
                 ...data,
                 orders: data.orders,
                 shipping,
                 paymentMethod,
-                paidWith: 'Manual',
             }).then((res) => {
                 trackSuccess({ phase: 'request', shipping, paymentMethod, itemCount: productIds.length });
+                // Clear before handing over — this page is about to be replaced
+                // by the bank's, so there's no later moment to do it in.
                 clearCartIfNeeded();
-                window.location = `/succeed?order_id=${res.data._id}`;
+                postToGateway(res.data.endpoint, res.data.fields);
             }).catch(handleFailure);
         } catch (error) {
             handleFailure(error);
@@ -143,12 +232,27 @@ const Checkout = () => {
             <section className="page-container pb-16">
                 <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
                     <main className="premium-card rounded-[28px] p-6 sm:rounded-[36px] sm:p-8 md:p-10">
-                        <form onSubmit={handleSubmit} onChangeCapture={markInteraction} className="space-y-8 sm:space-y-10">
+                        {/* noValidate: the browser's own bubble fires before ours and
+                            shows a message we cannot word or place. Every field below
+                            is checked in JS instead. */}
+                        <form onSubmit={handleSubmit} noValidate className="space-y-8 sm:space-y-10">
                             <section>
                                 <h3 className="text-[28px]">Contact information</h3>
                                 <div className="mt-5 grid gap-4 md:grid-cols-2">
-                                    <input className="premium-input" type="email" name="email" placeholder="Email address" required />
-                                    <input className="premium-input" type="tel" name="phone" placeholder="Phone number" required />
+                                    <FormField id="checkout-email" label="Email address" error={fieldErrors.email} touched={touched.email}>
+                                        {(fp) => (
+                                            <input {...fp} type="text" inputMode="email" autoComplete="email" name="email"
+                                                placeholder="you@example.com"
+                                                onBlur={handleFieldBlur('email')} onChange={handleFieldChange('email')} />
+                                        )}
+                                    </FormField>
+                                    <FormField id="checkout-phone" label="Phone number" error={fieldErrors.phone} touched={touched.phone}>
+                                        {(fp) => (
+                                            <input {...fp} type="tel" autoComplete="tel" name="phone"
+                                                placeholder="(313) 288-8312"
+                                                onBlur={handleFieldBlur('phone')} onChange={handleFieldChange('phone')} />
+                                        )}
+                                    </FormField>
                                 </div>
                             </section>
 
@@ -156,13 +260,51 @@ const Checkout = () => {
                                 <h3 className="text-[28px]">Shipping address</h3>
                                 <p className="mt-2 text-sm text-ink-soft">We ship within the United States only.</p>
                                 <div className="mt-5 grid gap-4">
-                                    <input className="premium-input" type="text" name="name" placeholder="Full name" required />
-                                    <input className="premium-input" type="text" name="street" placeholder="Street address" required />
-                                    <div className="grid gap-4 md:grid-cols-2">
-                                        <input className="premium-input" type="text" name="city" placeholder="City" required />
-                                        <input className="premium-input" type="text" name="postalCode" placeholder="Postal code" required />
+                                    <FormField id="checkout-name" label="Full name" error={fieldErrors.name} touched={touched.name}>
+                                        {(fp) => (
+                                            <input {...fp} type="text" autoComplete="name" name="name" placeholder="Full name"
+                                                onBlur={handleFieldBlur('name')} onChange={handleFieldChange('name')} />
+                                        )}
+                                    </FormField>
+                                    <FormField id="checkout-street" label="Street address" error={fieldErrors.street} touched={touched.street}>
+                                        {(fp) => (
+                                            <input {...fp} type="text" autoComplete="street-address" name="street"
+                                                placeholder="1295 Charleston Road"
+                                                onBlur={handleFieldBlur('street')} onChange={handleFieldChange('street')} />
+                                        )}
+                                    </FormField>
+                                    <div className="grid gap-4 md:grid-cols-3">
+                                        <FormField id="checkout-city" label="City" error={fieldErrors.city} touched={touched.city}>
+                                            {(fp) => (
+                                                <input {...fp} type="text" autoComplete="address-level2" name="city" placeholder="Mountain View"
+                                                    onBlur={handleFieldBlur('city')} onChange={handleFieldChange('city')} />
+                                            )}
+                                        </FormField>
+                                        {/* The bank checks state and ZIP against the card issuer's
+                                            records. A wrong value here is not a form error the
+                                            customer ever sees — it is a declined payment they
+                                            cannot explain, so both are checked properly first. */}
+                                        <FormField id="checkout-state" label="State" error={fieldErrors.state} touched={touched.state}>
+                                            {(fp) => (
+                                                <input {...fp} type="text" autoComplete="address-level1" name="state"
+                                                    className={`${fp.className} uppercase`} maxLength={2} placeholder="CA"
+                                                    onBlur={handleFieldBlur('state')} onChange={handleFieldChange('state')} />
+                                            )}
+                                        </FormField>
+                                        <FormField id="checkout-postalCode" label="ZIP code" error={fieldErrors.postalCode} touched={touched.postalCode}>
+                                            {(fp) => (
+                                                <input {...fp} type="text" inputMode="numeric" autoComplete="postal-code" name="postalCode"
+                                                    maxLength={10} placeholder="94043"
+                                                    onBlur={handleFieldBlur('postalCode')} onChange={handleFieldChange('postalCode')} />
+                                            )}
+                                        </FormField>
                                     </div>
-                                    <input className="premium-input bg-black/[0.03] text-ink-soft" type="text" name="country" value="United States" readOnly aria-readonly="true" />
+                                    <FormField id="checkout-country" label="Country">
+                                        {(fp) => (
+                                            <input {...fp} type="text" name="country" value="United States" readOnly aria-readonly="true"
+                                                className={`${fp.className} bg-black/[0.03] text-ink-soft`} />
+                                        )}
+                                    </FormField>
                                 </div>
                             </section>
 
@@ -203,22 +345,10 @@ const Checkout = () => {
                                 </div>
                             </section>
 
-                            <div className="rounded-[24px] border border-black/[0.06] bg-surface-alt p-5">
-                                <p className="flex items-center gap-2 text-sm font-bold text-apple-text">
-                                    <LockOutlinedIcon className="!text-[18px]" />
-                                    Secure, encrypted checkout
-                                </p>
-                                <p className="mt-2 text-sm leading-6 text-ink-soft">
-                                    This page is served over an encrypted HTTPS connection. Card payments are processed through a PCI DSS compliant payment processor. UpCell IT Inc. never stores your full card number or security code.
-                                </p>
-                            </div>
-
                             <div className="flex flex-col gap-4 border-t border-black/[0.06] pt-6 md:flex-row md:items-center md:justify-between">
-                                <p className="text-sm text-ink-soft">
-                                    Prices shown in US dollars (USD). Ships to the United States only. See our{' '}
-                                    <Link to="/return-policy" className="font-bold text-brand-red">Refund Policy</Link>,{' '}
-                                    <Link to="/delivery-policy" className="font-bold text-brand-red">Delivery Policy</Link>, or contact{' '}
-                                    <a href="mailto:usa.Upcells@gmail.com" className="font-bold text-brand-red">usa.Upcells@gmail.com</a>.
+                                <p className="flex items-center gap-2 text-sm text-ink-soft">
+                                    <LockOutlinedIcon className="!text-[18px]" />
+                                    Encrypted checkout and secure order processing.
                                 </p>
                                 <button type="submit" className="premium-button w-full md:w-auto md:min-w-[220px]" disabled={isLoading}>
                                     {isLoading ? 'Submitting...' : 'Submit order request'}
@@ -234,22 +364,55 @@ const Checkout = () => {
                         </div>
 
                         <div className="mt-6 space-y-4">
-                            {productIds.map((id, index) => {
-                                const product = products.find((item) => item._id === id);
-                                if (!product) return null;
-                                return (
-                                    <div key={`${id}-${index}`} className="flex gap-4 rounded-[24px] bg-surface-alt p-4">
-                                        <div className="flex h-16 w-16 items-center justify-center rounded-[18px] bg-white">
-                                            <img src={product.image} alt={product.productName} className="max-h-[80%] w-auto object-contain" />
+                            {summaryGroups.map((group) => (
+                                <div key={group.key} className="rounded-[24px] bg-surface-alt p-4">
+                                    {group.variants.length ? (
+                                        <div className="flex gap-4">
+                                            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[18px] bg-white">
+                                                <img src={group.image} alt={group.title} className="max-h-[80%] w-auto object-contain" />
+                                            </div>
+                                            <div className="flex-1">
+                                                <div className="font-bold text-apple-text">{group.title}</div>
+                                                {/* Each version on its own line with its own price.
+                                                    One line reading "$4076.00" gives the customer no
+                                                    way to check what they are about to pay for. */}
+                                                <div className="mt-1 space-y-1">
+                                                    {group.variants.map((entry) => (
+                                                        <div key={entry.product._id} className="flex gap-3 text-sm text-ink-soft">
+                                                            <span className="flex-1">
+                                                                {variantLabel(entry.product)}
+                                                                {entry.indices.length > 1 ? ` · ${entry.indices.length} × $${entry.product.price.toFixed(2)}` : ''}
+                                                            </span>
+                                                            <span className="font-bold text-apple-text">
+                                                                ${lineTotal(entry).toFixed(2)}
+                                                            </span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div className="flex-1">
-                                            <div className="font-bold text-apple-text">{product.productName}</div>
-                                            <div className="mt-1 text-sm text-ink-soft">{product.color?.name}, {product.storage}</div>
+                                    ) : null}
+
+                                    {group.accessories.length ? (
+                                        <div className={group.variants.length ? 'mt-3 border-t border-black/[0.06] pt-3' : ''}>
+                                            {group.accessories.map((entry) => (
+                                                <div key={entry.product._id} className="flex items-center gap-3 py-1 text-sm">
+                                                    {/* Indented under the device, not listed beside it —
+                                                        these were chosen to go on that device. */}
+                                                    <span className="text-apple-gray">+</span>
+                                                    <span className="flex-1 text-ink-soft">
+                                                        {entry.product.productName}
+                                                        {entry.indices.length > 1 ? ` · ${entry.indices.length} × $${entry.product.price.toFixed(2)}` : ''}
+                                                    </span>
+                                                    <span className="font-bold text-apple-text">
+                                                        ${lineTotal(entry).toFixed(2)}
+                                                    </span>
+                                                </div>
+                                            ))}
                                         </div>
-                                        <div className="whitespace-nowrap font-bold text-apple-text">${product.price} USD</div>
-                                    </div>
-                                );
-                            })}
+                                    ) : null}
+                                </div>
+                            ))}
                         </div>
 
                         <div className="mt-6 space-y-4 border-t border-black/[0.06] pt-6 text-sm text-ink-soft">
@@ -259,19 +422,15 @@ const Checkout = () => {
                             <div className="flex justify-between border-t border-black/[0.06] pt-4 text-base"><span className="font-bold text-apple-text">Total</span><strong className="whitespace-nowrap text-2xl text-apple-text">${total.toFixed(2)} <span className="text-sm font-normal text-ink-soft">USD</span></strong></div>
                         </div>
 
-                        <div className="mt-6">
-                            <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-apple-gray">Cards accepted</p>
-                            <div className="mt-2 grid grid-cols-3 gap-3">
-                                {[
-                                    { src: visa, label: 'Visa accepted' },
-                                    { src: mastercard, label: 'Mastercard accepted' },
-                                    { src: americanExpress, label: 'American Express accepted' },
-                                ].map((card) => (
-                                    <div key={card.label} className="flex h-12 items-center justify-center rounded-[16px] border border-black/[0.06] bg-white">
-                                        <img src={card.src} alt={card.label} className="max-h-7 w-auto object-contain" />
-                                    </div>
-                                ))}
-                            </div>
+                        <div className="mt-6 grid grid-cols-3 gap-3">
+                            {/* Amex removed: the logo was on the checkout but nobody had confirmed it
+    was on the merchant agreement, so it advertised a card we may not be
+    able to accept. Discover is on the bank's test card list. */}
+                            {[visa, mastercard, discover].map((icon, index) => (
+                                <div key={index} className="flex h-12 items-center justify-center rounded-[16px] border border-black/[0.06] bg-white">
+                                    <img src={icon} alt="Card network accepted" className="max-h-7 w-auto object-contain" />
+                                </div>
+                            ))}
                         </div>
                     </aside>
                 </div>
@@ -280,4 +439,5 @@ const Checkout = () => {
     );
 };
 
+// Trigger deployment update
 export default Checkout;

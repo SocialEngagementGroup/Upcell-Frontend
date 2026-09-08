@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import { resolveImageRef } from '../../utilities/cloudinary';
 const STORAGE_OPTIONS = ['64GB', '128GB', '256GB', '512GB', '1TB', '2TB', '4TB'];
 const STORAGE_ORDER = STORAGE_OPTIONS.reduce((map, storage, index) => {
     map[storage] = index;
@@ -132,7 +133,12 @@ const ProductBatchForm = ({ categories, existingProducts, initialProductName, in
             productName: matchedExistingProduct.productName,
             categoryId: matchedCategoryId,
         });
-        setImages((matchedExistingProduct.images || []).map((image) => image.url).filter(Boolean));
+        // An existing product's image may only carry a Cloudinary publicId
+        // (added by the backfill migration, not the original `url` field) —
+        // reading `.url` alone left those images pointing at nothing, which
+        // rendered as a broken image the moment this product was reopened
+        // for editing. resolveImageRef prefers the publicId when present.
+        setImages((matchedExistingProduct.images || []).map((image) => resolveImageRef(image)).filter(Boolean));
         setVariants(
             matchedExistingProduct.variants.length
                 ? matchedExistingProduct.variants.map((variant) => ({

@@ -6,12 +6,12 @@ import useFormAnalytics from '../../../utilities/useFormAnalytics';
 import { STATIC_IMAGES, staticImageUrl } from '../../../constants/staticImages';
 import visa from '../../../assets/visa.svg';
 import mastercard from '../../../assets/master.svg';
-import americanExpress from '../../../assets/americanExpress.svg';
+import discover from '../../../assets/discover.svg';
 
 const CARD_NETWORKS = [
     { src: visa, label: 'Visa accepted' },
     { src: mastercard, label: 'Mastercard accepted' },
-    { src: americanExpress, label: 'American Express accepted' },
+    { src: discover, label: 'Discover accepted' },
 ];
 
 // Modern Icons
@@ -129,6 +129,14 @@ const MyFooter = () => {
                             <form className="flex flex-col gap-3" onSubmit={handleNewsletterSubmit}>
                                 <input
                                     type="email"
+                                    // id/name so the browser can autofill this, and
+                                    // aria-label because the only visible text is the
+                                    // placeholder, which screen readers do not treat
+                                    // as a name for the field.
+                                    id="newsletter-email"
+                                    name="email"
+                                    autoComplete="email"
+                                    aria-label="Email address for newsletter"
                                     placeholder="your@email.com"
                                     value={newsletterEmail}
                                     onChange={(event) => {

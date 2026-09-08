@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axiosInstance from '../../../utilities/axiosInstance';
 import SingleNewsletterSubscriber from './SingleNewsletterSubscriber';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import AdminPagination from '../../../components/AdminPagination/AdminPagination';
 import AdminPageHeader from '../../../components/AdminPageHeader/AdminPageHeader';
 import AdminStatsGrid from '../../../components/AdminStatsGrid/AdminStatsGrid';
@@ -28,7 +28,7 @@ const AdminNewsletter = () => {
     const fetchSubscribers = async (filter = activeFilter, nextPage = page) => {
         setIsLoading(true);
         try {
-            const res = await axiosInstance.get(`admin-newsletter-subscribers/${filter}`, {
+            const res = await axiosInstance.get(`admin-newsletter-subscribers/${encodeURIComponent(filter)}`, {
                 params: { page: nextPage, limit: PAGE_LIMIT },
             });
             setSubscribers(res.data.items || []);

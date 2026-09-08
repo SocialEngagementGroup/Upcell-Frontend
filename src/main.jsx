@@ -40,11 +40,11 @@ const Promotions = lazy(() => import('./pages/Legal/Promotions/Promotions.jsx'))
 const PaymentInfo = lazy(() => import('./pages/Legal/PaymentInfo/PaymentInfo.jsx'));
 const AboutUs = lazy(() => import('./pages/Legal/AboutUs/AboutUs.jsx'));
 const ThankYou = lazy(() => import('./pages/ThankYou/ThankYou.jsx'));
-const PaypalReturn = lazy(() => import('./pages/PaypalReturn/PaypalReturn.jsx'));
 const ContactThankYou = lazy(() => import('./pages/ThankYou/ContactThankYou.jsx'));
 const JournalPost = lazy(() => import('./pages/Auxiliary/Resources/JournalPost.jsx'));
 const NotFound = lazy(() => import('./pages/NotFound/NotFound.jsx'));
 const AdminTradeIn = lazy(() => import('./pages/Admin/TradeIn/AdminTradeIn.jsx'));
+const AdminRefundRequests = lazy(() => import('./pages/Admin/RefundRequests/AdminRefundRequests.jsx'));
 const SingleTradeInPage = lazy(() => import('./pages/Admin/TradeIn/SingleTradeInPage.jsx'));
 const AdminNewsletter = lazy(() => import('./pages/Admin/Newsletter/AdminNewsletter.jsx'));
 const AdminContact = lazy(() => import('./pages/Admin/Contact/AdminContact.jsx'));
@@ -53,6 +53,7 @@ const AdminWholesale = lazy(() => import('./pages/Admin/Wholesale/AdminWholesale
 const AdminNotifications = lazy(() => import('./pages/Admin/Notifications/AdminNotifications.jsx'));
 const AdminEmailSettings = lazy(() => import('./pages/Admin/EmailSettings/AdminEmailSettings.jsx'));
 const AdminAuditLog = lazy(() => import('./pages/Admin/AuditLog/AdminAuditLog.jsx'));
+const AdminPayments = lazy(() => import('./pages/Admin/Payments/AdminPayments.jsx'));
 
 const lazyElement = (element) => (
   <Suspense fallback={<RouteLoadingScreen />}>
@@ -147,11 +148,12 @@ const router = createBrowserRouter([
       },
       {
         path: "succeed",
-        element: lazyElement(<ThankYou />),
-      },
-      {
-        path: "paypal-return",
-        element: lazyElement(<PaypalReturn />),
+        // Reached only after a real checkout, which is itself behind
+        // PrivateRoute — so the customer's session is already active by the
+        // time the bank redirects them here. Guarding it too costs nothing
+        // and closes off a bookmarked/shared link from showing even the
+        // PII-stripped order view to someone not signed in.
+        element: lazyElement(<PrivateRoute><ThankYou /></PrivateRoute>),
       },
       {
         path: "contact-thank-you",
@@ -168,6 +170,10 @@ const router = createBrowserRouter([
           {
             path: "orders",
             element: lazyElement(<AdminOrder />),
+          },
+          {
+            path: "refund-requests",
+            element: lazyElement(<AdminRefundRequests />),
           },
           {
             path: "trade-in",
@@ -200,6 +206,10 @@ const router = createBrowserRouter([
           {
             path: "audit-log",
             element: lazyElement(<AdminAuditLog />),
+          },
+          {
+            path: "payments",
+            element: lazyElement(<AdminPayments />),
           },
           {
             path: "wholesale",

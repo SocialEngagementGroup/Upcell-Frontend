@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axiosInstance from '../../../utilities/axiosInstance';
 import SingleAddFormSubmission from './SingleAddFormSubmission';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import AdminPagination from '../../../components/AdminPagination/AdminPagination';
 import AdminPageHeader from '../../../components/AdminPageHeader/AdminPageHeader';
 import AdminStatsGrid from '../../../components/AdminStatsGrid/AdminStatsGrid';
@@ -27,7 +27,7 @@ const AdminWholesale = () => {
     const fetchSubmissions = async (nextFilter = filter, nextPage = page) => {
         setIsLoading(true);
         try {
-            const res = await axiosInstance.get(`add-run-form-submit/admin/${nextFilter}`, {
+            const res = await axiosInstance.get(`add-run-form-submit/admin/${encodeURIComponent(nextFilter)}`, {
                 params: { page: nextPage, limit: PAGE_LIMIT },
             });
             setSubmissions(res.data.items || []);

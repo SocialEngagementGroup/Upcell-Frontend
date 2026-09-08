@@ -8,6 +8,7 @@
 // That is precisely how "pending_payment" orders went invisible.
 export const ORDER_STATUS = {
     PENDING_PAYMENT: 'pending_payment',
+    UNDER_REVIEW: 'under_review',
     PROCESSING: 'Processing',
     SHIPPED: 'Shipped',
     DELIVERED: 'Delivered',
@@ -20,6 +21,7 @@ export const ORDER_STATUS = {
 // the only orders actually waiting on an admin decision.
 export const ORDER_STATUS_TABS = [
     ORDER_STATUS.PENDING_PAYMENT,
+    ORDER_STATUS.UNDER_REVIEW,
     ORDER_STATUS.PROCESSING,
     ORDER_STATUS.SHIPPED,
     ORDER_STATUS.DELIVERED,
@@ -34,6 +36,7 @@ export const ORDER_STATUS_TABS = [
 // can stay untouched — renaming them would require a data migration.
 const ORDER_STATUS_LABELS = {
     [ORDER_STATUS.PENDING_PAYMENT]: 'Pending Payment',
+    [ORDER_STATUS.UNDER_REVIEW]: 'Under Review',
     [ORDER_STATUS.PROCESSING]: 'Paid',
     [ORDER_STATUS.PAYMENT_FAILED]: 'Payment Failed',
 };
@@ -52,8 +55,16 @@ export const ORDER_STATUS_OPTIONS = ORDER_STATUS_TABS;
 // order an admin has confirmed into Processing therefore still carries
 // paid:false, and must not be shown to them as "Failed".
 export const paymentDisplay = ({ paid, status }) => {
+    // Checked before the paid branch below: a refunded order still carries
+    // paid:true — the charge did happen, and that is deliberate so the order
+    // stays on the customer's own list — but showing it as "Completed" next
+    // to a status of Refunded tells the admin the opposite of what occurred.
+    if (status === ORDER_STATUS.REFUNDED) return { text: 'Refunded', className: 'text-apple-gray' };
     if (paid) return { text: 'Completed', className: 'text-green-600' };
     if (status === ORDER_STATUS.PENDING_PAYMENT) return { text: 'Awaiting confirmation', className: 'text-amber-600' };
+    // The bank is checking this payment by hand. Not failed, not confirmed —
+    // and the devices stay held until it resolves, so it needs saying plainly.
+    if (status === ORDER_STATUS.UNDER_REVIEW) return { text: 'Bank is reviewing', className: 'text-amber-600' };
     if (status === ORDER_STATUS.PAYMENT_FAILED) return { text: 'Failed', className: 'text-red-600' };
     return { text: 'Confirmed by admin', className: 'text-amber-600' };
 };

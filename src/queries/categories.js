@@ -15,6 +15,16 @@ export const useParentCategoryQuery = (id, options = {}) => useQuery({
     ...options,
 });
 
+// The admin categories page's own lean data source — variant counts computed
+// server-side via $lookup/$group, instead of fetching every ParentProduct
+// AND every SingleVariation (956+ documents) just to count matches in a
+// JavaScript loop.
+export const useCategoriesWithCountsQuery = (options = {}) => useQuery({
+    queryKey: categoryKeys.parentsWithCounts(),
+    queryFn: () => axiosInstance.get('admin-catagory-counts').then((res) => res.data),
+    ...options,
+});
+
 export const useShopCategoriesQuery = (options = {}) => useQuery({
     queryKey: categoryKeys.shop(),
     queryFn: () => axiosInstance.get('shop-categories').then((res) => res.data),
@@ -37,8 +47,13 @@ export const useUpdateShopCategoryMutation = () => {
         mutationFn: ({ id, patch }) => axiosInstance.patch(`shop-categories/${id}`, patch),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: categoryKeys.shop() });
-            // A category rename can affect how products under it are labeled/grouped.
+            // A category rename can affect how products under it are labeled/
+            // grouped — both product caches, not just the full-list one, or
+            // the Shop page's own leaner cache goes stale until it naturally
+            // expires (found during the 2026-09-04 caching audit).
             queryClient.invalidateQueries({ queryKey: productKeys.list() });
+            queryClient.invalidateQueries({ queryKey: productKeys.shopList() });
+            queryClient.invalidateQueries({ queryKey: productKeys.adminList() });
         },
     });
 };
@@ -50,6 +65,8 @@ export const useDeleteShopCategoryMutation = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: categoryKeys.shop() });
             queryClient.invalidateQueries({ queryKey: productKeys.list() });
+            queryClient.invalidateQueries({ queryKey: productKeys.shopList() });
+            queryClient.invalidateQueries({ queryKey: productKeys.adminList() });
         },
     });
 };

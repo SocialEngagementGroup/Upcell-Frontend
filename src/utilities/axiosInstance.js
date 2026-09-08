@@ -2,19 +2,34 @@ import axios from "axios";
 import { trackAnalyticsEvent } from "./analytics";
 import { apiBaseUrl } from "./env";
 
+// No timeout meant a slow/hung MongoDB Atlas connection (seen taking well
+// over a minute from some network paths) left requests pending forever —
+// Add/Edit Product and Trade-In submit would sit on "Submitting..." with no
+// error, indistinguishable from the feature being broken. 30s is generous
+// enough for a normal write but still resolves to a visible, retryable error
+// instead of an infinite hang.
 const axiosInstance = axios.create({
-    baseURL: apiBaseUrl
+    baseURL: apiBaseUrl,
+    timeout: 30_000,
 })
 
 const getRequestUrl = (config = {}) => {
     return String(config.url || "");
 };
 
-const isAdminRequest = (requestUrl) => {
-    return requestUrl.includes("admin") || requestUrl.includes("shop-categories") || requestUrl.includes("product-family");
+// shop-categories and product-family are admin-only for every verb except a
+// plain GET (the shop page reads shop-categories with no auth at all, so it
+// can never actually 401) — matching on the URL alone mislabelled that public
+// read as an admin request. Harmless in practice since a GET that can't 401
+// never reaches redirectToLogin, but confusing to read and easy to trust by
+// accident the next time this function is reused for something that does check.
+const isAdminRequest = (requestUrl, method = "get") => {
+    if (requestUrl.includes("admin")) return true;
+    const isAmbiguousAdminPath = requestUrl.includes("shop-categories") || requestUrl.includes("product-family");
+    return isAmbiguousAdminPath && String(method).toLowerCase() !== "get";
 };
 
-const redirectToLogin = (requestUrl) => {
+const redirectToLogin = (requestUrl, method) => {
     if (typeof window === "undefined") return;
 
     const currentPath = window.location.pathname;
@@ -22,7 +37,7 @@ const redirectToLogin = (requestUrl) => {
 
     if (isAlreadyOnLogin) return;
 
-    const shouldUseAdminLogin = currentPath.startsWith("/admin-secret") || isAdminRequest(requestUrl);
+    const shouldUseAdminLogin = currentPath.startsWith("/admin-secret") || isAdminRequest(requestUrl, method);
     const loginPath = shouldUseAdminLogin ? "/login?admin=true" : "/login";
 
     window.location.replace(loginPath);
@@ -62,7 +77,7 @@ axiosInstance.interceptors.response.use((response) => response, (error) => {
     }
 
     if (error?.response?.status === 401 && !isAnalyticsRequest) {
-        redirectToLogin(requestUrl);
+        redirectToLogin(requestUrl, error?.config?.method);
     }
 
     return Promise.reject(error);

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axiosInstance from '../../../utilities/axiosInstance';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
+import { TOAST_ICONS } from '../../../utilities/toastIcons';
 import AdminConfirmModal from '../../../components/AdminConfirmModal/AdminConfirmModal';
 
 const tradeInStatuses = [
@@ -40,7 +41,7 @@ const SingleTradeInRequest = ({ request, onStatusUpdated, onDeleted }) => {
         try {
             const response = await axiosInstance.patch(`trade-in-requests/${request._id}/status`, { status: nextStatus });
             onStatusUpdated?.(response.data);
-            toast.success(`Trade-in request marked as ${nextStatus}`);
+            toast.success(`Trade-in request marked as ${nextStatus}`, { icon: TOAST_ICONS.statusChanged });
         } catch (error) {
             setStatus(request.status);
             console.log(error);
@@ -55,7 +56,7 @@ const SingleTradeInRequest = ({ request, onStatusUpdated, onDeleted }) => {
         try {
             await axiosInstance.delete(`trade-in-requests/${request._id}`);
             onDeleted?.(request._id);
-            toast.success('Trade-in request deleted');
+            toast.success('Trade-in request deleted', { icon: TOAST_ICONS.deleted });
         } catch (error) {
             console.log(error);
             toast.error('Failed to delete trade-in request');

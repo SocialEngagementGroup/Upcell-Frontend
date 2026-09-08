@@ -1,11 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import axiosInstance from "../../../../utilities/axiosInstance";
 import JsBarcode from "jsbarcode";
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
+import { TOAST_ICONS } from '../../../../utilities/toastIcons';
 import { ORDER_STATUS_OPTIONS, orderStatusLabel, paymentDisplay } from "../../../../constants/orderStatus";
+import RefundPanel from "./RefundPanel";
 
 const SingleAdminOrder = ({ order, onStatusChanged }) => {
-    const { line_items, name, email, phone, city, postal, street, country, shipping, paid, status, createdAt, updatedAt } = order;
+    const { line_items, name, email, phone, city, postal, street, country, shipping, paid, status, createdAt, updatedAt, boaTransactionId, cardBrand, cardLast4 } = order;
     const [shippingStatus, setShippingStatus] = useState(status);
     const [showDetails, setShowDetails] = useState(false);
     const barcodeRef = useRef(null);
@@ -17,7 +19,7 @@ const SingleAdminOrder = ({ order, onStatusChanged }) => {
             try {
                 await axiosInstance.post("update-order-status", { orderId: order._id, status: nextStatus });
                 onStatusChanged?.();
-                toast.success(`Order marked as ${nextStatus}`);
+                toast.success(`Order marked as ${nextStatus}`, { icon: TOAST_ICONS.statusChanged });
             } catch (error) {
                 console.log(error);
                 setShippingStatus(status);
@@ -48,6 +50,17 @@ const SingleAdminOrder = ({ order, onStatusChanged }) => {
                     <p>Customer email: <strong className="text-apple-text">{email}</strong></p>
                     <p>Payment date: <strong className="text-apple-text">{(new Date(createdAt)).toLocaleString()}</strong></p>
                     <p>Last updated: <strong className="text-apple-text">{(new Date(updatedAt)).toLocaleString()}</strong></p>
+                    {/* Stored on every Bank of America order since the first
+                        payment, never shown here until now — the one thing
+                        Raymond or Yasir need to find this transaction in the
+                        Business Center, and this saved them opening the raw
+                        database to get it. */}
+                    {cardBrand || cardLast4 ? (
+                        <p>Card: <strong className="text-apple-text">{[cardBrand, cardLast4 && `••${cardLast4}`].filter(Boolean).join(' ')}</strong></p>
+                    ) : null}
+                    {boaTransactionId ? (
+                        <p>Bank transaction ID: <strong className="text-apple-text">{boaTransactionId}</strong></p>
+                    ) : null}
                 </div>
 
                 <div className="space-y-3">
@@ -94,17 +107,21 @@ const SingleAdminOrder = ({ order, onStatusChanged }) => {
                         <img className="mt-5 max-w-full" ref={barcodeRef} alt="order barcode" />
                     </div>
 
-                    <div className="rounded-[28px] bg-surface-alt p-5">
-                        <h4 className="mb-4 text-[24px]">Shipping information</h4>
-                        <div className="space-y-2 text-sm text-ink-soft">
-                            <p>Name: <strong className="text-apple-text">{name}</strong></p>
-                            <p>Email: <strong className="text-apple-text">{email}</strong></p>
-                            <p>Phone: <strong className="text-apple-text">{phone}</strong></p>
-                            <p>City: <strong className="text-apple-text">{city}</strong></p>
-                            <p>Street: <strong className="text-apple-text">{street}</strong></p>
-                            <p>Postal code: <strong className="text-apple-text">{postal}</strong></p>
-                            <p>Country: <strong className="text-apple-text">{country}</strong></p>
+                    <div className="space-y-6">
+                        <div className="rounded-[28px] bg-surface-alt p-5">
+                            <h4 className="mb-4 text-[24px]">Shipping information</h4>
+                            <div className="space-y-2 text-sm text-ink-soft">
+                                <p>Name: <strong className="text-apple-text">{name}</strong></p>
+                                <p>Email: <strong className="text-apple-text">{email}</strong></p>
+                                <p>Phone: <strong className="text-apple-text">{phone}</strong></p>
+                                <p>City: <strong className="text-apple-text">{city}</strong></p>
+                                <p>Street: <strong className="text-apple-text">{street}</strong></p>
+                                <p>Postal code: <strong className="text-apple-text">{postal}</strong></p>
+                                <p>Country: <strong className="text-apple-text">{country}</strong></p>
+                            </div>
                         </div>
+
+                        <RefundPanel order={order} onRefunded={onStatusChanged} />
                     </div>
                 </div>
             )}

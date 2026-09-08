@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
+import { TOAST_ICONS } from '../../../../utilities/toastIcons';
 import AdminConfirmModal from '../../../../components/AdminConfirmModal/AdminConfirmModal';
 import { useUpdateShopCategoryMutation, useDeleteShopCategoryMutation } from '../../../../queries/categories';
 import { useDeleteProductFamilyMutation } from '../../../../queries/products';
@@ -38,7 +39,7 @@ const SingleCatagory = ({ catagory, productGroups }) => {
     const handleDeleteProduct = (parentId) => {
         deleteProductFamily.mutate(parentId, {
             onSuccess: () => {
-                toast.success('Product family deleted');
+                toast.success('Product family deleted', { icon: TOAST_ICONS.deleted });
             },
             onError: (error) => {
                 console.log(error);
@@ -51,7 +52,7 @@ const SingleCatagory = ({ catagory, productGroups }) => {
     const handleDeleteCategory = () => {
         deleteCategory.mutate(catagory._id, {
             onSuccess: () => {
-                toast.success('Category deleted');
+                toast.success('Category deleted', { icon: TOAST_ICONS.deleted });
             },
             onError: (error) => {
                 console.log(error);
@@ -151,13 +152,13 @@ const SingleCatagory = ({ catagory, productGroups }) => {
                                                     <div>
                                                         <span className="block font-semibold text-apple-text">{product.productName}</span>
                                                         <span className="block text-xs font-bold text-ink-soft">
-                                                            {product.variants.length} variant{product.variants.length === 1 ? '' : 's'}
+                                                            {product.variantCount} variant{product.variantCount === 1 ? '' : 's'}
                                                         </span>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 text-sm font-medium">
-                                                {product.variants[0]?.price ? `$${product.variants[0].price}` : '-'}
+                                                {product.samplePrice ? `$${product.samplePrice}` : '-'}
                                             </td>
                                             <td className="px-6 py-4 text-right">
                                                 <div className="flex justify-end gap-3">

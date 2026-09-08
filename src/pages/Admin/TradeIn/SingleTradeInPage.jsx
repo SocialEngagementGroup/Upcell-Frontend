@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import axiosInstance from '../../../utilities/axiosInstance';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import SingleTradeInRequest from './SingleTradeInRequest';
 import AdminPageHeader from '../../../components/AdminPageHeader/AdminPageHeader';
 import AdminLoadingState from '../../../components/AdminState/AdminLoadingState';
@@ -16,7 +16,7 @@ const SingleTradeInPage = () => {
     const fetchRequest = async () => {
         setIsLoading(true);
         try {
-            const res = await axiosInstance.get(`admin-trade-in-requests/byRequestId:${id}`);
+            const res = await axiosInstance.get(`admin-trade-in-requests/${encodeURIComponent(`byRequestId:${id}`)}`);
             setRequest(res.data.items?.[0] || null);
         } catch (error) {
             console.log(error);

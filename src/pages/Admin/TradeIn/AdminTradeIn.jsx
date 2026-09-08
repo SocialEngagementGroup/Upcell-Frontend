@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axiosInstance from '../../../utilities/axiosInstance';
 import SingleTradeInRequest from './SingleTradeInRequest';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import AdminPagination from '../../../components/AdminPagination/AdminPagination';
 import AdminPageHeader from '../../../components/AdminPageHeader/AdminPageHeader';
 import AdminStatsGrid from '../../../components/AdminStatsGrid/AdminStatsGrid';
@@ -36,7 +36,7 @@ const AdminTradeIn = () => {
     const fetchRequests = async (filter = activeFilter, nextPage = page) => {
         setIsLoading(true);
         try {
-            const res = await axiosInstance.get(`admin-trade-in-requests/${filter}`, {
+            const res = await axiosInstance.get(`admin-trade-in-requests/${encodeURIComponent(filter)}`, {
                 params: { page: nextPage, limit: PAGE_LIMIT },
             });
             setRequests(res.data.items || []);

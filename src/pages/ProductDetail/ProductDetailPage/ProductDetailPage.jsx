@@ -3,14 +3,16 @@ import { useParams } from 'react-router';
 import { Link, useNavigate } from 'react-router-dom';
 import ScrollToTop from '../../../utilities/ScrollToTop';
 import { CartContext } from '../../../App';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
+import { TOAST_ICONS } from '../../../utilities/toastIcons';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 
-import { groupProductsByParent } from '../../../utilities/catalog';
-import { useProductsQuery } from '../../../queries/products';
+import axiosInstance from '../../../utilities/axiosInstance';
+import { useProductFamilyQuery, useRecommendedProductsQuery } from '../../../queries/products';
 import { EMPTY_ARRAY } from '../../../queries/keys';
 import ModernProductCard from '../../../components/ModernProductCard/ModernProductCard';
+import RouteLoadingScreen from '../../../components/RouteLoadingScreen/RouteLoadingScreen';
 
 
 
@@ -28,10 +30,7 @@ const featureCards = [
         body: 'Every order is backed by UpCell IT Inc. support and practical coverage designed for peace of mind.',
     },
 ];
-const ESSENTIAL_ADDONS = [
-    { id: 'addon_case', name: 'Clear Case (MagSafe)', price: 39, description: 'Crystal clear, yellowing-resistant protection.' },
-    { id: 'addon_protector', name: 'Ultra-Glass Protector', price: 19, description: 'Edge-to-edge scratch and impact defense.' },
-];
+
 
 // Plain-English explanation of each condition grade shown on the listing.
 const GRADE_EXPLANATIONS = {
@@ -66,17 +65,16 @@ const getStorageSortValue = (storageLabel = '') => {
 const ProductDetailPage = () => {
     const { parentId, productId } = useParams();
     const navigate = useNavigate();
-    const { data: products = EMPTY_ARRAY } = useProductsQuery();
+    // Only this product's own family, not the catalogue. The page reads it for
+    // the variant pickers and for switching between colour/storage combinations.
+    const { data: allProducts = EMPTY_ARRAY, isLoading: productsLoading } = useProductFamilyQuery(parentId);
+    const { data: recommendedPool = EMPTY_ARRAY } = useRecommendedProductsQuery(parentId);
     const [product, setProduct] = useState();
     const [selectedColor, setSelectedColor] = useState();
     const [selectedStorage, setSelectedStorage] = useState();
     const [quantity, setQuantity] = useState(1);
     const [addonQtys, setAddonQtys] = useState({});
     const { setCart } = useContext(CartContext);
-
-    const allProducts = useMemo(() => (
-        products.filter((item) => item.parentCatagory === parentId || item.parentId === parentId)
-    ), [products, parentId]);
 
     useEffect(() => {
         if (!allProducts.length) return;
@@ -86,11 +84,14 @@ const ProductDetailPage = () => {
         setSelectedStorage(selectedProduct?.storage);
     }, [allProducts, productId]);
 
+    // The server has already grouped these and excluded the current parent —
+    // all that is left is dropping families this section does not show and
+    // taking the first four.
     const recommendedProducts = useMemo(() => (
-        groupProductsByParent(products)
-            .filter((item) => item.parentCatagory !== parentId && ['iPhone', 'iPad', 'MacBook'].includes(item.family))
+        recommendedPool
+            .filter((item) => ['iPhone', 'iPad', 'MacBook'].includes(item.family))
             .slice(0, 4)
-    ), [products, parentId]);
+    ), [recommendedPool]);
 
     const availableColors = useMemo(() => {
         const colors = new Map();
@@ -125,18 +126,34 @@ const ProductDetailPage = () => {
         syncSelection(selectedColor, storage);
     };
 
-    const addonTotal = ESSENTIAL_ADDONS.reduce((sum, a) => sum + (addonQtys[a.id] || 0) * a.price, 0);
+    // Accessories come from the catalogue, so their ids are real product ids.
+    //
+    // They used to be a hard-coded list with invented ids like "addon_case".
+    // The cart keeps only real database ids, so those were silently dropped:
+    // the customer saw "Product and accessories added", was charged for the
+    // phone alone, and never received the accessories.
+    const [addons, setAddons] = useState([]);
+
+    useEffect(() => {
+        axiosInstance.get('accessories')
+            .then((res) => setAddons(res.data || []))
+            // The device is still purchasable if this fails; just show no add-ons.
+            .catch(() => setAddons([]));
+    }, []);
+
+    const addonTotal = addons.reduce((sum, a) => sum + (addonQtys[a._id] || 0) * a.price, 0);
     const grandTotal = product ? product.price * quantity + addonTotal : 0;
 
     const handleAddToCart = () => {
         if (!product?._id || product.outOfStock) return;
         const itemsToAdd = Array.from({ length: quantity }, () => product._id);
-        ESSENTIAL_ADDONS.forEach(addon => {
-            const qty = addonQtys[addon.id] || 0;
-            for (let i = 0; i < qty; i++) itemsToAdd.push(addon.id);
+        addons.forEach((addon) => {
+            const qty = addonQtys[addon._id] || 0;
+            for (let i = 0; i < qty; i++) itemsToAdd.push(addon._id);
         });
         setCart((prev) => [...prev, ...itemsToAdd]);
-        toast.success(addonTotal > 0 ? 'Product and accessories added' : 'Product added to cart');
+        toast.success(addonTotal > 0 ? 'Product and accessories added' : 'Product added to cart', { icon: TOAST_ICONS.cart });
+        setAddonQtys({});
     };
 
     const setAddonQty = (id, delta) => {
@@ -144,6 +161,20 @@ const ProductDetailPage = () => {
     };
 
 
+
+    // Was never actually checked before — this page just happened to always
+    // have the catalog already cached, back when the shop page fetched from
+    // this exact same endpoint. Now that the shop page has its own lighter
+    // data source, a direct link or a slow connection can land here before
+    // the catalog has loaded, and "no product yet" must not be read as
+    // "product doesn't exist" while the real answer is still in flight.
+    if (productsLoading) {
+        return (
+            <div className="page-shell">
+                <RouteLoadingScreen />
+            </div>
+        );
+    }
 
     if (!product) {
         return (
@@ -285,27 +316,34 @@ const ProductDetailPage = () => {
                                 </div>
                             </div>
 
+                            {/* Hidden entirely when there is nothing to offer, so a
+                                failed fetch or an empty accessory list does not leave
+                                an "Add protection" heading with nothing under it. */}
+                            {addons.length ? (
+                            <>
                             <div className="my-4 border-t border-black/[0.06]" />
 
                             <div className="text-[13px] font-extrabold uppercase tracking-[0.1em] text-apple-text">Add protection</div>
                             <div className="mt-3 space-y-2">
-                                {ESSENTIAL_ADDONS.map((addon) => {
-                                    const qty = addonQtys[addon.id] || 0;
+                                {addons.map((addon) => {
+                                    const qty = addonQtys[addon._id] || 0;
                                     return (
-                                        <div key={addon.id} className={`flex items-center justify-between rounded-[16px] px-4 py-3 transition-all duration-200 ${qty > 0 ? 'bg-black/[0.04]' : 'bg-transparent hover:bg-black/[0.02]'}`}>
+                                        <div key={addon._id} className={`flex items-center justify-between rounded-[16px] px-4 py-3 transition-all duration-200 ${qty > 0 ? 'bg-black/[0.04]' : 'bg-transparent hover:bg-black/[0.02]'}`}>
                                             <div className="mr-4 flex-1">
-                                                <div className="text-[14px] font-bold text-apple-text">{addon.name} <span className="font-extrabold text-apple-gray">· ${addon.price}</span></div>
+                                                <div className="text-[14px] font-bold text-apple-text">{addon.productName} <span className="font-extrabold text-apple-gray">· ${addon.price}</span></div>
                                                 <div className="text-[11px] font-medium text-apple-gray">{addon.description}</div>
                                             </div>
                                             <div className="flex h-9 items-center gap-1 rounded-full border border-black/[0.08] bg-white px-1.5">
-                                                <button className="flex h-6 w-6 items-center justify-center rounded-full text-sm text-apple-gray transition-colors hover:text-black" onClick={() => setAddonQty(addon.id, -1)}>−</button>
+                                                <button className="flex h-6 w-6 items-center justify-center rounded-full text-sm text-apple-gray transition-colors hover:text-black" onClick={() => setAddonQty(addon._id, -1)}>−</button>
                                                 <span className="min-w-[20px] text-center text-xs font-bold text-apple-text">{qty}</span>
-                                                <button className="flex h-6 w-6 items-center justify-center rounded-full text-sm text-apple-gray transition-colors hover:text-black" onClick={() => setAddonQty(addon.id, 1)}>+</button>
+                                                <button className="flex h-6 w-6 items-center justify-center rounded-full text-sm text-apple-gray transition-colors hover:text-black" onClick={() => setAddonQty(addon._id, 1)}>+</button>
                                             </div>
                                         </div>
                                     );
                                 })}
                             </div>
+                            </>
+                            ) : null}
                         </div>
 
                         <button

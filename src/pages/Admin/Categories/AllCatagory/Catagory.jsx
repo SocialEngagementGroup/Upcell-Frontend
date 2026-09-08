@@ -4,8 +4,7 @@ import SingleCatagory from '../AdminSingleCatagory/SingleCatagory.jsx';
 import AdminStatsGrid from '../../../../components/AdminStatsGrid/AdminStatsGrid.jsx';
 import AdminLoadingState from '../../../../components/AdminState/AdminLoadingState.jsx';
 import AdminEmptyState from '../../../../components/AdminState/AdminEmptyState.jsx';
-import { useParentCategoriesQuery, useShopCategoriesQuery } from '../../../../queries/categories';
-import { useProductsQuery } from '../../../../queries/products';
+import { useCategoriesWithCountsQuery, useShopCategoriesQuery } from '../../../../queries/categories';
 import { EMPTY_ARRAY } from '../../../../queries/keys';
 import { resolveImageRef } from '../../../../utilities/cloudinary';
 
@@ -14,22 +13,25 @@ const AllCatagories = () => {
     const searchQuery = outletContext.categorySearchQuery || '';
 
     const { data: shopCategories = EMPTY_ARRAY, isLoading: shopCategoriesLoading } = useShopCategoriesQuery();
-    const { data: parents = EMPTY_ARRAY, isLoading: parentsLoading } = useParentCategoriesQuery();
-    const { data: variants = EMPTY_ARRAY, isLoading: variantsLoading } = useProductsQuery();
+    // Variant counts and one sample price per product, computed server-side —
+    // this page used to fetch every ParentProduct AND every SingleVariation
+    // (956+ documents) just to count matches per parent in a JS loop.
+    const { data: parentsWithCounts = EMPTY_ARRAY, isLoading: parentsLoading } = useCategoriesWithCountsQuery();
 
-    const isLoading = shopCategoriesLoading || parentsLoading || variantsLoading;
+    const isLoading = shopCategoriesLoading || parentsLoading;
 
     const allCatagories = useMemo(() => (
         [...shopCategories].sort((left, right) => (left.modelName || '').localeCompare(right.modelName || ''))
     ), [shopCategories]);
 
-    const productGroups = useMemo(() => parents.map((parent) => ({
+    const productGroups = useMemo(() => parentsWithCounts.map((parent) => ({
         parentId: parent._id,
         productName: parent.modelName,
         categoryName: parent.categoryName || '',
         image: resolveImageRef(parent.images?.[0], { width: 160 }) || '',
-        variants: variants.filter((variant) => String(variant.parentCatagory) === String(parent._id)),
-    })), [parents, variants]);
+        variantCount: parent.variantCount || 0,
+        samplePrice: parent.samplePrice,
+    })), [parentsWithCounts]);
 
     const filteredCategories = useMemo(() => {
         const normalizedSearch = searchQuery.trim().toLowerCase();

@@ -1,36 +1,125 @@
-import { useContext, useEffect, useMemo } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { CartContext } from "../../App";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import ScrollToTop from "../../utilities/ScrollToTop";
 import CartProduct from "./CartProduct";
-import { useProductsQuery } from "../../queries/products";
+import { useCartProductsQuery } from "../../queries/products";
 import { EMPTY_ARRAY } from "../../queries/keys";
 import RouteLoadingScreen from "../../components/RouteLoadingScreen/RouteLoadingScreen";
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import { groupCartItems } from "../../utilities/cartGrouping";
+
+// What the bank's own redirect (?payment=…) means to a customer standing on
+// this page — cancel and decline are not the same event and must not read
+// the same. A cancel is something the customer chose; a decline is something
+// the bank refused. tone picks the visual treatment: an alarm reads wrong on
+// an action nobody did anything wrong to cause.
+const PAYMENT_BANNERS = {
+    cancelled: {
+        tone: 'neutral',
+        heading: 'Payment cancelled',
+        body: "You didn't complete the payment, so nothing was charged. Your cart is still here whenever you're ready.",
+    },
+    declined: {
+        tone: 'alert',
+        heading: 'Your card was declined',
+        body: 'The bank could not approve this card. Please check the card details and try again, or use a different card.',
+        cta: { label: 'Back to checkout', to: '/checkout/cart' },
+    },
+    review: {
+        tone: 'neutral',
+        heading: 'Your payment is being reviewed',
+        body: "The bank is taking a closer look at this payment — this can take a little time. We'll email you as soon as it's resolved. Please don't check out again for the same order in the meantime.",
+    },
+    // Separate from `declined` on purpose. The gateway distinguishes a card
+    // being refused from the payment never being properly attempted, and until
+    // now both landed on "your card was declined" — which sent a customer off
+    // to find another card for a problem no card would fix, and blamed their
+    // bank for something that was not their bank's doing. Same treatment as a
+    // decline because it still needs an action; different words because the
+    // action is "try again", not "try a different card".
+    error: {
+        tone: 'alert',
+        heading: "We couldn't complete your payment",
+        body: "Something went wrong before the payment went through, so you haven't been charged. This wasn't a problem with your card — please try again.",
+        cta: { label: 'Back to checkout', to: '/checkout/cart' },
+    },
+};
 
 const Cart = () => {
     const { cart, setCart } = useContext(CartContext);
-    const { data: allProducts = EMPTY_ARRAY, isLoading: productsLoading } = useProductsQuery();
-    const isLoading = Boolean(cart?.length) && productsLoading;
 
-    const products = useMemo(() => {
+    // Only real ObjectIds reach the server. localStorage is the cart's store and
+    // anything can end up in it — a hand-edited value, or an id left behind by
+    // an older version of the app — and the endpoint rejects the whole request
+    // if one entry fails its id check.
+    const cartIds = useMemo(() => {
         const isObjectId = (id) => /^[0-9a-fA-F]{24}$/.test(id);
-        const uniqueIds = new Set([...new Set(cart)].filter(isObjectId));
-        return allProducts.filter((product) => uniqueIds.has(product._id));
-    }, [allProducts, cart]);
+        return [...new Set(cart || [])].filter(isObjectId);
+    }, [cart]);
 
+    const {
+        data: products = EMPTY_ARRAY,
+        isLoading: productsLoading,
+        isSuccess: productsLoaded,
+    } = useCartProductsQuery(cartIds);
+    const isLoading = Boolean(cartIds.length) && productsLoading;
+
+    const [searchParams, setSearchParams] = useSearchParams();
+    // Read once, on the redirect that carries it, rather than on every render —
+    // clearing the param from the URL means refreshing the cart page later
+    // does not keep re-showing "your card was declined" forever.
+    const [paymentBanner] = useState(() => PAYMENT_BANNERS[searchParams.get('payment')] || null);
+
+    // Runs once, on the params the page loaded with — this only ever needs to
+    // strip the flag the redirect carried in, not react to it changing later.
     useEffect(() => {
-        if (!cart?.length || productsLoading) return;
+        if (searchParams.has('payment')) {
+            searchParams.delete('payment');
+            setSearchParams(searchParams, { replace: true });
+        }
+    }, []);
+
+    // Prunes ids the catalogue no longer has. Gated on a successful fetch, not
+    // merely on "not loading": a failed request also leaves products empty, and
+    // treating that as "every item was deleted" would empty a real customer's
+    // cart because their connection dropped for a moment.
+    useEffect(() => {
+        if (!cart?.length || !productsLoaded) return;
         const validIds = new Set(products.map((product) => product._id));
         const hasStaleIds = cart.some((id) => !validIds.has(id));
         if (hasStaleIds) {
             setCart((current) => current.filter((id) => validIds.has(id)));
         }
-    }, [cart, products, productsLoading, setCart]);
+    }, [cart, products, productsLoaded, setCart]);
 
+    // A device can sell while it sits in someone's cart — these are single
+    // units, so the second buyer can never be fulfilled. The server refuses
+    // that checkout, but a refusal at the payment step tells the customer
+    // nothing useful, so surface it here where they can act on it.
+    const soldOutItems = useMemo(
+        () => products.filter((product) => product.outOfStock),
+        [products]
+    );
+    const hasSoldOutItems = soldOutItems.length > 0;
+
+    // Sold items are excluded from the total. Showing a price that includes
+    // something they cannot buy makes the summary wrong.
     const total = useMemo(() => (
-        cart.reduce((sum, id) => sum + (products.find((item) => item._id === id)?.price || 0), 0)
+        cart.reduce((sum, id) => {
+            const product = products.find((item) => item._id === id);
+            if (!product || product.outOfStock) return sum;
+            return sum + (product.price || 0);
+        }, 0)
     ), [cart, products]);
+
+    // One entry per device, carrying the accessories bought to go with it.
+    const groups = useMemo(() => groupCartItems(cart, products), [cart, products]);
+
+    const removeSoldOutItems = () => {
+        const soldIds = new Set(soldOutItems.map((product) => product._id));
+        setCart((current) => current.filter((id) => !soldIds.has(id)));
+    };
 
     const hasDisplayableProducts = products.length > 0;
 
@@ -53,6 +142,24 @@ const Cart = () => {
                 </div>
             </section>
 
+            {paymentBanner ? (
+                <section className="page-container pb-6">
+                    <div className={`rounded-[28px] border-2 p-5 sm:p-6 ${
+                        paymentBanner.tone === 'alert'
+                            ? 'border-brand-red/40 bg-brand-red/[0.04]'
+                            : 'border-black/[0.08] bg-surface-alt'
+                    }`}>
+                        <h2 className="text-xl text-apple-text">{paymentBanner.heading}</h2>
+                        <p className="mt-2 text-sm leading-6 text-ink-soft">{paymentBanner.body}</p>
+                        {paymentBanner.cta ? (
+                            <Link to={paymentBanner.cta.to} className="premium-button mt-5 inline-flex">
+                                {paymentBanner.cta.label}
+                            </Link>
+                        ) : null}
+                    </div>
+                </section>
+            ) : null}
+
             <section className="page-container pb-16">
                 {isLoading ? (
                     <div className="premium-card rounded-[36px] px-8 py-16 text-center">
@@ -62,8 +169,29 @@ const Cart = () => {
                 ) : hasDisplayableProducts ? (
                     <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
                         <div className="space-y-5">
-                            {products.map((product) => (
-                                <CartProduct key={product._id} product={product} cart={cart} setCart={setCart} />
+                            {hasSoldOutItems ? (
+                                <div className="rounded-[28px] border-2 border-brand-red/40 bg-brand-red/[0.04] p-5 sm:p-6">
+                                    <h2 className="text-xl text-apple-text">
+                                        {soldOutItems.length === 1
+                                            ? 'One item in your cart has sold'
+                                            : `${soldOutItems.length} items in your cart have sold`}
+                                    </h2>
+                                    <p className="mt-2 text-sm leading-6 text-ink-soft">
+                                        Every device we sell is a single unit, so once one is bought it is gone.
+                                        Remove {soldOutItems.length === 1 ? 'it' : 'them'} to continue to checkout.
+                                    </p>
+                                    <button
+                                        type="button"
+                                        onClick={removeSoldOutItems}
+                                        className="premium-button mt-5"
+                                    >
+                                        {soldOutItems.length === 1 ? 'Remove sold item' : 'Remove sold items'}
+                                    </button>
+                                </div>
+                            ) : null}
+
+                            {groups.map((group) => (
+                                <CartProduct key={group.key} group={group} setCart={setCart} />
                             ))}
                         </div>
 
@@ -89,9 +217,24 @@ const Cart = () => {
                                     <span className="whitespace-nowrap text-2xl font-extrabold text-apple-text">${(total * 1.08).toFixed(2)} <span className="text-sm font-normal text-ink-soft">USD</span></span>
                                 </div>
                             </div>
-                            <Link to="/checkout/cart" className="premium-button mt-8 w-full">
-                                Proceed to checkout
-                            </Link>
+                            {hasSoldOutItems ? (
+                                <>
+                                    <button
+                                        type="button"
+                                        disabled
+                                        className="premium-button mt-8 w-full cursor-not-allowed opacity-40"
+                                    >
+                                        Proceed to checkout
+                                    </button>
+                                    <p className="mt-3 text-center text-xs font-bold text-brand-red">
+                                        Remove the sold {soldOutItems.length === 1 ? 'item' : 'items'} above to continue
+                                    </p>
+                                </>
+                            ) : (
+                                <Link to="/checkout/cart" className="premium-button mt-8 w-full">
+                                    Proceed to checkout
+                                </Link>
+                            )}
                         </aside>
                     </div>
                 ) : (

@@ -1,5 +1,5 @@
 import React from 'react';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import { useCreateShopCategoryMutation } from '../../../../queries/categories';
 
 const AddCatagory = () => {
@@ -8,6 +8,14 @@ const AddCatagory = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         const modelName = e.target.categoryName.value.trim();
+
+        // `required` only checks the field is non-empty before trimming, so
+        // a name of all spaces passes it and would otherwise reach the
+        // backend as "".
+        if (!modelName) {
+            toast.error("Category name can't be blank");
+            return;
+        }
 
         createCategory.mutate({ modelName }, {
             onSuccess: () => {

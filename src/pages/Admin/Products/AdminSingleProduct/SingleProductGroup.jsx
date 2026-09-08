@@ -4,11 +4,13 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
+import { TOAST_ICONS } from '../../../../utilities/toastIcons';
 import AdminConfirmModal from '../../../../components/AdminConfirmModal/AdminConfirmModal';
 import { useDeleteProductFamilyMutation, useDeleteProductVariantMutation, useUpdateProductVariantMutation } from '../../../../queries/products';
 import { STATIC_IMAGES, staticImageUrl } from '../../../../constants/staticImages';
 import { resolveImageSrc } from '../../../../utilities/cloudinary';
+import { extractApiError } from '../../../../utilities/formValidation';
 
 const currency = (value) => {
     if (value === '' || value === null || typeof value === 'undefined') return '-';
@@ -45,11 +47,11 @@ const SingleProductGroup = ({ productGroup, onDelete }) => {
         deleteProductFamily.mutate(productGroup.parentId, {
             onSuccess: () => {
                 onDelete(productGroup.parentId);
-                toast.success('Product family deleted');
+                toast.success('Product family deleted', { icon: TOAST_ICONS.deleted });
             },
             onError: (error) => {
                 console.log(error);
-                toast.error('Failed to delete product family');
+                toast.error(extractApiError(error, 'Failed to delete product family'));
             },
             onSettled: () => {
                 setSavingVariantId('');
@@ -72,7 +74,7 @@ const SingleProductGroup = ({ productGroup, onDelete }) => {
             onSuccess: () => setEditingVariantId(''),
             onError: (error) => {
                 console.log(error);
-                toast.error('Failed to save variant');
+                toast.error(extractApiError(error, 'Failed to save variant'));
             },
             onSettled: () => setSavingVariantId(''),
         });
@@ -86,11 +88,11 @@ const SingleProductGroup = ({ productGroup, onDelete }) => {
             deleteProductFamily.mutate(productGroup.parentId, {
                 onSuccess: () => {
                     onDelete(productGroup.parentId);
-                    toast.success('Last variant deleted with product family');
+                    toast.success('Last variant deleted with product family', { icon: TOAST_ICONS.deleted });
                 },
                 onError: (error) => {
                     console.log(error);
-                    toast.error('Failed to delete variant');
+                    toast.error(extractApiError(error, 'Failed to delete variant'));
                 },
                 onSettled: () => {
                     setSavingVariantId('');
@@ -106,7 +108,7 @@ const SingleProductGroup = ({ productGroup, onDelete }) => {
                 if (editingVariantId === variant._id) {
                     setEditingVariantId('');
                 }
-                toast.success('Variant deleted');
+                toast.success('Variant deleted', { icon: TOAST_ICONS.deleted });
             },
             onError: (error) => {
                 console.log(error);
@@ -131,7 +133,7 @@ const SingleProductGroup = ({ productGroup, onDelete }) => {
             onError: (error) => {
                 console.log(error);
                 updateDraftVariant(variant._id, { outOfStock: variant.outOfStock });
-                toast.error('Failed to update stock status');
+                toast.error(extractApiError(error, 'Failed to update stock status'));
             },
             onSettled: () => setSavingVariantId(''),
         });

@@ -1,11 +1,17 @@
-﻿import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+﻿import { useEffect } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axiosInstance from '../utilities/axiosInstance';
 import { normalizeProduct } from '../utilities/catalog';
 import { productKeys, categoryKeys } from './keys';
 
 const invalidateProductData = (queryClient) => {
     queryClient.invalidateQueries({ queryKey: productKeys.list() });
+    queryClient.invalidateQueries({ queryKey: productKeys.shopList() });
+    queryClient.invalidateQueries({ queryKey: productKeys.adminList() });
     queryClient.invalidateQueries({ queryKey: categoryKeys.parents() });
+    // A product being added/edited/removed changes the per-category variant
+    // counts shown on the admin categories page.
+    queryClient.invalidateQueries({ queryKey: categoryKeys.parentsWithCounts() });
 };
 
 // Hoisted so `select` has a stable identity across renders â€” an inline
@@ -16,6 +22,118 @@ const selectNormalizedProducts = (products) => products.map(normalizeProduct);
 export const useProductsQuery = (options = {}) => useQuery({
     queryKey: productKeys.list(),
     queryFn: () => axiosInstance.get('product').then((res) => res.data),
+    select: selectNormalizedProducts,
+    ...options,
+});
+
+// The shop page's data source. Same normalization as useProductsQuery
+// (family inference, image resolution, color fallback), but backed by
+// /products/shop — which returns only the fields a listing card needs
+// instead of every field of every SingleVariation document. Grouping,
+// filtering and search all stay client-side in ShopPage itself, exactly as
+// before; this only changes how much data it takes to get there.
+export const useShopProductsQuery = (options = {}) => useQuery({
+    queryKey: productKeys.shopList(),
+    queryFn: () => axiosInstance.get('products/shop').then((res) => res.data),
+    select: selectNormalizedProducts,
+    ...options,
+});
+
+// The cart's own products, fetched by id through the endpoint checkout already
+// uses. The page previously read useProductsQuery — every field of all 956
+// variations, 838 KB — to show the two or three items someone had added.
+//
+// A product that has since been deleted simply is not in the response, which is
+// the same signal the old approach gave (it was absent from the catalogue), so
+// the page's stale-id cleanup still works unchanged.
+export const useCartProductsQuery = (ids = [], options = {}) => useQuery({
+    queryKey: productKeys.cart(ids),
+    queryFn: () => axiosInstance.post('cart', { ids }).then((res) => res.data),
+    select: selectNormalizedProducts,
+    enabled: ids.length > 0,
+    ...options,
+});
+
+// A product page needs two things, and neither is the whole catalogue: the
+// variants of the product being viewed (for the colour and storage pickers)
+// and a few cards to recommend. It used to read useProductsQuery for both,
+// which fetches every field of all 956 variations — 838 KB — to render one
+// product.
+//
+// These two endpoints already existed on the backend and simply were not
+// being used here.
+export const useProductFamilyQuery = (parentId, options = {}) => useQuery({
+    queryKey: productKeys.byParent(parentId),
+    queryFn: () => axiosInstance.get(`allSameParentProducts/${parentId}`).then((res) => res.data),
+    select: selectNormalizedProducts,
+    enabled: Boolean(parentId),
+    ...options,
+});
+
+// limit is deliberately higher than the four cards that get rendered. The
+// server groups and slices before the client can drop families it does not
+// show (Watch, and anything inferFamily cannot place), so asking for exactly
+// four would sometimes render three.
+export const useRecommendedProductsQuery = (excludeParentId, options = {}) => useQuery({
+    queryKey: productKeys.recommended(excludeParentId),
+    queryFn: () => axiosInstance
+        .get('products/recommended', { params: { excludeParentId, limit: 8 } })
+        .then((res) => res.data),
+    select: selectNormalizedProducts,
+    enabled: Boolean(excludeParentId),
+    ...options,
+});
+
+// Warms the shop cache from a page the visitor is already on, so opening Shop
+// renders products straight away instead of showing the loading skeleton.
+//
+// Deliberately waits for the browser to go idle: the home page's own hero
+// image is what the visitor is actually looking at, and a prefetch that
+// competes with it for bandwidth would make the page they are on slower to
+// make a page they may never open faster.
+//
+// prefetchQuery is a no-op when the cache already holds fresh data, so
+// returning to the home page mid-session does not refetch.
+export const usePrefetchShopProducts = () => {
+    const queryClient = useQueryClient();
+
+    useEffect(() => {
+        let cancelled = false;
+
+        const run = () => {
+            if (cancelled) return;
+            queryClient.prefetchQuery({
+                queryKey: productKeys.shopList(),
+                queryFn: () => axiosInstance.get('products/shop').then((res) => res.data),
+            });
+        };
+
+        // requestIdleCallback is unsupported in Safari < 17, hence the fallback.
+        // Which one scheduled it decides which one cancels it — reading the
+        // pair independently would clear a timeout id with cancelIdleCallback.
+        const hasIdleCallback = typeof window.requestIdleCallback === 'function';
+        const handle = hasIdleCallback
+            ? window.requestIdleCallback(run, { timeout: 3000 })
+            : window.setTimeout(run, 1500);
+
+        return () => {
+            cancelled = true;
+            if (hasIdleCallback) {
+                window.cancelIdleCallback(handle);
+            } else {
+                window.clearTimeout(handle);
+            }
+        };
+    }, [queryClient]);
+};
+
+// AllProduct and AddProduct's own data source — same full, ungrouped variant
+// list they've always needed (for instant client-side search and duplicate-
+// name detection while typing), just trimmed to the fields those two pages
+// actually render or edit, instead of every field of every document.
+export const useAdminProductsQuery = (options = {}) => useQuery({
+    queryKey: productKeys.adminList(),
+    queryFn: () => axiosInstance.get('admin-products').then((res) => res.data),
     select: selectNormalizedProducts,
     ...options,
 });

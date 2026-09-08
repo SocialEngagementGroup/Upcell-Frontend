@@ -1,7 +1,7 @@
 import axiosInstance from "../../../../utilities/axiosInstance";
 import React, { useEffect, useState } from 'react';
 import SingleAdminOrder from "./SingleAdminOrder";
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import AdminPagination from "../../../../components/AdminPagination/AdminPagination";
 import AdminPageHeader from "../../../../components/AdminPageHeader/AdminPageHeader";
 import AdminStatsGrid from "../../../../components/AdminStatsGrid/AdminStatsGrid";
@@ -29,7 +29,7 @@ const AdminOrder = () => {
     const fetchOrders = async (status = orderStatus, nextPage = page) => {
         setIsLoading(true);
         try {
-            const res = await axiosInstance.get(`admin-orders/${status}`, {
+            const res = await axiosInstance.get(`admin-orders/${encodeURIComponent(status)}`, {
                 params: { page: nextPage, limit: PAGE_LIMIT },
             });
             setOrders(res.data.items || []);

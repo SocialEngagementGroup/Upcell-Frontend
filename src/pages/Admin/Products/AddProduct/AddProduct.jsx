@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react';
 import ProductBatchForm from '../../../../components/ProductForm/ProductBatchForm';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import { useSearchParams } from 'react-router-dom';
 import {
     useProductsByParentQuery,
-    useProductsQuery,
+    useAdminProductsQuery,
     useSaveProductMutation,
 } from '../../../../queries/products';
 import {
@@ -14,6 +14,7 @@ import {
     useCreateShopCategoryMutation,
 } from '../../../../queries/categories';
 import { EMPTY_ARRAY } from '../../../../queries/keys';
+import { extractApiError } from '../../../../utilities/formValidation';
 
 const buildGroupedProduct = (parent, variants = []) => ({
     parentId: parent._id,
@@ -51,7 +52,7 @@ const AddProduct = () => {
 
     const { data: shopCategories = EMPTY_ARRAY } = useShopCategoriesQuery();
     const { data: parents = EMPTY_ARRAY } = useParentCategoriesQuery();
-    const { data: variants = EMPTY_ARRAY } = useProductsQuery();
+    const { data: variants = EMPTY_ARRAY } = useAdminProductsQuery();
 
     // Fast path for "Edit product": fetch only the one product being edited
     // instead of waiting on the full catalog scan above, which can take a
@@ -89,7 +90,7 @@ const AddProduct = () => {
             setSearchParams({});
         } catch (error) {
             console.log(error);
-            toast.error("Failed to save product");
+            toast.error(extractApiError(error, "Failed to save product"));
         }
     }
 

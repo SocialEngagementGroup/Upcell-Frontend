@@ -9,7 +9,8 @@ import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import axiosInstance from '../../../utilities/axiosInstance';
-import { extractApiError, validateEmailAddress, validateRequiredText } from '../../../utilities/formValidation';
+import { extractApiError, validateEmailAddress, validateRequiredText, validateFields } from '../../../utilities/formValidation';
+import FormField from '../../../components/FormField/FormField';
 import useFormAnalytics from '../../../utilities/useFormAnalytics';
 
 const faqs = [
@@ -25,28 +26,65 @@ const Contactus = () => {
     const navigate = useNavigate();
     const [openIndex, setOpenIndex] = useState(0);
     const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
+    const [fieldErrors, setFieldErrors] = useState({});
+    const [touched, setTouched] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitMessage, setSubmitMessage] = useState('');
     const { markInteraction, trackSuccess, trackFailure } = useFormAnalytics('contact_support');
 
+    // The limits match contactSubmissionSchema on the server exactly. If they
+    // drift, a customer passes this form and is rejected by the API with a
+    // vaguer message and no idea which box to fix.
+    const RULES = {
+        name: (value) => validateRequiredText('Name', value, { min: 2, max: 120 }),
+        email: (value) => validateEmailAddress(value),
+        subject: (value) => validateRequiredText('Subject', value, { min: 4, max: 180 }),
+        message: (value) => validateRequiredText('Message', value, { min: 10, max: 3000 }),
+    };
+
     const handleChange = (field) => (event) => {
         markInteraction();
-        setFormData((prev) => ({ ...prev, [field]: event.target.value }));
+        const { value } = event.target;
+        setFormData((prev) => ({ ...prev, [field]: value }));
+
+        // Clear an error the moment it stops being true. Leaving it up while
+        // the customer fixes the field makes the form feel broken.
+        if (fieldErrors[field]) {
+            const stillWrong = RULES[field](value);
+            setFieldErrors((prev) => ({ ...prev, [field]: stillWrong }));
+        }
+    };
+
+    // Check when the customer leaves a field, not while they type — flagging
+    // "Email is required" at the first keystroke is nagging, not helping.
+    const handleBlur = (field) => () => {
+        setTouched((prev) => ({ ...prev, [field]: true }));
+        setFieldErrors((prev) => ({ ...prev, [field]: RULES[field](formData[field]) }));
     };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
         if (isSubmitting) return;
 
-        const nameError = validateRequiredText('Name', formData.name, { min: 2, max: 120 });
-        const emailError = validateEmailAddress(formData.email);
-        const subjectError = validateRequiredText('Subject', formData.subject, { min: 4, max: 180 });
-        const messageError = validateRequiredText('Message', formData.message, { min: 10, max: 3000 });
-        const validationMessage = nameError || emailError || subjectError || messageError;
+        // Every field at once. Chaining with || surfaced one error per submit,
+        // so someone with three bad fields had to submit three times to find
+        // them all.
+        const errors = validateFields(formData, RULES);
 
-        if (validationMessage) {
-            setSubmitMessage(validationMessage);
-            trackFailure(validationMessage, { source: 'contact-form', phase: 'validation' });
+        if (Object.keys(errors).length) {
+            setFieldErrors(errors);
+            setTouched({ name: true, email: true, subject: true, message: true });
+            setSubmitMessage('');
+            trackFailure(Object.values(errors).join(' '), {
+                source: 'contact-form',
+                phase: 'validation',
+                fields: Object.keys(errors).join(','),
+            });
+
+            // Move focus to the first problem so keyboard and screen-reader
+            // users are taken to it rather than left at the button.
+            const firstBad = Object.keys(RULES).find((field) => errors[field]);
+            document.getElementById(`contact-${firstBad}`)?.focus();
             return;
         }
 
@@ -62,6 +100,8 @@ const Contactus = () => {
             });
             trackSuccess({ source: 'contact-form' });
             setFormData({ name: '', email: '', subject: '', message: '' });
+            setFieldErrors({});
+            setTouched({});
             navigate('/contact-thank-you');
         } catch (error) {
             const failureMessage = extractApiError(error, 'Unable to send your message right now.');
@@ -125,13 +165,73 @@ const Contactus = () => {
                         </div>
                         <form className="grid gap-6" onSubmit={handleSubmit}>
                             <div className="grid gap-6 md:grid-cols-2">
-                                <input className="premium-input bg-apple-gray/5 border-transparent focus:bg-white" placeholder="Full name" value={formData.name} onChange={handleChange('name')} required />
-                                <input className="premium-input bg-apple-gray/5 border-transparent focus:bg-white" type="email" placeholder="Email address" value={formData.email} onChange={handleChange('email')} required />
+                                <FormField id="contact-name" label="Full name" error={fieldErrors.name} touched={touched.name}>
+                                    {(fieldProps) => (
+                                        <input
+                                            {...fieldProps}
+                                            placeholder="Full name"
+                                            value={formData.name}
+                                            onChange={handleChange('name')}
+                                            onBlur={handleBlur('name')}
+                                        />
+                                    )}
+                                </FormField>
+
+                                <FormField id="contact-email" label="Email address" error={fieldErrors.email} touched={touched.email}>
+                                    {(fieldProps) => (
+                                        <input
+                                            {...fieldProps}
+                                            // type="text", not "email": the browser's own
+                                            // bubble would fire before ours and show a
+                                            // message we cannot word or place.
+                                            type="text"
+                                            inputMode="email"
+                                            autoComplete="email"
+                                            placeholder="you@example.com"
+                                            value={formData.email}
+                                            onChange={handleChange('email')}
+                                            onBlur={handleBlur('email')}
+                                        />
+                                    )}
+                                </FormField>
                             </div>
-                            <input className="premium-input bg-apple-gray/5 border-transparent focus:bg-white" placeholder="Subject" value={formData.subject} onChange={handleChange('subject')} required />
-                            <textarea className="premium-input min-h-[220px] resize-none py-4 bg-apple-gray/5 border-transparent focus:bg-white" placeholder="Tell us how we can help." value={formData.message} onChange={handleChange('message')} required />
+
+                            <FormField id="contact-subject" label="Subject" error={fieldErrors.subject} touched={touched.subject}>
+                                {(fieldProps) => (
+                                    <input
+                                        {...fieldProps}
+                                        placeholder="What is this about?"
+                                        value={formData.subject}
+                                        onChange={handleChange('subject')}
+                                        onBlur={handleBlur('subject')}
+                                    />
+                                )}
+                            </FormField>
+
+                            <FormField
+                                id="contact-message"
+                                label="Message"
+                                error={fieldErrors.message}
+                                touched={touched.message}
+                                hint={`${formData.message.trim().length} of 3000 characters`}
+                            >
+                                {(fieldProps) => (
+                                    <textarea
+                                        {...fieldProps}
+                                        className={`${fieldProps.className} min-h-[220px] resize-none py-4`}
+                                        placeholder="Tell us how we can help."
+                                        maxLength={3000}
+                                        value={formData.message}
+                                        onChange={handleChange('message')}
+                                        onBlur={handleBlur('message')}
+                                    />
+                                )}
+                            </FormField>
+
                             {submitMessage && (
-                                <p className="text-sm text-apple-gray">{submitMessage}</p>
+                                <p role="alert" className="rounded-2xl bg-brand-red/[0.06] px-4 py-3 text-sm font-semibold text-brand-red">
+                                    {submitMessage}
+                                </p>
                             )}
                             <button type="submit" disabled={isSubmitting} className="h-[56px] px-10 rounded-full bg-apple-text text-white font-black text-lg transition-all hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70">
                                 {isSubmitting ? 'Sending...' : 'Send Message'}
