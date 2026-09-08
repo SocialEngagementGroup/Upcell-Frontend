@@ -3,12 +3,12 @@ import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import visa from '../../../assets/visa.svg';
 import mastercard from '../../../assets/master.svg';
-import americanExpress from '../../../assets/americanExpress.svg';
+import discover from '../../../assets/discover.svg';
 
 const CARDS = [
     { src: visa, label: 'Visa accepted' },
     { src: mastercard, label: 'Mastercard accepted' },
-    { src: americanExpress, label: 'American Express accepted' },
+    { src: discover, label: 'Discover accepted' },
 ];
 
 const PaymentInfo = () => {

@@ -1,6 +1,5 @@
 import React from "react";
 import ModernHero from "./ModernHero";
-import FeaturedUnits from "../../components/FeaturedUnits/FeaturedUnits";
 import CategoryShelf from "../../components/CategoryShelf/CategoryShelf";
 import TradeInAction from "../../components/TradeInAction/TradeInAction";
 import HomeTrustFeatures from "../../components/HomeTrustFeatures/HomeTrustFeatures";
@@ -17,7 +16,6 @@ const Home = () => {
         <div className="page-shell w-full overflow-x-hidden">
             <ScrollToTop />
             <ModernHero />
-            <FeaturedUnits />
             <CategoryShelf />
             <TradeInAction />
             <HomeTrustFeatures />
