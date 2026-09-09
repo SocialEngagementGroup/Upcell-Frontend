@@ -1,4 +1,4 @@
-﻿import { resolveProductImage, resolveProductImageSrcSet } from './productImages';
+﻿import { resolveProductImageParts } from './productImages';
 
 export const inferFamily = (product) => {
     const name = `${product?.categoryName || ''} ${product?.productName || ''} ${product?.description || ''}`.toLowerCase();
@@ -13,8 +13,8 @@ export const getProductRouteParent = (product) => product?.parentCatagory || pro
 
 export const normalizeProduct = (product) => ({
     ...product,
-    image: resolveProductImage(product),
-    imageSrcSet: resolveProductImageSrcSet(product),
+    // One pass of the image matcher for both, not two.
+    ...resolveProductImageParts(product),
     color: {
         ...(product?.color || {}),
         value: product?.color?.value || product?.color?.hex || '#d1d5db',

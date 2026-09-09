@@ -11,6 +11,13 @@ const money = (value) => `$${Number(value || 0).toFixed(2)}`;
 // customer can only be refunded for something they can also uncheck here.
 const isRefundableLine = (item) => Boolean(item?.price_data?.product_data?.metadata?.productId);
 
+// The tax line, matched the same way the backend matches it. Shipping looks
+// identical in the data — a totalPaid and no productId — and is not refunded,
+// so the name is the only thing that separates them.
+const isTaxLine = (item) =>
+    !isRefundableLine(item) &&
+    String(item?.price_data?.product_data?.name || '').trim().toLowerCase() === 'sales tax';
+
 /**
  * Calculates and records a refund. This never contacts the bank — UpCell has
  * no refund API credentials, so the number this produces still has to be
@@ -46,9 +53,24 @@ const RefundPanel = ({ order, onRefunded }) => {
     // A preview only — the server recalculates from the order itself and is
     // what actually gets recorded. Shown so staff see the number before they
     // commit to it, not as a promise it will be exactly this to the cent.
-    const itemsTotal = chosen.reduce((sum, item) => sum + (item.price_data.product_data.metadata.totalPaid || 0), 0);
+    const totalPaidOf = (items) => items.reduce(
+        (sum, item) => sum + (item.price_data.product_data.metadata.totalPaid || 0), 0
+    );
+
+    const itemsTotal = totalPaidOf(chosen);
     const restockingFee = waiveFee ? 0 : Math.round(itemsTotal * RESTOCKING_FEE_RATE * 100) / 100;
-    const previewAmount = Math.round((itemsTotal - restockingFee) * 100) / 100;
+
+    // The customer gets back the tax they actually paid on the items coming
+    // back, shared out by price — the same sum the server does, so the number
+    // on screen matches the one that gets recorded.
+    const goodsTotal = totalPaidOf(refundableLines);
+    const taxPaid = (order.line_items || []).filter(isTaxLine)
+        .reduce((sum, item) => sum + (item.price_data.product_data.metadata.totalPaid || 0), 0);
+    const taxRefunded = goodsTotal > 0
+        ? Math.round(taxPaid * (itemsTotal / goodsTotal) * 100) / 100
+        : 0;
+
+    const previewAmount = Math.round((itemsTotal - restockingFee + taxRefunded) * 100) / 100;
 
     const canSubmit = chosen.length > 0 && (!waiveFee || waiveReason.trim().length > 0) && !submitting;
 
@@ -89,6 +111,12 @@ const RefundPanel = ({ order, onRefunded }) => {
                     <p>Restocking fee: <strong className="text-apple-text">
                         {r.restockingFeeWaived ? 'Waived' : money(r.restockingFee)}
                     </strong></p>
+                    {/* Absent on refunds recorded before 9 Sep 2026, when tax was
+                        not refunded at all — showing $0.00 for those would read as
+                        a decision rather than a rule that did not exist yet. */}
+                    {r.taxRefunded ? (
+                        <p>Sales tax refunded: <strong className="text-apple-text">{money(r.taxRefunded)}</strong></p>
+                    ) : null}
                     {r.restockingFeeWaived && r.waiveReason ? (
                         <p>Waived because: <strong className="text-apple-text">{r.waiveReason}</strong></p>
                     ) : null}
@@ -169,17 +197,18 @@ const RefundPanel = ({ order, onRefunded }) => {
                     <span>Restocking fee (15%)</span>
                     <strong className="text-apple-text">{waiveFee ? 'Waived' : `−${money(restockingFee)}`}</strong>
                 </div>
+                {/* Confirmed with the client on 9 Sep 2026: the 8% comes back in
+                    full on whatever is returned, the fee is taken on the goods only. */}
+                <div className="flex justify-between">
+                    <span>Sales tax refunded</span>
+                    <strong className="text-apple-text">{taxRefunded > 0 ? money(taxRefunded) : 'None charged'}</strong>
+                </div>
                 {/* Confirmed with the client: shipping is never refunded, so it is
-                    named here rather than just left off the list. */}
+                    named here rather than just left off the list. UpCell bears that
+                    cost itself on a partial return. */}
                 <div className="flex justify-between"><span>Shipping</span><strong className="text-apple-text">Not refunded</strong></div>
                 <div className="flex justify-between text-base"><strong className="text-apple-text">Refund amount</strong><strong className="text-apple-text">{money(previewAmount)}</strong></div>
             </div>
-
-            {/* Not yet confirmed with the client, unlike the two rules above —
-                say so rather than silently deciding either way. */}
-            <p className="mt-2 text-xs text-ink-soft">
-                Sales tax on the returned item is not included above. Adjust by hand if it should be refunded.
-            </p>
 
             <button
                 type="button"
