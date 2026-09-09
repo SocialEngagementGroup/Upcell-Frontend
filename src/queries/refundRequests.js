@@ -8,10 +8,21 @@ import { refundRequestKeys } from './keys';
 // which of those it is instead of showing one generic failure.
 //
 // enabled by `orderId` so it only runs once an order is actually open.
-export const useRefundableItemsQuery = (orderId, options = {}) => useQuery({
-    queryKey: refundRequestKeys.refundable(orderId),
-    queryFn: () => axiosInstance.get(`orders/${orderId}/refundable`).then((res) => res.data),
+export const useRefundableItemsQuery = (orderId, { reasonCode = '', itemIds = [], ...options } = {}) => useQuery({
+    queryKey: refundRequestKeys.refundable(orderId, reasonCode, itemIds),
+    queryFn: () => axiosInstance
+        .get(`orders/${orderId}/refundable`, {
+            params: {
+                ...(reasonCode ? { reasonCode } : {}),
+                ...(itemIds.length ? { itemIds: [...itemIds].sort().join(',') } : {}),
+            },
+        })
+        .then((res) => res.data),
     enabled: Boolean(orderId),
+    // The reason and the tick boxes change as the customer works through the
+    // form, and each change is a different query. Without this the panel
+    // emptied to its loading line on every click.
+    placeholderData: (previous) => previous,
     ...options,
 });
 

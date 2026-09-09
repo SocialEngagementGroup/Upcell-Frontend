@@ -44,7 +44,12 @@ export const categoryKeys = {
 export const refundRequestKeys = {
     // What the return form needs before it can be drawn: which items are still
     // returnable on this order, and how long is left.
-    refundable: (orderId) => ['refundRequests', 'refundable', orderId],
+    // Keyed on the reason and the chosen items as well as the order, because
+    // the answer genuinely differs: the window is 14 days for a change of mind
+    // and 30 for a fault, and the estimate depends on what is being sent back.
+    // Sorted so picking A then B and B then A are one cache entry, not two.
+    refundable: (orderId, reasonCode = '', itemIds = []) =>
+        ['refundRequests', 'refundable', orderId, reasonCode, [...itemIds].sort().join(',')],
     mine: () => ['refundRequests', 'mine'],
     adminList: (status) => ['refundRequests', 'admin', status],
 };
