@@ -31,6 +31,11 @@ const buildGroupedProduct = (parent, variants = []) => ({
         discountPrice: variant.discountPrice ?? '',
         originalPrice: variant.originalPrice ?? '',
         outOfStock: Boolean(variant.outOfStock),
+        // Blank when this variant uses the product's first photo, so reopening
+        // an existing product shows the same choice the admin made.
+        imagePublicId: (parent.images || [])[0]?.publicId === variant.imagePublicId
+            ? ''
+            : (variant.imagePublicId || ''),
     })),
 });
 

@@ -19,6 +19,9 @@ const COLOR_PRESETS = [
 ];
 
 const createVariant = () => ({
+    // Which uploaded photo shows this variant. Empty means "the first one",
+    // which is what every variant used to get with no way to change it.
+    imagePublicId: '',
     storage: '',
     colorName: '',
     colorValue: '#000000',
@@ -144,6 +147,7 @@ const ProductBatchForm = ({ categories, existingProducts, initialProductName, in
         setVariants(
             matchedExistingProduct.variants.length
                 ? matchedExistingProduct.variants.map((variant) => ({
+                    imagePublicId: variant.imagePublicId || '',
                     storage: variant.storage || '',
                     colorName: variant.colorName || '',
                     colorValue: variant.colorValue || '#000000',
@@ -384,6 +388,12 @@ const ProductBatchForm = ({ categories, existingProducts, initialProductName, in
                 discountPrice: variant.discountPrice,
                 originalPrice: variant.originalPrice,
                 outOfStock: Boolean(variant.outOfStock),
+                // Only sent while it still matches a photo on the product — a
+                // variant pointing at a photo that has since been removed
+                // should fall back to the primary, not fail validation.
+                imagePublicId: images.some((image) => image.publicId === variant.imagePublicId)
+                    ? variant.imagePublicId
+                    : undefined,
             })),
         };
 
@@ -583,6 +593,7 @@ const ProductBatchForm = ({ categories, existingProducts, initialProductName, in
                     <table className="w-full text-left">
                         <thead className="bg-surface-alt/70 backdrop-blur-md">
                             <tr>
+                                <th className="px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-ink-soft">Photo</th>
                                 <th className="px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-ink-soft">Storage</th>
                                 <th className="px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-ink-soft">Color</th>
                                 <th className="px-2 py-2.5 text-center text-xs font-bold uppercase tracking-wider text-ink-soft">Price</th>
@@ -600,6 +611,37 @@ const ProductBatchForm = ({ categories, existingProducts, initialProductName, in
                                             ? 'bg-brand-red/10 hover:bg-brand-red/[0.14]'
                                             : 'hover:bg-surface-alt/20'
                                     }`}>
+                                        <td className="px-4 py-3 align-middle">
+                                            {images.length > 0 ? (
+                                                <div className="flex items-center gap-2">
+                                                    <img
+                                                        src={resolveImageRef(
+                                                            images.find((image) => image.publicId === variant.imagePublicId) || images[0],
+                                                            { width: 80 },
+                                                        )}
+                                                        alt=""
+                                                        className="h-9 w-9 shrink-0 rounded-lg border border-black/[0.08] object-cover"
+                                                    />
+                                                    <select
+                                                        className="admin-select h-9 w-full min-w-[92px] py-0 text-sm"
+                                                        value={variant.imagePublicId || ''}
+                                                        onChange={(event) => updateVariant(index, { imagePublicId: event.target.value })}
+                                                        aria-label="Photo for this variant"
+                                                    >
+                                                        {images.map((image, photoIndex) => (
+                                                            <option
+                                                                key={image.publicId || photoIndex}
+                                                                value={photoIndex === 0 ? '' : image.publicId}
+                                                            >
+                                                                Photo {photoIndex + 1}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                            ) : (
+                                                <span className="text-xs font-semibold text-ink-soft">Add a photo first</span>
+                                            )}
+                                        </td>
                                         <td className="px-4 py-3 align-middle">
                                             <select
                                                 className="admin-select h-9 w-full py-0 text-sm"
@@ -700,7 +742,7 @@ const ProductBatchForm = ({ categories, existingProducts, initialProductName, in
 
                                     {variant.showColorPicker && (
                                         <tr className="bg-surface-alt/25">
-                                            <td colSpan="7" className="px-4 py-3">
+                                            <td colSpan="8" className="px-4 py-3">
                                                 <div className="rounded-[18px] border border-black/[0.06] bg-white p-3">
                                                     <div className="flex flex-wrap gap-3">
                                                         {COLOR_PRESETS.map((color) => {

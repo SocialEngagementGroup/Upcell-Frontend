@@ -12,6 +12,7 @@ import { useProductBySlugQuery, useRecommendedProductsQuery, useAccessoriesQuery
 import { EMPTY_ARRAY } from '../../../queries/keys';
 import { pickVariant } from '../../../utilities/catalog';
 import { resolveProductImage } from '../../../utilities/productImages';
+import { resolveImageRef } from '../../../utilities/cloudinary';
 import ModernProductCard from '../../../components/ModernProductCard/ModernProductCard';
 import RouteLoadingScreen from '../../../components/RouteLoadingScreen/RouteLoadingScreen';
 
@@ -96,6 +97,45 @@ const ProductDetailPage = () => {
     // with each other for a render, and did.
     const selectedColor = product?.color;
     const selectedStorage = product?.storage;
+
+    // The photos this product page can show.
+    //
+    // The variant's own photo comes first, because that is the one chosen to
+    // represent this exact storage and colour. The rest of the product's
+    // uploaded photos follow, minus that one so it is not listed twice.
+    //
+    // Before this the page rendered three copies of a single image: the
+    // thumbnails were a literal [1, 2, 3].map. Every extra photo an admin
+    // uploaded was stored in Cloudinary and never displayed anywhere.
+    const galleryImages = useMemo(() => {
+        if (!product) return EMPTY_ARRAY;
+
+        const refs = [
+            { publicId: product.imagePublicId, url: product.image },
+            ...(data?.parent?.images || []).filter((image) => (
+                (image?.publicId || image?.url) !== (product.imagePublicId || product.image)
+            )),
+        ];
+
+        return refs
+            .map((ref) => ({
+                key: ref?.publicId || ref?.url,
+                full: resolveImageRef(ref, { width: 1000 }),
+                thumbnail: resolveImageRef(ref, { width: 200 }),
+            }))
+            .filter((image) => image.key && image.full);
+    }, [data?.parent?.images, product]);
+
+    // Reset to the variant's own photo whenever the variant changes — holding
+    // an index across a colour switch would leave the page showing the previous
+    // variant's third photo.
+    const [activeImageIndex, setActiveImageIndex] = useState(0);
+    useEffect(() => { setActiveImageIndex(0); }, [product?.slug]);
+
+    const activeImage = galleryImages[activeImageIndex]?.full
+        || galleryImages[0]?.full
+        // A product whose photos predate the gallery has none of the above.
+        || resolveProductImage(product, { width: 1000 });
 
     // The server has already grouped these and excluded the current parent —
     // all that is left is dropping families this section does not show and
@@ -240,18 +280,31 @@ const ProductDetailPage = () => {
                 <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
                     <div className="premium-card rounded-[28px] p-4 sm:rounded-[40px] sm:p-6 md:p-8">
                         <div className="flex gap-4">
-                            <div className="hidden w-[92px] flex-col gap-3 md:flex">
-                                {[1, 2, 3].map((item) => (
-                                    <div key={item} className="flex h-[92px] items-center justify-center rounded-[24px] border border-black/[0.06] bg-[linear-gradient(180deg,#f8f8fa_0%,#eef1f5_100%)]">
-                                        <img src={resolveProductImage(product, { width: 200 })} alt={product.productName} className="h-[72%] w-auto object-contain" />
-                                    </div>
-                                ))}
-                            </div>
+                            {galleryImages.length > 1 && (
+                                <div className="hidden w-[92px] flex-col gap-3 md:flex">
+                                    {galleryImages.map((image, index) => (
+                                        <button
+                                            key={image.key}
+                                            type="button"
+                                            onClick={() => setActiveImageIndex(index)}
+                                            aria-label={`Photo ${index + 1} of ${product.productName}`}
+                                            aria-current={index === activeImageIndex}
+                                            className={`flex h-[92px] items-center justify-center rounded-[24px] border bg-[linear-gradient(180deg,#f8f8fa_0%,#eef1f5_100%)] transition-all ${
+                                                index === activeImageIndex
+                                                    ? 'border-[#eb0000] shadow-[0_0_0_2px_rgba(235,0,0,0.12)]'
+                                                    : 'border-black/[0.06] hover:border-black/20'
+                                            }`}
+                                        >
+                                            <img src={image.thumbnail} alt="" className="h-[72%] w-auto object-contain" />
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
 
                             <div className="relative flex min-h-[340px] flex-1 items-center justify-center overflow-hidden rounded-[24px] bg-[linear-gradient(180deg,#fbfbfd_0%,#edf0f5_100%)] px-4 py-8 sm:min-h-[460px] sm:rounded-[34px] sm:px-6 sm:py-10 lg:min-h-[560px]">
                                 <div className="absolute inset-x-[18%] top-[12%] h-[70%] rounded-full bg-[radial-gradient(circle,_rgba(255,255,255,0.92),_rgba(220,225,232,0.35)_55%,_transparent_72%)] blur-2xl" />
                                 <img
-                                    src={resolveProductImage(product, { width: 1000 })}
+                                    src={activeImage}
                                     alt={product.productName}
                                     className="relative z-[2] max-h-[280px] w-auto object-contain drop-shadow-[0_35px_80px_rgba(15,23,42,0.18)] sm:max-h-[460px]"
                                 />
@@ -314,9 +367,11 @@ const ProductDetailPage = () => {
                                     const isAvailable = allOfThisStorage.some((p) => !p.outOfStock);
                                     // Shown in another colour: clicking switches to it, so name
                                     // the colour rather than letting the swatch change unexplained.
-                                    const switchesToColor = !variantForStorage
-                                        ? (allOfThisStorage.find((p) => !p.outOfStock) || allOfThisStorage[0])?.color?.name
+                                    const otherColorVariant = !variantForStorage
+                                        ? (allOfThisStorage.find((p) => !p.outOfStock) || allOfThisStorage[0])
                                         : null;
+                                    const switchesToColor = otherColorVariant?.color?.name;
+                                    const switchesToColorValue = otherColorVariant?.color?.value;
                                     const variantPrice = variantForStorage?.price
                                         ?? (allOfThisStorage.find((p) => !p.outOfStock) || allOfThisStorage[0])?.price;
 
@@ -346,8 +401,12 @@ const ProductDetailPage = () => {
                                                 <div className="mt-1 text-[10px] font-bold uppercase tracking-wider">Out of stock</div>
                                             )}
                                             {isAvailable && switchesToColor && (
-                                                <div className="mt-1 text-[10px] font-bold uppercase tracking-wider text-apple-gray/70">
-                                                    In {switchesToColor}
+                                                <div className="mt-1 flex items-center gap-1.5 text-[11px] font-semibold text-apple-text/70">
+                                                    <span
+                                                        className="h-2.5 w-2.5 rounded-full ring-1 ring-inset ring-black/20"
+                                                        style={{ backgroundColor: switchesToColorValue }}
+                                                    />
+                                                    {switchesToColor}
                                                 </div>
                                             )}
                                         </button>
