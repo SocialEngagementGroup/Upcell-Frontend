@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { resolveImageRef } from '../../utilities/cloudinary';
+import { uploadProductImage } from '../../utilities/uploadImage';
 const STORAGE_OPTIONS = ['64GB', '128GB', '256GB', '512GB', '1TB', '2TB', '4TB'];
 const STORAGE_ORDER = STORAGE_OPTIONS.reduce((map, storage, index) => {
     map[storage] = index;
@@ -47,13 +48,6 @@ const getPricingFromMatchingStorage = (variants, storage, currentIndex) => {
     return null;
 };
 
-const readFileAsDataUrl = (file) => new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-});
-
 const ProductBatchForm = ({ categories, existingProducts, initialProductName, initialCategoryId, initialParentId, onCreateCategory, onSubmit, submitting, onEditingProductChange }) => {
     const [formState, setFormState] = useState({
         productName: '',
@@ -63,8 +57,14 @@ const ProductBatchForm = ({ categories, existingProducts, initialProductName, in
     const [newCategoryName, setNewCategoryName] = useState('');
     const [newCategoryDescription, setNewCategoryDescription] = useState('');
     const [variants, setVariants] = useState([createVariant()]);
+    // { url, publicId } references, not display URLs. The publicId is what the
+    // site builds every delivery URL from, so it has to survive an edit — an
+    // earlier version stored the already-transformed display URL back onto the
+    // product, baking one fixed width and format permanently into the source.
     const [images, setImages] = useState([]);
     const [isDragging, setIsDragging] = useState(false);
+    const [uploading, setUploading] = useState(false);
+    const [uploadError, setUploadError] = useState('');
     const [editingProduct, setEditingProduct] = useState(null);
     const [showProductSuggestions, setShowProductSuggestions] = useState(false);
     const fileInputRef = useRef(null);
@@ -138,7 +138,9 @@ const ProductBatchForm = ({ categories, existingProducts, initialProductName, in
         // reading `.url` alone left those images pointing at nothing, which
         // rendered as a broken image the moment this product was reopened
         // for editing. resolveImageRef prefers the publicId when present.
-        setImages((matchedExistingProduct.images || []).map((image) => resolveImageRef(image)).filter(Boolean));
+        setImages((matchedExistingProduct.images || [])
+            .map((image) => (typeof image === 'string' ? { url: image } : image))
+            .filter((image) => image?.url || image?.publicId));
         setVariants(
             matchedExistingProduct.variants.length
                 ? matchedExistingProduct.variants.map((variant) => ({
@@ -174,12 +176,55 @@ const ProductBatchForm = ({ categories, existingProducts, initialProductName, in
         setShowProductSuggestions(false);
     };
 
-    const canSubmit = useMemo(() => (
-        formState.productName.trim()
-        && images.length > 0
-        && (useNewCategory ? newCategoryName.trim() : formState.categoryId)
-        && variants.every((variant) => variant.storage && variant.colorName.trim() && variant.price)
-    ), [formState, images.length, newCategoryName, useNewCategory, variants]);
+    // What is still missing, in the words the form uses for those fields.
+    //
+    // Save is disabled until this is empty, and the same list is shown next to
+    // the button. Deriving both from one place is the point: the button used to
+    // be disabled by a boolean that said nothing, and nothing on screen changed
+    // when it was — so a half-filled form looked exactly like a ready one, and
+    // clicking Save simply did nothing at all.
+    const missingRequirements = useMemo(() => {
+        const missing = [];
+
+        if (!formState.productName.trim()) missing.push('a product name');
+        if (useNewCategory ? !newCategoryName.trim() : !formState.categoryId) missing.push('a category');
+        if (!images.length) missing.push('at least one photo');
+
+        const incomplete = variants.filter((variant) => (
+            !variant.storage || !variant.colorName.trim() || !variant.price
+        )).length;
+        if (incomplete) {
+            missing.push(incomplete === 1
+                ? 'storage, colour and price on 1 variant'
+                : `storage, colour and price on ${incomplete} variants`);
+        }
+
+        return missing;
+    }, [formState, images.length, newCategoryName, useNewCategory, variants]);
+
+    // Storage and colour together are what a customer picks, so the same pair
+    // twice is one product saved twice — the page can only ever show one of
+    // them. The backend rejects this too; catching it here means the admin sees
+    // which rows clash while they are still on screen, instead of a failed save.
+    const duplicateVariantIndexes = useMemo(() => {
+        const seen = new Map();
+        const clashes = new Set();
+
+        variants.forEach((variant, index) => {
+            if (!variant.storage || !variant.colorName.trim()) return;
+            const key = `${variant.storage.trim().toLowerCase()}|${variant.colorName.trim().toLowerCase()}`;
+            const first = seen.get(key);
+
+            if (first === undefined) seen.set(key, index);
+            else { clashes.add(first); clashes.add(index); }
+        });
+
+        return clashes;
+    }, [variants]);
+
+    // Saving mid-upload would store the product with only the photos that had
+    // finished, and quietly drop the rest.
+    const canSubmit = missingRequirements.length === 0 && duplicateVariantIndexes.size === 0 && !uploading;
 
     const sortedVariants = useMemo(() => (
         variants
@@ -277,8 +322,22 @@ const ProductBatchForm = ({ categories, existingProducts, initialProductName, in
         const acceptedFiles = Array.from(fileList).filter((file) => file.type.startsWith('image/'));
         if (!acceptedFiles.length) return;
 
-        const dataUrls = await Promise.all(acceptedFiles.map(readFileAsDataUrl));
-        setImages((current) => [...current, ...dataUrls]);
+        setUploading(true);
+        setUploadError('');
+
+        try {
+            const uploaded = await Promise.all(acceptedFiles.map(
+                (file) => uploadProductImage(file, { productName: formState.productName.trim() })
+            ));
+            setImages((current) => [...current, ...uploaded]);
+        } catch (error) {
+            // Surfaced in the form rather than thrown away: an upload that
+            // failed silently used to leave the admin looking at a form with no
+            // image and no reason why, and Save is blocked until there is one.
+            setUploadError(error?.message || 'Image upload failed. Please try again.');
+        } finally {
+            setUploading(false);
+        }
     };
 
     const handleDrop = async (event) => {
@@ -304,7 +363,7 @@ const ProductBatchForm = ({ categories, existingProducts, initialProductName, in
             selectedCategory = await onCreateCategory({
                 modelName: newCategoryName.trim(),
                 description: newCategoryDescription.trim(),
-                images: images.map((url) => ({ url })),
+                images,
             });
         }
 
@@ -313,8 +372,8 @@ const ProductBatchForm = ({ categories, existingProducts, initialProductName, in
             productName: formState.productName.trim(),
             categoryId: selectedCategory?._id,
             categoryName: selectedCategory?.modelName || newCategoryName.trim(),
-            image: images[0],
-            images: images.map((url) => ({ url })),
+            image: images[0]?.url,
+            images,
             variants: variants.map((variant) => ({
                 storage: variant.storage,
                 color: {
@@ -473,15 +532,23 @@ const ProductBatchForm = ({ categories, existingProducts, initialProductName, in
                 >
                     <span className="text-lg font-bold text-apple-text">Drag and drop photos here</span>
                     <span className="mt-2 text-sm text-ink-soft">or click to browse from your computer</span>
-                    <span className="mt-4 text-xs font-bold uppercase tracking-[0.2em] text-apple-gray">First photo becomes the primary product image</span>
+                    <span className="mt-4 text-xs font-bold uppercase tracking-[0.2em] text-apple-gray">
+                        {uploading ? 'Uploading…' : 'First photo becomes the primary product image'}
+                    </span>
                 </button>
+
+                {uploadError && (
+                    <p className="mt-3 rounded-[16px] bg-brand-red/10 px-4 py-3 text-sm font-semibold text-brand-red" role="alert">
+                        {uploadError}
+                    </p>
+                )}
 
                 {images.length > 0 && (
                     <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                         {images.map((image, index) => (
-                            <div key={`${image.slice(0, 30)}-${index}`} className="overflow-hidden rounded-[22px] border border-black/[0.06] bg-white">
+                            <div key={`${image.publicId || image.url}-${index}`} className="overflow-hidden rounded-[22px] border border-black/[0.06] bg-white">
                                 <div className="relative aspect-square bg-surface-alt/40">
-                                    <img src={image} alt={`Upload ${index + 1}`} className="h-full w-full object-cover" />
+                                    <img src={resolveImageRef(image, { width: 400 })} alt={`Upload ${index + 1}`} className="h-full w-full object-cover" />
                                     {index === 0 && (
                                         <span className="absolute left-3 top-3 rounded-full bg-black px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-white">
                                             Primary
@@ -528,7 +595,11 @@ const ProductBatchForm = ({ categories, existingProducts, initialProductName, in
                         <tbody className="divide-y divide-black/[0.04] rounded-[22px] border border-black/[0.06] bg-white">
                             {sortedVariants.map(({ variant, index }) => (
                                 <React.Fragment key={index}>
-                                    <tr className="align-middle hover:bg-surface-alt/20 transition-colors">
+                                    <tr className={`align-middle transition-colors ${
+                                        duplicateVariantIndexes.has(index)
+                                            ? 'bg-brand-red/10 hover:bg-brand-red/[0.14]'
+                                            : 'hover:bg-surface-alt/20'
+                                    }`}>
                                         <td className="px-4 py-3 align-middle">
                                             <select
                                                 className="admin-select h-9 w-full py-0 text-sm"
@@ -715,9 +786,27 @@ const ProductBatchForm = ({ categories, existingProducts, initialProductName, in
                 </div>
             </div>
 
-            <button className="premium-button w-fit" type="submit" disabled={!canSubmit || submitting}>
-                {submitting ? 'Saving…' : editingProduct ? 'Save changes' : 'Save product'}
-            </button>
+            <div className="flex flex-wrap items-center gap-4">
+                <button className="premium-button w-fit" type="submit" disabled={!canSubmit || submitting}>
+                    {submitting ? 'Saving…' : editingProduct ? 'Save changes' : 'Save product'}
+                </button>
+
+                {!submitting && uploading && (
+                    <p className="text-sm font-semibold text-ink-soft">Waiting for the photo to finish uploading…</p>
+                )}
+
+                {!submitting && !uploading && missingRequirements.length > 0 && (
+                    <p className="text-sm font-semibold text-ink-soft">
+                        Still needed: {missingRequirements.join(', ')}
+                    </p>
+                )}
+
+                {!submitting && !uploading && duplicateVariantIndexes.size > 0 && (
+                    <p className="text-sm font-semibold text-brand-red" role="alert">
+                        Two variants have the same storage and colour. Change or remove one.
+                    </p>
+                )}
+            </div>
         </form>
     );
 };

@@ -233,7 +233,24 @@ const scoreImage = (image, productTokens, colorTokens, family) => {
 // than running this matching a second, subtly different way.
 const fallbackRef = (product) => ({ publicId: product?.imagePublicId, url: product?.image });
 
+// Whether this product's own stored photo is the final answer.
+//
+// It is, unless the catalogue has marked it a stand-in — one picture stored on
+// every variant of a model because no per-variant photo existed. Those are the
+// only ones the manifest below may improve on.
+//
+// Everything else is a photo somebody chose for this exact product, and the
+// manifest must not touch it. It used to: the matcher ran first and scored a
+// colour match at 45 against a threshold of 35, so a product called "test one"
+// in black scored high enough on colour alone to be shown a photo of an iPad.
+// An admin would upload one image and the site would display another.
+const hasOwnPhoto = (product) => (
+    !product?.imageIsGeneric && Boolean(product?.imagePublicId || product?.image)
+);
+
 const resolveProductImageRef = (product) => {
+    if (hasOwnPhoto(product)) return fallbackRef(product);
+
     const productTokens = getProductTokens(product);
     if (!productTokens.length) return fallbackRef(product);
 
@@ -278,9 +295,14 @@ const resolveProductImageRef = (product) => {
         : fallbackRef(product);
 };
 
-export const resolveProductImage = (product) => resolveImageRef(
+// width defaults to the catalogue card size. The product page passes a larger
+// one: it renders the photo far bigger than a card does, and it was reading
+// product.image directly — the stored original, at whatever resolution it was
+// uploaded at, with no transform at all. A 1122x1402 upload shipped in full to
+// fill a 460px-tall slot.
+export const resolveProductImage = (product, { width = CATALOG_IMAGE_WIDTH } = {}) => resolveImageRef(
     resolveProductImageRef(product),
-    { width: CATALOG_IMAGE_WIDTH }
+    { width }
 );
 
 // Same photo as resolveProductImage, offered at several widths so a phone

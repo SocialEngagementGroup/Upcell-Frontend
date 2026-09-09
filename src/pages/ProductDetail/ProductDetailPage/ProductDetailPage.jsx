@@ -8,9 +8,10 @@ import { TOAST_ICONS } from '../../../utilities/toastIcons';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 
-import axiosInstance from '../../../utilities/axiosInstance';
-import { useProductFamilyQuery, useRecommendedProductsQuery } from '../../../queries/products';
+import { useProductBySlugQuery, useRecommendedProductsQuery, useAccessoriesQuery } from '../../../queries/products';
 import { EMPTY_ARRAY } from '../../../queries/keys';
+import { pickVariant } from '../../../utilities/catalog';
+import { resolveProductImage } from '../../../utilities/productImages';
 import ModernProductCard from '../../../components/ModernProductCard/ModernProductCard';
 import RouteLoadingScreen from '../../../components/RouteLoadingScreen/RouteLoadingScreen';
 
@@ -63,26 +64,38 @@ const getStorageSortValue = (storageLabel = '') => {
 };
 
 const ProductDetailPage = () => {
-    const { parentId, productId } = useParams();
+    const { slug } = useParams();
     const navigate = useNavigate();
-    // Only this product's own family, not the catalogue. The page reads it for
-    // the variant pickers and for switching between colour/storage combinations.
-    const { data: allProducts = EMPTY_ARRAY, isLoading: productsLoading } = useProductFamilyQuery(parentId);
-    const { data: recommendedPool = EMPTY_ARRAY } = useRecommendedProductsQuery(parentId);
-    const [product, setProduct] = useState();
-    const [selectedColor, setSelectedColor] = useState();
-    const [selectedStorage, setSelectedStorage] = useState();
+
+    // One request for the variant, its family and its parent — the page cannot
+    // draw anything without all three.
+    //
+    // isLoading is true only on the very first load. Switching variants keeps
+    // the previous product on screen (see placeholderData in the hook), so the
+    // skeleton below never reappears mid-browse.
+    const { data, isLoading, isError, error, isPlaceholderData } = useProductBySlugQuery(slug);
+    const notFound = error?.response?.status === 404;
+
+    const product = notFound ? undefined : data?.product;
+    const allProducts = data?.family || EMPTY_ARRAY;
+    const { data: recommendedPool = EMPTY_ARRAY } = useRecommendedProductsQuery(product?.parentCatagory);
+
     const [quantity, setQuantity] = useState(1);
     const [addonQtys, setAddonQtys] = useState({});
     const { setCart } = useContext(CartContext);
 
-    useEffect(() => {
-        if (!allProducts.length) return;
-        const selectedProduct = allProducts.find((item) => item._id === productId) || allProducts[0];
-        setProduct(selectedProduct);
-        setSelectedColor(selectedProduct?.color);
-        setSelectedStorage(selectedProduct?.storage);
-    }, [allProducts, productId]);
+    // Derived from the URL, not copied into state by an effect.
+    //
+    // The old version resolved the product with `find(...) || allProducts[0]`,
+    // so a URL that named a product which did not exist quietly showed a
+    // different phone — same page, same buy button, wrong device. The server
+    // now answers 404 for an unknown slug and this renders that.
+    //
+    // The colour and storage pickers read straight off the product for the same
+    // reason: three pieces of state kept in step by an effect could disagree
+    // with each other for a render, and did.
+    const selectedColor = product?.color;
+    const selectedStorage = product?.storage;
 
     // The server has already grouped these and excluded the current parent —
     // all that is left is dropping families this section does not show and
@@ -106,25 +119,22 @@ const ProductDetailPage = () => {
             .sort((left, right) => getStorageSortValue(left) - getStorageSortValue(right) || left.localeCompare(right, undefined, { numeric: true }))
     ), [allProducts]);
 
-    const syncSelection = (nextColor, nextStorage) => {
-        const matchedProduct = allProducts.find((item) => (
-            item.color?.name === nextColor?.name && item.storage === nextStorage && !item.outOfStock
-        ));
-        if (matchedProduct) {
-            setProduct(matchedProduct);
-            navigate(`/iphone/${matchedProduct.parentCatagory}/${matchedProduct._id}`, { replace: true });
-        }
+    // Switching colour or storage is a navigation, not a state change. The URL
+    // is the single source of truth for which variant is shown, so the address
+    // bar always matches the page and the link can be shared or bookmarked.
+    // replace: true keeps Back going to the previous page rather than walking
+    // through every swatch the customer tried.
+    const goToVariant = (variant) => {
+        if (variant?.slug) navigate(`/product/${variant.slug}`, { replace: true });
     };
 
-    const handleColorSelect = (color) => {
-        setSelectedColor(color);
-        syncSelection(color, selectedStorage);
-    };
+    const handleColorSelect = (color) => goToVariant(pickVariant(allProducts, {
+        colorName: color?.name, storage: selectedStorage, anchor: 'color',
+    }));
 
-    const handleStorageSelect = (storage) => {
-        setSelectedStorage(storage);
-        syncSelection(selectedColor, storage);
-    };
+    const handleStorageSelect = (storage) => goToVariant(pickVariant(allProducts, {
+        colorName: selectedColor?.name, storage, anchor: 'storage',
+    }));
 
     // Accessories come from the catalogue, so their ids are real product ids.
     //
@@ -132,14 +142,14 @@ const ProductDetailPage = () => {
     // The cart keeps only real database ids, so those were silently dropped:
     // the customer saw "Product and accessories added", was charged for the
     // phone alone, and never received the accessories.
-    const [addons, setAddons] = useState([]);
-
-    useEffect(() => {
-        axiosInstance.get('accessories')
-            .then((res) => setAddons(res.data || []))
-            // The device is still purchasable if this fails; just show no add-ons.
-            .catch(() => setAddons([]));
-    }, []);
+    // Through React Query rather than its own effect, so the same two
+    // accessories are fetched once and reused as the customer moves between
+    // product pages instead of being refetched on every one.
+    //
+    // Defaulting to an empty array on failure is deliberate: the device is
+    // still purchasable without add-ons, so a failed accessories call must not
+    // take the buy button down with it.
+    const { data: addons = EMPTY_ARRAY } = useAccessoriesQuery();
 
     const addonTotal = addons.reduce((sum, a) => sum + (addonQtys[a._id] || 0) * a.price, 0);
     const grandTotal = product ? product.price * quantity + addonTotal : 0;
@@ -168,7 +178,7 @@ const ProductDetailPage = () => {
     // data source, a direct link or a slow connection can land here before
     // the catalog has loaded, and "no product yet" must not be read as
     // "product doesn't exist" while the real answer is still in flight.
-    if (productsLoading) {
+    if (isLoading) {
         return (
             <div className="page-shell">
                 <RouteLoadingScreen />
@@ -176,14 +186,38 @@ const ProductDetailPage = () => {
         );
     }
 
-    if (!product) {
+    // Three outcomes, three messages. They used to be one: any failure showed
+    // "no longer available", which tells someone whose connection dropped that
+    // the product is gone, and tells someone with a mistyped URL to keep
+    // waiting.
+    if (notFound || !product) {
         return (
             <div className="page-shell">
                 <div className="page-container py-24">
                     <div className="premium-card rounded-[36px] px-8 py-16 text-center">
                         <h2>Product not found</h2>
-                        <p className="mt-4 text-ink-soft">This product variation is no longer available.</p>
-                        <Link to="/shop" className="premium-button mt-6">Back to shop</Link>
+                        <p className="mt-4 text-ink-soft">
+                            We couldn&apos;t find that product. It may have sold out and been removed.
+                        </p>
+                        <Link to="/shop" className="premium-button mt-6">Browse the shop</Link>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    if (isError) {
+        return (
+            <div className="page-shell">
+                <div className="page-container py-24">
+                    <div className="premium-card rounded-[36px] px-8 py-16 text-center">
+                        <h2>Something went wrong</h2>
+                        <p className="mt-4 text-ink-soft">
+                            We couldn&apos;t load this product just now. Please try again.
+                        </p>
+                        <button type="button" onClick={() => window.location.reload()} className="premium-button mt-6">
+                            Try again
+                        </button>
                     </div>
                 </div>
             </div>
@@ -209,7 +243,7 @@ const ProductDetailPage = () => {
                             <div className="hidden w-[92px] flex-col gap-3 md:flex">
                                 {[1, 2, 3].map((item) => (
                                     <div key={item} className="flex h-[92px] items-center justify-center rounded-[24px] border border-black/[0.06] bg-[linear-gradient(180deg,#f8f8fa_0%,#eef1f5_100%)]">
-                                        <img src={product.image} alt={product.productName} className="h-[72%] w-auto object-contain" />
+                                        <img src={resolveProductImage(product, { width: 200 })} alt={product.productName} className="h-[72%] w-auto object-contain" />
                                     </div>
                                 ))}
                             </div>
@@ -217,7 +251,7 @@ const ProductDetailPage = () => {
                             <div className="relative flex min-h-[340px] flex-1 items-center justify-center overflow-hidden rounded-[24px] bg-[linear-gradient(180deg,#fbfbfd_0%,#edf0f5_100%)] px-4 py-8 sm:min-h-[460px] sm:rounded-[34px] sm:px-6 sm:py-10 lg:min-h-[560px]">
                                 <div className="absolute inset-x-[18%] top-[12%] h-[70%] rounded-full bg-[radial-gradient(circle,_rgba(255,255,255,0.92),_rgba(220,225,232,0.35)_55%,_transparent_72%)] blur-2xl" />
                                 <img
-                                    src={product.image}
+                                    src={resolveProductImage(product, { width: 1000 })}
                                     alt={product.productName}
                                     className="relative z-[2] max-h-[280px] w-auto object-contain drop-shadow-[0_35px_80px_rgba(15,23,42,0.18)] sm:max-h-[460px]"
                                 />
@@ -267,12 +301,24 @@ const ProductDetailPage = () => {
                             <div className="text-[13px] font-extrabold uppercase tracking-[0.1em] text-apple-text">Storage</div>
                             <div className="mt-4 flex flex-wrap gap-3">
                                 {availableStorages.map((storage) => {
-                                    // Find product for this storage in current color to get the price
                                     const variantForStorage = allProducts.find(
                                         (p) => p.color?.name === selectedColor?.name && p.storage === storage
                                     );
-                                    const variantPrice = variantForStorage?.price;
-                                    const isAvailable = !!variantForStorage && !variantForStorage.outOfStock;
+                                    // Every storage listed here exists somewhere in the family —
+                                    // the list is derived from the family itself. So a size is
+                                    // only genuinely unavailable when every colour of it is out
+                                    // of stock. It used to be marked "Out of stock" whenever the
+                                    // *selected colour* lacked it, which told a customer a size
+                                    // was sold out when it was simply a different colour.
+                                    const allOfThisStorage = allProducts.filter((p) => p.storage === storage);
+                                    const isAvailable = allOfThisStorage.some((p) => !p.outOfStock);
+                                    // Shown in another colour: clicking switches to it, so name
+                                    // the colour rather than letting the swatch change unexplained.
+                                    const switchesToColor = !variantForStorage
+                                        ? (allOfThisStorage.find((p) => !p.outOfStock) || allOfThisStorage[0])?.color?.name
+                                        : null;
+                                    const variantPrice = variantForStorage?.price
+                                        ?? (allOfThisStorage.find((p) => !p.outOfStock) || allOfThisStorage[0])?.price;
 
                                     return (
                                         <button
@@ -298,6 +344,11 @@ const ProductDetailPage = () => {
                                             )}
                                             {!isAvailable && (
                                                 <div className="mt-1 text-[10px] font-bold uppercase tracking-wider">Out of stock</div>
+                                            )}
+                                            {isAvailable && switchesToColor && (
+                                                <div className="mt-1 text-[10px] font-bold uppercase tracking-wider text-apple-gray/70">
+                                                    In {switchesToColor}
+                                                </div>
                                             )}
                                         </button>
                                     );

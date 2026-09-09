@@ -62,6 +62,14 @@ const sortByFamilyThenProductName = (left, right) => {
     return sortByProductName(left, right);
 };
 
+// Keyed by the value of the sort dropdown. Anything not listed — including the
+// default "featured" — falls back to the family order above.
+const SORT_COMPARATORS = {
+    'price-low': (left, right) => left.price - right.price,
+    'price-high': (left, right) => right.price - left.price,
+    name: (left, right) => left.productName.localeCompare(right.productName),
+};
+
 const sortOptions = [
     { value: 'featured', label: 'Featured' },
     { value: 'price-low', label: 'Price: Low to High' },
@@ -193,7 +201,7 @@ const ShopPage = () => {
     }, [products, searchQuery]);
 
     const handleSuggestionSelect = (suggestion) => {
-        navigate(`/iphone/${suggestion.parentCatagory}/${suggestion._id}`);
+        navigate(suggestion.slug ? `/product/${suggestion.slug}` : `/iphone/${suggestion.parentCatagory}/${suggestion._id}`);
     };
 
     const sidebarCategories = useMemo(() => {
@@ -318,11 +326,11 @@ const ShopPage = () => {
             return true;
         });
 
+        // One comparator, chosen up front. This used to sort by family first and
+        // then sort the same array again for price and name, so three of the
+        // four modes did the work twice and threw the first pass away.
         const sorted = groupProductsByParent(matchingVariations);
-        sorted.sort(sortByFamilyThenProductName);
-        if (sortBy === 'price-low') sorted.sort((a, b) => a.price - b.price);
-        if (sortBy === 'price-high') sorted.sort((a, b) => b.price - a.price);
-        if (sortBy === 'name') sorted.sort((a, b) => a.productName.localeCompare(b.productName));
+        sorted.sort(SORT_COMPARATORS[sortBy] || sortByFamilyThenProductName);
         return sorted;
     }, [products, activeCategory, priceRange, searchQuery, selectedModels, selectedStorages, sortBy]);
 

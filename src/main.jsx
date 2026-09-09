@@ -45,6 +45,7 @@ const JournalPost = lazy(() => import('./pages/Auxiliary/Resources/JournalPost.j
 const NotFound = lazy(() => import('./pages/NotFound/NotFound.jsx'));
 const AdminTradeIn = lazy(() => import('./pages/Admin/TradeIn/AdminTradeIn.jsx'));
 const AdminRefundRequests = lazy(() => import('./pages/Admin/RefundRequests/AdminRefundRequests.jsx'));
+const LegacyProductRedirect = lazy(() => import('./pages/ProductDetail/LegacyProductRedirect.jsx'));
 const SingleTradeInPage = lazy(() => import('./pages/Admin/TradeIn/SingleTradeInPage.jsx'));
 const AdminNewsletter = lazy(() => import('./pages/Admin/Newsletter/AdminNewsletter.jsx'));
 const AdminContact = lazy(() => import('./pages/Admin/Contact/AdminContact.jsx'));
@@ -79,8 +80,14 @@ const router = createBrowserRouter([
         element: lazyElement(<Cart />),
       },
       {
-        path: "iphone/:parentId/:productId",
+        path: "product/:slug",
         element: lazyElement(<ProductDetailPage />),
+      },
+      {
+        // Old shared links and bookmarks. The name was wrong as well as the
+        // shape — iPads and MacBooks were served from /iphone/ too.
+        path: "iphone/:parentId/:productId",
+        element: lazyElement(<LegacyProductRedirect />),
       },
       {
         path: "checkout",

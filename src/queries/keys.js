@@ -18,6 +18,13 @@ export const productKeys = {
     // getRecommendedProducts). Keyed by the parent it excludes, because the
     // result differs per product page.
     recommended: (excludeParentId) => ['products', 'recommended', excludeParentId],
+    // A product page, keyed by the slug in its URL. Two customers on the same
+    // product share this entry; the old id-keyed lookup could not, because the
+    // same product reached through different routes produced different keys.
+    bySlug: (slug) => ['products', 'bySlug', slug],
+    // The same handful of add-ons on every product page, so they are fetched
+    // once for the session rather than per page.
+    accessories: () => ['products', 'accessories'],
     // Just the products sitting in one cart (see Backend's getCartProducts).
     // Sorted so that adding A then B and adding B then A are the same cache
     // entry rather than two fetches of identical data.

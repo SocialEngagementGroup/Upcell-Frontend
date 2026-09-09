@@ -10,6 +10,7 @@ import SearchWithSuggestions from '../../../../components/SearchWithSuggestions/
 import { useAdminProductsQuery } from '../../../../queries/products';
 import { useParentCategoriesQuery } from '../../../../queries/categories';
 import { EMPTY_ARRAY } from '../../../../queries/keys';
+import { groupVariantsByParent } from '../../../../utilities/catalog';
 import { resolveImageRef } from '../../../../utilities/cloudinary';
 
 const familyOrder = ['iPhone', 'iPad', 'MacBook'];
@@ -59,9 +60,10 @@ const AllProduct = () => {
         const parentList = Array.isArray(parents) ? parents : [];
         const variationList = Array.isArray(variations) ? variations : [];
         if (!parentList.length) return [];
+        const variantsByParent = groupVariantsByParent(variationList);
         return parentList
             .map((parent) => {
-                const parentVariants = variationList.filter((variant) => String(variant.parentCatagory) === String(parent._id));
+                const parentVariants = variantsByParent.get(String(parent._id)) || EMPTY_ARRAY;
                 return {
                     parentId: parent._id,
                     productName: parent.modelName,

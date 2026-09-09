@@ -12,6 +12,7 @@ const ModernProductCard = ({ product, priority = false }) => {
     // If we're passing the raw API object, we map them.
     const parentId = product.parentId || product.parentCatagory;
     const productId = product.productId || product._id;
+    const slug = product.slug;
     const title = product.title || product.productName;
     const family = product.family;
     const image = product.image;
@@ -20,7 +21,7 @@ const ModernProductCard = ({ product, priority = false }) => {
 
     return (
         <Link
-            to={`/iphone/${parentId}/${productId}`}
+            to={slug ? `/product/${slug}` : `/iphone/${parentId}/${productId}`}
             className="group relative block overflow-hidden rounded-[24px] border border-black/[0.08] bg-white transition-all duration-500 hover:-translate-y-2 hover:border-brand-red hover:shadow-[0_14px_36px_rgba(217,11,15,0.15)]"
         >
             <div className="relative flex h-[310px] items-center justify-center overflow-hidden">

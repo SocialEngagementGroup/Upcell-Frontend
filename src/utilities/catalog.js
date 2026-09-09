@@ -70,4 +70,48 @@ export const groupProductsByParent = (products = []) => {
     return Array.from(map.values());
 };
 
+// Groups variants by the parent they belong to, in one pass.
+//
+// Both admin product pages used to do this by calling .filter() on the whole
+// variant list once per parent — 83 parents x 956 variants is 79,348
+// comparisons, each allocating two strings, and it re-ran on every change to
+// the list (including after every delete). Measured at 37.9ms against the real
+// catalogue, on the main thread, versus 0.4ms for this. Same output.
+export const groupVariantsByParent = (variants) => {
+    const byParent = new Map();
 
+    for (const variant of variants) {
+        const key = String(variant.parentCatagory);
+        const existing = byParent.get(key);
+        if (existing) existing.push(variant);
+        else byParent.set(key, [variant]);
+    }
+
+    return byParent;
+};
+
+// Which variant a colour or storage click should land on.
+//
+// The exact pair wins whenever it exists — including when it is out of stock,
+// because the product page has an honest out-of-stock state and showing it is
+// better than pretending the choice was never made.
+//
+// When the pair does not exist the click used to do nothing at all. A product
+// sold in Black at 64GB and 2TB, and in Silver at 128GB, left every other
+// storage button dead: the customer clicked and the page sat there. So keep
+// whichever half they just chose — that is the `anchor` — and find a partner
+// for it, preferring one that is in stock.
+export const pickVariant = (variants, { colorName, storage, anchor = 'storage' }) => {
+    const exact = variants.find((variant) => (
+        variant.color?.name === colorName && variant.storage === storage
+    ));
+    if (exact) return exact;
+
+    const matchesAnchor = anchor === 'color'
+        ? (variant) => variant.color?.name === colorName
+        : (variant) => variant.storage === storage;
+
+    const candidates = variants.filter(matchesAnchor);
+
+    return candidates.find((variant) => !variant.outOfStock) || candidates[0] || null;
+};

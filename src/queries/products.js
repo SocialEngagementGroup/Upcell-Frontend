@@ -54,6 +54,52 @@ export const useCartProductsQuery = (ids = [], options = {}) => useQuery({
     ...options,
 });
 
+// Everything a product page needs, from the slug in the URL: the variant being
+// viewed, its whole family for the colour and storage pickers, and the parent.
+// One request rather than three, because the page cannot render any of it
+// without all of it.
+//
+// A 404 from here means the slug does not exist. That is a real answer, not a
+// failure to retry — retrying a URL that was never valid just delays the 404
+// the customer needs to see.
+export const useProductBySlugQuery = (slug, options = {}) => useQuery({
+    queryKey: productKeys.bySlug(slug),
+    queryFn: () => axiosInstance.get(`products/by-slug/${slug}`).then((res) => res.data),
+    enabled: Boolean(slug),
+    retry: (failureCount, error) => error?.response?.status !== 404 && failureCount < 1,
+    // Choosing a different colour or storage navigates to another slug, which
+    // is a different query. Without this the page emptied to a skeleton and
+    // rebuilt itself on every swatch — the whole layout flashing for data it
+    // already had, since every variant of a family returns the same family.
+    //
+    // Keeping the previous result on screen while the new one arrives means the
+    // price and photo update in place. Not applied to a 404: showing the last
+    // good product under a URL that does not exist would be the old bug back in
+    // a different form.
+    placeholderData: (previous, previousQuery) =>
+        (previousQuery?.state?.error ? undefined : previous),
+    ...options,
+});
+
+// One product by its Mongo id. Used only by the legacy redirect, which has an
+// old /iphone/:parentId/:productId URL and needs the slug to send the visitor
+// on to. Nothing else should reach for this — pages address products by slug.
+export const useProductQuery = (productId, options = {}) => useQuery({
+    queryKey: ['products', 'byId', productId],
+    queryFn: () => axiosInstance.get(`product/${productId}`).then((res) => res.data),
+    enabled: Boolean(productId),
+    ...options,
+});
+
+// The add-ons offered on every product page. Moved out of a raw useEffect so
+// the two accessories are fetched once and reused across product pages instead
+// of being refetched every time somebody opens a different phone.
+export const useAccessoriesQuery = (options = {}) => useQuery({
+    queryKey: productKeys.accessories(),
+    queryFn: () => axiosInstance.get('accessories').then((res) => res.data),
+    ...options,
+});
+
 // A product page needs two things, and neither is the whole catalogue: the
 // variants of the product being viewed (for the colour and storage pickers)
 // and a few cards to recommend. It used to read useProductsQuery for both,
