@@ -6,42 +6,78 @@ import {
     useAdminRefundRequestsQuery,
     useUpdateRefundRequestMutation,
 } from '../../../queries/refundRequests';
+import { ReturnFlags, QueueSummary, money } from './ReturnPanelKit';
+import LabelPanel from './LabelPanel';
+import InspectionPanel from './InspectionPanel';
+import RevisedOfferPanel from './RevisedOfferPanel';
+import { SettlementPanel, DispositionPanel } from './SettlementPanel';
+import ReturnsDashboard from './ReturnsDashboard';
 
 // The queue Yasir works from. Tabs are the workflow itself, in order, so
 // "what needs me next" is the same as "which tab has a number in it".
 const TABS = [
     { value: 'Submitted', label: 'New' },
-    { value: 'ReturnApproved', label: 'Awaiting return' },
+    { value: 'ReturnApproved', label: 'Needs a label' },
+    { value: 'LabelIssued', label: 'In the post' },
     { value: 'DeviceReceived', label: 'To inspect' },
-    { value: 'Approved', label: 'To pay at bank' },
-    { value: 'Refunded', label: 'Done' },
-    { value: 'Rejected', label: 'Rejected' },
+    { value: 'InInspection', label: 'Inspecting' },
+    { value: 'ActionRequired', label: 'Blocked' },
+    { value: 'RevisedOffer', label: 'Offer sent' },
+    { value: 'Approved', label: 'To pay' },
+    { value: 'Refunded', label: 'Paid' },
+    { value: 'Rejected', label: 'To send back' },
+    { value: 'ReturnShipped', label: 'Sent back' },
+    { value: 'Closed', label: 'Closed' },
 ];
 
 // What each move needs before it can be made. The server enforces these too —
 // these fields exist so staff are asked for them rather than refused after
 // filling the form in.
+// The moves a person makes by hand. Everything with a form of its own — the
+// label, the inspection, an offer, the settlement, the disposition — lives in a
+// panel below instead, because those need more than a button and a text box.
+const REJECT = {
+    status: 'Rejected', label: 'Reject', field: 'rejectionReason',
+    prompt: 'Why? The customer is told this.', required: true, danger: true,
+};
+
 const ACTIONS = {
     Submitted: [
         { status: 'ReturnApproved', label: 'Approve return', field: 'returnInstructions', prompt: 'Return instructions — this text is emailed to the customer', required: true },
-        { status: 'Rejected', label: 'Reject', field: 'rejectionReason', prompt: 'Why? The customer is told this.', required: true, danger: true },
+        REJECT,
     ],
-    ReturnApproved: [
-        { status: 'DeviceReceived', label: 'Device arrived' },
-        { status: 'Rejected', label: 'Reject', field: 'rejectionReason', prompt: 'Why? The customer is told this.', required: true, danger: true },
+    // A device can be walked in, so arrival is available from every state a
+    // parcel can be in rather than only after a carrier says delivered.
+    ReturnApproved: [{ status: 'DeviceReceived', label: 'Device arrived' }, REJECT],
+    LabelIssued: [{ status: 'DeviceReceived', label: 'Device arrived' }, REJECT],
+    InTransit: [{ status: 'DeviceReceived', label: 'Device arrived' }, REJECT],
+    Delivered: [{ status: 'DeviceReceived', label: 'Device arrived' }, REJECT],
+    DeviceReceived: [REJECT],
+    InInspection: [
+        { status: 'Approved', label: 'Approve full refund', field: 'inspectionNotes', prompt: 'What did the device look like?' },
+        REJECT,
     ],
-    DeviceReceived: [
-        { status: 'Approved', label: 'Approve refund', field: 'inspectionNotes', prompt: 'What did the device look like?' },
-        { status: 'Rejected', label: 'Reject', field: 'rejectionReason', prompt: 'Why? The customer is told this.', required: true, danger: true },
-    ],
-    Approved: [
-        { status: 'Refunded', label: 'I entered it at the bank', confirm: 'Only tick this once the amount has actually been entered in the Business Center.' },
-    ],
-    Refunded: [],
+    ActionRequired: [REJECT],
+    RevisedOffer: [],
+    Approved: [],
+    Refunded: [{ status: 'Closed', label: 'Close return' }],
     Rejected: [],
+    ReturnShipped: [{ status: 'Closed', label: 'Close return' }],
+    Closed: [],
 };
 
-const money = (value) => `$${Number(value || 0).toFixed(2)}`;
+// Which form belongs under which status. One place, so a status that gains a
+// panel does not also need the card edited.
+const PANELS = {
+    ReturnApproved: (request) => <LabelPanel request={request} />,
+    LabelIssued: (request) => <LabelPanel request={request} />,
+    DeviceReceived: (request) => <InspectionPanel request={request} />,
+    ActionRequired: (request) => <InspectionPanel request={request} />,
+    InInspection: (request) => <RevisedOfferPanel request={request} />,
+    Approved: (request) => <SettlementPanel request={request} />,
+    Refunded: (request) => <DispositionPanel request={request} />,
+    Rejected: (request) => <LabelPanel request={request} direction="outbound" />,
+};
 
 const RequestCard = ({ request, onMove, busy }) => {
     const [field, setField] = useState('');
@@ -68,12 +104,47 @@ const RequestCard = ({ request, onMove, busy }) => {
             <div className="flex flex-wrap items-baseline justify-between gap-3">
                 <div>
                     <p className="text-sm font-medium text-apple-text">{request.email}</p>
-                    <p className="mt-0.5 font-mono text-xs text-apple-gray">Order {String(request.orderId)}</p>
+                    <p className="mt-0.5 font-mono text-xs text-apple-gray">
+                        {/* The number the customer quotes and writes on the box.
+                            First, because it is what a phone call opens with. */}
+                        {request.rmaNumber ? `${request.rmaNumber} · ` : ''}
+                        Order {String(request.orderId)}
+                    </p>
                 </div>
                 <p className="text-xs text-apple-gray">{new Date(request.createdAt).toLocaleString()}</p>
             </div>
 
+            <QueueSummary queue={request.queue} />
+            <ReturnFlags flags={request.queue?.flags} />
+
             <p className="mt-3 rounded-2xl bg-surface-alt p-3 text-sm leading-6 text-ink-soft">{request.reason}</p>
+
+            {/* Where the parcel is, when there is a parcel. */}
+            {request.shipping?.inbound?.trackingNumber ? (
+                <p className="mt-2 font-mono text-xs text-apple-gray">
+                    {request.shipping.inbound.carrier} {request.shipping.inbound.trackingNumber}
+                    {request.shipping?.outbound?.trackingNumber
+                        ? ` · back: ${request.shipping.outbound.trackingNumber}`
+                        : ''}
+                </p>
+            ) : null}
+
+            {/* What was offered and what is left to answer. */}
+            {request.status === 'RevisedOffer' && request.refundBreakdown?.offeredAmount != null ? (
+                <p className="mt-2 text-xs font-semibold text-amber-700">
+                    Offered {money(request.refundBreakdown.offeredAmount)} — waiting on the customer
+                    {request.refundBreakdown.offerExpiresAt
+                        ? ` until ${new Date(request.refundBreakdown.offerExpiresAt).toLocaleDateString()}`
+                        : ''}
+                </p>
+            ) : null}
+
+            {request.disposition?.type ? (
+                <p className="mt-2 text-xs text-ink-soft">
+                    Device routed: {request.disposition.type}
+                    {request.disposition.grade ? ` · grade ${request.disposition.grade}` : ''}
+                </p>
+            ) : null}
 
             <p className="mt-3 text-xs text-apple-gray">
                 {request.itemIds?.length} item{request.itemIds?.length === 1 ? '' : 's'}
@@ -115,6 +186,8 @@ const RequestCard = ({ request, onMove, busy }) => {
                     ))}
                 </div>
             ) : null}
+
+            {PANELS[request.status] ? PANELS[request.status](request) : null}
         </div>
     );
 };
@@ -134,11 +207,15 @@ const AdminRefundRequests = () => {
     return (
         <div className="space-y-6">
             <div>
-                <h2 className="text-[28px]">Refund requests</h2>
+                <h2 className="text-[28px]">Returns</h2>
                 <p className="mt-1 text-sm text-ink-soft">
                     A refund is only paid once the device is back and has been checked.
                 </p>
             </div>
+
+            {/* Clicking a counter goes to that queue, because the number is
+                only useful as a way in. */}
+            <ReturnsDashboard onJumpTo={setTab} />
 
             <div className="flex flex-wrap gap-2">
                 {TABS.map((item) => (

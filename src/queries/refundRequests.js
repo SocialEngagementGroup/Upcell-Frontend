@@ -66,3 +66,92 @@ export const useUpdateRefundRequestMutation = () => {
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ['refundRequests', 'admin'] }),
     });
 };
+
+// The counters Yasir opens the returns page to. Refetched on an interval
+// because a device can arrive or a customer can answer an offer while the page
+// is open, and a stale "3 overdue" is worse than no number.
+export const useReturnsDashboardQuery = (options = {}) => useQuery({
+    queryKey: refundRequestKeys.dashboard(),
+    queryFn: () => axiosInstance.get('admin-returns-dashboard').then((res) => res.data),
+    refetchInterval: 60_000,
+    ...options,
+});
+
+// The inspection checklist and the disposition list come from the server so
+// the options on screen and the ones it accepts are one list. They only change
+// when the code does, so they are cached for the session rather than refetched.
+const STATIC_LIST_OPTIONS = {
+    staleTime: Infinity,
+    gcTime: Infinity,
+    refetchOnMount: false,
+};
+
+export const useInspectionChecklistQuery = (options = {}) => useQuery({
+    queryKey: refundRequestKeys.checklist(),
+    queryFn: () => axiosInstance.get('admin-return-inspection-checklist').then((res) => res.data),
+    ...STATIC_LIST_OPTIONS,
+    ...options,
+});
+
+export const useDispositionsQuery = (options = {}) => useQuery({
+    queryKey: refundRequestKeys.dispositions(),
+    queryFn: () => axiosInstance.get('admin-return-dispositions').then((res) => res.data),
+    ...STATIC_LIST_OPTIONS,
+    ...options,
+});
+
+export const useShipBackQueueQuery = (options = {}) => useQuery({
+    queryKey: refundRequestKeys.shipBacks(),
+    queryFn: () => axiosInstance.get('admin-return-ship-backs').then((res) => res.data),
+    ...options,
+});
+
+export const useReturnsReportQuery = (filters = {}, options = {}) => useQuery({
+    queryKey: refundRequestKeys.report(filters),
+    queryFn: () => axiosInstance
+        .get('admin-returns-report', { params: filters })
+        .then((res) => res.data),
+    // Changing a filter is a different question, not a reason to blank the
+    // page — the previous answer stays up while the new one loads.
+    placeholderData: (previous) => previous,
+    ...options,
+});
+
+// Every write below moves a request between queues, so all of them invalidate
+// the whole admin tree rather than one status. A request that just left
+// "To inspect" has to disappear from it, and the dashboard counters change too.
+const invalidateReturns = (queryClient) => {
+    queryClient.invalidateQueries({ queryKey: ['refundRequests', 'admin'] });
+    queryClient.invalidateQueries({ queryKey: refundRequestKeys.dashboard() });
+    queryClient.invalidateQueries({ queryKey: refundRequestKeys.shipBacks() });
+};
+
+const adminMutation = (path, method = 'patch') => () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ id, ...body }) => axiosInstance[method](
+            `admin-refund-requests/${id}/${path}`,
+            body
+        ).then((res) => res.data),
+        onSuccess: () => invalidateReturns(queryClient),
+    });
+};
+
+export const useRecordLabelMutation = adminMutation('label');
+export const useSubmitInspectionMutation = adminMutation('inspection');
+export const useOfferRevisedRefundMutation = adminMutation('revised-offer');
+export const useSettleReturnMutation = adminMutation('settle');
+export const useShipBackMutation = adminMutation('ship-back');
+export const useMarkUndeliverableMutation = adminMutation('undeliverable');
+export const useRecordDispositionMutation = adminMutation('disposition');
+
+// Finding a parcel on the receiving bench by RMA or tracking number.
+//
+// A lookup rather than a search-as-you-type: staff read a number off a box, and
+// firing a request per keystroke against an unindexed prefix would be slower
+// and noisier than pressing enter.
+export const useReturnLookup = () => useMutation({
+    mutationFn: (q) => axiosInstance
+        .get('admin-refund-requests/lookup', { params: { q } })
+        .then((res) => res.data),
+});

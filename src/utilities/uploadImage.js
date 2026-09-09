@@ -16,7 +16,7 @@ import axiosInstance from './axiosInstance';
 // because there was no public_id to build a delivery URL from, and every page
 // that listed products paid for it. A publicId is a few dozen bytes and can be
 // asked for at any width.
-export const uploadProductImage = async (file, { productName = '' } = {}) => {
+export const uploadProductImage = async (file, { productName = '', target = 'product' } = {}) => {
     const baseName = file.name.replace(/\.[^.]+$/, '');
 
     // sourceKey decides the hash suffix on the public_id, and the same key
@@ -25,7 +25,10 @@ export const uploadProductImage = async (file, { productName = '' } = {}) => {
     // near-duplicate behind, while a genuinely different photo for the same
     // product gets its own id instead of silently replacing the first.
     const { data: signature } = await axiosInstance.post('uploads/signature', {
-        target: 'product',
+        // Which allowlisted folder this belongs in. Inspection photos are
+        // records rather than marketing — deleted on a schedule and never
+        // rendered on the site — so they are kept out of the product tree.
+        target,
         context: productName,
         parts: [productName, baseName],
         sourceKey: `${productName}|${file.name}|${file.size}|${file.lastModified}`,

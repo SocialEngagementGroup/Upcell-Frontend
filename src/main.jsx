@@ -45,6 +45,8 @@ const JournalPost = lazy(() => import('./pages/Auxiliary/Resources/JournalPost.j
 const NotFound = lazy(() => import('./pages/NotFound/NotFound.jsx'));
 const AdminTradeIn = lazy(() => import('./pages/Admin/TradeIn/AdminTradeIn.jsx'));
 const AdminRefundRequests = lazy(() => import('./pages/Admin/RefundRequests/AdminRefundRequests.jsx'));
+const ReceivingDesk = lazy(() => import('./pages/Admin/RefundRequests/ReceivingDesk.jsx'));
+const ReturnsReport = lazy(() => import('./pages/Admin/RefundRequests/ReturnsReport.jsx'));
 const LegacyProductRedirect = lazy(() => import('./pages/ProductDetail/LegacyProductRedirect.jsx'));
 const SingleTradeInPage = lazy(() => import('./pages/Admin/TradeIn/SingleTradeInPage.jsx'));
 const AdminNewsletter = lazy(() => import('./pages/Admin/Newsletter/AdminNewsletter.jsx'));
@@ -181,6 +183,16 @@ const router = createBrowserRouter([
           {
             path: "refund-requests",
             element: lazyElement(<AdminRefundRequests />),
+          },
+          {
+            // The bench, kept apart from the queue: somebody unpacking parcels
+            // wants one box to type into, not twelve tabs.
+            path: "receiving",
+            element: lazyElement(<ReceivingDesk />),
+          },
+          {
+            path: "returns-report",
+            element: lazyElement(<ReturnsReport />),
           },
           {
             path: "trade-in",

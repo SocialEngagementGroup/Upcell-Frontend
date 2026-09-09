@@ -52,6 +52,15 @@ export const refundRequestKeys = {
         ['refundRequests', 'refundable', orderId, reasonCode, [...itemIds].sort().join(',')],
     mine: () => ['refundRequests', 'mine'],
     adminList: (status) => ['refundRequests', 'admin', status],
+    // The counters at the top of the returns dashboard.
+    dashboard: () => ['refundRequests', 'dashboard'],
+    // Devices waiting to go back, and ones that came back undelivered.
+    shipBacks: () => ['refundRequests', 'shipBacks'],
+    // The fixed lists the server owns: the inspection checklist and the
+    // dispositions. Cached hard because they only change when the code does.
+    checklist: () => ['refundRequests', 'checklist'],
+    dispositions: () => ['refundRequests', 'dispositions'],
+    report: (filters = {}) => ['refundRequests', 'report', filters],
 };
 
 export const notificationKeys = {
