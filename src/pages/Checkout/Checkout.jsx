@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { CartContext } from '../../App';
+import { userContext } from '../../utilities/UserContextProvider';
 import ScrollToTop from '../../utilities/ScrollToTop';
 import axiosInstance from '../../utilities/axiosInstance';
 import visa from '../../assets/visa.svg';
@@ -42,6 +43,9 @@ const CHECKOUT_RULES = {
 const Checkout = () => {
     const params = useParams();
     const { cart } = useContext(CartContext);
+    // Only to decide whether to offer the sign-in shortcut. Checkout works
+    // either way — the form collects everything it needs on its own.
+    const { user } = useContext(userContext);
     const [products, setProducts] = useState([]);
     const [fieldErrors, setFieldErrors] = useState({});
     const [touched, setTouched] = useState({});
@@ -241,6 +245,18 @@ const Checkout = () => {
                             <section>
                                 <h3 className="text-[28px]">Contact information</h3>
                                 <div className="mt-5 grid gap-4 md:grid-cols-2">
+                                    {/* An offer, not a barrier. Checkout used to be behind
+                                        PrivateRoute, which made an account the price of
+                                        buying anything — and the account unlocked nothing
+                                        but the order they were already placing. */}
+                                    {!user ? (
+                                        <p className="mb-4 rounded-[18px] bg-surface-alt px-4 py-3 text-sm text-ink-soft">
+                                            <Link to="/login" className="font-bold text-apple-text underline underline-offset-2">Sign in</Link>
+                                            {' '}for faster checkout, or just carry on — we will email your receipt
+                                            with a link to your order.
+                                        </p>
+                                    ) : null}
+
                                     <FormField id="checkout-email" label="Email address" error={fieldErrors.email} touched={touched.email}>
                                         {(fp) => (
                                             <input {...fp} type="text" inputMode="email" autoComplete="email" name="email"

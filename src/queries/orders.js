@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axiosInstance from '../utilities/axiosInstance';
-import { taxKeys } from './keys';
+import { orderKeys, taxKeys } from './keys';
 
 // What a page quotes for the instant before the rate arrives, and if the
 // request fails. The same 8% the server falls back to, so the two never
@@ -36,6 +36,33 @@ export const useRecordShipmentMutation = () => {
         mutationFn: ({ id, ...body }) => axiosInstance
             .patch(`admin-orders/${id}/shipment`, body)
             .then((res) => res.data),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['orders'] }),
+    });
+};
+
+// A guest's own order, opened from the link in their receipt.
+//
+// No auth: the token in the link is the authorisation and it grants exactly
+// this one order. A wrong token, an expired one and an unknown id all answer
+// 404, so retrying is pointless and would only help somebody guessing.
+export const useGuestOrderQuery = (id, token) => useQuery({
+    queryKey: orderKeys.guest(id),
+    queryFn: () => axiosInstance.get(`order/${id}`, { params: { t: token } }).then((res) => res.data),
+    enabled: Boolean(id && token),
+    retry: false,
+    refetchOnWindowFocus: false,
+});
+
+// Asking for a fresh link after losing the receipt.
+export const useRequestOrderLinkMutation = () => useMutation({
+    mutationFn: (body) => axiosInstance.post('track-order', body).then((res) => res.data),
+});
+
+// Attaching guest orders to an account, once, after signing in.
+export const useClaimGuestOrdersMutation = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: () => axiosInstance.post('orders/claim').then((res) => res.data),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ['orders'] }),
     });
 };

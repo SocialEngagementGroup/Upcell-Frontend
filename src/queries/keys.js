@@ -42,6 +42,11 @@ export const categoryKeys = {
 };
 
 // The shop's sales tax rate. One number, quoted on every price.
+// One guest order, read from an emailed link.
+export const orderKeys = {
+    guest: (id) => ['orders', 'guest', id],
+};
+
 export const taxKeys = {
     rate: () => ['tax', 'rate'],
 };

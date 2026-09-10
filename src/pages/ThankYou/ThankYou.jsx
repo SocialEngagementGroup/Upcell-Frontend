@@ -87,6 +87,7 @@ const storedTotals = (order) => {
 const ThankYou = () => {
     const orderId = new URLSearchParams(window.location.search).get('order_id');
     const [order, setOrder] = useState(null);
+    const [unavailable, setUnavailable] = useState(false);
     const { setCart } = useContext(CartContext);
     // The real accessories, from the same query the product page uses. This
     // block used to be two hardcoded entries — an AirPods Pro at $249 and a
@@ -105,7 +106,13 @@ const ThankYou = () => {
         setCart([]);
         axiosInstance.get(`order/${orderId}`)
             .then((res) => setOrder(res.data))
-            .catch((error) => console.log(error));
+            // A guest gets a 404 here, and that is correct: this page has no
+            // token, and the token cannot be handed over in the bank's
+            // redirect because it is minted when the receipt is sent — a
+            // different request that runs whenever the bank gets round to it.
+            // So the page shows the confirmation it already knows and points
+            // at the email, rather than treating an expected 404 as a fault.
+            .catch(() => setUnavailable(true));
     }, [orderId]);
     // Every figure here is read from the order, never recomputed.
     //
@@ -185,6 +192,19 @@ const ThankYou = () => {
                             <div className="flex justify-between"><span>Shipping</span><strong className="text-apple-text">{totals.shippingCents === 0 ? 'Free' : money(totals.shippingCents)}</strong></div>
                             <div className="flex justify-between border-t border-black/[0.06] pt-4 text-base"><span className="font-bold text-apple-text">Total charged</span><strong className="text-2xl text-apple-text">{money(totals.totalCents)}</strong></div>
                         </div>
+
+                        {/* A guest has no account page. The receipt email is
+                            their way back to this order, so say so here rather
+                            than let them find out by looking for it. */}
+                        {unavailable ? (
+                            <p className="mt-6 rounded-[20px] bg-surface-alt p-4 text-sm leading-6 text-ink-soft">
+                                We have emailed your receipt with a link to this order — that link is how
+                                you get back to it. Lost it?{' '}
+                                <Link to="/track-order" className="font-bold text-apple-text underline underline-offset-2">
+                                    We will send a new one
+                                </Link>.
+                            </p>
+                        ) : null}
 
                         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4">
                             <Link to="/shop" className="premium-button w-full sm:w-auto">Continue shopping</Link>

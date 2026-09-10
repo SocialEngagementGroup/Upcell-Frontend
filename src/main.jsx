@@ -42,6 +42,8 @@ const AboutUs = lazy(() => import('./pages/Legal/AboutUs/AboutUs.jsx'));
 const ThankYou = lazy(() => import('./pages/ThankYou/ThankYou.jsx'));
 const ContactThankYou = lazy(() => import('./pages/ThankYou/ContactThankYou.jsx'));
 const JournalPost = lazy(() => import('./pages/Auxiliary/Resources/JournalPost.jsx'));
+const GuestOrder = lazy(() => import('./pages/OrderLookup/GuestOrder.jsx'));
+const TrackOrder = lazy(() => import('./pages/OrderLookup/TrackOrder.jsx'));
 const OfferResponse = lazy(() => import('./pages/Returns/OfferResponse.jsx'));
 const NotFound = lazy(() => import('./pages/NotFound/NotFound.jsx'));
 const AdminTradeIn = lazy(() => import('./pages/Admin/TradeIn/AdminTradeIn.jsx'));
@@ -98,7 +100,11 @@ const router = createBrowserRouter([
       },
       {
         path: "checkout/:id",
-        element: lazyElement(<PrivateRoute><Checkout /></PrivateRoute>),
+        // No PrivateRoute. Requiring an account to buy a phone was the biggest
+        // thing between a visitor and a sale, and the account it forced them
+        // to make unlocked nothing but the order they were already placing.
+        // /myaccount keeps its guard — that one is an account.
+        element: lazyElement(<Checkout />),
       },
       {
         path: "login",
@@ -155,6 +161,17 @@ const router = createBrowserRouter([
       {
         path: "trade-in",
         element: lazyElement(<TradeIn />),
+      },
+      {
+        // A guest's own order, from the link in their receipt. No guard: the
+        // token in the link is the authorisation.
+        path: "order/:id",
+        element: lazyElement(<GuestOrder />),
+      },
+      {
+        // Getting a fresh link after deleting the receipt.
+        path: "track-order",
+        element: lazyElement(<TrackOrder />),
       },
       {
         // Where the revised-offer email lands. No PrivateRoute: the token in
