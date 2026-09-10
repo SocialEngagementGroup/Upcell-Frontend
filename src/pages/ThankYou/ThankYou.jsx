@@ -5,16 +5,35 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import LocalShippingOutlinedIcon from '@mui/icons-material/LocalShippingOutlined';
 import axiosInstance from '../../utilities/axiosInstance';
 import { CartContext } from '../../App';
+import { useAccessoriesQuery } from '../../queries/products';
+import { resolveProductImage } from '../../utilities/productImages';
+import { STATIC_IMAGES, staticImageUrl } from '../../constants/staticImages';
 
-const accessories = [
-    { name: 'AirPods Pro (2nd Gen)', desc: 'Noise cancellation and effortless pairing.', price: 249.0, image: 'https://via.placeholder.com/200x200?text=AirPods' },
-    { name: 'MagSafe Charger', desc: 'Clean, fast, dependable charging.', price: 39.0, image: 'https://via.placeholder.com/200x200?text=Charger' },
-];
+// A module-level constant, not a literal in the destructure: a fresh [] on
+// every render is a new reference and re-runs everything downstream of it.
+const EMPTY_ACCESSORIES = [];
+
+// Both accessories still point at /product-images/accessories/*.png — files
+// that were never uploaded to Cloudinary and no longer exist in public/. Any
+// dead URL lands here rather than showing the browser's broken-image icon,
+// and it keeps working for whatever the catalogue holds next.
+const showPlaceholder = (event) => {
+    if (event.currentTarget.dataset.fallback) return;
+    event.currentTarget.dataset.fallback = 'true';
+    event.currentTarget.src = staticImageUrl(STATIC_IMAGES.NOT_AVAILABLE, 200);
+};
 
 const ThankYou = () => {
     const orderId = new URLSearchParams(window.location.search).get('order_id');
     const [order, setOrder] = useState(null);
     const { setCart } = useContext(CartContext);
+    // The real accessories, from the same query the product page uses. This
+    // block used to be two hardcoded entries — an AirPods Pro at $249 and a
+    // MagSafe charger at $39 — with images from via.placeholder.com. Neither
+    // was a UpCell listing, the prices were invented, and the placeholder
+    // service is not in the site's CSP, so both pictures were blocked and the
+    // section rendered as two broken images under a heading.
+    const { data: accessories = EMPTY_ACCESSORIES } = useAccessoriesQuery();
 
     useEffect(() => {
         if (!orderId) return;
@@ -109,18 +128,28 @@ const ThankYou = () => {
                             <h3 className="text-[28px]">Delivery note</h3>
                             <p className="mt-3 text-base leading-8 text-ink-soft">Tracking will be available once the shipment is created. Priority orders move first when selected.</p>
                         </div>
-                        <div className="premium-card rounded-[32px] p-6">
+                        <div className={`premium-card rounded-[32px] p-6 ${accessories.length ? '' : 'hidden'}`}>
                             <h3 className="text-[28px]">Complete the setup</h3>
                             <div className="mt-5 space-y-4">
                                 {accessories.map((item) => (
-                                    <div key={item.name} className="rounded-[24px] bg-surface-alt p-4">
+                                    <Link
+                                        key={item._id}
+                                        to={`/product/${item.slug}`}
+                                        className="block rounded-[24px] bg-surface-alt p-4 transition-colors hover:bg-black/[0.04]"
+                                    >
                                         <div className="flex h-24 items-center justify-center rounded-[18px] bg-white">
-                                            <img src={item.image} alt={item.name} className="max-h-[75%] w-auto object-contain" />
+                                            <img
+                                                src={resolveProductImage(item, { width: 200 }) || staticImageUrl(STATIC_IMAGES.NOT_AVAILABLE, 200)}
+                                                onError={showPlaceholder}
+                                                alt={item.productName}
+                                                loading="lazy"
+                                                className="max-h-[75%] w-auto object-contain"
+                                            />
                                         </div>
-                                        <div className="mt-4 font-bold text-apple-text">{item.name}</div>
-                                        <div className="mt-1 text-sm text-ink-soft">{item.desc}</div>
-                                        <div className="mt-3 text-lg font-extrabold text-apple-text">${item.price.toFixed(2)}</div>
-                                    </div>
+                                        <div className="mt-4 font-bold text-apple-text">{item.productName}</div>
+                                        <div className="mt-1 text-sm text-ink-soft">{item.description}</div>
+                                        <div className="mt-3 text-lg font-extrabold text-apple-text">${Number(item.price).toFixed(2)}</div>
+                                    </Link>
                                 ))}
                             </div>
                         </div>

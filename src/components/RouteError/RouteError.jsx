@@ -4,12 +4,56 @@ import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined
 
 // Branded fallback shown if a route ever throws, instead of react-router's
 // default "Unexpected Application Error" screen.
+// A page's JavaScript is split into a chunk named by content hash, so a deploy
+// renames every one of them. A tab left open across a deploy still holds the
+// old names, and the request for a chunk that no longer exists comes back as
+// index.html — which the browser refuses to run as a module. The message is
+// about a MIME type and says nothing about the real cause, which is simply an
+// out-of-date page.
+const isStaleChunk = (error) => /dynamically imported module|Importing a module script failed|Failed to fetch dynamically/i
+    .test(String(error?.message || error));
+
+// Reloading fetches a fresh index.html with the new names.
+//
+// Guarded by a timestamp rather than a plain flag: a flag that is never
+// cleared means the second deploy of the day stops recovering, and one that
+// is cleared on success is cleared by the reload itself. Two failures inside
+// the window is a real error and falls through to the page below; a failure
+// long after the last reload gets its own attempt.
+const RELOAD_KEY = 'upcell:chunk-reload';
+const RELOAD_WINDOW_MS = 15000;
+
+// Storage throws outright in some privacy modes, and a crash inside the error
+// screen leaves the user with a blank page instead of a bad one.
+const recentlyReloaded = () => {
+    try {
+        const last = Number(sessionStorage.getItem(RELOAD_KEY));
+        return Number.isFinite(last) && Date.now() - last < RELOAD_WINDOW_MS;
+    } catch {
+        return true;
+    }
+};
+
+const rememberReload = () => {
+    try {
+        sessionStorage.setItem(RELOAD_KEY, String(Date.now()));
+        return true;
+    } catch {
+        return false;
+    }
+};
+
 const RouteError = () => {
     const error = useRouteError();
 
     if (import.meta.env.DEV && error) {
         // Surface details in dev only.
         console.error('Route error:', error);
+    }
+
+    if (isStaleChunk(error) && !recentlyReloaded() && rememberReload()) {
+        window.location.reload();
+        return null;
     }
 
     return (
