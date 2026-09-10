@@ -19,13 +19,6 @@ const invalidateProductData = (queryClient) => {
 // selector and produces a brand-new array every render, forever.
 const selectNormalizedProducts = (products) => products.map(normalizeProduct);
 
-export const useProductsQuery = (options = {}) => useQuery({
-    queryKey: productKeys.list(),
-    queryFn: () => axiosInstance.get('product').then((res) => res.data),
-    select: selectNormalizedProducts,
-    ...options,
-});
-
 // The shop page's data source. Same normalization as useProductsQuery
 // (family inference, image resolution, color fallback), but backed by
 // /products/shop — which returns only the fields a listing card needs
