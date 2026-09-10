@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axiosInstance from '../utilities/axiosInstance';
 import { taxKeys } from './keys';
 
@@ -24,3 +24,18 @@ export const useTaxRateQuery = (options = {}) => useQuery({
     placeholderData: (previous) => previous,
     ...options,
 });
+
+// Marking an order shipped, and correcting the number afterwards.
+//
+// Invalidates every admin order list rather than one: the order leaves the
+// queue it was in and joins Shipped, so the tab that was open is stale either
+// way.
+export const useRecordShipmentMutation = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ id, ...body }) => axiosInstance
+            .patch(`admin-orders/${id}/shipment`, body)
+            .then((res) => res.data),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['orders'] }),
+    });
+};

@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { TOAST_ICONS } from '../../../../utilities/toastIcons';
 import { ORDER_STATUS_OPTIONS, orderStatusLabel, paymentDisplay } from "../../../../constants/orderStatus";
 import RefundPanel from "./RefundPanel";
+import ShipPanel from "./ShipPanel";
 
 const SingleAdminOrder = ({ order, onStatusChanged }) => {
     const { line_items, name, email, phone, city, postal, street, country, shipping, paid, status, createdAt, updatedAt, boaTransactionId, cardBrand, cardLast4 } = order;
@@ -120,6 +121,10 @@ const SingleAdminOrder = ({ order, onStatusChanged }) => {
                                 <p>Country: <strong className="text-apple-text">{country}</strong></p>
                             </div>
                         </div>
+
+                        {/* Shipping first: it is what happens to most orders,
+                            and a refund is the exception. */}
+                        <ShipPanel order={order} onShipped={onStatusChanged} />
 
                         <RefundPanel order={order} onRefunded={onStatusChanged} />
                     </div>

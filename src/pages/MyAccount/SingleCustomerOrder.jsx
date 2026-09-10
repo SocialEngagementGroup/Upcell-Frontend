@@ -100,6 +100,39 @@ const SingleCustomerOrder = ({ order }) => {
                         <img className="mt-5 max-w-full" ref={barcodeRef} alt="order barcode" />
                     </div>
 
+                    {/* Where the parcel is. Shown above the address, because
+                        once an order has shipped this is the only part of this
+                        card anybody opens it to read. */}
+                    {order.fulfilment?.trackingNumber ? (
+                        <div className="mb-5 rounded-[28px] border border-black/[0.08] bg-white p-5">
+                            <h4 className="text-[20px] font-extrabold text-apple-text">On its way</h4>
+                            <p className="mt-2 text-sm text-ink-soft">
+                                {order.fulfilment.carrier} · <span className="font-mono">{order.fulfilment.trackingNumber}</span>
+                            </p>
+                            {order.shippedAt ? (
+                                <p className="mt-1 text-xs text-apple-gray">
+                                    Shipped {new Date(order.shippedAt).toLocaleDateString()}
+                                </p>
+                            ) : null}
+                            {order.fulfilment.trackingUrl ? (
+                                <a
+                                    href={order.fulfilment.trackingUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="premium-button mt-4 inline-block px-5 py-2.5 text-sm"
+                                >
+                                    Track this parcel
+                                </a>
+                            ) : (
+                                // No link for a carrier we have no page for. The
+                                // number on its own still works anywhere.
+                                <p className="mt-3 text-xs text-ink-soft">
+                                    Track it with {order.fulfilment.carrier} using the number above.
+                                </p>
+                            )}
+                        </div>
+                    ) : null}
+
                     <div className="rounded-[28px] bg-surface-alt p-5">
                         <h4 className="mb-4 text-[24px]">Shipping information</h4>
                         <div className="space-y-2 text-sm text-ink-soft">
