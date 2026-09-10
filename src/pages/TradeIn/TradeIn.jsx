@@ -30,67 +30,15 @@ const androidBrandOptions = [
     { id: 'AndroidOther', title: 'Other Brand', desc: "Different brand or model? Tell us about it and our team will reach out with an offer.", icon: AndroidIcon },
 ];
 
-const modelOptions = {
-    'iPhone': [
-        { id: 'iphone16promax', title: 'iPhone 16 Pro Max' },
-        { id: 'iphone16pro', title: 'iPhone 16 Pro' },
-        { id: 'iphone16plus', title: 'iPhone 16 Plus' },
-        { id: 'iphone16', title: 'iPhone 16' },
-        { id: 'iphone15promax', title: 'iPhone 15 Pro Max' },
-        { id: 'iphone15pro', title: 'iPhone 15 Pro' },
-        { id: 'iphone15plus', title: 'iPhone 15 Plus' },
-        { id: 'iphone15', title: 'iPhone 15' },
-        { id: 'iphone14promax', title: 'iPhone 14 Pro Max' },
-        { id: 'iphone14pro', title: 'iPhone 14 Pro' },
-        { id: 'iphone14', title: 'iPhone 14' },
-        { id: 'iphone13pro', title: 'iPhone 13 Pro' },
-        { id: 'iphone13', title: 'iPhone 13' },
-        { id: 'iphone12pro', title: 'iPhone 12 Pro' },
-        { id: 'iphone12', title: 'iPhone 12' },
-        { id: 'iphone11', title: 'iPhone 11' },
-    ],
-    'iPad': [
-        { id: 'ipadprom4', title: 'iPad Pro M4' },
-        { id: 'ipadpro12', title: 'iPad Pro 12.9-inch' },
-        { id: 'ipadpro11', title: 'iPad Pro 11-inch' },
-        { id: 'ipadairm2', title: 'iPad Air M2' },
-        { id: 'ipadair5', title: 'iPad Air (5th Gen)' },
-        { id: 'ipadmini6', title: 'iPad mini (6th Gen)' },
-        { id: 'ipad10', title: 'iPad (10th Gen)' },
-        { id: 'ipad9', title: 'iPad (9th Gen)' },
-    ],
-    'MacBook': [
-        { id: 'mbp16m3', title: 'MacBook Pro 16" M3' },
-        { id: 'mbp14m3', title: 'MacBook Pro 14" M3' },
-        { id: 'mbp16m2', title: 'MacBook Pro 16" M2' },
-        { id: 'mbp14m2', title: 'MacBook Pro 14" M2' },
-        { id: 'mba15m3', title: 'MacBook Air 15" M3' },
-        { id: 'mba13m3', title: 'MacBook Air 13" M3' },
-        { id: 'mba15m2', title: 'MacBook Air 15" M2' },
-        { id: 'mba13m2', title: 'MacBook Air 13" M2' },
-    ],
-    'Samsung': [
-        { id: 's25ultra', title: 'Galaxy S25 Ultra' },
-        { id: 's25plus', title: 'Galaxy S25+' },
-        { id: 's25', title: 'Galaxy S25' },
-        { id: 's24ultra', title: 'Galaxy S24 Ultra' },
-        { id: 's24plus', title: 'Galaxy S24+' },
-        { id: 's24', title: 'Galaxy S24' },
-        { id: 's23ultra', title: 'Galaxy S23 Ultra' },
-        { id: 's23plus', title: 'Galaxy S23+' },
-        { id: 's23', title: 'Galaxy S23' },
-        { id: 's22ultra', title: 'Galaxy S22 Ultra' },
-    ],
-    'Google': [
-        { id: 'pixel9proxl', title: 'Pixel 9 Pro XL' },
-        { id: 'pixel9pro', title: 'Pixel 9 Pro' },
-        { id: 'pixel9', title: 'Pixel 9' },
-        { id: 'pixel9a', title: 'Pixel 9a' },
-        { id: 'pixel8pro', title: 'Pixel 8 Pro' },
-        { id: 'pixel8', title: 'Pixel 8' },
-        { id: 'pixel8a', title: 'Pixel 8a' },
-    ],
-};
+// The models come from GET /trade-in-catalog. This was a fourth table in the
+// page's bundle, and the one that had to be edited every time UpCell started
+// or stopped quoting for a device — a deploy to add a phone.
+//
+// carrierOptions and storageOptions below stay: they are what the *form*
+// offers, and the catalogue reports what each model is priced for, which is
+// not the same list. A model with no 1TB price should still show 1TB as a
+// choice; it is quoted at the base price, not hidden.
+
 
 const carrierOptions = {
     'iPhone': [
@@ -126,122 +74,23 @@ const storageOptions = {
     'Google': ['128GB', '256GB', '512GB', '1TB'],
 };
 
-const conditionQuestions = {
-    'iPhone': [
-        { id: 'powersOn', question: 'Does the device power on and hold a charge?', yes: 'Yes, it powers on normally', no: 'No, it won\'t turn on' },
-        { id: 'functional', question: 'Is the device fully functional?', subtitle: 'All buttons, touch, Face ID, cameras, and speakers work normally.', yes: 'Yes, everything works', no: 'No, something is broken' },
-        { id: 'cracked', question: 'Are the front and back glass free of cracks?', yes: 'Yes, no cracks', no: 'No, there are cracks' },
-        { id: 'screenCondition', question: 'What best describes the screen condition?', options: [
-            { id: 'flawless', title: 'Flawless', desc: 'No visible scratches or marks on the display.' },
-            { id: 'good', title: 'Good', desc: 'Minor scratches only visible when screen is off.' },
-            { id: 'fair', title: 'Fair', desc: 'Noticeable scratches visible during regular use.' },
-        ]},
-        { id: 'bodyCondition', question: 'What best describes the body condition?', options: [
-            { id: 'flawless', title: 'Like New', desc: 'No visible wear on the frame or back glass.' },
-            { id: 'good', title: 'Good', desc: 'Minor cosmetic marks that don\'t affect function.' },
-            { id: 'fair', title: 'Fair', desc: 'Noticeable dents, scratches, or marks on the body.' },
-        ]},
-    ],
-    'iPad': [
-        { id: 'powersOn', question: 'Does the device power on and hold a charge?', yes: 'Yes, it powers on normally', no: 'No, it won\'t turn on' },
-        { id: 'functional', question: 'Is the device fully functional?', subtitle: 'Touch, cameras, buttons, and speakers all work properly.', yes: 'Yes, everything works', no: 'No, something is broken' },
-        { id: 'cracked', question: 'Is the screen free of cracks?', yes: 'Yes, no cracks', no: 'No, there are cracks' },
-        { id: 'screenCondition', question: 'What best describes the screen condition?', options: [
-            { id: 'flawless', title: 'Flawless', desc: 'No visible scratches.' },
-            { id: 'good', title: 'Good', desc: 'Minor scratches only visible when screen is off.' },
-            { id: 'fair', title: 'Fair', desc: 'Noticeable scratches visible during use.' },
-        ]},
-    ],
-    'MacBook': [
-        { id: 'powersOn', question: 'Does the MacBook power on and hold a charge?', yes: 'Yes, it powers on normally', no: 'No, it won\'t turn on' },
-        { id: 'functional', question: 'Is the MacBook fully functional?', subtitle: 'Keyboard, trackpad, display, ports, and speakers all work properly.', yes: 'Yes, everything works', no: 'No, something is broken' },
-        { id: 'screenCondition', question: 'What best describes the overall condition?', options: [
-            { id: 'flawless', title: 'Like New', desc: 'No visible scratches, dents, or marks.' },
-            { id: 'good', title: 'Good', desc: 'Minor cosmetic wear that doesn\'t affect use.' },
-            { id: 'fair', title: 'Fair', desc: 'Visible wear, small dents, or noticeable scratches.' },
-        ]},
-    ],
-    'Samsung': [
-        { id: 'powersOn', question: 'Does the device power on and hold a charge?', yes: 'Yes, it powers on normally', no: 'No, it won\'t turn on' },
-        { id: 'functional', question: 'Is the device fully functional?', subtitle: 'All buttons, touch, fingerprint/face unlock, cameras, and speakers work normally.', yes: 'Yes, everything works', no: 'No, something is broken' },
-        { id: 'cracked', question: 'Are the front and back glass free of cracks?', yes: 'Yes, no cracks', no: 'No, there are cracks' },
-        { id: 'screenCondition', question: 'What best describes the screen condition?', options: [
-            { id: 'flawless', title: 'Flawless', desc: 'No visible scratches or marks on the display.' },
-            { id: 'good', title: 'Good', desc: 'Minor scratches only visible when screen is off.' },
-            { id: 'fair', title: 'Fair', desc: 'Noticeable scratches visible during regular use.' },
-        ]},
-        { id: 'bodyCondition', question: 'What best describes the body condition?', options: [
-            { id: 'flawless', title: 'Like New', desc: 'No visible wear on the frame or back glass.' },
-            { id: 'good', title: 'Good', desc: 'Minor cosmetic marks that don\'t affect function.' },
-            { id: 'fair', title: 'Fair', desc: 'Noticeable dents, scratches, or marks on the body.' },
-        ]},
-    ],
-    'Google': [
-        { id: 'powersOn', question: 'Does the device power on and hold a charge?', yes: 'Yes, it powers on normally', no: 'No, it won\'t turn on' },
-        { id: 'functional', question: 'Is the device fully functional?', subtitle: 'All buttons, touch, fingerprint/face unlock, cameras, and speakers work normally.', yes: 'Yes, everything works', no: 'No, something is broken' },
-        { id: 'cracked', question: 'Are the front and back glass free of cracks?', yes: 'Yes, no cracks', no: 'No, there are cracks' },
-        { id: 'screenCondition', question: 'What best describes the screen condition?', options: [
-            { id: 'flawless', title: 'Flawless', desc: 'No visible scratches or marks on the display.' },
-            { id: 'good', title: 'Good', desc: 'Minor scratches only visible when screen is off.' },
-            { id: 'fair', title: 'Fair', desc: 'Noticeable scratches visible during regular use.' },
-        ]},
-        { id: 'bodyCondition', question: 'What best describes the body condition?', options: [
-            { id: 'flawless', title: 'Like New', desc: 'No visible wear on the frame or back glass.' },
-            { id: 'good', title: 'Good', desc: 'Minor cosmetic marks that don\'t affect function.' },
-            { id: 'fair', title: 'Fair', desc: 'Noticeable dents, scratches, or marks on the body.' },
-        ]},
-    ],
-};
+// The condition questions come from GET /trade-in-catalog, with the price
+// each answer carries left behind on the server. The page needs to know what
+// to ask; it does not need to know that a cracked screen costs half.
 
-/* ───────────── PRICING LOGIC ───────────── */
 
-const basePrices = {
-    'iphone16promax': 820, 'iphone16pro': 720, 'iphone16plus': 580, 'iphone16': 510,
-    'iphone15promax': 680, 'iphone15pro': 590, 'iphone15plus': 470, 'iphone15': 400,
-    'iphone14promax': 520, 'iphone14pro': 440, 'iphone14': 310,
-    'iphone13pro': 360, 'iphone13': 250, 'iphone12pro': 270, 'iphone12': 190, 'iphone11': 120,
-    'ipadprom4': 680, 'ipadpro12': 520, 'ipadpro11': 430, 'ipadairm2': 400,
-    'ipadair5': 320, 'ipadmini6': 260, 'ipad10': 210, 'ipad9': 140,
-    'mbp16m3': 1250, 'mbp14m3': 1050, 'mbp16m2': 980, 'mbp14m2': 820,
-    'mba15m3': 780, 'mba13m3': 650, 'mba15m2': 620, 'mba13m2': 520,
-    's25ultra': 850, 's25plus': 620, 's25': 520,
-    's24ultra': 700, 's24plus': 520, 's24': 440,
-    's23ultra': 540, 's23plus': 380, 's23': 320,
-    's22ultra': 360,
-    'pixel9proxl': 720, 'pixel9pro': 620, 'pixel9': 480, 'pixel9a': 340,
-    'pixel8pro': 480, 'pixel8': 360, 'pixel8a': 280,
-};
+/* ───────────── PRICING ─────────────
 
-const storageMultiplier = { '64GB': 0.85, '128GB': 1.0, '256GB': 1.12, '512GB': 1.25, '1TB': 1.45, '2TB': 1.65 };
+    There is none here any more.
 
-function calculateEstimate(selection) {
-    const base = basePrices[selection.model] || 0;
-    if (!base) return null;
+    basePrices, storageMultiplier and calculateEstimate used to live at this
+    spot: 49 prices, a multiplier table and the deduction chain, shipped to
+    every visitor and run in their browser. The number they produced was
+    posted with the request and stored as the offer, so editing it before
+    sending changed what UpCell was asked to pay.
 
-    let price = base;
-
-    // Storage multiplier
-    if (selection.storage) {
-        price *= (storageMultiplier[selection.storage] || 1.0);
-    }
-
-    // Condition deductions
-    const answers = selection.answers || {};
-
-    if (answers.powersOn === false) return Math.round(price * 0.15); // broken = very low
-    if (answers.functional === false) price *= 0.55;
-    if (answers.cracked === false) price *= 0.50;
-
-    // Screen condition
-    if (answers.screenCondition === 'good') price *= 0.90;
-    if (answers.screenCondition === 'fair') price *= 0.75;
-
-    // Body condition
-    if (answers.bodyCondition === 'good') price *= 0.92;
-    if (answers.bodyCondition === 'fair') price *= 0.80;
-
-    return Math.round(price);
-}
+    The server prices it now, and this page asks. See queries/tradeIn.js.
+                                                                          */
 
 /* ───────────── STEP LABELS ───────────── */
 
@@ -295,9 +144,40 @@ const TradeIn = () => {
 
     const totalSteps = getTotalSteps(selection.device || 'iPhone');
 
-    const estimate = useMemo(() => calculateEstimate(selection), [selection]);
+    const { data: catalog } = useTradeInCatalogQuery();
 
-    const currentQuestions = conditionQuestions[selection.device] || [];
+    // "Up to $X" per model, from the catalogue. A Map so the model grid is a
+    // lookup rather than a scan of 49 rows per card.
+    const teasers = useMemo(
+        () => new Map((catalog?.models || []).map((model) => [model.modelKey, model.teaserDollars])),
+        [catalog]
+    );
+    const teaserFor = (modelKey) => teasers.get(modelKey);
+
+    // Grouped once rather than filtered per render. The catalogue is one flat
+    // list; the page shows one device type at a time.
+    const modelsByDevice = useMemo(() => {
+        const grouped = {};
+        for (const model of catalog?.models || []) {
+            (grouped[model.deviceType] ||= []).push({ id: model.modelKey, title: model.displayName });
+        }
+        return grouped;
+    }, [catalog]);
+
+    // The server's number, asked for as the customer answers. Nothing on this
+    // page computes a price any more.
+    const { quote, pending: quotePending, failed: quoteFailed } = useTradeInQuote({
+        modelKey: selection.model,
+        storage: selection.storage,
+        carrier: selection.carrier,
+        answers: selection.answers,
+    });
+    const estimate = quote?.estimate ?? null;
+
+    const currentQuestions = useMemo(() => {
+        const set = (catalog?.questions || []).find((entry) => entry.deviceType === selection.device);
+        return set?.questions || [];
+    }, [catalog, selection.device]);
     const currentQuestion = currentQuestions[conditionStep];
     const allConditionAnswered = conditionStep >= currentQuestions.length;
 
@@ -342,7 +222,7 @@ const TradeIn = () => {
     };
 
     const stepLabels = getStepLabels(selection.device || 'iPhone');
-    const selectedModelTitle = (modelOptions[selection.device] || []).find((model) => model.id === selection.model)?.title || '';
+    const selectedModelTitle = (modelsByDevice[selection.device] || []).find((model) => model.id === selection.model)?.title || '';
     const selectedCarrierTitle = (carrierOptions[selection.device] || []).find((carrier) => carrier.id === selection.carrier)?.title || '';
 
     const handleSubmitTradeInRequest = async () => {
@@ -552,7 +432,7 @@ const TradeIn = () => {
                     <div>
                         <h2 className="mb-6 text-[32px]">Select your {selection.device} model</h2>
                         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                            {(modelOptions[selection.device] || []).map((model) => (
+                            {(modelsByDevice[selection.device] || []).map((model) => (
                                 <button
                                     key={model.id}
                                     className="premium-card rounded-[28px] p-6 text-left transition-all duration-300 hover:-translate-y-1 hover:shadow-medium"
@@ -564,9 +444,13 @@ const TradeIn = () => {
                                 >
                                     <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-apple-gray">{selection.device}</div>
                                     <h3 className="mt-3 text-[22px] font-bold">{model.title}</h3>
-                                    {basePrices[model.id] && (
-                                        <p className="mt-2 text-sm text-ink-soft">Up to <span className="font-bold text-apple-text">${Math.round(basePrices[model.id] * 1.45)}</span></p>
-                                    )}
+                                    {/* The server's own "up to": the best storage with the
+                                        best answers. The page used to guess it as the base
+                                        price times 1.45, which was neither the top storage
+                                        multiplier nor a number any real device reached. */}
+                                    {teaserFor(model.id) ? (
+                                        <p className="mt-2 text-sm text-ink-soft">Up to <span className="font-bold text-apple-text">${teaserFor(model.id)}</span></p>
+                                    ) : null}
                                 </button>
                             ))}
                         </div>
@@ -680,7 +564,7 @@ const TradeIn = () => {
                                     <div className="flex justify-between"><span className="text-ink-soft">Device</span><span className="font-bold text-apple-text">{selection.device}</span></div>
                                 )}
                                 {selection.model && (
-                                    <div className="flex justify-between"><span className="text-ink-soft">Model</span><span className="font-bold text-apple-text">{(modelOptions[selection.device] || []).find(m => m.id === selection.model)?.title}</span></div>
+                                    <div className="flex justify-between"><span className="text-ink-soft">Model</span><span className="font-bold text-apple-text">{selectedModelTitle}</span></div>
                                 )}
                                 {selection.carrier && (
                                     <div className="flex justify-between"><span className="text-ink-soft">Carrier</span><span className="font-bold text-apple-text">{(carrierOptions[selection.device] || []).find(c => c.id === selection.carrier)?.title}</span></div>
@@ -729,7 +613,7 @@ const TradeIn = () => {
                                     </div>
                                     <div className="rounded-2xl bg-surface-alt p-4">
                                         <div className="text-[10px] font-bold uppercase tracking-[0.1em] text-apple-gray">Model</div>
-                                        <div className="mt-1 font-bold truncate">{(modelOptions[selection.device] || []).find(m => m.id === selection.model)?.title}</div>
+                                        <div className="mt-1 font-bold truncate">{selectedModelTitle}</div>
                                     </div>
                                     <div className="rounded-2xl bg-surface-alt p-4">
                                         <div className="text-[10px] font-bold uppercase tracking-[0.1em] text-apple-gray">Storage</div>
