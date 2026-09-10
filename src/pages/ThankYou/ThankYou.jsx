@@ -7,6 +7,7 @@ import axiosInstance from '../../utilities/axiosInstance';
 import { CartContext } from '../../App';
 import { useAccessoriesQuery } from '../../queries/products';
 import { resolveProductImage } from '../../utilities/productImages';
+import { resolveImageRef } from '../../utilities/cloudinary';
 import { STATIC_IMAGES, staticImageUrl } from '../../constants/staticImages';
 
 // A module-level constant, not a literal in the destructure: a fresh [] on
@@ -21,6 +22,66 @@ const showPlaceholder = (event) => {
     if (event.currentTarget.dataset.fallback) return;
     event.currentTarget.dataset.fallback = 'true';
     event.currentTarget.src = staticImageUrl(STATIC_IMAGES.NOT_AVAILABLE, 200);
+};
+
+const money = (cents) => "$" + (Number(cents || 0) / 100).toFixed(2);
+
+// items[] is the canonical shape and the only one chunk 7 keeps. An order
+// placed before that migration ran carries only the legacy line_items, so
+// those are mapped across rather than rendering an empty receipt at the one
+// moment a customer is looking for reassurance.
+const itemsToRender = (order) => {
+    if (order?.items?.length) return order.items;
+
+    return (order?.line_items || [])
+        .filter((line) => line?.price_data?.product_data?.metadata?.productId)
+        .map((line) => {
+            const product = line.price_data.product_data;
+            return {
+                productId: product.metadata.productId,
+                name: product.name,
+                description: product.description,
+                image: product.images?.[0],
+                quantity: product.metadata.quantity,
+                lineTotalCents: Math.round((product.metadata.totalPaid || 0) * 100),
+            };
+        });
+};
+
+// The four numbers the bank was actually sent. A legacy order without them
+// falls back to reading its own lines by name - still the order's own
+// figures, never a fresh tax calculation.
+const storedTotals = (order) => {
+    if (!order) return { subtotalCents: 0, shippingCents: 0, taxCents: 0, totalCents: 0 };
+
+    if (order.totalCents != null) {
+        return {
+            subtotalCents: order.subtotalCents || 0,
+            shippingCents: order.shippingCents || 0,
+            taxCents: order.taxCents || 0,
+            totalCents: order.totalCents,
+        };
+    }
+
+    const lines = order.line_items || [];
+    const sumOf = (predicate) => lines
+        .filter(predicate)
+        .reduce((sum, line) => sum + (line?.price_data?.product_data?.metadata?.totalPaid || 0), 0);
+
+    const isProduct = (line) => Boolean(line?.price_data?.product_data?.metadata?.productId);
+    const named = (pattern) => (line) => !isProduct(line)
+        && pattern.test(line?.price_data?.product_data?.name || "");
+
+    const subtotal = sumOf(isProduct);
+    const tax = sumOf(named(/tax/i));
+    const shipping = sumOf(named(/shipping/i));
+
+    return {
+        subtotalCents: Math.round(subtotal * 100),
+        shippingCents: Math.round(shipping * 100),
+        taxCents: Math.round(tax * 100),
+        totalCents: Math.round((subtotal + tax + shipping) * 100),
+    };
 };
 
 const ThankYou = () => {
@@ -46,12 +107,17 @@ const ThankYou = () => {
             .then((res) => setOrder(res.data))
             .catch((error) => console.log(error));
     }, [orderId]);
-    const orderItems = order?.line_items?.filter((item) => item?.price_data?.product_data?.metadata?.productId) || [];
-    const subtotal = orderItems.reduce((total, item) => total + (item?.price_data?.product_data?.metadata?.totalPaid || 0), 0);
-    const shippingItem = order?.line_items?.find((item) => !item?.price_data?.product_data?.metadata?.productId);
-    const shippingTotal = shippingItem?.price_data?.product_data?.metadata?.totalPaid || 0;
-    const taxEstimate = subtotal * 0.08;
-    const grandTotal = subtotal + shippingTotal + taxEstimate;
+    // Every figure here is read from the order, never recomputed.
+    //
+    // This block used to find "the first line without a productId" and call it
+    // shipping. Checkout writes the tax line before the shipping line, so that
+    // found the tax - and then added another 8% on top as an estimate. A
+    // $1,099 phone with express shipping was charged $1,211.92 and the receipt
+    // said $1,274.84, with shipping missing and the tax shown twice under two
+    // names. A confirmation page that disagrees with the card statement is the
+    // first thing a customer disputes.
+    const orderItems = itemsToRender(order);
+    const totals = storedTotals(order);
 
     return (
         <div className="page-shell">
@@ -92,29 +158,32 @@ const ThankYou = () => {
                     <main className="premium-card rounded-[28px] p-6 sm:rounded-[36px] sm:p-8 md:p-10">
                         <h2>Order summary</h2>
                         <div className="mt-6 space-y-4">
-                            {orderItems.map((item, index) => {
-                                const product = item.price_data.product_data;
-                                return (
-                                    <div key={index} className="flex gap-4 rounded-[24px] bg-surface-alt p-4">
-                                        <div className="flex h-16 w-16 items-center justify-center rounded-[18px] bg-white">
-                                            <img src={product.images?.[0]} alt={product.name} className="max-h-[80%] w-auto object-contain" />
-                                        </div>
-                                        <div className="flex-1">
-                                            <div className="font-bold text-apple-text">{product.name}</div>
-                                            <div className="mt-1 text-sm text-ink-soft">{product.description}</div>
-                                            <div className="mt-1 text-sm text-apple-gray">Qty: {product.metadata?.quantity}</div>
-                                        </div>
-                                        <div className="font-bold text-apple-text">${(product.metadata?.totalPaid || 0).toFixed(2)}</div>
+                            {orderItems.map((item, index) => (
+                                <div key={item.productId || index} className="flex gap-4 rounded-[24px] bg-surface-alt p-4">
+                                    <div className="flex h-16 w-16 items-center justify-center rounded-[18px] bg-white">
+                                        <img
+                                            src={resolveImageRef(item.image, { width: 120 })}
+                                            onError={showPlaceholder}
+                                            alt={item.name}
+                                            className="max-h-[80%] w-auto object-contain"
+                                        />
                                     </div>
-                                );
-                            })}
+                                    <div className="flex-1">
+                                        <div className="font-bold text-apple-text">{item.name}</div>
+                                        <div className="mt-1 text-sm text-ink-soft">{item.description}</div>
+                                        <div className="mt-1 text-sm text-apple-gray">Qty: {item.quantity}</div>
+                                    </div>
+                                    <div className="font-bold text-apple-text">{money(item.lineTotalCents)}</div>
+                                </div>
+                            ))}
                         </div>
 
                         <div className="mt-6 space-y-4 border-t border-black/[0.06] pt-6 text-sm text-ink-soft">
-                            <div className="flex justify-between"><span>Subtotal</span><strong className="text-apple-text">${subtotal.toFixed(2)}</strong></div>
-                            <div className="flex justify-between"><span>Estimated tax</span><strong className="text-apple-text">${taxEstimate.toFixed(2)}</strong></div>
-                            <div className="flex justify-between"><span>Shipping</span><strong className="text-apple-text">{shippingTotal === 0 ? 'Free' : `$${shippingTotal.toFixed(2)}`}</strong></div>
-                            <div className="flex justify-between border-t border-black/[0.06] pt-4 text-base"><span className="font-bold text-apple-text">Total</span><strong className="text-2xl text-apple-text">${grandTotal.toFixed(2)}</strong></div>
+                            <div className="flex justify-between"><span>Subtotal</span><strong className="text-apple-text">{money(totals.subtotalCents)}</strong></div>
+                            {/* "Sales tax", not "Estimated tax" - this one was charged, not guessed. */}
+                            <div className="flex justify-between"><span>Sales tax</span><strong className="text-apple-text">{money(totals.taxCents)}</strong></div>
+                            <div className="flex justify-between"><span>Shipping</span><strong className="text-apple-text">{totals.shippingCents === 0 ? 'Free' : money(totals.shippingCents)}</strong></div>
+                            <div className="flex justify-between border-t border-black/[0.06] pt-4 text-base"><span className="font-bold text-apple-text">Total charged</span><strong className="text-2xl text-apple-text">{money(totals.totalCents)}</strong></div>
                         </div>
 
                         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4">

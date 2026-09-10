@@ -55,4 +55,15 @@ export default defineConfig({
   server: {
     proxy,
   },
+  // Nothing the app logs is for a customer. Most of the console.log calls in
+  // this codebase are `console.log(error)` inside a catch, which prints the
+  // API's own error payload — route names, validation messages, occasionally
+  // an id — into the console of whoever opens dev tools on the live site.
+  //
+  // Dropped at build time rather than deleted from the source, so the same
+  // lines still help while developing and a future one cannot slip out. This
+  // applies to the production build only; `vite dev` keeps them.
+  esbuild: {
+    drop: ['console', 'debugger'],
+  },
 })
