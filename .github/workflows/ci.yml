@@ -1,0 +1,36 @@
+# Runs the build and the tests on every push to dev-sunit and every PR to main.
+#
+# The build is the real gate here: this app has 36 unit tests and no component
+# tests, so a broken import or a missing export is caught by vite rather than
+# by vitest. Both run, in that order, because a failing build makes the test
+# result meaningless.
+name: CI
+
+on:
+  push:
+    branches: [dev-sunit]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm test
+
+      - run: npm run build
+        env:
+          # The build reads this and renders a "missing key" page instead when
+          # it is absent — which would pass CI while shipping a dead site. A
+          # placeholder is enough to prove the app itself compiles.
+          VITE_CLERK_PUBLISHABLE_KEY: pk_test_ci
