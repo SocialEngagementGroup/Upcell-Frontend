@@ -291,7 +291,17 @@ if (!clerkPublishableKey) {
 } else {
   root.render(
     <QueryClientProvider client={queryClient}>
-      <ClerkProvider publishableKey={clerkPublishableKey}>
+      {/* signInUrl and signUpUrl tell Clerk that this app hosts its own auth
+          pages. Without them Clerk falls back to the Account Portal it hosts
+          on accounts.dev, and any redirect it starts itself lands there —
+          including the one after a cancelled Google sign-in, which dropped
+          the customer on an unbranded page in the wrong theme with no way
+          back to the shop. */}
+      <ClerkProvider
+        publishableKey={clerkPublishableKey}
+        signInUrl="/login"
+        signUpUrl="/login?mode=signup"
+      >
         <UserContextProvider>
           <ErrorBoundary>
             <RouterProvider router={router} />
