@@ -41,6 +41,11 @@ export const categoryKeys = {
     parentsWithCounts: () => ['categories', 'withCounts'],
 };
 
+// The shop's sales tax rate. One number, quoted on every price.
+export const taxKeys = {
+    rate: () => ['tax', 'rate'],
+};
+
 export const refundRequestKeys = {
     // What the return form needs before it can be drawn: which items are still
     // returnable on this order, and how long is left.

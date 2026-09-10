@@ -79,7 +79,9 @@ const Checkout = () => {
         productIds.reduce((acc, id) => acc + (products.find((product) => product._id === id)?.price || 0), 0)
     ), [productIds, products]);
 
-    const estTax = subtotal * 0.08;
+    // The rate the server will actually charge, not a copy of it kept here.
+    const { data: taxRate = DEFAULT_TAX_RATE } = useTaxRateQuery();
+    const estTax = subtotal * taxRate;
     const shippingCosts = {
         standard: 0,
         priority: 10.5,

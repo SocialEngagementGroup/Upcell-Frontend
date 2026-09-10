@@ -8,6 +8,7 @@ import { EMPTY_ARRAY } from "../../queries/keys";
 import RouteLoadingScreen from "../../components/RouteLoadingScreen/RouteLoadingScreen";
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { groupCartItems } from "../../utilities/cartGrouping";
+import { useTaxRateQuery, DEFAULT_TAX_RATE } from '../../queries/orders';
 
 // What the bank's own redirect (?payment=…) means to a customer standing on
 // this page — cancel and decline are not the same event and must not read
@@ -47,6 +48,10 @@ const PAYMENT_BANNERS = {
 };
 
 const Cart = () => {
+    // The rate the server will charge, rather than a copy kept on this page.
+    const { data: taxRate = DEFAULT_TAX_RATE } = useTaxRateQuery();
+    const taxPercent = `${(taxRate * 100).toFixed(taxRate * 100 % 1 ? 2 : 0)}%`;
+
     const { cart, setCart } = useContext(CartContext);
 
     // Only real ObjectIds reach the server. localStorage is the cart's store and
@@ -207,14 +212,14 @@ const Cart = () => {
                                     <span className="font-bold text-apple-text">Free</span>
                                 </div>
                                 <div className="flex items-center justify-between">
-                                    <span>Estimated tax</span>
-                                    <span className="font-bold text-apple-text">${(total * 0.08).toFixed(2)}</span>
+                                    <span>Estimated tax ({taxPercent})</span>
+                                    <span className="font-bold text-apple-text">${(total * taxRate).toFixed(2)}</span>
                                 </div>
                             </div>
                             <div className="mt-6 border-t border-black/[0.06] pt-6">
                                 <div className="flex items-center justify-between">
                                     <span className="text-base font-bold text-apple-text">Estimated total</span>
-                                    <span className="whitespace-nowrap text-2xl font-extrabold text-apple-text">${(total * 1.08).toFixed(2)} <span className="text-sm font-normal text-ink-soft">USD</span></span>
+                                    <span className="whitespace-nowrap text-2xl font-extrabold text-apple-text">${(total * (1 + taxRate)).toFixed(2)} <span className="text-sm font-normal text-ink-soft">USD</span></span>
                                 </div>
                             </div>
                             {hasSoldOutItems ? (
