@@ -4,9 +4,7 @@ import { CartContext } from '../../App';
 import { userContext } from '../../utilities/UserContextProvider';
 import ScrollToTop from '../../utilities/ScrollToTop';
 import axiosInstance from '../../utilities/axiosInstance';
-import visa from '../../assets/visa.svg';
-import mastercard from '../../assets/master.svg';
-import discover from '../../assets/discover.svg';
+import { CARD_BRANDS, showCardBrands } from '../../constants/cardBrands';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
@@ -440,16 +438,20 @@ const Checkout = () => {
                             <div className="flex justify-between border-t border-black/[0.06] pt-4 text-base"><span className="font-bold text-apple-text">Total</span><strong className="whitespace-nowrap text-2xl text-apple-text">${total.toFixed(2)} <span className="text-sm font-normal text-ink-soft">USD</span></strong></div>
                         </div>
 
-                        <div className="mt-6 grid grid-cols-3 gap-3">
-                            {/* Amex removed: the logo was on the checkout but nobody had confirmed it
-    was on the merchant agreement, so it advertised a card we may not be
-    able to accept. Discover is on the bank's test card list. */}
-                            {[visa, mastercard, discover].map((icon, index) => (
-                                <div key={index} className="flex h-12 items-center justify-center rounded-[16px] border border-black/[0.06] bg-white">
-                                    <img src={icon} alt="Card network accepted" className="max-h-7 w-auto object-contain" />
-                                </div>
-                            ))}
-                        </div>
+                        {/* Amex came off because nobody had confirmed it was on the
+                            merchant agreement. Discover went on because it is on the
+                            bank's *test* card list, which is not the same thing and
+                            carries the same open question — so the whole row is behind
+                            a flag until BofA answers. See constants/cardBrands.js. */}
+                        {showCardBrands() ? (
+                            <div className="mt-6 grid grid-cols-3 gap-3">
+                                {CARD_BRANDS.map((card) => (
+                                    <div key={card.id} className="flex h-12 items-center justify-center rounded-[16px] border border-black/[0.06] bg-white">
+                                        <img src={card.src} alt={card.label} className="max-h-7 w-auto object-contain" />
+                                    </div>
+                                ))}
+                            </div>
+                        ) : null}
                     </aside>
                 </div>
             </section>

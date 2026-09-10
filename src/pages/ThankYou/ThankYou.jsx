@@ -8,6 +8,7 @@ import { CartContext } from '../../App';
 import { useAccessoriesQuery } from '../../queries/products';
 import { resolveProductImage } from '../../utilities/productImages';
 import { resolveImageRef } from '../../utilities/cloudinary';
+import { trackPurchase } from '../../utilities/gtm';
 import { STATIC_IMAGES, staticImageUrl } from '../../constants/staticImages';
 
 // A module-level constant, not a literal in the destructure: a fresh [] on
@@ -105,7 +106,12 @@ const ThankYou = () => {
         // paths agree the cart should be emptied.
         setCart([]);
         axiosInstance.get(`order/${orderId}`)
-            .then((res) => setOrder(res.data))
+            .then((res) => {
+                setOrder(res.data);
+                // Guarded against a refresh, the back button, and the bank
+                // redirecting here twice — see trackPurchase.
+                trackPurchase(res.data);
+            })
             // A guest gets a 404 here, and that is correct: this page has no
             // token, and the token cannot be handed over in the bank's
             // redirect because it is minted when the receipt is sent — a

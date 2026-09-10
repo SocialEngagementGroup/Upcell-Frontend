@@ -293,6 +293,15 @@ const TradeIn = () => {
             const response = await axiosInstance.post('trade-in-requests', payload);
 
             setSavedRequest(response.data);
+
+            // The server's figure, not the one on screen. They are the same
+            // number now, but reporting on what was actually stored is the
+            // habit worth having.
+            trackTradeInLead({
+                modelTitle: selectedModelTitle,
+                estimate: response.data?.estimate,
+            });
+
             trackSuccess({
                 phase: 'request',
                 device: selection.device,

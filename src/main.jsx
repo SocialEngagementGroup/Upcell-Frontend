@@ -4,6 +4,7 @@ import { ClerkProvider } from '@clerk/clerk-react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import './index.css';
+import { loadGtm } from './utilities/gtm';
 
 import App from './App.jsx';
 import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
@@ -305,6 +306,11 @@ const queryClient = new QueryClient({
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 if (!clerkPublishableKey) {
+  // Loads only when VITE_GTM_ID is set. With it empty nothing is requested
+  // and every track() call below is a no-op, so the events can be wired now
+  // and switched on later without a release.
+  loadGtm();
+
   root.render(
     <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', padding: '24px', fontFamily: 'system-ui, sans-serif' }}>
       <div style={{ maxWidth: '520px', border: '1px solid #eee', borderRadius: '24px', padding: '32px', boxShadow: '0 18px 60px rgba(15,23,42,0.08)' }}>

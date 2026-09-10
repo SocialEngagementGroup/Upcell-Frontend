@@ -1,15 +1,7 @@
 import { Link } from 'react-router-dom';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import visa from '../../../assets/visa.svg';
-import mastercard from '../../../assets/master.svg';
-import discover from '../../../assets/discover.svg';
-
-const CARDS = [
-    { src: visa, label: 'Visa accepted' },
-    { src: mastercard, label: 'Mastercard accepted' },
-    { src: discover, label: 'Discover accepted' },
-];
+import { CARD_BRANDS, showCardBrands } from '../../../constants/cardBrands';
 
 const PaymentInfo = () => {
     return (
@@ -32,13 +24,21 @@ const PaymentInfo = () => {
                 <div className="grid gap-6 lg:grid-cols-2">
                     <div className="premium-card rounded-[28px] p-6 sm:rounded-[36px] sm:p-8">
                         <h2 className="text-2xl">Cards we accept</h2>
-                        <div className="mt-5 flex flex-wrap gap-3">
-                            {CARDS.map((card) => (
-                                <span key={card.label} className="flex h-12 w-20 items-center justify-center rounded-[16px] border border-black/[0.06] bg-white">
-                                    <img src={card.src} alt={card.label} className="max-h-7 w-auto object-contain" />
-                                </span>
-                            ))}
-                        </div>
+                        {showCardBrands() ? (
+                            <div className="mt-5 flex flex-wrap gap-3">
+                                {CARD_BRANDS.map((card) => (
+                                    <span key={card.id} className="flex h-12 w-20 items-center justify-center rounded-[16px] border border-black/[0.06] bg-white">
+                                        <img src={card.src} alt={card.label} className="max-h-7 w-auto object-contain" />
+                                    </span>
+                                ))}
+                            </div>
+                        ) : (
+                            // Says something true rather than nothing. A heading with a
+                            // gap under it reads as a page that failed to load.
+                            <p className="mt-4 text-sm leading-6 text-ink-soft">
+                                All major credit and debit cards, processed securely through our bank.
+                            </p>
+                        )}
                         <p className="mt-4 text-sm leading-6 text-ink-soft">
                             We also accept bank transfer and cash at pickup. Full payment terms are in our{' '}
                             <Link to="/terms-conditions" className="font-bold text-brand-red">Terms &amp; Conditions</Link>.
