@@ -141,20 +141,15 @@ const RefundRequestPanel = ({ order }) => {
                 <p className="mt-1 text-xs font-medium text-brand-red">Please tell us why you are returning it.</p>
             ) : null}
 
-            {/* What this reason costs the customer, said before they commit
-                rather than discovered as a deduction afterwards. */}
+            {/* What the return costs the customer: nothing. Said plainly and
+                unconditionally, because the whole value of the policy is that
+                it does not depend on picking the right reason. It used to vary
+                by reason, and a change of mind cost postage and 15%. */}
             {chosenReason ? (
                 <div className="mt-3 rounded-2xl bg-white p-4">
                     <p className="text-xs leading-5 text-ink-soft">
-                        {chosenReason.customerPaysPostage
-                            ? 'You pay the postage to send it back.'
-                            : 'UpCell pays the postage — we will send you a prepaid label.'}
-                        {' '}
-                        {chosenReason.restockingFee
-                            ? 'A 15% restocking fee is deducted from your refund.'
-                            : 'No restocking fee applies.'}
-                        {' '}
-                        You have {chosenReason.windowDays} days from delivery for this reason.
+                        Returns are free — we send you a prepaid label and there is no
+                        restocking fee. You have {chosenReason.windowDays} days from delivery.
                     </p>
 
                     {data.estimate && selected.size > 0 ? (
@@ -169,9 +164,12 @@ const RefundRequestPanel = ({ order }) => {
                                     <dd className="text-apple-text">${data.estimate.taxRefunded.toFixed(2)}</dd>
                                 </div>
                             ) : null}
+                            {/* Nothing charges a fee any more. The row survives
+                                only so an older request that carries one still
+                                renders honestly. */}
                             {data.estimate.restockingFee > 0 ? (
                                 <div className="flex justify-between">
-                                    <dt className="text-ink-soft">Restocking fee (15%)</dt>
+                                    <dt className="text-ink-soft">Restocking fee</dt>
                                     <dd className="text-brand-red">−${data.estimate.restockingFee.toFixed(2)}</dd>
                                 </div>
                             ) : null}

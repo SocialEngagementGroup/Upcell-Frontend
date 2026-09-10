@@ -170,6 +170,16 @@ const ReturnsReport = () => {
                             {money(metrics.dispositionedValue)} of devices were given a route in this period.
                         </p>
                     ) : null}
+
+                    {/* Photos kept past their ninety days. Reported rather
+                        than assumed: the retention promise is only as good as
+                        somebody being able to see how often it is suspended. */}
+                    {metrics.underDisputeHold > 0 ? (
+                        <p className="text-xs text-ink-soft">
+                            {metrics.underDisputeHold} return{metrics.underDisputeHold === 1 ? '' : 's'} still holding
+                            inspection photos — rejected, reduced, or marked disputed.
+                        </p>
+                    ) : null}
                 </>
             ) : (
                 <p className="text-sm text-ink-soft">Loading…</p>

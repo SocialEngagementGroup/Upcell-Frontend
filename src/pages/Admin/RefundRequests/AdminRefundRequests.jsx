@@ -12,6 +12,7 @@ import InspectionPanel from './InspectionPanel';
 import RevisedOfferPanel from './RevisedOfferPanel';
 import { SettlementPanel, DispositionPanel } from './SettlementPanel';
 import ReturnsDashboard from './ReturnsDashboard';
+import { WindowPanel, DisputeHoldPanel } from './WindowAndHoldPanels';
 
 // The queue Yasir works from. Tabs are the workflow itself, in order, so
 // "what needs me next" is the same as "which tab has a number in it".
@@ -119,6 +120,11 @@ const RequestCard = ({ request, onMove, busy }) => {
 
             <p className="mt-3 rounded-2xl bg-surface-alt p-3 text-sm leading-6 text-ink-soft">{request.reason}</p>
 
+            {/* When the thirty days were counted from, and the way to move it.
+                Shown on every request because it is the first thing anyone
+                checks when a return looks late. */}
+            <WindowPanel request={request} />
+
             {/* Where the parcel is, when there is a parcel. */}
             {request.shipping?.inbound?.trackingNumber ? (
                 <p className="mt-2 font-mono text-xs text-apple-gray">
@@ -155,6 +161,9 @@ const RequestCard = ({ request, onMove, busy }) => {
             {request.rejectionReason ? (
                 <p className="mt-2 text-xs text-brand-red">Rejected: {request.rejectionReason}</p>
             ) : null}
+
+            {/* Only once there are photos to hold. */}
+            <DisputeHoldPanel request={request} />
 
             {openAction ? (
                 <textarea

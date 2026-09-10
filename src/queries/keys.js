@@ -59,7 +59,10 @@ export const refundRequestKeys = {
     // The fixed lists the server owns: the inspection checklist and the
     // dispositions. Cached hard because they only change when the code does.
     checklist: () => ['refundRequests', 'checklist'],
-    dispositions: () => ['refundRequests', 'dispositions'],
+    // Keyed by request because the answer includes whether the supplier
+    // route is open for that particular unit, which is a fact about the
+    // device rather than about the list.
+    dispositions: (requestId = '') => ['refundRequests', 'dispositions', requestId],
     report: (filters = {}) => ['refundRequests', 'report', filters],
 };
 

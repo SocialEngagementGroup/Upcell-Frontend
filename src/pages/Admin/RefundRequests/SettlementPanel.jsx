@@ -124,19 +124,29 @@ export const SettlementPanel = ({ request }) => {
 // this — otherwise the process ends at the refund and the phone becomes
 // something on a shelf that nobody is responsible for.
 export const DispositionPanel = ({ request }) => {
-    const { data } = useDispositionsQuery();
+    const { data } = useDispositionsQuery(request._id);
     const record = useRecordDispositionMutation();
 
-    const [type, setType] = useState('');
-    const [grade, setGrade] = useState(request.inspection?.grade || '');
+    const suggested = request.inspection?.suggestedDisposition;
+
+    const [type, setType] = useState(suggested?.type || '');
+    const [grade, setGrade] = useState(
+        suggested?.grade || request.inspection?.finalGrade || ''
+    );
+    const [price, setPrice] = useState('');
     const [reason, setReason] = useState('');
     const [imei, setImei] = useState(request.device?.imei || '');
     const [error, setError] = useState('');
 
     const options = data?.dispositions || [];
+    const grades = data?.grades || [];
     const chosen = options.find((option) => option.type === type);
-    const needsReason = ['SCRAP', 'RETURN_TO_SUPPLIER'].includes(type);
-    const needsGrade = chosen && !chosen.restocks;
+
+    // Every rule below is the server's answer, not a second copy of it. The
+    // copy that drifts is always the one in front of the person filling it in.
+    const needsReason = Boolean(chosen?.requiresReason);
+    const needsPrice = Boolean(chosen?.reprices);
+    const blocked = chosen?.unavailableReason;
 
     const submit = () => {
         setError('');
@@ -144,17 +154,18 @@ export const DispositionPanel = ({ request }) => {
             {
                 id: request._id,
                 type,
-                ...(grade ? { grade } : {}),
+                grade,
+                ...(needsPrice ? { price: Number(price) } : {}),
                 ...(reason.trim() ? { reason: reason.trim() } : {}),
                 ...(imei.trim() ? { imei: imei.trim() } : {}),
             },
             {
                 onSuccess: (result) => {
                     toast.success(
-                        result.restocked ? 'Recorded — device is back on sale' : 'Recorded',
+                        result.relisted ? 'Recorded — the unit is back on sale' : 'Recorded',
                         { icon: TOAST_ICONS.statusChanged }
                     );
-                    // Surfaced rather than swallowed: a restock that silently
+                    // Surfaced rather than swallowed: a relist that silently
                     // failed leaves a device off sale that everyone believes
                     // is on it.
                     if (result.warning) toast.warning(result.warning);
@@ -171,26 +182,55 @@ export const DispositionPanel = ({ request }) => {
             onSubmit={submit}
             submitLabel="Record disposition"
             busy={record.isPending}
-            disabled={!type || (needsGrade && !grade) || (needsReason && !reason.trim())}
-            error={error}
+            disabled={
+                !type
+                || !grade
+                || Boolean(blocked)
+                || (needsPrice && !(Number(price) > 0))
+                || (needsReason && !reason.trim())
+            }
+            error={error || blocked || ''}
         >
             <Field label="Route" hint={chosen?.description}>
                 <Select value={type} onChange={(event) => setType(event.target.value)}>
                     <option value="">Choose…</option>
                     {options.map((option) => (
-                        <option key={option.type} value={option.type}>{option.label}</option>
+                        <option
+                            key={option.type}
+                            value={option.type}
+                            // Shown but not selectable, with the reason under
+                            // the box: a route that quietly vanishes looks
+                            // like a missing feature.
+                            disabled={Boolean(option.unavailableReason)}
+                        >
+                            {option.label}
+                            {option.unavailableReason ? ' — not available' : ''}
+                        </option>
                     ))}
                 </Select>
             </Field>
 
-            {needsGrade ? (
-                <Field label="Grade" hint="Whoever handles it next needs this, and it cannot be recovered later.">
-                    <Select value={grade} onChange={(event) => setGrade(event.target.value)}>
-                        <option value="">Choose…</option>
-                        {['A', 'B', 'C', 'FAIL'].map((option) => (
-                            <option key={option} value={option}>{option}</option>
-                        ))}
-                    </Select>
+            {/* Every route needs it, including the ones that do not relist:
+                whoever handles the device next reads it off this record, and
+                it cannot be recovered once the phone has left the bench. */}
+            <Field
+                label="Grade"
+                hint={suggested?.reason || 'The grade this device leaves inspection at.'}
+            >
+                <Select value={grade} onChange={(event) => setGrade(event.target.value)}>
+                    <option value="">Choose…</option>
+                    {grades.map((option) => (
+                        <option key={option} value={option}>{option}</option>
+                    ))}
+                </Select>
+            </Field>
+
+            {needsPrice ? (
+                <Field
+                    label="New price"
+                    hint="The grade dropped, so the listing cannot go back up at the old one. It goes live re-priced in the same write."
+                >
+                    <Num value={price} onChange={(event) => setPrice(event.target.value)} />
                 </Field>
             ) : null}
 

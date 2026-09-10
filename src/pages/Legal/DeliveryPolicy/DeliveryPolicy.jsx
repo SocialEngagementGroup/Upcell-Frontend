@@ -99,7 +99,7 @@ const DeliveryPolicy = () => {
                     <p>
                         If anything is wrong — damaged packaging or a wrong item — contact us at{' '}
                         <a href="mailto:usa.Upcells@gmail.com" className="font-bold text-brand-red">usa.Upcells@gmail.com</a>{' '}
-                        within 48 hours of receipt. Devices damaged during shipping, or that do not function on first use, are covered under our Return &amp; Refund Policy without a restocking fee.
+                        within 3 business days of delivery. Devices damaged in transit, or that do not work on first use, are covered under our Return &amp; Refund Policy — returns are free and no restocking fee applies to any return.
                     </p>
 
                     <h2>8. Failed &amp; Unclaimed Deliveries</h2>

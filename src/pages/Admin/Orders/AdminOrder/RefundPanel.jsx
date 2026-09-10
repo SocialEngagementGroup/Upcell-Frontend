@@ -3,7 +3,6 @@ import { toast } from 'sonner';
 import axiosInstance from '../../../../utilities/axiosInstance';
 import { extractApiError } from '../../../../utilities/formValidation';
 
-const RESTOCKING_FEE_RATE = 0.15;
 const money = (value) => `$${Number(value || 0).toFixed(2)}`;
 
 // Tax and shipping lines carry no productId — only real devices and
@@ -35,8 +34,6 @@ const RefundPanel = ({ order, onRefunded }) => {
     const [selected, setSelected] = useState(
         () => new Set(refundableLines.map((item) => item.price_data.product_data.metadata.productId))
     );
-    const [waiveFee, setWaiveFee] = useState(false);
-    const [waiveReason, setWaiveReason] = useState('');
     const [notes, setNotes] = useState('');
     const [submitting, setSubmitting] = useState(false);
 
@@ -58,7 +55,9 @@ const RefundPanel = ({ order, onRefunded }) => {
     );
 
     const itemsTotal = totalPaidOf(chosen);
-    const restockingFee = waiveFee ? 0 : Math.round(itemsTotal * RESTOCKING_FEE_RATE * 100) / 100;
+    // Always zero. Returns are free, whatever the reason — the rate constant
+    // and the waive control both went with the policy.
+    const restockingFee = 0;
 
     // The customer gets back the tax they actually paid on the items coming
     // back, shared out by price — the same sum the server does, so the number
@@ -72,7 +71,7 @@ const RefundPanel = ({ order, onRefunded }) => {
 
     const previewAmount = Math.round((itemsTotal - restockingFee + taxRefunded) * 100) / 100;
 
-    const canSubmit = chosen.length > 0 && (!waiveFee || waiveReason.trim().length > 0) && !submitting;
+    const canSubmit = chosen.length > 0 && !submitting;
 
     const submit = async () => {
         if (!canSubmit) return;
@@ -86,8 +85,6 @@ const RefundPanel = ({ order, onRefunded }) => {
         try {
             const res = await axiosInstance.post(`admin-orders/${order._id}/refund`, {
                 itemIds: Array.from(selected),
-                waiveRestockingFee: waiveFee,
-                waiveReason: waiveFee ? waiveReason.trim() : undefined,
                 notes: notes.trim() || undefined,
             });
             toast.success(res.data?.message || 'Refund recorded');
@@ -163,25 +160,6 @@ const RefundPanel = ({ order, onRefunded }) => {
                 })}
             </div>
 
-            <label className="mt-4 flex items-center gap-2 text-sm text-ink-soft">
-                <input
-                    type="checkbox"
-                    checked={waiveFee}
-                    onChange={(e) => setWaiveFee(e.target.checked)}
-                    className="h-4 w-4 accent-brand-red"
-                />
-                Waive the 15% restocking fee
-            </label>
-
-            {waiveFee ? (
-                <input
-                    type="text"
-                    className="admin-input mt-2 w-full"
-                    placeholder="Reason (required) — e.g. confirmed faulty device"
-                    value={waiveReason}
-                    onChange={(e) => setWaiveReason(e.target.value)}
-                />
-            ) : null}
 
             <textarea
                 className="admin-textarea mt-3"
@@ -193,10 +171,15 @@ const RefundPanel = ({ order, onRefunded }) => {
 
             <div className="mt-4 space-y-1 border-t border-black/[0.06] pt-3 text-sm text-ink-soft">
                 <div className="flex justify-between"><span>Items total</span><strong className="text-apple-text">{money(itemsTotal)}</strong></div>
-                <div className="flex justify-between">
-                    <span>Restocking fee (15%)</span>
-                    <strong className="text-apple-text">{waiveFee ? 'Waived' : `−${money(restockingFee)}`}</strong>
-                </div>
+                {/* Kept only for a historic refund that still carries one.
+                    Nothing charges a restocking fee any more — returns are
+                    free, whatever the reason. */}
+                {restockingFee > 0 ? (
+                    <div className="flex justify-between">
+                        <span>Restocking fee</span>
+                        <strong className="text-apple-text">−{money(restockingFee)}</strong>
+                    </div>
+                ) : null}
                 {/* Confirmed with the client on 9 Sep 2026: the 8% comes back in
                     full on whatever is returned, the fee is taken on the goods only. */}
                 <div className="flex justify-between">

@@ -7,7 +7,7 @@ import {
     useSubmitInspectionMutation,
 } from '../../../queries/refundRequests';
 import { uploadProductImage } from '../../../utilities/uploadImage';
-import { Panel, Field, Area } from './ReturnPanelKit';
+import { Panel, Field, Area, Num, Select } from './ReturnPanelKit';
 
 const REQUIRED_PHOTOS = 5;
 
@@ -28,6 +28,11 @@ const InspectionPanel = ({ request }) => {
     const submitInspection = useSubmitInspectionMutation();
 
     const [answers, setAnswers] = useState({});
+    // Two checks answer with a reading rather than a verdict: the battery
+    // percentage, and the cosmetic grade. Held apart from the pass/fail
+    // answers because they are different shapes, not different values.
+    const [battery, setBattery] = useState('');
+    const [cosmetic, setCosmetic] = useState('');
     const [photos, setPhotos] = useState([]);
     const [findings, setFindings] = useState('');
     const [uploading, setUploading] = useState(false);
@@ -41,7 +46,15 @@ const InspectionPanel = ({ request }) => {
     // trains people to answer "N/A" eleven times — which is how a checklist
     // stops being read.
     const visibleItems = items.filter((item) => !item.onlyWhenFaultClaimed || faultClaimed);
-    const unanswered = visibleItems.filter((item) => !answers[item.key]).length;
+    const grades = checklist?.grades || [];
+
+    // A measured or graded check is answered by its reading, not by a button.
+    const answerFor = (item) => {
+        if (item.measured) return battery !== '' ? battery : '';
+        if (item.graded) return cosmetic;
+        return answers[item.key] || '';
+    };
+    const unanswered = visibleItems.filter((item) => !answerFor(item)).length;
 
     const addPhotos = async (fileList) => {
         const files = Array.from(fileList).filter((file) => file.type.startsWith('image/'));
@@ -54,7 +67,7 @@ const InspectionPanel = ({ request }) => {
             const uploaded = await Promise.all(
                 files.map((file) => uploadProductImage(file, {
                     target: 'return_photo',
-                    productName: `return-${request.rmaNumber || request._id}`,
+                    productName: request.rmaNumber || request._id,
                 }))
             );
             setPhotos((current) => [...current, ...uploaded]);
@@ -72,7 +85,14 @@ const InspectionPanel = ({ request }) => {
         submitInspection.mutate(
             {
                 id: request._id,
-                checklist: visibleItems.map((item) => ({ key: item.key, result: answers[item.key] })),
+                checklist: visibleItems.map((item) => ({
+                    key: item.key,
+                    // A reading is still a pass — it is recorded, not judged.
+                    // The server decides what the number and the grade mean.
+                    result: item.measured || item.graded ? 'pass' : answers[item.key],
+                    ...(item.measured ? { value: Number(battery) } : {}),
+                    ...(item.graded ? { grade: cosmetic } : {}),
+                })),
                 photos: photos.map((photo) => ({ url: photo.url, publicId: photo.publicId })),
                 ...(findings.trim() ? { findings: findings.trim() } : {}),
             },
@@ -83,6 +103,8 @@ const InspectionPanel = ({ request }) => {
                         { icon: TOAST_ICONS.statusChanged }
                     );
                     setAnswers({});
+                    setBattery('');
+                    setCosmetic('');
                     setPhotos([]);
                     setFindings('');
                 },
@@ -105,6 +127,18 @@ const InspectionPanel = ({ request }) => {
             error={error}
             details={details}
         >
+            {/* What the listing said when it sold. The regrade compares
+                against this, and a bench without it is guessing at whether
+                the device came back worse than it left. */}
+            {request.device?.gradeAtSale ? (
+                <p className="rounded-xl bg-surface-alt/60 px-3 py-2 text-[11px] font-semibold text-ink-soft">
+                    Sold as {request.device.gradeAtSale}
+                    {request.device.batteryHealthAtSale != null
+                        ? ` · battery ${request.device.batteryHealthAtSale}%`
+                        : ''}
+                </p>
+            ) : null}
+
             <div className="space-y-1.5">
                 {visibleItems.map((item) => (
                     <div key={item.key} className="flex items-center justify-between gap-3 rounded-xl bg-surface-alt/60 px-3 py-2">
@@ -114,7 +148,43 @@ const InspectionPanel = ({ request }) => {
                                 the one that decides where the device goes. */}
                             {item.critical ? <span className="ml-1 text-brand-red">*</span> : null}
                         </span>
-                        <div className="flex shrink-0 gap-1">
+
+                        {/* The battery reading. Written down because the next
+                            buyer needs it and a return can be compared against
+                            what it sold at — never a deduction, so the row
+                            says so rather than leaving it to be assumed. */}
+                        {item.measured ? (
+                            <div className="flex w-32 shrink-0 items-center gap-1.5">
+                                <Num
+                                    step="1"
+                                    min="0"
+                                    max="100"
+                                    value={battery}
+                                    onChange={(event) => setBattery(event.target.value)}
+                                    aria-label={item.label}
+                                />
+                                <span className="text-[11px] font-bold text-ink-soft">%</span>
+                            </div>
+                        ) : null}
+
+                        {/* One of the two axes the final grade is the lower
+                            of, and the only one a regrade reads. */}
+                        {item.graded ? (
+                            <div className="w-36 shrink-0">
+                                <Select
+                                    value={cosmetic}
+                                    onChange={(event) => setCosmetic(event.target.value)}
+                                    aria-label={item.label}
+                                >
+                                    <option value="">Choose…</option>
+                                    {grades.map((option) => (
+                                        <option key={option} value={option}>{option}</option>
+                                    ))}
+                                </Select>
+                            </div>
+                        ) : null}
+
+                        <div className={`flex shrink-0 gap-1 ${item.measured || item.graded ? 'hidden' : ''}`}>
                             {RESULTS.map((result) => (
                                 <button
                                     key={result.value}

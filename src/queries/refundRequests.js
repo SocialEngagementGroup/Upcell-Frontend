@@ -93,10 +93,21 @@ export const useInspectionChecklistQuery = (options = {}) => useQuery({
     ...options,
 });
 
-export const useDispositionsQuery = (options = {}) => useQuery({
-    queryKey: refundRequestKeys.dispositions(),
-    queryFn: () => axiosInstance.get('admin-return-dispositions').then((res) => res.data),
+// The routes a device can take, and — when a request is named — whether each
+// one is open for that unit. A device bought from a member of the public has
+// no supplier to go back to, and the answer is better given before the staff
+// member picks the route than after they have typed a reason for it.
+export const useDispositionsQuery = (requestId, options = {}) => useQuery({
+    queryKey: refundRequestKeys.dispositions(requestId),
+    queryFn: () => axiosInstance
+        .get('admin-return-dispositions', {
+            params: requestId ? { requestId } : undefined,
+        })
+        .then((res) => res.data),
     ...STATIC_LIST_OPTIONS,
+    // The availability half depends on the unit, so this one is not the
+    // session-long cache the plain list is.
+    ...(requestId ? { staleTime: 60_000, gcTime: 5 * 60_000 } : {}),
     ...options,
 });
 
@@ -144,6 +155,11 @@ export const useSettleReturnMutation = adminMutation('settle');
 export const useShipBackMutation = adminMutation('ship-back');
 export const useMarkUndeliverableMutation = adminMutation('undeliverable');
 export const useRecordDispositionMutation = adminMutation('disposition');
+// Moving the date the customer's 30 days started from. It decides whether a
+// return is inside the window, so it moves money — the server demands a note.
+export const useOverrideWindowMutation = adminMutation('window');
+// Freezing the inspection photos past their ninety days, and letting them go.
+export const useSetDisputeHoldMutation = adminMutation('dispute-hold');
 
 // Finding a parcel on the receiving bench by RMA or tracking number.
 //
