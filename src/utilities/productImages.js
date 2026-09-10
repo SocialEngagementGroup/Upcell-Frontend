@@ -305,15 +305,6 @@ export const resolveProductImage = (product, { width = CATALOG_IMAGE_WIDTH } = {
     { width }
 );
 
-// Same photo as resolveProductImage, offered at several widths so a phone
-// downloads a phone-sized file instead of the 600px one every device gets
-// today. Returns an empty string for a legacy local path, which has no
-// Cloudinary id to resize — the browser then simply uses src, as before.
-export const resolveProductImageSrcSet = (product) => {
-    const { publicId } = resolveProductImageRef(product) || {};
-    return publicId ? cloudinarySrcSet(publicId) : '';
-};
-
 // The src and the srcset of one product, from a single pass of the matcher.
 //
 // Callers that need both were paying for the matching twice. Matching is not

@@ -16,13 +16,13 @@ const BASE = "https://res.cloudinary.com";
 
 // Widths used for srcset. Chosen to cover the real slots in this UI: grid
 // thumbnail, product card, detail view, and 2x for retina on the largest.
-export const IMAGE_WIDTHS = [200, 400, 600, 1000];
+const IMAGE_WIDTHS = [200, 400, 600, 1000];
 
 // A Cloudinary public_id, as produced by the backend's buildPublicId, looks
 // like "upcell/products/iphone/iphone-16-pro-blue--a1b2c3d4". Anything that is
 // an absolute URL or starts with a slash is a legacy local asset and must be
 // passed through untouched. Both kinds coexist during the migration.
-export const isCloudinaryId = (value) => (
+const isCloudinaryId = (value) => (
     typeof value === "string"
     && value.startsWith("upcell/")
     && !value.startsWith("http")
@@ -69,9 +69,6 @@ export const resolveImageSrc = (value, options = {}) => {
     return cloudinaryUrl(value, options) || "";
 };
 
-export const resolveImageSrcSet = (value, widths = IMAGE_WIDTHS, options = {}) => (
-    isCloudinaryId(value) ? cloudinarySrcSet(value, widths, options) : ""
-);
 
 // An image reference as stored in MongoDB. The backfill added `publicId`
 // alongside the original `url` rather than replacing it, so documents carry

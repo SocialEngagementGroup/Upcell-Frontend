@@ -93,21 +93,6 @@ export const useAccessoriesQuery = (options = {}) => useQuery({
     ...options,
 });
 
-// A product page needs two things, and neither is the whole catalogue: the
-// variants of the product being viewed (for the colour and storage pickers)
-// and a few cards to recommend. It used to read useProductsQuery for both,
-// which fetches every field of all 956 variations — 838 KB — to render one
-// product.
-//
-// These two endpoints already existed on the backend and simply were not
-// being used here.
-export const useProductFamilyQuery = (parentId, options = {}) => useQuery({
-    queryKey: productKeys.byParent(parentId),
-    queryFn: () => axiosInstance.get(`allSameParentProducts/${parentId}`).then((res) => res.data),
-    select: selectNormalizedProducts,
-    enabled: Boolean(parentId),
-    ...options,
-});
 
 // limit is deliberately higher than the four cards that get rendered. The
 // server groups and slices before the client can drop families it does not
