@@ -58,6 +58,8 @@ export const refundRequestKeys = {
     shipBacks: () => ['refundRequests', 'shipBacks'],
     // The fixed lists the server owns: the inspection checklist and the
     // dispositions. Cached hard because they only change when the code does.
+    // One customer's offer, read from an emailed link.
+    offer: (id) => ['refundRequests', 'offer', id],
     checklist: () => ['refundRequests', 'checklist'],
     // Keyed by request because the answer includes whether the supplier
     // route is open for that particular unit, which is a fact about the

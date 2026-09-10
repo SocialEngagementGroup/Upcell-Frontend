@@ -42,6 +42,7 @@ const AboutUs = lazy(() => import('./pages/Legal/AboutUs/AboutUs.jsx'));
 const ThankYou = lazy(() => import('./pages/ThankYou/ThankYou.jsx'));
 const ContactThankYou = lazy(() => import('./pages/ThankYou/ContactThankYou.jsx'));
 const JournalPost = lazy(() => import('./pages/Auxiliary/Resources/JournalPost.jsx'));
+const OfferResponse = lazy(() => import('./pages/Returns/OfferResponse.jsx'));
 const NotFound = lazy(() => import('./pages/NotFound/NotFound.jsx'));
 const AdminTradeIn = lazy(() => import('./pages/Admin/TradeIn/AdminTradeIn.jsx'));
 const AdminRefundRequests = lazy(() => import('./pages/Admin/RefundRequests/AdminRefundRequests.jsx'));
@@ -154,6 +155,13 @@ const router = createBrowserRouter([
       {
         path: "trade-in",
         element: lazyElement(<TradeIn />),
+      },
+      {
+        // Where the revised-offer email lands. No PrivateRoute: the token in
+        // the link is the authorisation, and a sign-in wall here is how an
+        // offer expires unanswered and a device gets posted back for nothing.
+        path: "returns/:id/:decision",
+        element: lazyElement(<OfferResponse />),
       },
       {
         path: "succeed",

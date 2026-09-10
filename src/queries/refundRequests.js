@@ -161,6 +161,29 @@ export const useOverrideWindowMutation = adminMutation('window');
 // Freezing the inspection photos past their ninety days, and letting them go.
 export const useSetDisputeHoldMutation = adminMutation('dispute-hold');
 
+// The revised offer, for the page the email links to.
+//
+// No auth: the token in the link is the authorisation, and it grants exactly
+// this one return. A bad token, an unknown id and a deleted return all answer
+// 404, so retry is pointless and would only help somebody guessing.
+export const useRevisedOfferQuery = (id, token) => useQuery({
+    queryKey: refundRequestKeys.offer(id),
+    queryFn: () => axiosInstance
+        .get(`returns/${id}`, { params: { token } })
+        .then((res) => res.data),
+    enabled: Boolean(id && token),
+    retry: false,
+    refetchOnWindowFocus: false,
+});
+
+// Accepting or declining it. Deliberately not wired to invalidateReturns: the
+// customer is not signed in and has no admin queries to refresh.
+export const useRespondToOfferMutation = () => useMutation({
+    mutationFn: ({ id, decision, token }) => axiosInstance
+        .post(`returns/${id}/${decision}`, {}, { params: { token } })
+        .then((res) => res.data),
+});
+
 // Finding a parcel on the receiving bench by RMA or tracking number.
 //
 // A lookup rather than a search-as-you-type: staff read a number off a box, and
