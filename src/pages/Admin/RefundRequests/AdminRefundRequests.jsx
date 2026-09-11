@@ -58,6 +58,23 @@ const ACTIONS = {
         { status: 'Approved', label: 'Approve full refund', field: 'inspectionNotes', prompt: 'What did the device look like?' },
         REJECT,
     ],
+    // WARRANTY replaces the list above when the request is a warranty claim —
+    // see actionsFor. A warranty claim ends in a working phone, so "approve
+    // full refund" is not one of the things that can happen to it.
+    WARRANTY_IN_INSPECTION: [
+        { status: 'Approved', label: 'Repaired', warrantyOutcome: 'REPAIR', field: 'inspectionNotes', prompt: 'What was wrong, and what did you do?', required: true },
+        { status: 'Approved', label: 'Replaced', warrantyOutcome: 'REPLACE', field: 'inspectionNotes', prompt: 'What was wrong, and what went out instead?', required: true },
+        {
+            status: 'Approved',
+            label: 'Refund as an exception',
+            warrantyOutcome: 'REFUND_EXCEPTION',
+            field: 'inspectionNotes',
+            prompt: 'Why can this not be repaired or replaced?',
+            required: true,
+            confirm: 'Refund in full under warranty? Only do this when the device cannot be repaired and there is nothing to replace it with.',
+        },
+        REJECT,
+    ],
     ActionRequired: [REJECT],
     RevisedOffer: [],
     Approved: [],
@@ -83,19 +100,34 @@ const PANELS = {
 const RequestCard = ({ request, onMove, busy }) => {
     const [field, setField] = useState('');
     const [openAction, setOpenAction] = useState(null);
-    const actions = ACTIONS[request.status] || [];
+    // A warranty claim at inspection is answered differently from a return:
+    // repair, replace, or refund as an exception. Everything before and after
+    // inspection is the same process, so only this one state diverges.
+    const warranty = request.claimKind === 'WARRANTY';
+    const actions = (warranty && request.status === 'InInspection'
+        ? ACTIONS.WARRANTY_IN_INSPECTION
+        : ACTIONS[request.status]) || [];
 
     const run = (action) => {
         // A move that needs no text is a single click; one that does opens the
         // box first rather than sending an empty field to be rejected.
-        if (action.field && openAction !== action.status) {
-            setOpenAction(action.status);
+        // Keyed on the label, not the status: the three warranty outcomes all
+        // move to Approved, so keying on the status would make clicking
+        // 'Replaced' submit the box that 'Repaired' had opened.
+        if (action.field && openAction !== action.label) {
+            setOpenAction(action.label);
             return;
         }
         if (action.required && !field.trim()) return;
         if (action.confirm && !window.confirm(action.confirm)) return;
 
-        onMove({ id: request._id, status: action.status, [action.field || 'noop']: field.trim() || undefined });
+        onMove({
+            id: request._id,
+            status: action.status,
+            [action.field || 'noop']: field.trim() || undefined,
+            // Only on a warranty action. The server ignores it on a return.
+            warrantyOutcome: action.warrantyOutcome,
+        });
         setField('');
         setOpenAction(null);
     };
@@ -171,7 +203,7 @@ const RequestCard = ({ request, onMove, busy }) => {
                     autoFocus
                     value={field}
                     onChange={(event) => setField(event.target.value)}
-                    placeholder={actions.find((a) => a.status === openAction)?.prompt}
+                    placeholder={actions.find((a) => a.label === openAction)?.prompt}
                     className="mt-3 w-full rounded-2xl border border-black/[0.08] bg-white p-3 text-sm outline-none focus:border-apple-text/25"
                 />
             ) : null}
@@ -190,7 +222,7 @@ const RequestCard = ({ request, onMove, busy }) => {
                                     : 'premium-button px-4 py-2 text-sm disabled:opacity-50'
                             }
                         >
-                            {openAction === action.status ? 'Confirm' : action.label}
+                            {openAction === action.label ? 'Confirm' : action.label}
                         </button>
                     ))}
                 </div>

@@ -63,6 +63,11 @@ const RefundRequestPanel = ({ order }) => {
         return next;
     });
 
+    // A return and a warranty claim are the same form with different words,
+    // different reasons, and a different promise at the end of it. The server
+    // decides which; this page only reads it.
+    const warranty = data.kind === 'WARRANTY';
+
     const reasons = data.reasons || [];
     const chosenReason = reasons.find((entry) => entry.code === reasonCode) || null;
 
@@ -92,10 +97,27 @@ const RefundRequestPanel = ({ order }) => {
 
     return (
         <div className="rounded-[24px] border border-black/[0.06] bg-surface-alt p-5">
-            <h4 className="text-base font-medium text-apple-text">Return an item</h4>
+            <h4 className="text-base font-medium text-apple-text">
+                {warranty ? 'Make a warranty claim' : 'Return an item'}
+            </h4>
             <p className="mt-1.5 text-xs leading-5 text-ink-soft">
-                {data.feeNotice} You have until {new Date(data.closesAt).toLocaleDateString()}.
+                {data.feeNotice}{' '}
+                {warranty
+                    ? data.warrantyEndsAt
+                        ? `Your warranty runs until ${new Date(data.warrantyEndsAt).toLocaleDateString()}.`
+                        : ''
+                    : `You have until ${new Date(data.closesAt).toLocaleDateString()}.`}
             </p>
+
+            {/* Both dates, once the return window has gone. A customer told
+                only that the window closed has no way to know the warranty is
+                still running, which is the half that helps them. */}
+            {!warranty && data.warrantyEndsAt ? (
+                <p className="mt-1 text-xs leading-5 text-ink-soft">
+                    After that, your 12-month warranty covers hardware faults until{' '}
+                    {new Date(data.warrantyEndsAt).toLocaleDateString()}.
+                </p>
+            ) : null}
 
             <div className="mt-4 space-y-2">
                 {data.items.map((item) => (
@@ -123,7 +145,7 @@ const RefundRequestPanel = ({ order }) => {
             ) : null}
 
             <label htmlFor="refund-reason-code" className="mt-4 block text-xs font-bold uppercase tracking-[0.1em] text-apple-gray">
-                Why are you returning it?
+                {warranty ? 'What is wrong with it?' : 'Why are you returning it?'}
             </label>
             <select
                 id="refund-reason-code"
@@ -132,7 +154,7 @@ const RefundRequestPanel = ({ order }) => {
                 onChange={(event) => setReasonCode(event.target.value)}
                 className="mt-2 w-full rounded-2xl border border-black/[0.08] bg-white p-3 text-sm text-apple-text outline-none transition-all focus:border-apple-text/25"
             >
-                <option value="">Choose a reason…</option>
+                <option value="">{warranty ? 'Choose a fault…' : 'Choose a reason…'}</option>
                 {reasons.map((entry) => (
                     <option key={entry.code} value={entry.code}>{entry.label}</option>
                 ))}
@@ -148,8 +170,9 @@ const RefundRequestPanel = ({ order }) => {
             {chosenReason ? (
                 <div className="mt-3 rounded-2xl bg-white p-4">
                     <p className="text-xs leading-5 text-ink-soft">
-                        Returns are free — we send you a prepaid label and there is no
-                        restocking fee. You have {chosenReason.windowDays} days from delivery.
+                        {warranty
+                            ? 'We send you a prepaid label both ways. Once we have looked at it we will repair or replace the device — a refund is only offered where neither is possible.'
+                            : `Returns are free — we send you a prepaid label and there is no restocking fee. You have ${chosenReason.windowDays} days from delivery.`}
                     </p>
 
                     {data.estimate && selected.size > 0 ? (
