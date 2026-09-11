@@ -12,6 +12,7 @@ import { useProductBySlugQuery, useRecommendedProductsQuery, useAccessoriesQuery
 import { EMPTY_ARRAY } from '../../../queries/keys';
 import { pickVariant } from '../../../utilities/catalog';
 import { resolveProductImage } from '../../../utilities/productImages';
+import { gradeFor, carrierLabelFor, batteryLabelFor } from '../../../constants/deviceGrades';
 import { resolveImageRef } from '../../../utilities/cloudinary';
 import ModernProductCard from '../../../components/ModernProductCard/ModernProductCard';
 import RouteLoadingScreen from '../../../components/RouteLoadingScreen/RouteLoadingScreen';
@@ -33,16 +34,6 @@ const featureCards = [
     },
 ];
 
-
-// Plain-English explanation of each condition grade shown on the listing.
-const GRADE_EXPLANATIONS = {
-    New: 'Brand new and unused, in factory-sealed packaging.',
-    Excellent: 'Minimal to no visible wear. Looks close to new under normal use.',
-    Good: 'Light, normal signs of use with minor cosmetic marks. Fully functional.',
-    Fair: 'Noticeable cosmetic wear such as light scratches or scuffs. Fully tested and functional.',
-    Refurbished: 'Professionally restored and tested to full working condition.',
-    Refubrished: 'Professionally restored and tested to full working condition.',
-};
 
 // What our certified-premium program includes on every device. These are
 // program-wide standards; anything specific to a single unit is noted on its
@@ -78,6 +69,13 @@ const ProductDetailPage = () => {
     const notFound = error?.response?.status === 404;
 
     const product = notFound ? undefined : data?.product;
+
+    // The three facts a used-phone buyer checks first. All were in the data
+    // and none was on the page: the grade was shown from the old free-text
+    // field, and the battery and carrier were not shown at all.
+    const grade = gradeFor(product);
+    const battery = batteryLabelFor(product);
+    const carrier = carrierLabelFor(product);
     const allProducts = data?.family || EMPTY_ARRAY;
     const { data: recommendedPool = EMPTY_ARRAY } = useRecommendedProductsQuery(product?.parentCatagory);
 
@@ -316,11 +314,38 @@ const ProductDetailPage = () => {
                     <div className="md:mt-0">
                         <h1 className="text-[clamp(2rem,4vw,4.3rem)] leading-[1] sm:leading-[0.95]">{product.productName}</h1>
                         <div className="mt-3 text-3xl font-extrabold text-apple-text sm:text-4xl">${product.price} <span className="text-lg font-semibold text-ink-soft">USD</span></div>
-                        {product.condition && (
-                            <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-black/[0.08] bg-surface-alt px-4 py-1.5 text-[13px] font-bold text-apple-text">
-                                Condition grade: {product.condition}
-                            </div>
-                        )}
+                        {/* The grade, the battery and the carrier lock: the three
+                            things a used-phone buyer checks before anything else.
+                            They were all in the data and none of them was shown. */}
+                        <div className="mt-3 flex flex-wrap gap-2">
+                            {grade ? (
+                                <span
+                                    title={grade.explanation}
+                                    className="inline-flex items-center gap-2 rounded-full border border-black/[0.08] bg-surface-alt px-4 py-1.5 text-[13px] font-bold text-apple-text"
+                                >
+                                    Condition: {grade.label}
+                                </span>
+                            ) : null}
+
+                            {battery ? (
+                                <span className="inline-flex items-center gap-2 rounded-full border border-black/[0.08] bg-surface-alt px-4 py-1.5 text-[13px] font-bold text-apple-text">
+                                    Battery {battery}
+                                </span>
+                            ) : null}
+
+                            {carrier ? (
+                                <span className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[13px] font-bold ${
+                                    product.carrierStatus === 'UNLOCKED'
+                                        ? 'border border-black/[0.08] bg-surface-alt text-apple-text'
+                                        // A lock is a restriction and reads as one. Burying
+                                        // it in the same grey as everything else is how a
+                                        // customer finds out after it arrives.
+                                        : 'border border-brand-red/20 bg-brand-red/[0.06] text-brand-red'
+                                }`}>
+                                    {carrier}
+                                </span>
+                            ) : null}
+                        </div>
 
                         {/* ─── Color Selection ─── */}
                         <div className="mt-10">
@@ -497,15 +522,34 @@ const ProductDetailPage = () => {
                                         <dd className="text-sm font-bold text-apple-text text-right">{product.color.name}</dd>
                                     </div>
                                 )}
-                                {product.condition && (
+                                {grade && (
                                     <div className="flex justify-between gap-4 py-3">
                                         <dt className="text-sm font-semibold text-apple-gray">Condition grade</dt>
                                         <dd className="text-sm font-bold text-apple-text text-right">
-                                            {product.condition}
-                                            {GRADE_EXPLANATIONS[product.condition] && (
-                                                <span className="mt-1 block text-xs font-normal text-ink-soft">{GRADE_EXPLANATIONS[product.condition]}</span>
+                                            {grade.label}
+                                            {grade.explanation && (
+                                                <span className="mt-1 block text-xs font-normal text-ink-soft">{grade.explanation}</span>
                                             )}
                                         </dd>
+                                    </div>
+                                )}
+                                {battery && (
+                                    <div className="flex justify-between gap-4 py-3">
+                                        <dt className="text-sm font-semibold text-apple-gray">Battery health</dt>
+                                        <dd className="text-sm font-bold text-apple-text text-right">
+                                            {battery}
+                                            {/* Said plainly, because a number with no floor
+                                                beside it invites the question. */}
+                                            <span className="mt-1 block text-xs font-normal text-ink-soft">
+                                                We do not list a device below 80%.
+                                            </span>
+                                        </dd>
+                                    </div>
+                                )}
+                                {carrier && (
+                                    <div className="flex justify-between gap-4 py-3">
+                                        <dt className="text-sm font-semibold text-apple-gray">Carrier</dt>
+                                        <dd className="text-sm font-bold text-apple-text text-right">{carrier}</dd>
                                     </div>
                                 )}
                             </dl>
