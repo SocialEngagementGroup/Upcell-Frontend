@@ -40,3 +40,8 @@ public/staticImages/*
 
 # Vite writes these while building and never cleans them up
 vite.config.js.timestamp-*
+
+# Playwright's own output. Written on a failed smoke run, never source.
+/test-results/
+/playwright-report/
+/playwright/.cache/

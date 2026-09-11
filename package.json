@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "sitemap": "node scripts/generate-sitemap.mjs"
+    "sitemap": "node scripts/generate-sitemap.mjs",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.61.8",
@@ -30,6 +31,7 @@
     "validator": "^13.15.35"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@types/react": "^18.2.15",
     "@vitejs/plugin-react": "^4.0.3",
     "autoprefixer": "^10.4.27",

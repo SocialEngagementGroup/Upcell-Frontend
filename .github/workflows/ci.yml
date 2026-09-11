@@ -34,3 +34,43 @@ jobs:
           # it is absent — which would pass CI while shipping a dead site. A
           # placeholder is enough to prove the app itself compiles.
           VITE_CLERK_PUBLISHABLE_KEY: pk_test_ci
+
+  # The one path that makes money, walked end to end against a deployed site.
+  #
+  # A separate job because it needs something CI cannot provide on its own: a
+  # URL with real products, real images and real Clerk behind it. Set the
+  # E2E_BASE_URL repository variable to a Vercel preview to turn it on; until
+  # then the job runs, finds nothing to do, and passes — which is honest, and
+  # keeps the workflow from failing for a reason nobody can fix in the repo.
+  #
+  # It never gates the build job above. A flaky network should not stop a
+  # merge, and this is here to catch a broken checkout, not to be a tollgate.
+  smoke:
+    runs-on: ubuntu-latest
+    needs: build
+    if: vars.E2E_BASE_URL != ''
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - run: npm ci
+
+      # Chromium only. The browsers are ~400MB and this proves the app works,
+      # not that it works in three engines.
+      - run: npx playwright install --with-deps chromium
+
+      - run: npm run test:e2e
+        env:
+          E2E_BASE_URL: ${{ vars.E2E_BASE_URL }}
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

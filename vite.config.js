@@ -66,4 +66,10 @@ export default defineConfig({
   esbuild: {
     drop: ['console', 'debugger'],
   },
+  test: {
+    // Playwright's spec lives in tests-e2e and drives a deployed site through
+    // a real browser. Vitest picking it up meant `npm test` failed on an
+    // import of @playwright/test that has no business running here.
+    exclude: ['node_modules/**', 'tests-e2e/**', 'dist/**'],
+  },
 })
