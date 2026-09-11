@@ -30,6 +30,7 @@ const AdminCatagory = lazy(() => import('./pages/Admin/Categories/AdminCatagory/
 const AdminHome = lazy(() => import('./pages/Admin/Dashboard/AdminHome/AdminHome.jsx'));
 const AllProduct = lazy(() => import('./pages/Admin/Products/AllProduct/AllProduct.jsx'));
 const AddProduct = lazy(() => import('./pages/Admin/Products/AddProduct/AddProduct.jsx'));
+const ImportProducts = lazy(() => import('./pages/Admin/Products/ImportProducts/ImportProducts.jsx'));
 const Checkout = lazy(() => import('./pages/Checkout/Checkout.jsx'));
 const AdminOrder = lazy(() => import('./pages/Admin/Orders/AdminOrder/AdminOrder.jsx'));
 const LoginAndSignup = lazy(() => import('./pages/Auth/LoginAndSignup/LoginAndSignup.jsx'));
@@ -289,6 +290,13 @@ const router = createBrowserRouter([
           {
             path: "addproduct",
             element: lazyElement(<AddProduct />),
+          },
+          {
+            // A pallet of stock from a spreadsheet. Kept apart from Add
+            // Product because the two are different jobs: one is a new model,
+            // the other is forty units of one that already exists.
+            path: "import-products",
+            element: lazyElement(<ImportProducts />),
           },
         ],
       },

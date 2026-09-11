@@ -3,6 +3,7 @@ import { userContext } from '../../../../utilities/UserContextProvider';
 import axiosInstance from '../../../../utilities/axiosInstance';
 import AdminPageHeader from '../../../../components/AdminPageHeader/AdminPageHeader';
 import AdminLoadingState from '../../../../components/AdminState/AdminLoadingState';
+import StockSummary from './StockSummary';
 
 const AdminHome = () => {
     const [ordersToday, setOrdersToday] = useState({ amount: 0, money: 0 });
@@ -59,6 +60,10 @@ const AdminHome = () => {
                     ))}
                 </div>
             )}
+
+            {/* How much of that catalogue can actually be sold, which is not
+                the same as how much of it is in the building. */}
+            <StockSummary />
         </section>
     );
 };

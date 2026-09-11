@@ -8,6 +8,7 @@ const links = [
     { to: 'catagory', label: 'Categories' },
     { to: 'products', label: 'Products' },
     { to: 'addproduct', label: 'Add Product' },
+    { to: 'import-products', label: 'Import Stock' },
     { to: 'orders', label: 'Orders' },
     { to: 'payments', label: 'Payments' },
     { to: 'refund-requests', label: 'Returns' },
