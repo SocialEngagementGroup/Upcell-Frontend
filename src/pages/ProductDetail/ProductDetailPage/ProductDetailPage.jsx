@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
+import Seo, { productJsonLd } from '../../../components/Seo/Seo';
 import { useParams } from 'react-router';
 import { Link, useNavigate } from 'react-router-dom';
 import ScrollToTop from '../../../utilities/ScrollToTop';
@@ -76,6 +77,13 @@ const ProductDetailPage = () => {
     const grade = gradeFor(product);
     const battery = batteryLabelFor(product);
     const carrier = carrierLabelFor(product);
+
+    // The one page where structured data earns its place. itemCondition is
+    // the point: Google shows a "Used" badge on a result that declares
+    // UsedCondition, and a listing that does not say so competes against new
+    // stock on price alone and loses.
+    const canonicalPath = product?.slug ? `/product/${product.slug}` : undefined;
+    const socialImage = product ? resolveProductImage(product, { width: 1200 }) : undefined;
     const allProducts = data?.family || EMPTY_ARRAY;
     const { data: recommendedPool = EMPTY_ARRAY } = useRecommendedProductsQuery(product?.parentCatagory);
 
@@ -219,6 +227,24 @@ const ProductDetailPage = () => {
     if (isLoading) {
         return (
             <div className="page-shell">
+            {product ? (
+                <Seo
+                    title={product.productName}
+                    description={[
+                        product.productName,
+                        grade ? `in ${grade.label} condition` : null,
+                        product.storage,
+                        battery ? `battery ${battery}` : null,
+                    ].filter(Boolean).join(', ') + '. Tested, graded and covered by a 30-day free return.'}
+                    path={canonicalPath}
+                    image={socialImage}
+                    jsonLd={productJsonLd({
+                        product,
+                        url: canonicalPath ? `https://www.upcellit.com${canonicalPath}` : undefined,
+                        image: socialImage,
+                    })}
+                />
+            ) : null}
                 <RouteLoadingScreen />
             </div>
         );

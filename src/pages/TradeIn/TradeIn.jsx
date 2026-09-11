@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import Seo from '../../components/Seo/Seo';
 import ScrollToTop from '../../utilities/ScrollToTop';
 import { Link } from 'react-router-dom';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
@@ -321,6 +322,11 @@ const TradeIn = () => {
 
     return (
         <div className="page-shell">
+            <Seo
+                title="Trade in your phone, tablet or laptop"
+                description="Get an instant quote for your used Apple or Android device. Free insured shipping and payment within a day of inspection."
+                path="/trade-in"
+            />
             <ScrollToTop />
 
             {/* ─── Hero ─── */}

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Seo from '../../components/Seo/Seo';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
@@ -11,6 +12,7 @@ const day = (value) => (value ? new Date(value).toLocaleDateString() : null);
 
 const Shell = ({ children }) => (
     <div className="page-shell">
+            <Seo title="Your return" noIndex />
         <section className="page-container py-16">
             <div className="premium-card mx-auto max-w-[640px] rounded-[32px] px-6 py-12 sm:rounded-[40px] sm:px-10">
                 {children}

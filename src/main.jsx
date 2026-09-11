@@ -2,6 +2,7 @@ import React, { Suspense, lazy } from 'react';
 import ReactDOM from 'react-dom/client';
 import { ClerkProvider } from '@clerk/clerk-react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { HelmetProvider } from 'react-helmet-async';
 
 import './index.css';
 import { loadGtm } from './utilities/gtm';
@@ -328,6 +329,7 @@ if (!clerkPublishableKey) {
   );
 } else {
   root.render(
+    <HelmetProvider>
     <QueryClientProvider client={queryClient}>
       {/* signInUrl and signUpUrl tell Clerk that this app hosts its own auth
           pages. Without them Clerk falls back to the Account Portal it hosts
@@ -347,5 +349,6 @@ if (!clerkPublishableKey) {
         </UserContextProvider>
       </ClerkProvider>
     </QueryClientProvider>
+    </HelmetProvider>
   );
 }

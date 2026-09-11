@@ -1,4 +1,5 @@
 import React from 'react';
+import Seo from '../../components/Seo/Seo';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import LocalShippingOutlinedIcon from '@mui/icons-material/LocalShippingOutlined';
 import { useGuestOrderQuery } from '../../queries/orders';
@@ -28,6 +29,7 @@ const GuestOrder = () => {
         // purpose — the API will not say which, so neither can this page.
         return (
             <div className="page-shell">
+            <Seo title="Your order" noIndex />
                 <section className="page-container py-20">
                     <div className="premium-card mx-auto max-w-[560px] rounded-[32px] px-8 py-14 text-center">
                         <h1 className="text-[clamp(1.8rem,4vw,2.6rem)] font-extrabold text-apple-text">
@@ -49,6 +51,7 @@ const GuestOrder = () => {
 
     return (
         <div className="page-shell">
+            <Seo title="Your order" noIndex />
             <section className="page-container py-12">
                 <div className="mx-auto max-w-[760px]">
                     <p className="text-xs font-black uppercase tracking-[0.16em] text-brand-red">Your order</p>

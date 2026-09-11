@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Seo from '../../components/Seo/Seo';
 import { Link } from 'react-router-dom';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import axiosInstance from '../../utilities/axiosInstance';
@@ -81,7 +82,12 @@ const Wholesale = () => {
     if (sent) {
         return (
             <div className="page-shell">
-                <ScrollToTop />
+                <Seo
+                title="Sell devices in volume"
+                description="We buy Apple and Android handsets, tablets and laptops by the batch, in any condition. One quote for the whole lot."
+                path="/wholesale"
+            />
+            <ScrollToTop />
                 <section className="page-container py-20">
                     <div className="premium-card mx-auto max-w-[560px] rounded-[32px] px-8 py-14 text-center">
                         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-apple-text/[0.06] text-apple-text">

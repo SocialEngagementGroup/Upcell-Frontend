@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
+import Seo from '../../components/Seo/Seo';
 import { Link } from 'react-router-dom';
 import ScrollToTop from '../../utilities/ScrollToTop';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -134,6 +135,7 @@ const ThankYou = () => {
 
     return (
         <div className="page-shell">
+            <Seo title="Order confirmed" noIndex />
             <ScrollToTop />
 
             <section className="page-container pb-10 pt-6">

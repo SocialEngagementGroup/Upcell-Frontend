@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import Seo from '../../components/Seo/Seo';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { CartContext } from '../../App';
 import ScrollToTop from '../../utilities/ScrollToTop';
@@ -450,6 +451,11 @@ const ShopPage = () => {
     const activeSortOption = sortOptions.find((option) => option.value === sortBy) || sortOptions[0];
     return (
         <div className="page-shell">
+            <Seo
+                title="Shop certified used iPhone, iPad and Mac"
+                description="Every device tested, graded and covered. Free returns for 30 days, free shipping both ways."
+                path="/shop"
+            />
             <ScrollToTop />
 
             <section className="page-container pb-10 pt-6">

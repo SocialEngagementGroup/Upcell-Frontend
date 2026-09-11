@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Seo from '../../components/Seo/Seo';
 import { Link } from 'react-router-dom';
 import MarkEmailReadOutlinedIcon from '@mui/icons-material/MarkEmailReadOutlined';
 import { useRequestOrderLinkMutation } from '../../queries/orders';
@@ -34,6 +35,7 @@ const TrackOrder = () => {
     if (asked) {
         return (
             <div className="page-shell">
+            <Seo title="Find your order" noIndex />
                 <section className="page-container py-20">
                     <div className="premium-card mx-auto max-w-[560px] rounded-[32px] px-8 py-14 text-center">
                         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-apple-text/[0.06] text-apple-text">
@@ -53,6 +55,7 @@ const TrackOrder = () => {
 
     return (
         <div className="page-shell">
+            <Seo title="Find your order" noIndex />
             <section className="page-container py-16">
                 <form onSubmit={submit} className="premium-card mx-auto max-w-[560px] rounded-[32px] px-6 py-12 sm:px-10">
                     <h1 className="text-[clamp(1.7rem,4vw,2.4rem)] font-extrabold text-apple-text">Find your order</h1>
