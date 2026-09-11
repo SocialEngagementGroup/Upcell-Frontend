@@ -43,6 +43,7 @@ const AboutUs = lazy(() => import('./pages/Legal/AboutUs/AboutUs.jsx'));
 const ThankYou = lazy(() => import('./pages/ThankYou/ThankYou.jsx'));
 const ContactThankYou = lazy(() => import('./pages/ThankYou/ContactThankYou.jsx'));
 const JournalPost = lazy(() => import('./pages/Auxiliary/Resources/JournalPost.jsx'));
+const Wholesale = lazy(() => import('./pages/Wholesale/Wholesale.jsx'));
 const GuestOrder = lazy(() => import('./pages/OrderLookup/GuestOrder.jsx'));
 const TrackOrder = lazy(() => import('./pages/OrderLookup/TrackOrder.jsx'));
 const OfferResponse = lazy(() => import('./pages/Returns/OfferResponse.jsx'));
@@ -162,6 +163,12 @@ const router = createBrowserRouter([
       {
         path: "trade-in",
         element: lazyElement(<TradeIn />),
+      },
+      {
+        // Selling in volume. The backend has taken these since before the
+        // September work; there was no page to submit one from.
+        path: "wholesale",
+        element: lazyElement(<Wholesale />),
       },
       {
         // A guest's own order, from the link in their receipt. No guard: the
