@@ -6,6 +6,7 @@ import { Toaster } from 'sonner';
 import { TOASTER_ICONS } from './utilities/toastIcons';
 
 import { createContext, useEffect, useMemo, useState } from 'react'
+import useCartSync from './utilities/useCartSync';
 export const CartContext = createContext([])
 
 function App() {
@@ -17,6 +18,11 @@ function App() {
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart))
   }, [cart])
+
+  // For a signed-in customer the cart also lives on the server, so it follows
+  // them between a phone and a laptop and survives clearing site data. Guests
+  // keep theirs in the browser, which is all a guest has.
+  useCartSync(cart, setCart);
 
   // Memoised because this object is the context value: written inline it is a
   // new object on every App render, so every consumer re-renders whenever
