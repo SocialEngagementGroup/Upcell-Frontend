@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import Seo, { productJsonLd } from '../../../components/Seo/Seo';
+import ReviewsSection from '../../../components/Reviews/ReviewsSection';
 import { useParams } from 'react-router';
 import { Link, useNavigate } from 'react-router-dom';
 import ScrollToTop from '../../../utilities/ScrollToTop';
@@ -608,6 +609,11 @@ const ProductDetailPage = () => {
                     </div>
                 </div>
             </section>
+
+            {/* Above the recommendations, because somebody deciding on this
+                phone should read what its owners said before being offered a
+                different one. */}
+            <ReviewsSection parentId={product?.parentCatagory} productName={product?.productName} />
 
             <section className="page-container pb-16 pt-12 md:pt-20">
                 <div className="mb-8 text-center md:mb-10 md:text-left">

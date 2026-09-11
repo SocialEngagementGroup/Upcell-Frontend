@@ -31,6 +31,7 @@ const AdminHome = lazy(() => import('./pages/Admin/Dashboard/AdminHome/AdminHome
 const AllProduct = lazy(() => import('./pages/Admin/Products/AllProduct/AllProduct.jsx'));
 const AddProduct = lazy(() => import('./pages/Admin/Products/AddProduct/AddProduct.jsx'));
 const ImportProducts = lazy(() => import('./pages/Admin/Products/ImportProducts/ImportProducts.jsx'));
+const AdminReviews = lazy(() => import('./pages/Admin/Reviews/AdminReviews.jsx'));
 const Checkout = lazy(() => import('./pages/Checkout/Checkout.jsx'));
 const AdminOrder = lazy(() => import('./pages/Admin/Orders/AdminOrder/AdminOrder.jsx'));
 const LoginAndSignup = lazy(() => import('./pages/Auth/LoginAndSignup/LoginAndSignup.jsx'));

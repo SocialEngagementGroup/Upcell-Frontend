@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import JsBarcode from "jsbarcode";
 import RefundRequestPanel from "./RefundRequestPanel";
+import WriteReviewPanel from "./WriteReviewPanel";
 import { resolveImageRef } from "../../utilities/cloudinary";
 
 const money = (cents) => "$" + (Number(cents || 0) / 100).toFixed(2);
@@ -153,6 +154,16 @@ const SingleCustomerOrder = ({ order }) => {
                     {paid ? (
                         <div className="lg:col-span-2">
                             <RefundRequestPanel order={order} />
+                        </div>
+                    ) : null}
+
+                    {/* Below the return form on purpose. Somebody opening a
+                        delivered order is more often dealing with a problem
+                        than praising it, and the answer to a problem should
+                        not be under an invitation to leave five stars. */}
+                    {paid ? (
+                        <div className="lg:col-span-2">
+                            <WriteReviewPanel order={order} lines={lines} />
                         </div>
                     ) : null}
                 </div>

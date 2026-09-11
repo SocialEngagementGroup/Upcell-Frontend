@@ -78,6 +78,14 @@ export const refundRequestKeys = {
     report: (filters = {}) => ['refundRequests', 'report', filters],
 };
 
+// What customers said. Keyed by product and page for the product page, by
+// status for the moderation queue.
+export const reviewKeys = {
+    forProduct: (parentId, page = 1) => ['reviews', 'product', parentId, page],
+    mine: () => ['reviews', 'mine'],
+    admin: (status) => ['reviews', 'admin', status],
+};
+
 export const notificationKeys = {
     // Shared between the sidebar badge (AdminSecret) and the Notifications
     // page itself — before this, each polled admin-notifications-unread-count
