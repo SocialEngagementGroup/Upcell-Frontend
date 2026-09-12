@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { UserProfile } from "@clerk/clerk-react";
 import SingleCustomerOrder from "./SingleCustomerOrder";
+import TradeInPanel from "./TradeInPanel";
 import axiosInstance from "../../utilities/axiosInstance";
 
 // Brand-aligned styling for Clerk's embedded UserProfile (matches tailwind tokens).
@@ -116,6 +117,11 @@ const MyAccount = () => {
             </section>
 
             <section className="page-container pb-16">
+                {/* Above the orders, because a trade-in is the one that may be
+                    waiting on the customer to do something — a label to print,
+                    an offer to answer — and an order usually is not. */}
+                {activeTab === 'orders' ? <div className="mb-5"><TradeInPanel /></div> : null}
+
                 {activeTab === 'orders' ? (
                     isLoading ? (
                         <div className="premium-card rounded-[36px] px-8 py-16 text-center">

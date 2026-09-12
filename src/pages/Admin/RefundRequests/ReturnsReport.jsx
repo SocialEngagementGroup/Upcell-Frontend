@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useReturnsReportQuery } from '../../../queries/refundRequests';
-import { apiBaseUrl } from '../../../utilities/env';
+import { toast } from 'sonner';
+import { downloadCsv } from '../../../utilities/downloadCsv';
+import { extractApiError } from '../../../utilities/formValidation';
 import { money } from './ReturnPanelKit';
 
 // Is a model coming back more than the rest, and what for.
@@ -91,14 +93,18 @@ const ReturnsReport = () => {
                     />
                 </label>
 
-                {/* A plain link, not a fetch: the browser already knows how to
-                    save a file, and the endpoint sends the filename. */}
-                <a
-                    href={`${apiBaseUrl}admin-returns-report.csv${from || to ? `?${new URLSearchParams(filters)}` : ''}`}
+                {/* Through axios, not a plain link. The endpoint is behind
+                    verifyToken and a link navigation sends no Authorization
+                    header, so the old <a href> answered 401 and bounced the
+                    page to the login screen. See utilities/downloadCsv.js. */}
+                <button
+                    type="button"
+                    onClick={() => downloadCsv('admin-returns-report.csv', filters, 'upcell-returns.csv')
+                        .catch((error) => toast.error(extractApiError(error)))}
                     className="rounded-full border border-black/[0.08] px-4 py-2.5 text-sm font-medium text-apple-text hover:bg-black/[0.03]"
                 >
                     Download CSV
-                </a>
+                </button>
 
                 {isFetching ? <span className="text-xs text-ink-soft">Updating…</span> : null}
             </div>

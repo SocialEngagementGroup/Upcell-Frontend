@@ -86,6 +86,20 @@ export const reviewKeys = {
     admin: (status) => ['reviews', 'admin', status],
 };
 
+// Trade-ins. The admin queue by status, one request, and the report.
+export const tradeInKeys = {
+    adminList: (status) => ['tradeIns', 'admin', status],
+    one: (id) => ['tradeIns', id],
+    // What this customer has traded in. Their own list, not the queue.
+    mine: () => ['tradeIns', 'mine'],
+    report: (filters = {}) => ['tradeIns', 'report', filters],
+    // A revised offer, read from an emailed link. Keyed on the token as well
+    // as the id, because a stale token must not read a cached answer that a
+    // live one fetched.
+    offer: (id, token) => ['tradeIns', 'offer', id, token],
+    lookup: (term) => ['tradeIns', 'lookup', term],
+};
+
 export const notificationKeys = {
     // Shared between the sidebar badge (AdminSecret) and the Notifications
     // page itself — before this, each polled admin-notifications-unread-count

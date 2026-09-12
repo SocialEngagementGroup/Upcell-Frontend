@@ -52,6 +52,10 @@ const TrackOrder = lazy(() => import('./pages/OrderLookup/TrackOrder.jsx'));
 const OfferResponse = lazy(() => import('./pages/Returns/OfferResponse.jsx'));
 const NotFound = lazy(() => import('./pages/NotFound/NotFound.jsx'));
 const AdminTradeIn = lazy(() => import('./pages/Admin/TradeIn/AdminTradeIn.jsx'));
+const TradeInQueue = lazy(() => import('./pages/Admin/TradeIn/TradeInQueue.jsx'));
+const TradeInReceiving = lazy(() => import('./pages/Admin/TradeIn/TradeInReceiving.jsx'));
+const TradeInReport = lazy(() => import('./pages/Admin/TradeIn/TradeInReport.jsx'));
+const TradeInOffer = lazy(() => import('./pages/TradeIn/TradeInOffer.jsx'));
 const AdminRefundRequests = lazy(() => import('./pages/Admin/RefundRequests/AdminRefundRequests.jsx'));
 const ReceivingDesk = lazy(() => import('./pages/Admin/RefundRequests/ReceivingDesk.jsx'));
 const ReturnsReport = lazy(() => import('./pages/Admin/RefundRequests/ReturnsReport.jsx'));
@@ -110,6 +114,13 @@ const router = createBrowserRouter([
         // to make unlocked nothing but the order they were already placing.
         // /myaccount keeps its guard — that one is an account.
         element: lazyElement(<Checkout />),
+      },
+      {
+        // Answering a revised trade-in offer from an emailed link. No login:
+        // an offer somebody cannot open is an offer that expires and a device
+        // that gets posted back. The token in the URL is the proof.
+        path: "trade-in/offer/:id/:token",
+        element: lazyElement(<TradeInOffer />),
       },
       {
         path: "login",
@@ -231,7 +242,26 @@ const router = createBrowserRouter([
             element: lazyElement(<ReturnsReport />),
           },
           {
+            // The queue, one tab per state, with the form each state needs.
             path: "trade-in",
+            element: lazyElement(<TradeInQueue />),
+          },
+          {
+            // The bench: a box, a number, one field. Kept apart from the queue
+            // because somebody unpacking parcels wants one box to type into,
+            // not twelve tabs — the same reason the returns desk is separate.
+            path: "trade-in/receiving",
+            element: lazyElement(<TradeInReceiving />),
+          },
+          {
+            path: "trade-in/report",
+            element: lazyElement(<TradeInReport />),
+          },
+          {
+            // The old list, kept reachable while the new queue is bedded in.
+            // Nothing links to it; it is here so a staff member mid-task is not
+            // stranded if the queue turns out to be missing something.
+            path: "trade-in/legacy",
             element: lazyElement(<AdminTradeIn />),
           },
           {

@@ -16,6 +16,8 @@ const links = [
     { to: 'receiving', label: 'Receiving Desk' },
     { to: 'returns-report', label: 'Returns Report' },
     { to: 'trade-in', label: 'Trade In' },
+    { to: 'trade-in/receiving', label: 'Trade-In Desk' },
+    { to: 'trade-in/report', label: 'Trade-In Report' },
     { to: 'notifications', label: 'Notifications' },
     { to: 'email-settings', label: 'Email Settings' },
     { to: 'newsletter', label: 'Newsletter' },
