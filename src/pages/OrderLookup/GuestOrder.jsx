@@ -88,7 +88,7 @@ const GuestOrder = () => {
                             {(order.items || []).map((item, index) => (
                                 <div key={item.productId || index} className="flex gap-4 rounded-[24px] bg-surface-alt p-4">
                                     <div className="flex h-16 w-16 items-center justify-center rounded-[18px] bg-white">
-                                        <img src={resolveImageRef(item.image, { width: 120 })} alt={item.name} className="max-h-[80%] w-auto object-contain" />
+                                        <img loading="lazy" decoding="async" src={resolveImageRef(item.image, { width: 120 })} alt={item.name} className="max-h-[80%] w-auto object-contain" />
                                     </div>
                                     <div className="flex-1">
                                         <div className="font-bold text-apple-text">{item.name}</div>

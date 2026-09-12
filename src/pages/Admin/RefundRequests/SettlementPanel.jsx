@@ -105,7 +105,7 @@ export const SettlementPanel = ({ request }) => {
                         className="mt-1.5 w-full text-xs text-ink-soft file:mr-3 file:rounded-lg file:border-0 file:bg-apple-text file:px-3 file:py-1.5 file:text-xs file:font-bold file:text-white"
                     />
                     {receiptUrl ? (
-                        <img src={receiptUrl} alt="" className="mt-2 h-20 rounded-lg object-cover" />
+                        <img loading="lazy" decoding="async" src={receiptUrl} alt="" className="mt-2 h-20 rounded-lg object-cover" />
                     ) : null}
                 </Field>
             ) : (

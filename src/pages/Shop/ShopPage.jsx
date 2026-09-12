@@ -499,7 +499,7 @@ const ShopPage = () => {
                                     <>
                                         <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] transition-colors ${focused ? 'bg-white/20' : 'bg-surface-alt group-hover:bg-white/20'}`}>
                                             {suggestion.image && (
-                                                <img src={suggestion.image} alt={suggestion.productName} className="max-h-[80%] w-auto object-contain" />
+                                                <img loading="lazy" decoding="async" src={suggestion.image} alt={suggestion.productName} className="max-h-[80%] w-auto object-contain" />
                                             )}
                                         </span>
                                         <span className="min-w-0 flex-1">

@@ -12,6 +12,17 @@
          dns-prefetch is the fallback for browsers without preconnect. -->
     <link rel="preconnect" href="https://res.cloudinary.com" />
     <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+
+    <!-- Clerk. Every page waits on this one: the app cannot decide whether
+         somebody is signed in until Clerk answers, so the handshake is on the
+         critical path in a way Cloudinary's is not.
+
+         WITH crossorigin here, unlike Cloudinary above — Clerk's script and its
+         fetches are CORS requests, so a preconnect without it opens a
+         connection they will not reuse, which is a wasted round trip rather
+         than a saved one. The two links differ on purpose. -->
+    <link rel="preconnect" href="https://clerk.upcellit.com" crossorigin />
+    <link rel="dns-prefetch" href="https://clerk.upcellit.com" />
     <title>UpCell | Certified Premium iPhone, iPad &amp; MacBook | Trade In Your Apple Device</title>
     <meta name="description" content="Shop certified premium iPhones, iPads, and MacBooks at UpCell. Every premium Apple device is professionally inspected, graded for condition, and backed by a 12-month warranty. Save up to 40% versus new, and get a fast trade-in quote for your current device." />
     <meta name="keywords" content="certified premium iPhone, premium iPad, premium MacBook, buy Apple devices, iPhone trade-in, Apple trade-in value, certified Apple, certified premium iPhone, premium MacBook, certified Apple" />

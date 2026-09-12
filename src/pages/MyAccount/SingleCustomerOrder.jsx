@@ -75,7 +75,7 @@ const SingleCustomerOrder = ({ order }) => {
                             {lines.map((line, index) => (
                                 <div key={line.productId || index} className="rounded-[24px] bg-surface-alt p-4">
                                     <div className="flex gap-4">
-                                        {line.image && <img src={resolveImageRef(line.image, { width: 120 })} alt='product' className="h-16 w-16 rounded-2xl bg-white object-contain p-2" />}
+                                        {line.image && <img loading="lazy" decoding="async" src={resolveImageRef(line.image, { width: 120 })} alt='product' className="h-16 w-16 rounded-2xl bg-white object-contain p-2" />}
                                         <div className="flex-1">
                                             <h5 className="text-lg font-bold text-apple-text">{line.name}</h5>
                                             <small className="text-ink-soft">{line.description}</small>

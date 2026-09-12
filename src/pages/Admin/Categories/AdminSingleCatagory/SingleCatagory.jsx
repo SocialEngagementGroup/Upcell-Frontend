@@ -147,7 +147,7 @@ const SingleCatagory = ({ catagory, productGroups }) => {
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-4">
                                                     <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-lg bg-surface-alt p-1">
-                                                        <img src={resolveImageSrc(product.image, { width: 80 }) || staticImageUrl(STATIC_IMAGES.NOT_AVAILABLE, 80)} className="h-full w-full object-contain" alt="" />
+                                                        <img loading="lazy" decoding="async" src={resolveImageSrc(product.image, { width: 80 }) || staticImageUrl(STATIC_IMAGES.NOT_AVAILABLE, 80)} className="h-full w-full object-contain" alt="" />
                                                     </div>
                                                     <div>
                                                         <span className="block font-semibold text-apple-text">{product.productName}</span>

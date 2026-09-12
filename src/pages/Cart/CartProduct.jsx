@@ -20,7 +20,7 @@ const Thumb = ({ src, alt, size = 'h-14 w-14', faded = false }) => {
                     {(alt || '?').charAt(0)}
                 </span>
             ) : (
-                <img
+                <img loading="lazy" decoding="async"
                     src={src}
                     alt={alt}
                     onError={() => setFailed(true)}

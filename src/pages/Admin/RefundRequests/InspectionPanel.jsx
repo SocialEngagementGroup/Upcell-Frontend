@@ -223,7 +223,7 @@ const InspectionPanel = ({ request }) => {
                 <div className="flex flex-wrap gap-2">
                     {photos.map((photo, index) => (
                         <div key={photo.publicId} className="relative">
-                            <img src={photo.url} alt="" className="h-14 w-14 rounded-lg object-cover" />
+                            <img loading="lazy" decoding="async" src={photo.url} alt="" className="h-14 w-14 rounded-lg object-cover" />
                             <button
                                 type="button"
                                 onClick={() => setPhotos((current) => current.filter((_, i) => i !== index))}

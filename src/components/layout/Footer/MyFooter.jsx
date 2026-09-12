@@ -57,7 +57,7 @@ const MyFooter = () => {
                     <div className="grid gap-12 lg:grid-cols-[1.4fr_0.8fr_0.8fr_0.8fr_1.6fr]">
                         <div className="space-y-5 lg:pt-8">
                             <Link to="/" className="flex items-center">
-                                <img src={staticImageUrl(STATIC_IMAGES.LOGO_FOOTER, 240)} alt="UpCell Logo" className="h-12 w-auto" />
+                                <img loading="lazy" decoding="async" src={staticImageUrl(STATIC_IMAGES.LOGO_FOOTER, 240)} alt="UpCell Logo" className="h-12 w-auto" />
                             </Link>
                             <p className="max-w-[320px] text-[13px] leading-6 text-ink-soft">
                                 Premium Apple devices you can trust. We professionally inspect and honestly grade every certified iPhone, iPad, and MacBook, then back it with a 12-month warranty. Save up to 40% versus buying new.
@@ -80,7 +80,7 @@ const MyFooter = () => {
                                     <div className="mt-2 flex flex-wrap gap-2">
                                         {CARD_BRANDS.map((card) => (
                                             <span key={card.id} className="flex h-9 w-14 items-center justify-center rounded-lg border border-black/[0.06] bg-white">
-                                                <img src={card.src} alt={card.label} className="max-h-5 w-auto object-contain" />
+                                                <img loading="lazy" decoding="async" src={card.src} alt={card.label} className="max-h-5 w-auto object-contain" />
                                             </span>
                                         ))}
                                     </div>

@@ -385,7 +385,7 @@ const Checkout = () => {
                                     {group.variants.length ? (
                                         <div className="flex gap-4">
                                             <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[18px] bg-white">
-                                                <img src={group.image} alt={group.title} className="max-h-[80%] w-auto object-contain" />
+                                                <img loading="lazy" decoding="async" src={group.image} alt={group.title} className="max-h-[80%] w-auto object-contain" />
                                             </div>
                                             <div className="flex-1">
                                                 <div className="font-bold text-apple-text">{group.title}</div>
@@ -447,7 +447,7 @@ const Checkout = () => {
                             <div className="mt-6 grid grid-cols-3 gap-3">
                                 {CARD_BRANDS.map((card) => (
                                     <div key={card.id} className="flex h-12 items-center justify-center rounded-[16px] border border-black/[0.06] bg-white">
-                                        <img src={card.src} alt={card.label} className="max-h-7 w-auto object-contain" />
+                                        <img loading="lazy" decoding="async" src={card.src} alt={card.label} className="max-h-7 w-auto object-contain" />
                                     </div>
                                 ))}
                             </div>

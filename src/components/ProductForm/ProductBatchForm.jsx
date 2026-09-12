@@ -558,7 +558,7 @@ const ProductBatchForm = ({ categories, existingProducts, initialProductName, in
                         {images.map((image, index) => (
                             <div key={`${image.publicId || image.url}-${index}`} className="overflow-hidden rounded-[22px] border border-black/[0.06] bg-white">
                                 <div className="relative aspect-square bg-surface-alt/40">
-                                    <img src={resolveImageRef(image, { width: 400 })} alt={`Upload ${index + 1}`} className="h-full w-full object-cover" />
+                                    <img loading="lazy" decoding="async" src={resolveImageRef(image, { width: 400 })} alt={`Upload ${index + 1}`} className="h-full w-full object-cover" />
                                     {index === 0 && (
                                         <span className="absolute left-3 top-3 rounded-full bg-black px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-white">
                                             Primary
@@ -614,7 +614,7 @@ const ProductBatchForm = ({ categories, existingProducts, initialProductName, in
                                         <td className="px-4 py-3 align-middle">
                                             {images.length > 0 ? (
                                                 <div className="flex items-center gap-2">
-                                                    <img
+                                                    <img loading="lazy" decoding="async"
                                                         src={resolveImageRef(
                                                             images.find((image) => image.publicId === variant.imagePublicId) || images[0],
                                                             { width: 80 },

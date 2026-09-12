@@ -87,7 +87,7 @@ const SingleAdminOrder = ({ order, onStatusChanged }) => {
                                 return (
                                     <div className="rounded-[24px] bg-surface-alt p-4" key={index}>
                                         <div className="flex gap-4">
-                                            {productData.images && <img src={productData.images[0]} alt="product" className="h-16 w-16 rounded-2xl bg-white object-contain p-2" />}
+                                            {productData.images && <img loading="lazy" decoding="async" src={productData.images[0]} alt="product" className="h-16 w-16 rounded-2xl bg-white object-contain p-2" />}
                                             <div className="flex-1">
                                                 <h5 className="text-lg font-bold text-apple-text">{productData.name}</h5>
                                                 <small className="text-ink-soft">{productData.description}</small>

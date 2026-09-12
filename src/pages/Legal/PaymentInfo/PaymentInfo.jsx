@@ -28,7 +28,7 @@ const PaymentInfo = () => {
                             <div className="mt-5 flex flex-wrap gap-3">
                                 {CARD_BRANDS.map((card) => (
                                     <span key={card.id} className="flex h-12 w-20 items-center justify-center rounded-[16px] border border-black/[0.06] bg-white">
-                                        <img src={card.src} alt={card.label} className="max-h-7 w-auto object-contain" />
+                                        <img loading="lazy" decoding="async" src={card.src} alt={card.label} className="max-h-7 w-auto object-contain" />
                                     </span>
                                 ))}
                             </div>

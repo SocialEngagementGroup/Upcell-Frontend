@@ -320,7 +320,7 @@ const ProductDetailPage = () => {
                                                     : 'border-black/[0.06] hover:border-black/20'
                                             }`}
                                         >
-                                            <img src={image.thumbnail} alt="" className="h-[72%] w-auto object-contain" />
+                                            <img loading="lazy" decoding="async" src={image.thumbnail} alt="" className="h-[72%] w-auto object-contain" />
                                         </button>
                                     ))}
                                 </div>
@@ -328,7 +328,7 @@ const ProductDetailPage = () => {
 
                             <div className="relative flex min-h-[340px] flex-1 items-center justify-center overflow-hidden rounded-[24px] bg-[linear-gradient(180deg,#fbfbfd_0%,#edf0f5_100%)] px-4 py-8 sm:min-h-[460px] sm:rounded-[34px] sm:px-6 sm:py-10 lg:min-h-[560px]">
                                 <div className="absolute inset-x-[18%] top-[12%] h-[70%] rounded-full bg-[radial-gradient(circle,_rgba(255,255,255,0.92),_rgba(220,225,232,0.35)_55%,_transparent_72%)] blur-2xl" />
-                                <img
+                                <img loading="eager" decoding="async" fetchpriority="high"
                                     src={activeImage}
                                     alt={product.productName}
                                     className="relative z-[2] max-h-[280px] w-auto object-contain drop-shadow-[0_35px_80px_rgba(15,23,42,0.18)] sm:max-h-[460px]"

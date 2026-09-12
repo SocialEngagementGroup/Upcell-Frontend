@@ -40,7 +40,7 @@ const AboutUs = () => {
                         </p>
                     </div>
                     <div className="premium-card overflow-hidden rounded-[28px] p-3 sm:rounded-[36px]">
-                        <img src={staticImageUrl(STATIC_IMAGES.ABOUT_US_BG, 900)} alt="About UpCell IT Inc." className="h-48 w-full rounded-[22px] object-cover sm:h-full sm:rounded-[28px]" />
+                        <img loading="lazy" decoding="async" src={staticImageUrl(STATIC_IMAGES.ABOUT_US_BG, 900)} alt="About UpCell IT Inc." className="h-48 w-full rounded-[22px] object-cover sm:h-full sm:rounded-[28px]" />
                     </div>
                 </div>
             </section>

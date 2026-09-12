@@ -9,7 +9,7 @@ const JournalCard = ({ article }) => {
             className="premium-card group flex flex-col overflow-hidden rounded-[40px] bg-white p-6 shadow-sm transition-all duration-500 hover:-translate-y-2 hover:shadow-medium h-full"
         >
             <div className="h-[240px] w-full overflow-hidden rounded-[32px] bg-apple-gray/5 shrink-0">
-                <img 
+                <img loading="lazy" decoding="async" 
                     src={article.image} 
                     alt={article.title} 
                     className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" 

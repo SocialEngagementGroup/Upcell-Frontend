@@ -32,7 +32,7 @@ const JournalPost = () => {
                 </nav>
 
                 <div className="relative h-[260px] sm:h-[400px] md:h-[600px] w-full overflow-hidden rounded-[24px] sm:rounded-[40px] bg-apple-gray/5 shadow-medium">
-                    <img 
+                    <img loading="lazy" decoding="async" 
                         src={article.image} 
                         alt={article.title} 
                         className="h-full w-full object-cover"
