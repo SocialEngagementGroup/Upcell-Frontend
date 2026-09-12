@@ -55,6 +55,8 @@ const AdminTradeIn = lazy(() => import('./pages/Admin/TradeIn/AdminTradeIn.jsx')
 const TradeInQueue = lazy(() => import('./pages/Admin/TradeIn/TradeInQueue.jsx'));
 const TradeInReceiving = lazy(() => import('./pages/Admin/TradeIn/TradeInReceiving.jsx'));
 const TradeInReport = lazy(() => import('./pages/Admin/TradeIn/TradeInReport.jsx'));
+const TradeInPriceBook = lazy(() => import('./pages/Admin/TradeIn/TradeInPriceBook.jsx'));
+const TradeInQuestions = lazy(() => import('./pages/Admin/TradeIn/TradeInQuestions.jsx'));
 const TradeInOffer = lazy(() => import('./pages/TradeIn/TradeInOffer.jsx'));
 const AdminRefundRequests = lazy(() => import('./pages/Admin/RefundRequests/AdminRefundRequests.jsx'));
 const ReceivingDesk = lazy(() => import('./pages/Admin/RefundRequests/ReceivingDesk.jsx'));
@@ -256,6 +258,17 @@ const router = createBrowserRouter([
           {
             path: "trade-in/report",
             element: lazyElement(<TradeInReport />),
+          },
+          {
+            // What UpCell pays, editable by the person who decides it. Without
+            // this the prices are on the server and still unreachable to
+            // anybody who cannot deploy.
+            path: "trade-in/pricebook",
+            element: lazyElement(<TradeInPriceBook />),
+          },
+          {
+            path: "trade-in/questions",
+            element: lazyElement(<TradeInQuestions />),
           },
           {
             // The old list, kept reachable while the new queue is bedded in.

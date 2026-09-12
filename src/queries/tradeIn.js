@@ -172,3 +172,43 @@ export const useMyTradeInsQuery = (options = {}) => useQuery({
     retry: false,
     ...options,
 });
+
+// The price book, and editing it.
+//
+// One model per save, matching the API: a bulk write lets a stale tab
+// overwrite somebody else's edit with nothing to show what happened.
+export const usePriceBookQuery = (options = {}) => useQuery({
+    queryKey: ['tradeIns', 'pricebook'],
+    queryFn: () => axiosInstance.get('admin-trade-in-pricebook').then((res) => res.data),
+    ...options,
+});
+
+export const useUpdatePriceBookEntryMutation = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: ({ modelKey, ...body }) => axiosInstance
+            .patch(`admin-trade-in-pricebook/${encodeURIComponent(modelKey)}`, body)
+            .then((res) => res.data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['tradeIns', 'pricebook'] });
+            // The public catalogue too: it is the same prices, and a customer
+            // loading the trade-in page a moment later should see the new one.
+            queryClient.invalidateQueries({ queryKey: ['tradeIn', 'catalog'] });
+        },
+    });
+};
+
+export const useUpdateQuestionSetMutation = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: ({ deviceType, questions }) => axiosInstance
+            .put(`admin-trade-in-questions/${encodeURIComponent(deviceType)}`, { questions })
+            .then((res) => res.data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['tradeIns', 'pricebook'] });
+            queryClient.invalidateQueries({ queryKey: ['tradeIn', 'catalog'] });
+        },
+    });
+};

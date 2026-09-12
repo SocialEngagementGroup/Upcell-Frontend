@@ -18,6 +18,8 @@ const links = [
     { to: 'trade-in', label: 'Trade In' },
     { to: 'trade-in/receiving', label: 'Trade-In Desk' },
     { to: 'trade-in/report', label: 'Trade-In Report' },
+    { to: 'trade-in/pricebook', label: 'Trade-In Prices' },
+    { to: 'trade-in/questions', label: 'Trade-In Questions' },
     { to: 'notifications', label: 'Notifications' },
     { to: 'email-settings', label: 'Email Settings' },
     { to: 'newsletter', label: 'Newsletter' },
