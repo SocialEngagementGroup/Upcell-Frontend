@@ -84,6 +84,11 @@ const Checkout = () => {
     // The rate the server will actually charge, not a copy of it kept here.
     const { data: taxRate = DEFAULT_TAX_RATE } = useTaxRateQuery();
     const estTax = subtotal * taxRate;
+    // Shown to the customer, and built from the rate the server sent rather
+    // than written as "8%". A hardcoded percentage beside a server-computed
+    // amount is two numbers that can disagree, and the label is the one
+    // somebody would believe. Matches the cart's own formatting.
+    const taxPercent = `${(taxRate * 100).toFixed(taxRate * 100 % 1 ? 2 : 0)}%`;
     const shippingCosts = {
         standard: 0,
         priority: 10.5,
@@ -433,7 +438,7 @@ const Checkout = () => {
 
                         <div className="mt-6 space-y-4 border-t border-black/[0.06] pt-6 text-sm text-ink-soft">
                             <div className="flex justify-between"><span>Subtotal</span><strong className="text-apple-text">${subtotal.toFixed(2)}</strong></div>
-                            <div className="flex justify-between"><span>Estimated tax</span><strong className="text-apple-text">${estTax.toFixed(2)}</strong></div>
+                            <div className="flex justify-between"><span>Sales tax ({taxPercent})</span><strong className="text-apple-text">${estTax.toFixed(2)}</strong></div>
                             <div className="flex justify-between"><span>Shipping</span><strong className="text-apple-text">{shippingCost === 0 ? 'Free' : `$${shippingCost.toFixed(2)}`}</strong></div>
                             <div className="flex justify-between border-t border-black/[0.06] pt-4 text-base"><span className="font-bold text-apple-text">Total</span><strong className="whitespace-nowrap text-2xl text-apple-text">${total.toFixed(2)} <span className="text-sm font-normal text-ink-soft">USD</span></strong></div>
                         </div>
