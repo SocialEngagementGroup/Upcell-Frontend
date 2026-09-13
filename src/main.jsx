@@ -271,6 +271,12 @@ const router = createBrowserRouter([
             element: lazyElement(<TradeInQuestions />),
           },
           {
+            // Nothing a customer wrote reaches a product page until somebody
+            // has read it here.
+            path: "reviews",
+            element: lazyElement(<AdminReviews />),
+          },
+          {
             // The old list, kept reachable while the new queue is bedded in.
             // Nothing links to it; it is here so a staff member mid-task is not
             // stranded if the queue turns out to be missing something.
