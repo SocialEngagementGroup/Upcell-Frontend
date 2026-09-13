@@ -61,7 +61,7 @@ const AdminCatagory = () => {
                                 <>
                                     <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] transition-colors ${focused ? 'bg-white/20' : 'bg-surface-alt group-hover:bg-white/20'}`}>
                                         {resolveImageRef(category.images?.[0], { width: 80 }) && (
-                                            <img src={resolveImageRef(category.images?.[0], { width: 80 })} alt={category.modelName} className="max-h-[80%] w-auto object-contain" />
+                                            <img loading="lazy" decoding="async" src={resolveImageRef(category.images?.[0], { width: 80 })} alt={category.modelName} className="max-h-[80%] w-auto object-contain" />
                                         )}
                                     </span>
                                     <span className="min-w-0 flex-1">

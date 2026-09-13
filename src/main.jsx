@@ -2,8 +2,10 @@ import React, { Suspense, lazy } from 'react';
 import ReactDOM from 'react-dom/client';
 import { ClerkProvider } from '@clerk/clerk-react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { HelmetProvider } from 'react-helmet-async';
 
 import './index.css';
+import { loadGtm } from './utilities/gtm';
 
 import App from './App.jsx';
 import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
@@ -28,6 +30,8 @@ const AdminCatagory = lazy(() => import('./pages/Admin/Categories/AdminCatagory/
 const AdminHome = lazy(() => import('./pages/Admin/Dashboard/AdminHome/AdminHome.jsx'));
 const AllProduct = lazy(() => import('./pages/Admin/Products/AllProduct/AllProduct.jsx'));
 const AddProduct = lazy(() => import('./pages/Admin/Products/AddProduct/AddProduct.jsx'));
+const ImportProducts = lazy(() => import('./pages/Admin/Products/ImportProducts/ImportProducts.jsx'));
+const AdminReviews = lazy(() => import('./pages/Admin/Reviews/AdminReviews.jsx'));
 const Checkout = lazy(() => import('./pages/Checkout/Checkout.jsx'));
 const AdminOrder = lazy(() => import('./pages/Admin/Orders/AdminOrder/AdminOrder.jsx'));
 const LoginAndSignup = lazy(() => import('./pages/Auth/LoginAndSignup/LoginAndSignup.jsx'));
@@ -42,9 +46,22 @@ const AboutUs = lazy(() => import('./pages/Legal/AboutUs/AboutUs.jsx'));
 const ThankYou = lazy(() => import('./pages/ThankYou/ThankYou.jsx'));
 const ContactThankYou = lazy(() => import('./pages/ThankYou/ContactThankYou.jsx'));
 const JournalPost = lazy(() => import('./pages/Auxiliary/Resources/JournalPost.jsx'));
+const Wholesale = lazy(() => import('./pages/Wholesale/Wholesale.jsx'));
+const GuestOrder = lazy(() => import('./pages/OrderLookup/GuestOrder.jsx'));
+const TrackOrder = lazy(() => import('./pages/OrderLookup/TrackOrder.jsx'));
+const OfferResponse = lazy(() => import('./pages/Returns/OfferResponse.jsx'));
 const NotFound = lazy(() => import('./pages/NotFound/NotFound.jsx'));
 const AdminTradeIn = lazy(() => import('./pages/Admin/TradeIn/AdminTradeIn.jsx'));
+const TradeInQueue = lazy(() => import('./pages/Admin/TradeIn/TradeInQueue.jsx'));
+const TradeInReceiving = lazy(() => import('./pages/Admin/TradeIn/TradeInReceiving.jsx'));
+const TradeInReport = lazy(() => import('./pages/Admin/TradeIn/TradeInReport.jsx'));
+const TradeInPriceBook = lazy(() => import('./pages/Admin/TradeIn/TradeInPriceBook.jsx'));
+const TradeInQuestions = lazy(() => import('./pages/Admin/TradeIn/TradeInQuestions.jsx'));
+const TradeInOffer = lazy(() => import('./pages/TradeIn/TradeInOffer.jsx'));
 const AdminRefundRequests = lazy(() => import('./pages/Admin/RefundRequests/AdminRefundRequests.jsx'));
+const ReceivingDesk = lazy(() => import('./pages/Admin/RefundRequests/ReceivingDesk.jsx'));
+const ReturnsReport = lazy(() => import('./pages/Admin/RefundRequests/ReturnsReport.jsx'));
+const LegacyProductRedirect = lazy(() => import('./pages/ProductDetail/LegacyProductRedirect.jsx'));
 const SingleTradeInPage = lazy(() => import('./pages/Admin/TradeIn/SingleTradeInPage.jsx'));
 const AdminNewsletter = lazy(() => import('./pages/Admin/Newsletter/AdminNewsletter.jsx'));
 const AdminContact = lazy(() => import('./pages/Admin/Contact/AdminContact.jsx'));
@@ -79,8 +96,14 @@ const router = createBrowserRouter([
         element: lazyElement(<Cart />),
       },
       {
-        path: "iphone/:parentId/:productId",
+        path: "product/:slug",
         element: lazyElement(<ProductDetailPage />),
+      },
+      {
+        // Old shared links and bookmarks. The name was wrong as well as the
+        // shape — iPads and MacBooks were served from /iphone/ too.
+        path: "iphone/:parentId/:productId",
+        element: lazyElement(<LegacyProductRedirect />),
       },
       {
         path: "checkout",
@@ -88,7 +111,18 @@ const router = createBrowserRouter([
       },
       {
         path: "checkout/:id",
-        element: lazyElement(<PrivateRoute><Checkout /></PrivateRoute>),
+        // No PrivateRoute. Requiring an account to buy a phone was the biggest
+        // thing between a visitor and a sale, and the account it forced them
+        // to make unlocked nothing but the order they were already placing.
+        // /myaccount keeps its guard — that one is an account.
+        element: lazyElement(<Checkout />),
+      },
+      {
+        // Answering a revised trade-in offer from an emailed link. No login:
+        // an offer somebody cannot open is an offer that expires and a device
+        // that gets posted back. The token in the URL is the proof.
+        path: "trade-in/offer/:id/:token",
+        element: lazyElement(<TradeInOffer />),
       },
       {
         path: "login",
@@ -147,6 +181,30 @@ const router = createBrowserRouter([
         element: lazyElement(<TradeIn />),
       },
       {
+        // Selling in volume. The backend has taken these since before the
+        // September work; there was no page to submit one from.
+        path: "wholesale",
+        element: lazyElement(<Wholesale />),
+      },
+      {
+        // A guest's own order, from the link in their receipt. No guard: the
+        // token in the link is the authorisation.
+        path: "order/:id",
+        element: lazyElement(<GuestOrder />),
+      },
+      {
+        // Getting a fresh link after deleting the receipt.
+        path: "track-order",
+        element: lazyElement(<TrackOrder />),
+      },
+      {
+        // Where the revised-offer email lands. No PrivateRoute: the token in
+        // the link is the authorisation, and a sign-in wall here is how an
+        // offer expires unanswered and a device gets posted back for nothing.
+        path: "returns/:id/:decision",
+        element: lazyElement(<OfferResponse />),
+      },
+      {
         path: "succeed",
         // Reached only after a real checkout, which is itself behind
         // PrivateRoute — so the customer's session is already active by the
@@ -176,7 +234,47 @@ const router = createBrowserRouter([
             element: lazyElement(<AdminRefundRequests />),
           },
           {
+            // The bench, kept apart from the queue: somebody unpacking parcels
+            // wants one box to type into, not twelve tabs.
+            path: "receiving",
+            element: lazyElement(<ReceivingDesk />),
+          },
+          {
+            path: "returns-report",
+            element: lazyElement(<ReturnsReport />),
+          },
+          {
+            // The queue, one tab per state, with the form each state needs.
             path: "trade-in",
+            element: lazyElement(<TradeInQueue />),
+          },
+          {
+            // The bench: a box, a number, one field. Kept apart from the queue
+            // because somebody unpacking parcels wants one box to type into,
+            // not twelve tabs — the same reason the returns desk is separate.
+            path: "trade-in/receiving",
+            element: lazyElement(<TradeInReceiving />),
+          },
+          {
+            path: "trade-in/report",
+            element: lazyElement(<TradeInReport />),
+          },
+          {
+            // What UpCell pays, editable by the person who decides it. Without
+            // this the prices are on the server and still unreachable to
+            // anybody who cannot deploy.
+            path: "trade-in/pricebook",
+            element: lazyElement(<TradeInPriceBook />),
+          },
+          {
+            path: "trade-in/questions",
+            element: lazyElement(<TradeInQuestions />),
+          },
+          {
+            // The old list, kept reachable while the new queue is bedded in.
+            // Nothing links to it; it is here so a staff member mid-task is not
+            // stranded if the queue turns out to be missing something.
+            path: "trade-in/legacy",
             element: lazyElement(<AdminTradeIn />),
           },
           {
@@ -237,6 +335,13 @@ const router = createBrowserRouter([
             path: "addproduct",
             element: lazyElement(<AddProduct />),
           },
+          {
+            // A pallet of stock from a spreadsheet. Kept apart from Add
+            // Product because the two are different jobs: one is a new model,
+            // the other is forty units of one that already exists.
+            path: "import-products",
+            element: lazyElement(<ImportProducts />),
+          },
         ],
       },
       {
@@ -261,6 +366,11 @@ const queryClient = new QueryClient({
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 if (!clerkPublishableKey) {
+  // Loads only when VITE_GTM_ID is set. With it empty nothing is requested
+  // and every track() call below is a no-op, so the events can be wired now
+  // and switched on later without a release.
+  loadGtm();
+
   root.render(
     <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', padding: '24px', fontFamily: 'system-ui, sans-serif' }}>
       <div style={{ maxWidth: '520px', border: '1px solid #eee', borderRadius: '24px', padding: '32px', boxShadow: '0 18px 60px rgba(15,23,42,0.08)' }}>
@@ -271,8 +381,19 @@ if (!clerkPublishableKey) {
   );
 } else {
   root.render(
+    <HelmetProvider>
     <QueryClientProvider client={queryClient}>
-      <ClerkProvider publishableKey={clerkPublishableKey}>
+      {/* signInUrl and signUpUrl tell Clerk that this app hosts its own auth
+          pages. Without them Clerk falls back to the Account Portal it hosts
+          on accounts.dev, and any redirect it starts itself lands there —
+          including the one after a cancelled Google sign-in, which dropped
+          the customer on an unbranded page in the wrong theme with no way
+          back to the shop. */}
+      <ClerkProvider
+        publishableKey={clerkPublishableKey}
+        signInUrl="/login"
+        signUpUrl="/login?mode=signup"
+      >
         <UserContextProvider>
           <ErrorBoundary>
             <RouterProvider router={router} />
@@ -280,5 +401,6 @@ if (!clerkPublishableKey) {
         </UserContextProvider>
       </ClerkProvider>
     </QueryClientProvider>
+    </HelmetProvider>
   );
 }

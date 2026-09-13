@@ -1,9 +1,36 @@
 import React, { useEffect, useRef, useState } from 'react';
 import JsBarcode from "jsbarcode";
 import RefundRequestPanel from "./RefundRequestPanel";
+import WriteReviewPanel from "./WriteReviewPanel";
+import { resolveImageRef } from "../../utilities/cloudinary";
+
+const money = (cents) => "$" + (Number(cents || 0) / 100).toFixed(2);
+
+// items[] is the shape the API sends now, and the only one chunk 7 keeps. An
+// order written before the chunk 6 migration ran carries only the legacy
+// line_items, so those are mapped across rather than showing a customer an
+// empty order.
+const linesOf = (order) => {
+    if (order?.items?.length) return order.items;
+
+    return (order?.line_items || [])
+        .filter((line) => line?.price_data?.product_data?.metadata?.productId)
+        .map((line) => {
+            const product = line.price_data.product_data;
+            return {
+                productId: product.metadata.productId,
+                name: product.name,
+                description: product.description,
+                image: product.images?.[0],
+                quantity: product.metadata.quantity,
+                lineTotalCents: Math.round((product.metadata.totalPaid || 0) * 100),
+            };
+        });
+};
 
 const SingleCustomerOrder = ({ order }) => {
-    const { line_items, name, email, phone, city, postal, street, country, shipping, paid, status, createdAt, updatedAt } = order;
+    const { name, email, phone, city, postal, street, country, shipping, paid, status, createdAt, updatedAt } = order;
+    const lines = linesOf(order);
     const [showDetails, setShowDetails] = useState(false);
     const barcodeRef = useRef(null);
 
@@ -13,7 +40,12 @@ const SingleCustomerOrder = ({ order }) => {
         }
     }, [order]);
 
-    const total = line_items.reduce((sum, item) => sum + (item?.price_data?.product_data?.metadata?.totalPaid || 0), 0);
+    // The figure the bank was sent, when the order has it. Summing the device
+    // lines instead — as this did — leaves out tax and shipping, so a customer
+    // comparing this against their statement saw two different numbers.
+    const totalCents = order.totalCents != null
+        ? order.totalCents
+        : lines.reduce((sum, line) => sum + (line.lineTotalCents || 0), 0);
 
     return (
         <div className="premium-card rounded-[30px] p-6">
@@ -40,31 +72,67 @@ const SingleCustomerOrder = ({ order }) => {
                     <div>
                         <h4 className="mb-4 text-[24px]">Product details</h4>
                         <div className="space-y-4">
-                            {line_items.map((item, index) => {
-                                const productData = item.price_data.product_data;
-                                return (
-                                    <div key={index} className="rounded-[24px] bg-surface-alt p-4">
-                                        <div className="flex gap-4">
-                                            {productData.images && <img src={productData.images[0]} alt='product' className="h-16 w-16 rounded-2xl bg-white object-contain p-2" />}
-                                            <div className="flex-1">
-                                                <h5 className="text-lg font-bold text-apple-text">{productData.name}</h5>
-                                                <small className="text-ink-soft">{productData.description}</small>
-                                            </div>
-                                            <div className="text-right text-sm">
-                                                <p className='font-bold text-apple-text'>x{productData?.metadata?.quantity}</p>
-                                                <p className='text-ink-soft'>$ {productData?.metadata?.totalPaid}</p>
-                                            </div>
+                            {lines.map((line, index) => (
+                                <div key={line.productId || index} className="rounded-[24px] bg-surface-alt p-4">
+                                    <div className="flex gap-4">
+                                        {line.image && <img loading="lazy" decoding="async" src={resolveImageRef(line.image, { width: 120 })} alt='product' className="h-16 w-16 rounded-2xl bg-white object-contain p-2" />}
+                                        <div className="flex-1">
+                                            <h5 className="text-lg font-bold text-apple-text">{line.name}</h5>
+                                            <small className="text-ink-soft">{line.description}</small>
+                                            {/* The device's own identity, on the record of the
+                                                order that bought it. It is what a customer needs
+                                                when they call the carrier or claim on insurance. */}
+                                            {line.imei ? (
+                                                <small className="mt-1 block font-mono text-xs text-apple-gray">IMEI {line.imei}</small>
+                                            ) : null}
+                                        </div>
+                                        <div className="text-right text-sm">
+                                            <p className='font-bold text-apple-text'>x{line.quantity}</p>
+                                            <p className='text-ink-soft'>{money(line.lineTotalCents)}</p>
                                         </div>
                                     </div>
-                                );
-                            })}
+                                </div>
+                            ))}
                         </div>
                         <div className="mt-5 flex items-center justify-between">
-                            <p className="text-base font-bold text-apple-text">Total</p>
-                            <p className="text-xl font-extrabold text-apple-text">$ {total.toFixed(2)}</p>
+                            <p className="text-base font-bold text-apple-text">Total {order.totalCents != null ? 'charged' : ''}</p>
+                            <p className="text-xl font-extrabold text-apple-text">{money(totalCents)}</p>
                         </div>
                         <img className="mt-5 max-w-full" ref={barcodeRef} alt="order barcode" />
                     </div>
+
+                    {/* Where the parcel is. Shown above the address, because
+                        once an order has shipped this is the only part of this
+                        card anybody opens it to read. */}
+                    {order.fulfilment?.trackingNumber ? (
+                        <div className="mb-5 rounded-[28px] border border-black/[0.08] bg-white p-5">
+                            <h4 className="text-[20px] font-extrabold text-apple-text">On its way</h4>
+                            <p className="mt-2 text-sm text-ink-soft">
+                                {order.fulfilment.carrier} · <span className="font-mono">{order.fulfilment.trackingNumber}</span>
+                            </p>
+                            {order.shippedAt ? (
+                                <p className="mt-1 text-xs text-apple-gray">
+                                    Shipped {new Date(order.shippedAt).toLocaleDateString()}
+                                </p>
+                            ) : null}
+                            {order.fulfilment.trackingUrl ? (
+                                <a
+                                    href={order.fulfilment.trackingUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="premium-button mt-4 inline-block px-5 py-2.5 text-sm"
+                                >
+                                    Track this parcel
+                                </a>
+                            ) : (
+                                // No link for a carrier we have no page for. The
+                                // number on its own still works anywhere.
+                                <p className="mt-3 text-xs text-ink-soft">
+                                    Track it with {order.fulfilment.carrier} using the number above.
+                                </p>
+                            )}
+                        </div>
+                    ) : null}
 
                     <div className="rounded-[28px] bg-surface-alt p-5">
                         <h4 className="mb-4 text-[24px]">Shipping information</h4>
@@ -86,6 +154,16 @@ const SingleCustomerOrder = ({ order }) => {
                     {paid ? (
                         <div className="lg:col-span-2">
                             <RefundRequestPanel order={order} />
+                        </div>
+                    ) : null}
+
+                    {/* Below the return form on purpose. Somebody opening a
+                        delivered order is more often dealing with a problem
+                        than praising it, and the answer to a problem should
+                        not be under an invitation to leave five stars. */}
+                    {paid ? (
+                        <div className="lg:col-span-2">
+                            <WriteReviewPanel order={order} lines={lines} />
                         </div>
                     ) : null}
                 </div>

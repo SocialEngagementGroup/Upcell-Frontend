@@ -3,13 +3,19 @@ import { toast } from 'sonner';
 import axiosInstance from '../../../../utilities/axiosInstance';
 import { extractApiError } from '../../../../utilities/formValidation';
 
-const RESTOCKING_FEE_RATE = 0.15;
 const money = (value) => `$${Number(value || 0).toFixed(2)}`;
 
 // Tax and shipping lines carry no productId — only real devices and
 // accessories do. Matches isRefundableLine on the backend exactly, since a
 // customer can only be refunded for something they can also uncheck here.
 const isRefundableLine = (item) => Boolean(item?.price_data?.product_data?.metadata?.productId);
+
+// The tax line, matched the same way the backend matches it. Shipping looks
+// identical in the data — a totalPaid and no productId — and is not refunded,
+// so the name is the only thing that separates them.
+const isTaxLine = (item) =>
+    !isRefundableLine(item) &&
+    String(item?.price_data?.product_data?.name || '').trim().toLowerCase() === 'sales tax';
 
 /**
  * Calculates and records a refund. This never contacts the bank — UpCell has
@@ -28,8 +34,6 @@ const RefundPanel = ({ order, onRefunded }) => {
     const [selected, setSelected] = useState(
         () => new Set(refundableLines.map((item) => item.price_data.product_data.metadata.productId))
     );
-    const [waiveFee, setWaiveFee] = useState(false);
-    const [waiveReason, setWaiveReason] = useState('');
     const [notes, setNotes] = useState('');
     const [submitting, setSubmitting] = useState(false);
 
@@ -46,11 +50,28 @@ const RefundPanel = ({ order, onRefunded }) => {
     // A preview only — the server recalculates from the order itself and is
     // what actually gets recorded. Shown so staff see the number before they
     // commit to it, not as a promise it will be exactly this to the cent.
-    const itemsTotal = chosen.reduce((sum, item) => sum + (item.price_data.product_data.metadata.totalPaid || 0), 0);
-    const restockingFee = waiveFee ? 0 : Math.round(itemsTotal * RESTOCKING_FEE_RATE * 100) / 100;
-    const previewAmount = Math.round((itemsTotal - restockingFee) * 100) / 100;
+    const totalPaidOf = (items) => items.reduce(
+        (sum, item) => sum + (item.price_data.product_data.metadata.totalPaid || 0), 0
+    );
 
-    const canSubmit = chosen.length > 0 && (!waiveFee || waiveReason.trim().length > 0) && !submitting;
+    const itemsTotal = totalPaidOf(chosen);
+    // Always zero. Returns are free, whatever the reason — the rate constant
+    // and the waive control both went with the policy.
+    const restockingFee = 0;
+
+    // The customer gets back the tax they actually paid on the items coming
+    // back, shared out by price — the same sum the server does, so the number
+    // on screen matches the one that gets recorded.
+    const goodsTotal = totalPaidOf(refundableLines);
+    const taxPaid = (order.line_items || []).filter(isTaxLine)
+        .reduce((sum, item) => sum + (item.price_data.product_data.metadata.totalPaid || 0), 0);
+    const taxRefunded = goodsTotal > 0
+        ? Math.round(taxPaid * (itemsTotal / goodsTotal) * 100) / 100
+        : 0;
+
+    const previewAmount = Math.round((itemsTotal - restockingFee + taxRefunded) * 100) / 100;
+
+    const canSubmit = chosen.length > 0 && !submitting;
 
     const submit = async () => {
         if (!canSubmit) return;
@@ -64,8 +85,6 @@ const RefundPanel = ({ order, onRefunded }) => {
         try {
             const res = await axiosInstance.post(`admin-orders/${order._id}/refund`, {
                 itemIds: Array.from(selected),
-                waiveRestockingFee: waiveFee,
-                waiveReason: waiveFee ? waiveReason.trim() : undefined,
                 notes: notes.trim() || undefined,
             });
             toast.success(res.data?.message || 'Refund recorded');
@@ -89,6 +108,12 @@ const RefundPanel = ({ order, onRefunded }) => {
                     <p>Restocking fee: <strong className="text-apple-text">
                         {r.restockingFeeWaived ? 'Waived' : money(r.restockingFee)}
                     </strong></p>
+                    {/* Absent on refunds recorded before 9 Sep 2026, when tax was
+                        not refunded at all — showing $0.00 for those would read as
+                        a decision rather than a rule that did not exist yet. */}
+                    {r.taxRefunded ? (
+                        <p>Sales tax refunded: <strong className="text-apple-text">{money(r.taxRefunded)}</strong></p>
+                    ) : null}
                     {r.restockingFeeWaived && r.waiveReason ? (
                         <p>Waived because: <strong className="text-apple-text">{r.waiveReason}</strong></p>
                     ) : null}
@@ -135,25 +160,6 @@ const RefundPanel = ({ order, onRefunded }) => {
                 })}
             </div>
 
-            <label className="mt-4 flex items-center gap-2 text-sm text-ink-soft">
-                <input
-                    type="checkbox"
-                    checked={waiveFee}
-                    onChange={(e) => setWaiveFee(e.target.checked)}
-                    className="h-4 w-4 accent-brand-red"
-                />
-                Waive the 15% restocking fee
-            </label>
-
-            {waiveFee ? (
-                <input
-                    type="text"
-                    className="admin-input mt-2 w-full"
-                    placeholder="Reason (required) — e.g. confirmed faulty device"
-                    value={waiveReason}
-                    onChange={(e) => setWaiveReason(e.target.value)}
-                />
-            ) : null}
 
             <textarea
                 className="admin-textarea mt-3"
@@ -165,21 +171,27 @@ const RefundPanel = ({ order, onRefunded }) => {
 
             <div className="mt-4 space-y-1 border-t border-black/[0.06] pt-3 text-sm text-ink-soft">
                 <div className="flex justify-between"><span>Items total</span><strong className="text-apple-text">{money(itemsTotal)}</strong></div>
+                {/* Kept only for a historic refund that still carries one.
+                    Nothing charges a restocking fee any more — returns are
+                    free, whatever the reason. */}
+                {restockingFee > 0 ? (
+                    <div className="flex justify-between">
+                        <span>Restocking fee</span>
+                        <strong className="text-apple-text">−{money(restockingFee)}</strong>
+                    </div>
+                ) : null}
+                {/* Confirmed with the client on 9 Sep 2026: the 8% comes back in
+                    full on whatever is returned, the fee is taken on the goods only. */}
                 <div className="flex justify-between">
-                    <span>Restocking fee (15%)</span>
-                    <strong className="text-apple-text">{waiveFee ? 'Waived' : `−${money(restockingFee)}`}</strong>
+                    <span>Sales tax refunded</span>
+                    <strong className="text-apple-text">{taxRefunded > 0 ? money(taxRefunded) : 'None charged'}</strong>
                 </div>
                 {/* Confirmed with the client: shipping is never refunded, so it is
-                    named here rather than just left off the list. */}
+                    named here rather than just left off the list. UpCell bears that
+                    cost itself on a partial return. */}
                 <div className="flex justify-between"><span>Shipping</span><strong className="text-apple-text">Not refunded</strong></div>
                 <div className="flex justify-between text-base"><strong className="text-apple-text">Refund amount</strong><strong className="text-apple-text">{money(previewAmount)}</strong></div>
             </div>
-
-            {/* Not yet confirmed with the client, unlike the two rules above —
-                say so rather than silently deciding either way. */}
-            <p className="mt-2 text-xs text-ink-soft">
-                Sales tax on the returned item is not included above. Adjust by hand if it should be refunded.
-            </p>
 
             <button
                 type="button"

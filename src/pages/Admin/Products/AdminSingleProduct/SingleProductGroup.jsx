@@ -164,7 +164,7 @@ const SingleProductGroup = ({ productGroup, onDelete }) => {
                     className="group flex cursor-pointer items-start gap-4"
                 >
                     <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-[22px] bg-surface-alt">
-                        <img
+                        <img loading="lazy" decoding="async"
                             className="max-h-full w-auto object-contain"
                             src={resolveImageSrc(productGroup.image, { width: 160 }) || staticImageUrl(STATIC_IMAGES.NOT_AVAILABLE, 160)}
                             alt={productGroup.productName}

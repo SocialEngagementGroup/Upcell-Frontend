@@ -24,10 +24,10 @@ const ReturnPolicy = () => {
                         <Link to="/terms-conditions#returns-refunds" className="font-bold text-brand-red">Terms &amp; Conditions</Link>. If anything here conflicts with the Terms, the Terms apply.</p>
 
                     <h2>30-day return window</h2>
-                    <p>Eligible products may be returned within <strong>30 calendar days</strong> of delivery or in-store purchase. A return based on preference or a change of mind must be requested within this 30-day period.</p>
+                    <p>Eligible products may be returned within <strong>30 calendar days</strong> of delivery or in-store purchase. The same 30 days apply whatever the reason &mdash; a change of mind is treated no differently from a fault. <strong>Returns are free and there is no restocking fee.</strong></p>
 
                     <h2>Ask us before sending anything back</h2>
-                    <p>Before mailing a product back, contact us to request <strong>return authorization</strong> and shipping instructions. Returns sent without authorization may be delayed or refused. Unless the return resulted from our error or a confirmed defect, you are responsible for return shipping, and original shipping charges are non-refundable. We recommend a trackable, insured service — UpCell IT is not responsible for merchandise lost or damaged during return shipping.</p>
+                    <p>Before mailing a product back, contact us to request <strong>return authorization</strong> and shipping instructions. Returns sent without authorization may be delayed or refused. <strong>Return shipping is free</strong> &mdash; we email you a prepaid label once the return is approved, whatever the reason for it. Original shipping charges paid on the order are not refunded.</p>
 
                     <h2>Return eligibility</h2>
                     <ul>
@@ -38,9 +38,6 @@ const ReturnPolicy = () => {
                         <li>All personal information, passcodes, SIM cards, Apple IDs, and activation locks must be removed.</li>
                         <li>Proof of purchase is required.</li>
                     </ul>
-
-                    <h2>15% restocking fee</h2>
-                    <p>Opened, used, or activated devices may be subject to a <strong>15% restocking fee</strong> unless the device is confirmed to be defective. The restocking fee is waived when the device was damaged during shipping, you received the wrong product, or our inspection confirms an undisclosed hardware defect at the time of sale.</p>
 
                     <h2>What cannot be returned</h2>
                     <p>The following are final sale and cannot be returned unless required by law or confirmed defective:</p>
@@ -55,7 +52,7 @@ const ReturnPolicy = () => {
                     </ul>
 
                     <h2>Inspection &amp; refunds</h2>
-                    <p>All returns are inspected before approval. Approval normally requires confirmation of the device&rsquo;s IMEI or serial number, physical and cosmetic condition, account and activation-lock status, functionality, and included accessories and packaging. Approved refunds are issued to the original payment method; processing times vary by your bank or payment provider. Cash purchases are refunded by bank transfer. Devices that do not satisfy this policy may be returned to you at your expense.</p>
+                    <p>All returns are inspected before approval. Approval normally requires confirmation of the device&rsquo;s IMEI or serial number, physical and cosmetic condition, account and activation-lock status, and functionality. <strong>Normal battery wear is never a deduction</strong> &mdash; a device sold at 90% battery health that comes back at 88% keeps its grade. A deduction is only made for new physical damage, and we show you the inspection photos before anything is taken off. Approved refunds are issued by the method you paid with; processing times vary by your bank or payment provider. Cash purchases are refunded in cash against a signed receipt. If a return is refused, we send the device back to you at our cost.</p>
 
                     <h2>How to start a return</h2>
                     <ol>

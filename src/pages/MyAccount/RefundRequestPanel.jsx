@@ -14,12 +14,21 @@ const MIN_REASON = 10;
 // open are all things the browser can be lied to about, so the answer that
 // matters is the one the server gives — this only draws it.
 const RefundRequestPanel = ({ order }) => {
-    const { data, isLoading } = useRefundableItemsQuery(order?._id);
-    const createRequest = useCreateRefundRequestMutation();
-
     const [selected, setSelected] = useState(new Set());
+    const [reasonCode, setReasonCode] = useState('');
     const [reason, setReason] = useState('');
     const [touched, setTouched] = useState(false);
+
+    // The reason and the chosen items go to the server, which sends back the
+    // window for that reason and what the refund would come to. Both are
+    // questions only the server can answer honestly: the window differs by
+    // reason, and the estimate has to be worked out the same way the real
+    // figure is at approval, or the two drift apart.
+    const { data, isLoading } = useRefundableItemsQuery(order?._id, {
+        reasonCode,
+        itemIds: [...selected],
+    });
+    const createRequest = useCreateRefundRequestMutation();
 
     if (isLoading) {
         return (
@@ -54,20 +63,30 @@ const RefundRequestPanel = ({ order }) => {
         return next;
     });
 
+    // A return and a warranty claim are the same form with different words,
+    // different reasons, and a different promise at the end of it. The server
+    // decides which; this page only reads it.
+    const warranty = data.kind === 'WARRANTY';
+
+    const reasons = data.reasons || [];
+    const chosenReason = reasons.find((entry) => entry.code === reasonCode) || null;
+
     const reasonTooShort = reason.trim().length < MIN_REASON;
     const nothingChosen = selected.size === 0;
-    const canSubmit = !nothingChosen && !reasonTooShort && !createRequest.isPending;
+    const noReasonChosen = !reasonCode;
+    const canSubmit = !nothingChosen && !noReasonChosen && !reasonTooShort && !createRequest.isPending;
 
     const submit = () => {
         setTouched(true);
         if (!canSubmit) return;
 
         createRequest.mutate(
-            { orderId: order._id, itemIds: [...selected], reason: reason.trim() },
+            { orderId: order._id, itemIds: [...selected], reasonCode, reason: reason.trim() },
             {
                 onSuccess: () => {
                     toast.success('Return request sent — check your email', { icon: TOAST_ICONS.statusChanged });
                     setSelected(new Set());
+                    setReasonCode('');
                     setReason('');
                     setTouched(false);
                 },
@@ -78,10 +97,27 @@ const RefundRequestPanel = ({ order }) => {
 
     return (
         <div className="rounded-[24px] border border-black/[0.06] bg-surface-alt p-5">
-            <h4 className="text-base font-medium text-apple-text">Return an item</h4>
+            <h4 className="text-base font-medium text-apple-text">
+                {warranty ? 'Make a warranty claim' : 'Return an item'}
+            </h4>
             <p className="mt-1.5 text-xs leading-5 text-ink-soft">
-                {data.feeNotice} You have until {new Date(data.closesAt).toLocaleDateString()}.
+                {data.feeNotice}{' '}
+                {warranty
+                    ? data.warrantyEndsAt
+                        ? `Your warranty runs until ${new Date(data.warrantyEndsAt).toLocaleDateString()}.`
+                        : ''
+                    : `You have until ${new Date(data.closesAt).toLocaleDateString()}.`}
             </p>
+
+            {/* Both dates, once the return window has gone. A customer told
+                only that the window closed has no way to know the warranty is
+                still running, which is the half that helps them. */}
+            {!warranty && data.warrantyEndsAt ? (
+                <p className="mt-1 text-xs leading-5 text-ink-soft">
+                    After that, your 12-month warranty covers hardware faults until{' '}
+                    {new Date(data.warrantyEndsAt).toLocaleDateString()}.
+                </p>
+            ) : null}
 
             <div className="mt-4 space-y-2">
                 {data.items.map((item) => (
@@ -108,8 +144,76 @@ const RefundRequestPanel = ({ order }) => {
                 <p className="mt-2 text-xs font-medium text-brand-red">Choose at least one item to return.</p>
             ) : null}
 
+            <label htmlFor="refund-reason-code" className="mt-4 block text-xs font-bold uppercase tracking-[0.1em] text-apple-gray">
+                {warranty ? 'What is wrong with it?' : 'Why are you returning it?'}
+            </label>
+            <select
+                id="refund-reason-code"
+                name="reasonCode"
+                value={reasonCode}
+                onChange={(event) => setReasonCode(event.target.value)}
+                className="mt-2 w-full rounded-2xl border border-black/[0.08] bg-white p-3 text-sm text-apple-text outline-none transition-all focus:border-apple-text/25"
+            >
+                <option value="">{warranty ? 'Choose a fault…' : 'Choose a reason…'}</option>
+                {reasons.map((entry) => (
+                    <option key={entry.code} value={entry.code}>{entry.label}</option>
+                ))}
+            </select>
+            {touched && noReasonChosen ? (
+                <p className="mt-1 text-xs font-medium text-brand-red">Please tell us why you are returning it.</p>
+            ) : null}
+
+            {/* What the return costs the customer: nothing. Said plainly and
+                unconditionally, because the whole value of the policy is that
+                it does not depend on picking the right reason. It used to vary
+                by reason, and a change of mind cost postage and 15%. */}
+            {chosenReason ? (
+                <div className="mt-3 rounded-2xl bg-white p-4">
+                    <p className="text-xs leading-5 text-ink-soft">
+                        {warranty
+                            ? 'We send you a prepaid label both ways. Once we have looked at it we will repair or replace the device — a refund is only offered where neither is possible.'
+                            : `Returns are free — we send you a prepaid label and there is no restocking fee. You have ${chosenReason.windowDays} days from delivery.`}
+                    </p>
+
+                    {data.estimate && selected.size > 0 ? (
+                        <dl className="mt-3 space-y-1.5 border-t border-black/[0.06] pt-3 text-sm">
+                            <div className="flex justify-between">
+                                <dt className="text-ink-soft">Items</dt>
+                                <dd className="text-apple-text">${data.estimate.itemsTotal.toFixed(2)}</dd>
+                            </div>
+                            {data.estimate.taxRefunded > 0 ? (
+                                <div className="flex justify-between">
+                                    <dt className="text-ink-soft">Sales tax refunded</dt>
+                                    <dd className="text-apple-text">${data.estimate.taxRefunded.toFixed(2)}</dd>
+                                </div>
+                            ) : null}
+                            {/* Nothing charges a fee any more. The row survives
+                                only so an older request that carries one still
+                                renders honestly. */}
+                            {data.estimate.restockingFee > 0 ? (
+                                <div className="flex justify-between">
+                                    <dt className="text-ink-soft">Restocking fee</dt>
+                                    <dd className="text-brand-red">−${data.estimate.restockingFee.toFixed(2)}</dd>
+                                </div>
+                            ) : null}
+                            <div className="flex justify-between border-t border-black/[0.06] pt-1.5 font-medium">
+                                <dt className="text-apple-text">Estimated refund</dt>
+                                <dd className="text-apple-text">${data.estimate.refundAmount.toFixed(2)}</dd>
+                            </div>
+                        </dl>
+                    ) : null}
+
+                    {/* Said plainly. Inspection can change this, and a number
+                        presented as final that then drops is the thing that
+                        turns a return into a complaint. */}
+                    <p className="mt-2 text-[11px] leading-4 text-apple-gray">
+                        An estimate. The final amount is confirmed after we inspect the device.
+                    </p>
+                </div>
+            ) : null}
+
             <label htmlFor="refund-reason" className="mt-4 block text-xs font-bold uppercase tracking-[0.1em] text-apple-gray">
-                What is wrong with it?
+                {chosenReason?.requiresNote ? 'Tell us what happened' : 'Anything else we should know?'}
             </label>
             <textarea
                 id="refund-reason"

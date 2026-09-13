@@ -1,0 +1,17 @@
+# Everything a customer browses is fair game.
+User-agent: *
+Allow: /
+
+# Not these. Each one either needs a session or carries a secret in the URL —
+# a tokenised order link, an offer somebody can accept, a checkout in progress.
+# Indexing any of them puts a working key in a search result.
+Disallow: /admin-secret
+Disallow: /myaccount
+Disallow: /checkout
+Disallow: /cart
+Disallow: /order/
+Disallow: /returns/
+Disallow: /track-order
+Disallow: /succeed
+
+Sitemap: https://www.upcellit.com/sitemap.xml

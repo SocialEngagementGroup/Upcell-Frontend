@@ -90,6 +90,13 @@
         @apply inline-flex h-[56px] items-center justify-center rounded-full bg-brand-red px-8 text-sm font-bold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#b00a0d] active:scale-[0.98];
     }
 
+    /* A disabled button has to look disabled. Without this a dead Save button
+       rendered full red and still lifted on hover, so the only way to discover
+       the form was incomplete was to click it and watch nothing happen. */
+    .premium-button:disabled {
+        @apply cursor-not-allowed bg-apple-gray/40 hover:translate-y-0 hover:bg-apple-gray/40 active:scale-100;
+    }
+
     .premium-button-secondary {
         @apply inline-flex h-[56px] items-center justify-center rounded-full border border-black/[0.12] bg-white/75 px-8 text-sm font-bold text-apple-text backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:bg-white active:scale-[0.98];
     }

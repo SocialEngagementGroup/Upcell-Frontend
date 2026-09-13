@@ -1,4 +1,6 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
+import Seo, { productJsonLd } from '../../../components/Seo/Seo';
+import ReviewsSection from '../../../components/Reviews/ReviewsSection';
 import { useParams } from 'react-router';
 import { Link, useNavigate } from 'react-router-dom';
 import ScrollToTop from '../../../utilities/ScrollToTop';
@@ -8,9 +10,12 @@ import { TOAST_ICONS } from '../../../utilities/toastIcons';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 
-import axiosInstance from '../../../utilities/axiosInstance';
-import { useProductFamilyQuery, useRecommendedProductsQuery } from '../../../queries/products';
+import { useProductBySlugQuery, useRecommendedProductsQuery, useAccessoriesQuery } from '../../../queries/products';
 import { EMPTY_ARRAY } from '../../../queries/keys';
+import { pickVariant } from '../../../utilities/catalog';
+import { resolveProductImage } from '../../../utilities/productImages';
+import { gradeFor, carrierLabelFor, batteryLabelFor } from '../../../constants/deviceGrades';
+import { resolveImageRef } from '../../../utilities/cloudinary';
 import ModernProductCard from '../../../components/ModernProductCard/ModernProductCard';
 import RouteLoadingScreen from '../../../components/RouteLoadingScreen/RouteLoadingScreen';
 
@@ -31,16 +36,6 @@ const featureCards = [
     },
 ];
 
-
-// Plain-English explanation of each condition grade shown on the listing.
-const GRADE_EXPLANATIONS = {
-    New: 'Brand new and unused, in factory-sealed packaging.',
-    Excellent: 'Minimal to no visible wear. Looks close to new under normal use.',
-    Good: 'Light, normal signs of use with minor cosmetic marks. Fully functional.',
-    Fair: 'Noticeable cosmetic wear such as light scratches or scuffs. Fully tested and functional.',
-    Refurbished: 'Professionally restored and tested to full working condition.',
-    Refubrished: 'Professionally restored and tested to full working condition.',
-};
 
 // What our certified-premium program includes on every device. These are
 // program-wide standards; anything specific to a single unit is noted on its
@@ -63,26 +58,91 @@ const getStorageSortValue = (storageLabel = '') => {
 };
 
 const ProductDetailPage = () => {
-    const { parentId, productId } = useParams();
+    const { slug } = useParams();
     const navigate = useNavigate();
-    // Only this product's own family, not the catalogue. The page reads it for
-    // the variant pickers and for switching between colour/storage combinations.
-    const { data: allProducts = EMPTY_ARRAY, isLoading: productsLoading } = useProductFamilyQuery(parentId);
-    const { data: recommendedPool = EMPTY_ARRAY } = useRecommendedProductsQuery(parentId);
-    const [product, setProduct] = useState();
-    const [selectedColor, setSelectedColor] = useState();
-    const [selectedStorage, setSelectedStorage] = useState();
+
+    // One request for the variant, its family and its parent — the page cannot
+    // draw anything without all three.
+    //
+    // isLoading is true only on the very first load. Switching variants keeps
+    // the previous product on screen (see placeholderData in the hook), so the
+    // skeleton below never reappears mid-browse.
+    const { data, isLoading, isError, error, isPlaceholderData } = useProductBySlugQuery(slug);
+    const notFound = error?.response?.status === 404;
+
+    const product = notFound ? undefined : data?.product;
+
+    // The three facts a used-phone buyer checks first. All were in the data
+    // and none was on the page: the grade was shown from the old free-text
+    // field, and the battery and carrier were not shown at all.
+    const grade = gradeFor(product);
+    const battery = batteryLabelFor(product);
+    const carrier = carrierLabelFor(product);
+
+    // The one page where structured data earns its place. itemCondition is
+    // the point: Google shows a "Used" badge on a result that declares
+    // UsedCondition, and a listing that does not say so competes against new
+    // stock on price alone and loses.
+    const canonicalPath = product?.slug ? `/product/${product.slug}` : undefined;
+    const socialImage = product ? resolveProductImage(product, { width: 1200 }) : undefined;
+    const allProducts = data?.family || EMPTY_ARRAY;
+    const { data: recommendedPool = EMPTY_ARRAY } = useRecommendedProductsQuery(product?.parentCatagory);
+
     const [quantity, setQuantity] = useState(1);
     const [addonQtys, setAddonQtys] = useState({});
     const { setCart } = useContext(CartContext);
 
-    useEffect(() => {
-        if (!allProducts.length) return;
-        const selectedProduct = allProducts.find((item) => item._id === productId) || allProducts[0];
-        setProduct(selectedProduct);
-        setSelectedColor(selectedProduct?.color);
-        setSelectedStorage(selectedProduct?.storage);
-    }, [allProducts, productId]);
+    // Derived from the URL, not copied into state by an effect.
+    //
+    // The old version resolved the product with `find(...) || allProducts[0]`,
+    // so a URL that named a product which did not exist quietly showed a
+    // different phone — same page, same buy button, wrong device. The server
+    // now answers 404 for an unknown slug and this renders that.
+    //
+    // The colour and storage pickers read straight off the product for the same
+    // reason: three pieces of state kept in step by an effect could disagree
+    // with each other for a render, and did.
+    const selectedColor = product?.color;
+    const selectedStorage = product?.storage;
+
+    // The photos this product page can show.
+    //
+    // The variant's own photo comes first, because that is the one chosen to
+    // represent this exact storage and colour. The rest of the product's
+    // uploaded photos follow, minus that one so it is not listed twice.
+    //
+    // Before this the page rendered three copies of a single image: the
+    // thumbnails were a literal [1, 2, 3].map. Every extra photo an admin
+    // uploaded was stored in Cloudinary and never displayed anywhere.
+    const galleryImages = useMemo(() => {
+        if (!product) return EMPTY_ARRAY;
+
+        const refs = [
+            { publicId: product.imagePublicId, url: product.image },
+            ...(data?.parent?.images || []).filter((image) => (
+                (image?.publicId || image?.url) !== (product.imagePublicId || product.image)
+            )),
+        ];
+
+        return refs
+            .map((ref) => ({
+                key: ref?.publicId || ref?.url,
+                full: resolveImageRef(ref, { width: 1000 }),
+                thumbnail: resolveImageRef(ref, { width: 200 }),
+            }))
+            .filter((image) => image.key && image.full);
+    }, [data?.parent?.images, product]);
+
+    // Reset to the variant's own photo whenever the variant changes — holding
+    // an index across a colour switch would leave the page showing the previous
+    // variant's third photo.
+    const [activeImageIndex, setActiveImageIndex] = useState(0);
+    useEffect(() => { setActiveImageIndex(0); }, [product?.slug]);
+
+    const activeImage = galleryImages[activeImageIndex]?.full
+        || galleryImages[0]?.full
+        // A product whose photos predate the gallery has none of the above.
+        || resolveProductImage(product, { width: 1000 });
 
     // The server has already grouped these and excluded the current parent —
     // all that is left is dropping families this section does not show and
@@ -106,25 +166,22 @@ const ProductDetailPage = () => {
             .sort((left, right) => getStorageSortValue(left) - getStorageSortValue(right) || left.localeCompare(right, undefined, { numeric: true }))
     ), [allProducts]);
 
-    const syncSelection = (nextColor, nextStorage) => {
-        const matchedProduct = allProducts.find((item) => (
-            item.color?.name === nextColor?.name && item.storage === nextStorage && !item.outOfStock
-        ));
-        if (matchedProduct) {
-            setProduct(matchedProduct);
-            navigate(`/iphone/${matchedProduct.parentCatagory}/${matchedProduct._id}`, { replace: true });
-        }
+    // Switching colour or storage is a navigation, not a state change. The URL
+    // is the single source of truth for which variant is shown, so the address
+    // bar always matches the page and the link can be shared or bookmarked.
+    // replace: true keeps Back going to the previous page rather than walking
+    // through every swatch the customer tried.
+    const goToVariant = (variant) => {
+        if (variant?.slug) navigate(`/product/${variant.slug}`, { replace: true });
     };
 
-    const handleColorSelect = (color) => {
-        setSelectedColor(color);
-        syncSelection(color, selectedStorage);
-    };
+    const handleColorSelect = (color) => goToVariant(pickVariant(allProducts, {
+        colorName: color?.name, storage: selectedStorage, anchor: 'color',
+    }));
 
-    const handleStorageSelect = (storage) => {
-        setSelectedStorage(storage);
-        syncSelection(selectedColor, storage);
-    };
+    const handleStorageSelect = (storage) => goToVariant(pickVariant(allProducts, {
+        colorName: selectedColor?.name, storage, anchor: 'storage',
+    }));
 
     // Accessories come from the catalogue, so their ids are real product ids.
     //
@@ -132,14 +189,14 @@ const ProductDetailPage = () => {
     // The cart keeps only real database ids, so those were silently dropped:
     // the customer saw "Product and accessories added", was charged for the
     // phone alone, and never received the accessories.
-    const [addons, setAddons] = useState([]);
-
-    useEffect(() => {
-        axiosInstance.get('accessories')
-            .then((res) => setAddons(res.data || []))
-            // The device is still purchasable if this fails; just show no add-ons.
-            .catch(() => setAddons([]));
-    }, []);
+    // Through React Query rather than its own effect, so the same two
+    // accessories are fetched once and reused as the customer moves between
+    // product pages instead of being refetched on every one.
+    //
+    // Defaulting to an empty array on failure is deliberate: the device is
+    // still purchasable without add-ons, so a failed accessories call must not
+    // take the buy button down with it.
+    const { data: addons = EMPTY_ARRAY } = useAccessoriesQuery();
 
     const addonTotal = addons.reduce((sum, a) => sum + (addonQtys[a._id] || 0) * a.price, 0);
     const grandTotal = product ? product.price * quantity + addonTotal : 0;
@@ -168,22 +225,64 @@ const ProductDetailPage = () => {
     // data source, a direct link or a slow connection can land here before
     // the catalog has loaded, and "no product yet" must not be read as
     // "product doesn't exist" while the real answer is still in flight.
-    if (productsLoading) {
+    if (isLoading) {
         return (
             <div className="page-shell">
+            {product ? (
+                <Seo
+                    title={product.productName}
+                    description={[
+                        product.productName,
+                        grade ? `in ${grade.label} condition` : null,
+                        product.storage,
+                        battery ? `battery ${battery}` : null,
+                    ].filter(Boolean).join(', ') + '. Tested, graded and covered by a 30-day free return.'}
+                    path={canonicalPath}
+                    image={socialImage}
+                    jsonLd={productJsonLd({
+                        product,
+                        url: canonicalPath ? `https://www.upcellit.com${canonicalPath}` : undefined,
+                        image: socialImage,
+                    })}
+                />
+            ) : null}
                 <RouteLoadingScreen />
             </div>
         );
     }
 
-    if (!product) {
+    // Three outcomes, three messages. They used to be one: any failure showed
+    // "no longer available", which tells someone whose connection dropped that
+    // the product is gone, and tells someone with a mistyped URL to keep
+    // waiting.
+    if (notFound || !product) {
         return (
             <div className="page-shell">
                 <div className="page-container py-24">
                     <div className="premium-card rounded-[36px] px-8 py-16 text-center">
                         <h2>Product not found</h2>
-                        <p className="mt-4 text-ink-soft">This product variation is no longer available.</p>
-                        <Link to="/shop" className="premium-button mt-6">Back to shop</Link>
+                        <p className="mt-4 text-ink-soft">
+                            We couldn&apos;t find that product. It may have sold out and been removed.
+                        </p>
+                        <Link to="/shop" className="premium-button mt-6">Browse the shop</Link>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    if (isError) {
+        return (
+            <div className="page-shell">
+                <div className="page-container py-24">
+                    <div className="premium-card rounded-[36px] px-8 py-16 text-center">
+                        <h2>Something went wrong</h2>
+                        <p className="mt-4 text-ink-soft">
+                            We couldn&apos;t load this product just now. Please try again.
+                        </p>
+                        <button type="button" onClick={() => window.location.reload()} className="premium-button mt-6">
+                            Try again
+                        </button>
                     </div>
                 </div>
             </div>
@@ -206,18 +305,31 @@ const ProductDetailPage = () => {
                 <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
                     <div className="premium-card rounded-[28px] p-4 sm:rounded-[40px] sm:p-6 md:p-8">
                         <div className="flex gap-4">
-                            <div className="hidden w-[92px] flex-col gap-3 md:flex">
-                                {[1, 2, 3].map((item) => (
-                                    <div key={item} className="flex h-[92px] items-center justify-center rounded-[24px] border border-black/[0.06] bg-[linear-gradient(180deg,#f8f8fa_0%,#eef1f5_100%)]">
-                                        <img src={product.image} alt={product.productName} className="h-[72%] w-auto object-contain" />
-                                    </div>
-                                ))}
-                            </div>
+                            {galleryImages.length > 1 && (
+                                <div className="hidden w-[92px] flex-col gap-3 md:flex">
+                                    {galleryImages.map((image, index) => (
+                                        <button
+                                            key={image.key}
+                                            type="button"
+                                            onClick={() => setActiveImageIndex(index)}
+                                            aria-label={`Photo ${index + 1} of ${product.productName}`}
+                                            aria-current={index === activeImageIndex}
+                                            className={`flex h-[92px] items-center justify-center rounded-[24px] border bg-[linear-gradient(180deg,#f8f8fa_0%,#eef1f5_100%)] transition-all ${
+                                                index === activeImageIndex
+                                                    ? 'border-[#eb0000] shadow-[0_0_0_2px_rgba(235,0,0,0.12)]'
+                                                    : 'border-black/[0.06] hover:border-black/20'
+                                            }`}
+                                        >
+                                            <img loading="lazy" decoding="async" src={image.thumbnail} alt="" className="h-[72%] w-auto object-contain" />
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
 
                             <div className="relative flex min-h-[340px] flex-1 items-center justify-center overflow-hidden rounded-[24px] bg-[linear-gradient(180deg,#fbfbfd_0%,#edf0f5_100%)] px-4 py-8 sm:min-h-[460px] sm:rounded-[34px] sm:px-6 sm:py-10 lg:min-h-[560px]">
                                 <div className="absolute inset-x-[18%] top-[12%] h-[70%] rounded-full bg-[radial-gradient(circle,_rgba(255,255,255,0.92),_rgba(220,225,232,0.35)_55%,_transparent_72%)] blur-2xl" />
-                                <img
-                                    src={product.image}
+                                <img loading="eager" decoding="async" fetchpriority="high"
+                                    src={activeImage}
                                     alt={product.productName}
                                     className="relative z-[2] max-h-[280px] w-auto object-contain drop-shadow-[0_35px_80px_rgba(15,23,42,0.18)] sm:max-h-[460px]"
                                 />
@@ -229,11 +341,38 @@ const ProductDetailPage = () => {
                     <div className="md:mt-0">
                         <h1 className="text-[clamp(2rem,4vw,4.3rem)] leading-[1] sm:leading-[0.95]">{product.productName}</h1>
                         <div className="mt-3 text-3xl font-extrabold text-apple-text sm:text-4xl">${product.price} <span className="text-lg font-semibold text-ink-soft">USD</span></div>
-                        {product.condition && (
-                            <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-black/[0.08] bg-surface-alt px-4 py-1.5 text-[13px] font-bold text-apple-text">
-                                Condition grade: {product.condition}
-                            </div>
-                        )}
+                        {/* The grade, the battery and the carrier lock: the three
+                            things a used-phone buyer checks before anything else.
+                            They were all in the data and none of them was shown. */}
+                        <div className="mt-3 flex flex-wrap gap-2">
+                            {grade ? (
+                                <span
+                                    title={grade.explanation}
+                                    className="inline-flex items-center gap-2 rounded-full border border-black/[0.08] bg-surface-alt px-4 py-1.5 text-[13px] font-bold text-apple-text"
+                                >
+                                    Condition: {grade.label}
+                                </span>
+                            ) : null}
+
+                            {battery ? (
+                                <span className="inline-flex items-center gap-2 rounded-full border border-black/[0.08] bg-surface-alt px-4 py-1.5 text-[13px] font-bold text-apple-text">
+                                    Battery {battery}
+                                </span>
+                            ) : null}
+
+                            {carrier ? (
+                                <span className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[13px] font-bold ${
+                                    product.carrierStatus === 'UNLOCKED'
+                                        ? 'border border-black/[0.08] bg-surface-alt text-apple-text'
+                                        // A lock is a restriction and reads as one. Burying
+                                        // it in the same grey as everything else is how a
+                                        // customer finds out after it arrives.
+                                        : 'border border-brand-red/20 bg-brand-red/[0.06] text-brand-red'
+                                }`}>
+                                    {carrier}
+                                </span>
+                            ) : null}
+                        </div>
 
                         {/* ─── Color Selection ─── */}
                         <div className="mt-10">
@@ -267,12 +406,26 @@ const ProductDetailPage = () => {
                             <div className="text-[13px] font-extrabold uppercase tracking-[0.1em] text-apple-text">Storage</div>
                             <div className="mt-4 flex flex-wrap gap-3">
                                 {availableStorages.map((storage) => {
-                                    // Find product for this storage in current color to get the price
                                     const variantForStorage = allProducts.find(
                                         (p) => p.color?.name === selectedColor?.name && p.storage === storage
                                     );
-                                    const variantPrice = variantForStorage?.price;
-                                    const isAvailable = !!variantForStorage && !variantForStorage.outOfStock;
+                                    // Every storage listed here exists somewhere in the family —
+                                    // the list is derived from the family itself. So a size is
+                                    // only genuinely unavailable when every colour of it is out
+                                    // of stock. It used to be marked "Out of stock" whenever the
+                                    // *selected colour* lacked it, which told a customer a size
+                                    // was sold out when it was simply a different colour.
+                                    const allOfThisStorage = allProducts.filter((p) => p.storage === storage);
+                                    const isAvailable = allOfThisStorage.some((p) => !p.outOfStock);
+                                    // Shown in another colour: clicking switches to it, so name
+                                    // the colour rather than letting the swatch change unexplained.
+                                    const otherColorVariant = !variantForStorage
+                                        ? (allOfThisStorage.find((p) => !p.outOfStock) || allOfThisStorage[0])
+                                        : null;
+                                    const switchesToColor = otherColorVariant?.color?.name;
+                                    const switchesToColorValue = otherColorVariant?.color?.value;
+                                    const variantPrice = variantForStorage?.price
+                                        ?? (allOfThisStorage.find((p) => !p.outOfStock) || allOfThisStorage[0])?.price;
 
                                     return (
                                         <button
@@ -298,6 +451,15 @@ const ProductDetailPage = () => {
                                             )}
                                             {!isAvailable && (
                                                 <div className="mt-1 text-[10px] font-bold uppercase tracking-wider">Out of stock</div>
+                                            )}
+                                            {isAvailable && switchesToColor && (
+                                                <div className="mt-1 flex items-center gap-1.5 text-[11px] font-semibold text-apple-text/70">
+                                                    <span
+                                                        className="h-2.5 w-2.5 rounded-full ring-1 ring-inset ring-black/20"
+                                                        style={{ backgroundColor: switchesToColorValue }}
+                                                    />
+                                                    {switchesToColor}
+                                                </div>
                                             )}
                                         </button>
                                     );
@@ -387,15 +549,34 @@ const ProductDetailPage = () => {
                                         <dd className="text-sm font-bold text-apple-text text-right">{product.color.name}</dd>
                                     </div>
                                 )}
-                                {product.condition && (
+                                {grade && (
                                     <div className="flex justify-between gap-4 py-3">
                                         <dt className="text-sm font-semibold text-apple-gray">Condition grade</dt>
                                         <dd className="text-sm font-bold text-apple-text text-right">
-                                            {product.condition}
-                                            {GRADE_EXPLANATIONS[product.condition] && (
-                                                <span className="mt-1 block text-xs font-normal text-ink-soft">{GRADE_EXPLANATIONS[product.condition]}</span>
+                                            {grade.label}
+                                            {grade.explanation && (
+                                                <span className="mt-1 block text-xs font-normal text-ink-soft">{grade.explanation}</span>
                                             )}
                                         </dd>
+                                    </div>
+                                )}
+                                {battery && (
+                                    <div className="flex justify-between gap-4 py-3">
+                                        <dt className="text-sm font-semibold text-apple-gray">Battery health</dt>
+                                        <dd className="text-sm font-bold text-apple-text text-right">
+                                            {battery}
+                                            {/* Said plainly, because a number with no floor
+                                                beside it invites the question. */}
+                                            <span className="mt-1 block text-xs font-normal text-ink-soft">
+                                                We do not list a device below 80%.
+                                            </span>
+                                        </dd>
+                                    </div>
+                                )}
+                                {carrier && (
+                                    <div className="flex justify-between gap-4 py-3">
+                                        <dt className="text-sm font-semibold text-apple-gray">Carrier</dt>
+                                        <dd className="text-sm font-bold text-apple-text text-right">{carrier}</dd>
                                     </div>
                                 )}
                             </dl>
@@ -428,6 +609,11 @@ const ProductDetailPage = () => {
                     </div>
                 </div>
             </section>
+
+            {/* Above the recommendations, because somebody deciding on this
+                phone should read what its owners said before being offered a
+                different one. */}
+            <ReviewsSection parentId={product?.parentCatagory} productName={product?.productName} />
 
             <section className="page-container pb-16 pt-12 md:pt-20">
                 <div className="mb-8 text-center md:mb-10 md:text-left">

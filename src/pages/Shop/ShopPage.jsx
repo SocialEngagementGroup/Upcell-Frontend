@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import Seo from '../../components/Seo/Seo';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { CartContext } from '../../App';
 import ScrollToTop from '../../utilities/ScrollToTop';
@@ -60,6 +61,14 @@ const sortByFamilyThenProductName = (left, right) => {
     }
 
     return sortByProductName(left, right);
+};
+
+// Keyed by the value of the sort dropdown. Anything not listed — including the
+// default "featured" — falls back to the family order above.
+const SORT_COMPARATORS = {
+    'price-low': (left, right) => left.price - right.price,
+    'price-high': (left, right) => right.price - left.price,
+    name: (left, right) => left.productName.localeCompare(right.productName),
 };
 
 const sortOptions = [
@@ -136,6 +145,30 @@ const ShopProductPreloader = () => (
         <span className="sr-only">Loading products</span>
     </div>
 );
+// The three filters added in T08. Values match exactly what the API sends, so
+// a filter compares like with like rather than translating on the way past.
+const CONDITION_FILTERS = [
+    { value: 'EXCELLENT', label: 'Excellent' },
+    { value: 'GOOD', label: 'Good' },
+    { value: 'FAIR', label: 'Fair' },
+];
+
+const CARRIER_FILTERS = [
+    { value: 'UNLOCKED', label: 'Unlocked' },
+    { value: 'ATT', label: 'AT&T' },
+    { value: 'VERIZON', label: 'Verizon' },
+    { value: 'TMOBILE', label: 'T-Mobile' },
+];
+
+// 80 is the floor the shop already enforces through refurbState, so it is not
+// offered as a choice — every listing is already at least that.
+const BATTERY_FILTERS = [
+    { value: 0, label: 'Any' },
+    { value: 85, label: '85+' },
+    { value: 90, label: '90+' },
+    { value: 95, label: '95+' },
+];
+
 const ShopPage = () => {
     const location = useLocation();
     const navigate = useNavigate();
@@ -145,6 +178,33 @@ const ShopPage = () => {
     const [priceRange, setPriceRange] = useState(3500);
     const [selectedModels, setSelectedModels] = useState([]);
     const [selectedStorages, setSelectedStorages] = useState([]);
+    // Three filters the catalogue could always have answered and never offered.
+    // Condition and battery are what separate two listings of the same phone at
+    // different prices; a carrier lock is what makes one of them useless to a
+    // particular buyer.
+    const [selectedGrades, setSelectedGrades] = useState([]);
+    const [selectedCarriers, setSelectedCarriers] = useState([]);
+    const [minBattery, setMinBattery] = useState(0);
+
+    // A filter is only offered when the catalogue can answer it.
+    //
+    // Today every one of the 954 listings is unlocked and none carries a
+    // battery reading, so a fixed list would show "Locked to AT&T" and
+    // "Battery 90+" as choices that empty the shop. A filter that always
+    // returns nothing is worse than no filter: it reads as a shop with no
+    // stock rather than a question nobody has answered yet.
+    //
+    // These appear on their own as soon as inspection starts recording the
+    // values, with no code change.
+    const carrierChoices = useMemo(() => {
+        const present = new Set(products.map((product) => product.carrierStatus || 'UNLOCKED'));
+        return present.size > 1 ? CARRIER_FILTERS.filter((option) => present.has(option.value)) : [];
+    }, [products]);
+
+    const batteryChoices = useMemo(
+        () => (products.some((product) => Number(product.batteryHealth) > 0) ? BATTERY_FILTERS : []),
+        [products]
+    );
     const [sortBy, setSortBy] = useState('featured');
     const [searchQuery, setSearchQuery] = useState('');
     const [sortMenuOpen, setSortMenuOpen] = useState(false);
@@ -193,7 +253,7 @@ const ShopPage = () => {
     }, [products, searchQuery]);
 
     const handleSuggestionSelect = (suggestion) => {
-        navigate(`/iphone/${suggestion.parentCatagory}/${suggestion._id}`);
+        navigate(suggestion.slug ? `/product/${suggestion.slug}` : `/iphone/${suggestion.parentCatagory}/${suggestion._id}`);
     };
 
     const sidebarCategories = useMemo(() => {
@@ -301,6 +361,26 @@ const ShopPage = () => {
                 }
             }
 
+            if (selectedGrades.length > 0) {
+                // Falls back to the old free-text field for rows the grade
+                // migration could not map, so a filter does not silently hide
+                // products that simply predate the new one.
+                const grade = product.cosmeticGrade || String(product.condition || '').toUpperCase();
+                if (!selectedGrades.includes(grade)) return false;
+            }
+
+            if (selectedCarriers.length > 0) {
+                if (!selectedCarriers.includes(product.carrierStatus || 'UNLOCKED')) return false;
+            }
+
+            if (minBattery > 0) {
+                const battery = Number(product.batteryHealth);
+                // A product with no reading is excluded when a minimum is set.
+                // "at least 90%" has to mean measured, or the filter promises
+                // something it cannot check.
+                if (!Number.isFinite(battery) || battery < minBattery) return false;
+            }
+
             if (selectedStorages.length > 0) {
                 const storages = product.availableStorages?.length ? product.availableStorages : [product.storage];
                 if (!selectedStorages.some((storage) => storages.includes(storage))) {
@@ -318,19 +398,19 @@ const ShopPage = () => {
             return true;
         });
 
+        // One comparator, chosen up front. This used to sort by family first and
+        // then sort the same array again for price and name, so three of the
+        // four modes did the work twice and threw the first pass away.
         const sorted = groupProductsByParent(matchingVariations);
-        sorted.sort(sortByFamilyThenProductName);
-        if (sortBy === 'price-low') sorted.sort((a, b) => a.price - b.price);
-        if (sortBy === 'price-high') sorted.sort((a, b) => b.price - a.price);
-        if (sortBy === 'name') sorted.sort((a, b) => a.productName.localeCompare(b.productName));
+        sorted.sort(SORT_COMPARATORS[sortBy] || sortByFamilyThenProductName);
         return sorted;
-    }, [products, activeCategory, priceRange, searchQuery, selectedModels, selectedStorages, sortBy]);
+    }, [products, activeCategory, priceRange, searchQuery, selectedModels, selectedStorages, selectedGrades, selectedCarriers, minBattery, sortBy]);
 
     const totalPages = Math.max(1, Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE));
 
     useEffect(() => {
         setCurrentPage(1);
-    }, [activeCategory, priceRange, searchQuery, selectedModels, selectedStorages, sortBy]);
+    }, [activeCategory, priceRange, searchQuery, selectedModels, selectedStorages, selectedGrades, selectedCarriers, minBattery, sortBy]);
 
     useEffect(() => {
         setCurrentPage((current) => Math.min(current, totalPages));
@@ -361,6 +441,9 @@ const ShopPage = () => {
         setPriceRange(3500);
         setSelectedModels([]);
         setSelectedStorages([]);
+        setSelectedGrades([]);
+        setSelectedCarriers([]);
+        setMinBattery(0);
         setSortBy('featured');
         setSearchQuery('');
     };
@@ -368,6 +451,11 @@ const ShopPage = () => {
     const activeSortOption = sortOptions.find((option) => option.value === sortBy) || sortOptions[0];
     return (
         <div className="page-shell">
+            <Seo
+                title="Shop certified used iPhone, iPad and Mac"
+                description="Every device tested, graded and covered. Free returns for 30 days, free shipping both ways."
+                path="/shop"
+            />
             <ScrollToTop />
 
             <section className="page-container pb-10 pt-6">
@@ -411,7 +499,7 @@ const ShopPage = () => {
                                     <>
                                         <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] transition-colors ${focused ? 'bg-white/20' : 'bg-surface-alt group-hover:bg-white/20'}`}>
                                             {suggestion.image && (
-                                                <img src={suggestion.image} alt={suggestion.productName} className="max-h-[80%] w-auto object-contain" />
+                                                <img loading="lazy" decoding="async" src={suggestion.image} alt={suggestion.productName} className="max-h-[80%] w-auto object-contain" />
                                             )}
                                         </span>
                                         <span className="min-w-0 flex-1">
@@ -515,6 +603,58 @@ const ShopPage = () => {
                                 ))}
                             </div>
                         </div>
+
+                        <div className="mt-8">
+                            <div className="text-sm font-bold uppercase tracking-[0.2em] text-ink-soft">Condition</div>
+                            <div className="mt-4 grid grid-cols-3 gap-3">
+                                {CONDITION_FILTERS.map((option) => (
+                                    <button
+                                        key={option.value}
+                                        className={selectedGrades.includes(option.value) ? 'flex items-center justify-center rounded-[18px] border border-apple-text bg-apple-text px-1 py-3 text-[13px] font-bold text-white shadow-[0_12px_24px_rgba(29,29,31,0.16)]' : 'flex items-center justify-center rounded-[18px] border border-black/[0.06] bg-white px-1 py-3 text-[13px] font-bold text-apple-text transition-all hover:border-black/12 hover:bg-surface-alt'}
+                                        onClick={() => toggleValue(option.value, selectedGrades, setSelectedGrades)}
+                                    >
+                                        {option.label}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {carrierChoices.length ? (
+                        <div className="mt-8">
+                            <div className="text-sm font-bold uppercase tracking-[0.2em] text-ink-soft">Carrier</div>
+                            <div className="mt-4 grid grid-cols-2 gap-3">
+                                {carrierChoices.map((option) => (
+                                    <button
+                                        key={option.value}
+                                        className={selectedCarriers.includes(option.value) ? 'flex items-center justify-center rounded-[18px] border border-apple-text bg-apple-text px-1 py-3 text-[13px] font-bold text-white shadow-[0_12px_24px_rgba(29,29,31,0.16)]' : 'flex items-center justify-center rounded-[18px] border border-black/[0.06] bg-white px-1 py-3 text-[13px] font-bold text-apple-text transition-all hover:border-black/12 hover:bg-surface-alt'}
+                                        onClick={() => toggleValue(option.value, selectedCarriers, setSelectedCarriers)}
+                                    >
+                                        {option.label}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                        ) : null}
+
+                        {batteryChoices.length ? (
+                        <div className="mt-8">
+                            <div className="text-sm font-bold uppercase tracking-[0.2em] text-ink-soft">Battery health</div>
+                            <div className="mt-4 grid grid-cols-4 gap-2">
+                                {batteryChoices.map((option) => (
+                                    <button
+                                        key={option.value}
+                                        className={minBattery === option.value ? 'flex items-center justify-center rounded-[18px] border border-apple-text bg-apple-text px-1 py-3 text-[13px] font-bold text-white shadow-[0_12px_24px_rgba(29,29,31,0.16)]' : 'flex items-center justify-center rounded-[18px] border border-black/[0.06] bg-white px-1 py-3 text-[13px] font-bold text-apple-text transition-all hover:border-black/12 hover:bg-surface-alt'}
+                                        onClick={() => setMinBattery(option.value)}
+                                    >
+                                        {option.label}
+                                    </button>
+                                ))}
+                            </div>
+                            {/* Said out loud, because a filter offering 85 and 90
+                                invites the question of what the floor is. */}
+                            <p className="mt-3 text-xs text-ink-soft">We never list a device below 80&#37;.</p>
+                        </div>
+                        ) : null}
 
                         <div className="mt-8">
                             <div className="text-sm font-bold uppercase tracking-[0.2em] text-ink-soft">Max price</div>

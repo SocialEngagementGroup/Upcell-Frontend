@@ -5,7 +5,8 @@ import MyFooter from './components/layout/Footer/MyFooter'
 import { Toaster } from 'sonner';
 import { TOASTER_ICONS } from './utilities/toastIcons';
 
-import { createContext, useEffect, useState } from 'react'
+import { createContext, useEffect, useMemo, useState } from 'react'
+import useCartSync from './utilities/useCartSync';
 export const CartContext = createContext([])
 
 function App() {
@@ -18,8 +19,22 @@ function App() {
     localStorage.setItem("cart", JSON.stringify(cart))
   }, [cart])
 
+  // For a signed-in customer the cart also lives on the server, so it follows
+  // them between a phone and a laptop and survives clearing site data. Guests
+  // keep theirs in the browser, which is all a guest has.
+  useCartSync(cart, setCart);
+
+  // Memoised because this object is the context value: written inline it is a
+  // new object on every App render, so every consumer re-renders whenever
+  // anything above them does — the shop grid included, which is the most
+  // expensive thing on the site to re-render.
+  //
+  // setCart is a useState setter and is already stable, so cart is the only
+  // real dependency.
+  const cartValue = useMemo(() => ({ cart, setCart }), [cart]);
+
   return (
-    <CartContext.Provider value={{ cart, setCart }}>
+    <CartContext.Provider value={cartValue}>
       <ScrollRestoration />
       <div className="flex min-h-screen flex-col bg-transparent">
         <HeaderComponent />

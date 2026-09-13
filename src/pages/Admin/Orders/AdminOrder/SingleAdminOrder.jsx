@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { TOAST_ICONS } from '../../../../utilities/toastIcons';
 import { ORDER_STATUS_OPTIONS, orderStatusLabel, paymentDisplay } from "../../../../constants/orderStatus";
 import RefundPanel from "./RefundPanel";
+import ShipPanel from "./ShipPanel";
 
 const SingleAdminOrder = ({ order, onStatusChanged }) => {
     const { line_items, name, email, phone, city, postal, street, country, shipping, paid, status, createdAt, updatedAt, boaTransactionId, cardBrand, cardLast4 } = order;
@@ -86,7 +87,7 @@ const SingleAdminOrder = ({ order, onStatusChanged }) => {
                                 return (
                                     <div className="rounded-[24px] bg-surface-alt p-4" key={index}>
                                         <div className="flex gap-4">
-                                            {productData.images && <img src={productData.images[0]} alt="product" className="h-16 w-16 rounded-2xl bg-white object-contain p-2" />}
+                                            {productData.images && <img loading="lazy" decoding="async" src={productData.images[0]} alt="product" className="h-16 w-16 rounded-2xl bg-white object-contain p-2" />}
                                             <div className="flex-1">
                                                 <h5 className="text-lg font-bold text-apple-text">{productData.name}</h5>
                                                 <small className="text-ink-soft">{productData.description}</small>
@@ -120,6 +121,10 @@ const SingleAdminOrder = ({ order, onStatusChanged }) => {
                                 <p>Country: <strong className="text-apple-text">{country}</strong></p>
                             </div>
                         </div>
+
+                        {/* Shipping first: it is what happens to most orders,
+                            and a refund is the exception. */}
+                        <ShipPanel order={order} onShipped={onStatusChanged} />
 
                         <RefundPanel order={order} onRefunded={onStatusChanged} />
                     </div>

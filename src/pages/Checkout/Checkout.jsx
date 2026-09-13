@@ -1,11 +1,10 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { CartContext } from '../../App';
+import { userContext } from '../../utilities/UserContextProvider';
 import ScrollToTop from '../../utilities/ScrollToTop';
 import axiosInstance from '../../utilities/axiosInstance';
-import visa from '../../assets/visa.svg';
-import mastercard from '../../assets/master.svg';
-import discover from '../../assets/discover.svg';
+import { CARD_BRANDS, showCardBrands } from '../../constants/cardBrands';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
@@ -42,6 +41,9 @@ const CHECKOUT_RULES = {
 const Checkout = () => {
     const params = useParams();
     const { cart } = useContext(CartContext);
+    // Only to decide whether to offer the sign-in shortcut. Checkout works
+    // either way — the form collects everything it needs on its own.
+    const { user } = useContext(userContext);
     const [products, setProducts] = useState([]);
     const [fieldErrors, setFieldErrors] = useState({});
     const [touched, setTouched] = useState({});
@@ -79,7 +81,14 @@ const Checkout = () => {
         productIds.reduce((acc, id) => acc + (products.find((product) => product._id === id)?.price || 0), 0)
     ), [productIds, products]);
 
-    const estTax = subtotal * 0.08;
+    // The rate the server will actually charge, not a copy of it kept here.
+    const { data: taxRate = DEFAULT_TAX_RATE } = useTaxRateQuery();
+    const estTax = subtotal * taxRate;
+    // Shown to the customer, and built from the rate the server sent rather
+    // than written as "8%". A hardcoded percentage beside a server-computed
+    // amount is two numbers that can disagree, and the label is the one
+    // somebody would believe. Matches the cart's own formatting.
+    const taxPercent = `${(taxRate * 100).toFixed(taxRate * 100 % 1 ? 2 : 0)}%`;
     const shippingCosts = {
         standard: 0,
         priority: 10.5,
@@ -239,6 +248,18 @@ const Checkout = () => {
                             <section>
                                 <h3 className="text-[28px]">Contact information</h3>
                                 <div className="mt-5 grid gap-4 md:grid-cols-2">
+                                    {/* An offer, not a barrier. Checkout used to be behind
+                                        PrivateRoute, which made an account the price of
+                                        buying anything — and the account unlocked nothing
+                                        but the order they were already placing. */}
+                                    {!user ? (
+                                        <p className="mb-4 rounded-[18px] bg-surface-alt px-4 py-3 text-sm text-ink-soft">
+                                            <Link to="/login" className="font-bold text-apple-text underline underline-offset-2">Sign in</Link>
+                                            {' '}for faster checkout, or just carry on — we will email your receipt
+                                            with a link to your order.
+                                        </p>
+                                    ) : null}
+
                                     <FormField id="checkout-email" label="Email address" error={fieldErrors.email} touched={touched.email}>
                                         {(fp) => (
                                             <input {...fp} type="text" inputMode="email" autoComplete="email" name="email"
@@ -369,7 +390,7 @@ const Checkout = () => {
                                     {group.variants.length ? (
                                         <div className="flex gap-4">
                                             <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[18px] bg-white">
-                                                <img src={group.image} alt={group.title} className="max-h-[80%] w-auto object-contain" />
+                                                <img loading="lazy" decoding="async" src={group.image} alt={group.title} className="max-h-[80%] w-auto object-contain" />
                                             </div>
                                             <div className="flex-1">
                                                 <div className="font-bold text-apple-text">{group.title}</div>
@@ -417,21 +438,25 @@ const Checkout = () => {
 
                         <div className="mt-6 space-y-4 border-t border-black/[0.06] pt-6 text-sm text-ink-soft">
                             <div className="flex justify-between"><span>Subtotal</span><strong className="text-apple-text">${subtotal.toFixed(2)}</strong></div>
-                            <div className="flex justify-between"><span>Estimated tax</span><strong className="text-apple-text">${estTax.toFixed(2)}</strong></div>
+                            <div className="flex justify-between"><span>Sales tax ({taxPercent})</span><strong className="text-apple-text">${estTax.toFixed(2)}</strong></div>
                             <div className="flex justify-between"><span>Shipping</span><strong className="text-apple-text">{shippingCost === 0 ? 'Free' : `$${shippingCost.toFixed(2)}`}</strong></div>
                             <div className="flex justify-between border-t border-black/[0.06] pt-4 text-base"><span className="font-bold text-apple-text">Total</span><strong className="whitespace-nowrap text-2xl text-apple-text">${total.toFixed(2)} <span className="text-sm font-normal text-ink-soft">USD</span></strong></div>
                         </div>
 
-                        <div className="mt-6 grid grid-cols-3 gap-3">
-                            {/* Amex removed: the logo was on the checkout but nobody had confirmed it
-    was on the merchant agreement, so it advertised a card we may not be
-    able to accept. Discover is on the bank's test card list. */}
-                            {[visa, mastercard, discover].map((icon, index) => (
-                                <div key={index} className="flex h-12 items-center justify-center rounded-[16px] border border-black/[0.06] bg-white">
-                                    <img src={icon} alt="Card network accepted" className="max-h-7 w-auto object-contain" />
-                                </div>
-                            ))}
-                        </div>
+                        {/* Amex came off because nobody had confirmed it was on the
+                            merchant agreement. Discover went on because it is on the
+                            bank's *test* card list, which is not the same thing and
+                            carries the same open question — so the whole row is behind
+                            a flag until BofA answers. See constants/cardBrands.js. */}
+                        {showCardBrands() ? (
+                            <div className="mt-6 grid grid-cols-3 gap-3">
+                                {CARD_BRANDS.map((card) => (
+                                    <div key={card.id} className="flex h-12 items-center justify-center rounded-[16px] border border-black/[0.06] bg-white">
+                                        <img loading="lazy" decoding="async" src={card.src} alt={card.label} className="max-h-7 w-auto object-contain" />
+                                    </div>
+                                ))}
+                            </div>
+                        ) : null}
                     </aside>
                 </div>
             </section>

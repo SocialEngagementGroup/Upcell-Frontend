@@ -4,15 +4,7 @@ import axiosInstance from '../../../utilities/axiosInstance';
 import { extractApiError, validateEmailAddress } from '../../../utilities/formValidation';
 import useFormAnalytics from '../../../utilities/useFormAnalytics';
 import { STATIC_IMAGES, staticImageUrl } from '../../../constants/staticImages';
-import visa from '../../../assets/visa.svg';
-import mastercard from '../../../assets/master.svg';
-import discover from '../../../assets/discover.svg';
-
-const CARD_NETWORKS = [
-    { src: visa, label: 'Visa accepted' },
-    { src: mastercard, label: 'Mastercard accepted' },
-    { src: discover, label: 'Discover accepted' },
-];
+import { CARD_BRANDS, showCardBrands } from '../../../constants/cardBrands';
 
 // Modern Icons
 const SocialIcons = {
@@ -65,7 +57,7 @@ const MyFooter = () => {
                     <div className="grid gap-12 lg:grid-cols-[1.4fr_0.8fr_0.8fr_0.8fr_1.6fr]">
                         <div className="space-y-5 lg:pt-8">
                             <Link to="/" className="flex items-center">
-                                <img src={staticImageUrl(STATIC_IMAGES.LOGO_FOOTER, 240)} alt="UpCell Logo" className="h-12 w-auto" />
+                                <img loading="lazy" decoding="async" src={staticImageUrl(STATIC_IMAGES.LOGO_FOOTER, 240)} alt="UpCell Logo" className="h-12 w-auto" />
                             </Link>
                             <p className="max-w-[320px] text-[13px] leading-6 text-ink-soft">
                                 Premium Apple devices you can trust. We professionally inspect and honestly grade every certified iPhone, iPad, and MacBook, then back it with a 12-month warranty. Save up to 40% versus buying new.
@@ -79,16 +71,21 @@ const MyFooter = () => {
                                 <a href="https://www.instagram.com/Upcells_usa/" target="_blank" rel="noreferrer" aria-label="Instagram" className="flex h-11 w-11 items-center justify-center rounded-full border border-black/[0.06] text-apple-gray hover:-translate-y-0.5 hover:bg-surface-alt hover:text-apple-text"><SocialIcons.Instagram /></a>
                                 <a href="https://www.facebook.com/usa.Upcells" target="_blank" rel="noreferrer" aria-label="Facebook" className="flex h-11 w-11 items-center justify-center rounded-full border border-black/[0.06] text-apple-gray hover:-translate-y-0.5 hover:bg-surface-alt hover:text-apple-text"><SocialIcons.Facebook /></a>
                             </div>
-                            <div className="pt-1">
-                                <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-apple-gray">We accept</p>
-                                <div className="mt-2 flex flex-wrap gap-2">
-                                    {CARD_NETWORKS.map((card) => (
-                                        <span key={card.label} className="flex h-9 w-14 items-center justify-center rounded-lg border border-black/[0.06] bg-white">
-                                            <img src={card.src} alt={card.label} className="max-h-5 w-auto object-contain" />
-                                        </span>
-                                    ))}
+                            {/* Behind a flag until BofA confirms which networks are on
+                                the merchant agreement — showing a scheme's mark is a
+                                claim UpCell can take that card. */}
+                            {showCardBrands() ? (
+                                <div className="pt-1">
+                                    <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-apple-gray">We accept</p>
+                                    <div className="mt-2 flex flex-wrap gap-2">
+                                        {CARD_BRANDS.map((card) => (
+                                            <span key={card.id} className="flex h-9 w-14 items-center justify-center rounded-lg border border-black/[0.06] bg-white">
+                                                <img loading="lazy" decoding="async" src={card.src} alt={card.label} className="max-h-5 w-auto object-contain" />
+                                            </span>
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
+                            ) : null}
                         </div>
 
                         <div className="space-y-4 lg:pt-8">

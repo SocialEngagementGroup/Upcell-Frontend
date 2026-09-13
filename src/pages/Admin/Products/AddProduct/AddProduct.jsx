@@ -14,6 +14,7 @@ import {
     useCreateShopCategoryMutation,
 } from '../../../../queries/categories';
 import { EMPTY_ARRAY } from '../../../../queries/keys';
+import { groupVariantsByParent } from '../../../../utilities/catalog';
 import { extractApiError } from '../../../../utilities/formValidation';
 
 const buildGroupedProduct = (parent, variants = []) => ({
@@ -30,6 +31,11 @@ const buildGroupedProduct = (parent, variants = []) => ({
         discountPrice: variant.discountPrice ?? '',
         originalPrice: variant.originalPrice ?? '',
         outOfStock: Boolean(variant.outOfStock),
+        // Blank when this variant uses the product's first photo, so reopening
+        // an existing product shows the same choice the admin made.
+        imagePublicId: (parent.images || [])[0]?.publicId === variant.imagePublicId
+            ? ''
+            : (variant.imagePublicId || ''),
     })),
 });
 
@@ -62,9 +68,10 @@ const AddProduct = () => {
     const loadingEditTarget = Boolean(initialParentId) && !editParent && (editParentLoading || editVariantsLoading);
 
     const existingProducts = useMemo(() => {
+        const variantsByParent = groupVariantsByParent(variants);
         const fullList = parents.map((parent) => buildGroupedProduct(
             parent,
-            variants.filter((variant) => String(variant.parentCatagory) === String(parent._id))
+            variantsByParent.get(String(parent._id)) || EMPTY_ARRAY
         ));
 
         if (editParent) {

@@ -233,7 +233,24 @@ const scoreImage = (image, productTokens, colorTokens, family) => {
 // than running this matching a second, subtly different way.
 const fallbackRef = (product) => ({ publicId: product?.imagePublicId, url: product?.image });
 
+// Whether this product's own stored photo is the final answer.
+//
+// It is, unless the catalogue has marked it a stand-in — one picture stored on
+// every variant of a model because no per-variant photo existed. Those are the
+// only ones the manifest below may improve on.
+//
+// Everything else is a photo somebody chose for this exact product, and the
+// manifest must not touch it. It used to: the matcher ran first and scored a
+// colour match at 45 against a threshold of 35, so a product called "test one"
+// in black scored high enough on colour alone to be shown a photo of an iPad.
+// An admin would upload one image and the site would display another.
+const hasOwnPhoto = (product) => (
+    !product?.imageIsGeneric && Boolean(product?.imagePublicId || product?.image)
+);
+
 const resolveProductImageRef = (product) => {
+    if (hasOwnPhoto(product)) return fallbackRef(product);
+
     const productTokens = getProductTokens(product);
     if (!productTokens.length) return fallbackRef(product);
 
@@ -278,18 +295,57 @@ const resolveProductImageRef = (product) => {
         : fallbackRef(product);
 };
 
-export const resolveProductImage = (product) => resolveImageRef(
+// width defaults to the catalogue card size. The product page passes a larger
+// one: it renders the photo far bigger than a card does, and it was reading
+// product.image directly — the stored original, at whatever resolution it was
+// uploaded at, with no transform at all. A 1122x1402 upload shipped in full to
+// fill a 460px-tall slot.
+export const resolveProductImage = (product, { width = CATALOG_IMAGE_WIDTH } = {}) => resolveImageRef(
     resolveProductImageRef(product),
-    { width: CATALOG_IMAGE_WIDTH }
+    { width }
 );
 
-// Same photo as resolveProductImage, offered at several widths so a phone
-// downloads a phone-sized file instead of the 600px one every device gets
-// today. Returns an empty string for a legacy local path, which has no
-// Cloudinary id to resize — the browser then simply uses src, as before.
-export const resolveProductImageSrcSet = (product) => {
-    const { publicId } = resolveProductImageRef(product) || {};
-    return publicId ? cloudinarySrcSet(publicId) : '';
+// The src and the srcset of one product, from a single pass of the matcher.
+//
+// Callers that need both were paying for the matching twice. Matching is not
+// cheap: a product with no photo of its own is compared against all 891
+// manifest records, filtering on family path, required tokens, forbidden
+// tokens and colour, then scoring the survivors. The shop page normalises 954
+// products at once, 510 of which take that path, so doing it twice cost about
+// 80ms of blocked main thread on a fast desktop and rather more on a laptop —
+// long enough that a click arriving during it waits, which is what shows up as
+// input delay rather than as a slow render.
+// Keyed on every field the answer depends on, so a product whose photo or name
+// changed gets a fresh entry rather than a stale one. The manifest itself never
+// changes at runtime, so the same key always has the same answer.
+//
+// Worth caching because the shop list is normalised again on every mount —
+// leaving Shop and coming back, or any refetch, repeats the whole 954-product
+// pass. The first is unavoidable; the rest should be free.
+const partsCache = new Map();
+
+const partsCacheKey = (product) => [
+    product?.imagePublicId,
+    product?.image,
+    product?.imageIsGeneric,
+    product?.productName,
+    product?.categoryName,
+    product?.color?.name,
+].join('|');
+
+export const resolveProductImageParts = (product) => {
+    const key = partsCacheKey(product);
+    const cached = partsCache.get(key);
+    if (cached) return cached;
+
+    const ref = resolveProductImageRef(product) || {};
+    const parts = {
+        image: resolveImageRef(ref, { width: CATALOG_IMAGE_WIDTH }),
+        imageSrcSet: ref.publicId ? cloudinarySrcSet(ref.publicId) : '',
+    };
+
+    partsCache.set(key, parts);
+    return parts;
 };
 
 

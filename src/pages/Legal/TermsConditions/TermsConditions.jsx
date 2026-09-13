@@ -97,7 +97,7 @@ const TermsConditions = () => {
                         <li>Proof of purchase is required</li>
                     </ul>
                     <p>Devices returned with an active Apple ID, Google account, Samsung account, Find My activation lock, lost or stolen status, financing balance, or carrier account restriction will not be accepted.</p>
-                    <p><strong>Opened or activated devices.</strong> Opened, used, or activated devices may be subject to a 15% restocking fee unless the device is confirmed to be defective. The restocking fee is waived when the device was damaged during shipping, you received the wrong product, or our inspection confirms an undisclosed hardware defect at the time of sale.</p>
+                    <p><strong>Opened or activated devices.</strong> Opening or using a device does not affect your right to return it, and no restocking fee applies. A deduction is only made for new physical damage found at inspection, and we show you the photographs before any amount is withheld. Normal battery wear is never treated as damage.</p>
                     <p><strong>Nonreturnable items.</strong> The following are final sale and cannot be returned unless required by law or confirmed defective:</p>
                     <ul>
                         <li>Clearance or specially marked final-sale merchandise</li>

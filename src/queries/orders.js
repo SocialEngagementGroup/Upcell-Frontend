@@ -1,0 +1,68 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import axiosInstance from '../utilities/axiosInstance';
+import { orderKeys, taxKeys } from './keys';
+
+// What a page quotes for the instant before the rate arrives, and if the
+// request fails. The same 8% the server falls back to, so the two never
+// disagree by more than one render.
+export const DEFAULT_TAX_RATE = 0.08;
+
+// The sales tax rate, from the server.
+//
+// It used to be written into three places on this side — twice in the cart as
+// 0.08 and 1.08, once at the checkout — so changing it meant finding all
+// three, and any one of them could drift from what the customer is actually
+// charged. The rate is the same for everyone and changes about never, so it is
+// cached hard and the last known answer is kept while it revalidates.
+export const useTaxRateQuery = (options = {}) => useQuery({
+    queryKey: taxKeys.rate(),
+    queryFn: () => axiosInstance.get('tax-rate').then((res) => res.data.rate),
+    staleTime: 60 * 60 * 1000,
+    gcTime: 24 * 60 * 60 * 1000,
+    // A quoted total is better slightly stale than missing. The figure that
+    // binds is the one checkout computes anyway.
+    placeholderData: (previous) => previous,
+    ...options,
+});
+
+// Marking an order shipped, and correcting the number afterwards.
+//
+// Invalidates every admin order list rather than one: the order leaves the
+// queue it was in and joins Shipped, so the tab that was open is stale either
+// way.
+export const useRecordShipmentMutation = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ id, ...body }) => axiosInstance
+            .patch(`admin-orders/${id}/shipment`, body)
+            .then((res) => res.data),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['orders'] }),
+    });
+};
+
+// A guest's own order, opened from the link in their receipt.
+//
+// No auth: the token in the link is the authorisation and it grants exactly
+// this one order. A wrong token, an expired one and an unknown id all answer
+// 404, so retrying is pointless and would only help somebody guessing.
+export const useGuestOrderQuery = (id, token) => useQuery({
+    queryKey: orderKeys.guest(id),
+    queryFn: () => axiosInstance.get(`order/${id}`, { params: { t: token } }).then((res) => res.data),
+    enabled: Boolean(id && token),
+    retry: false,
+    refetchOnWindowFocus: false,
+});
+
+// Asking for a fresh link after losing the receipt.
+export const useRequestOrderLinkMutation = () => useMutation({
+    mutationFn: (body) => axiosInstance.post('track-order', body).then((res) => res.data),
+});
+
+// Attaching guest orders to an account, once, after signing in.
+export const useClaimGuestOrdersMutation = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: () => axiosInstance.post('orders/claim').then((res) => res.data),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['orders'] }),
+    });
+};

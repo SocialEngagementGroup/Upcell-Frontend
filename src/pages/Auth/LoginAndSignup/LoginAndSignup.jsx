@@ -5,11 +5,19 @@ import RouteLoadingScreen from '../../../components/RouteLoadingScreen/RouteLoad
 import { userContext } from '../../../utilities/UserContextProvider';
 import { STATIC_IMAGES, staticImageUrl } from '../../../constants/staticImages';
 
+// Clerk's `variables` take real colour values, not Tailwind class names, so the
+// brand hexes have to be written out here — the one place in the app where that
+// is unavoidable. They must match Documentation/Upcell-Brand-Guidelines.md
+// exactly; these were previously a shade off (#d20a0d instead of the brand red,
+// #111111 instead of Near Black), which is invisible on its own screen and
+// obvious the moment the login sits next to the site.
+//
+// Everything under `elements` uses the Tailwind tokens instead, as normal.
 const clerkAppearance = {
     variables: {
-        colorPrimary: '#d20a0d',
-        colorText: '#111111',
-        colorTextSecondary: '#6b7280',
+        colorPrimary: '#D90B0F',
+        colorText: '#0C0C0C',
+        colorTextSecondary: '#86868b',
         colorBackground: '#ffffff',
         colorInputBackground: '#ffffff',
         colorInputText: '#111111',
@@ -30,6 +38,19 @@ const clerkAppearance = {
         formResendCodeLink: 'text-brand-red font-bold',
         otpCodeFieldInput: 'rounded-xl border-[#d1d5db] focus:border-brand-red',
     },
+};
+
+// Clerk's prebuilt form only validates on submit, so a one-character username
+// looks accepted right up until the customer presses Continue and is told it is
+// too short. We cannot change when it validates — but we can say the rule
+// before they type, which is the better fix anyway.
+//
+// 4 is Clerk's own floor, not a choice: the dashboard will not accept a lower
+// minimum. Keep these numbers in step with Configure → User & authentication →
+// Username if they are ever raised.
+const clerkLocalization = {
+    formFieldLabel__username: 'Username (4–32 characters)',
+    formFieldInputPlaceholder__username: 'Choose a username',
 };
 
 
@@ -111,6 +132,7 @@ const LoginAndSignup = () => {
                 forceRedirectUrl={postAuthReturnUrl}
                 fallbackRedirectUrl={postAuthReturnUrl}
                 appearance={clerkAppearance}
+                localization={clerkLocalization}
             />
         );
     };
@@ -122,7 +144,7 @@ const LoginAndSignup = () => {
                     <div className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full bg-brand-red/30 blur-[90px]" />
                     <div className="pointer-events-none absolute -bottom-24 -left-12 h-56 w-56 rounded-full bg-brand-red/20 blur-[90px]" />
                     <Link to="/" className="relative z-10">
-                        <img src={staticImageUrl(STATIC_IMAGES.LOGO_LIGHT, 240)} alt="UpCell IT Inc." className="h-12 w-auto" />
+                        <img loading="eager" decoding="async" src={staticImageUrl(STATIC_IMAGES.LOGO_LIGHT, 240)} alt="UpCell IT Inc." className="h-12 w-auto" />
                     </Link>
                     <div className="relative z-10">
                         <h2 className="text-[34px] font-extrabold leading-[1.1] text-white">Premium devices,<br />better prices.</h2>
@@ -136,7 +158,7 @@ const LoginAndSignup = () => {
                 <div className="flex w-full flex-col overflow-y-auto px-5 py-8 sm:px-10 sm:py-10 lg:w-[56%] lg:px-12">
                     <div className="m-auto w-full max-w-[430px]">
                         <Link to="/" className="mb-8 inline-block lg:hidden">
-                            <img src={staticImageUrl(STATIC_IMAGES.LOGO, 160)} alt="UpCell IT Inc." className="h-8 w-auto" />
+                            <img loading="eager" decoding="async" src={staticImageUrl(STATIC_IMAGES.LOGO, 160)} alt="UpCell IT Inc." className="h-8 w-auto" />
                         </Link>
                         <header className="mb-6">
                             <h1 className="text-3xl font-extrabold mb-2">{signin ? "Welcome back" : "Join UpCell"}</h1>

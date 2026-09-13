@@ -1,4 +1,5 @@
 import React from 'react';
+import { gradeFor, batteryLabelFor } from '../../constants/deviceGrades';
 import { Link } from 'react-router-dom';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
@@ -12,15 +13,18 @@ const ModernProductCard = ({ product, priority = false }) => {
     // If we're passing the raw API object, we map them.
     const parentId = product.parentId || product.parentCatagory;
     const productId = product.productId || product._id;
+    const slug = product.slug;
     const title = product.title || product.productName;
     const family = product.family;
     const image = product.image;
     const price = product.price.toString().startsWith('$') ? product.price : `$${product.price}`;
+    const grade = gradeFor(product);
+    const battery = batteryLabelFor(product);
     const availableColors = product.availableColors || [];
 
     return (
         <Link
-            to={`/iphone/${parentId}/${productId}`}
+            to={slug ? `/product/${slug}` : `/iphone/${parentId}/${productId}`}
             className="group relative block overflow-hidden rounded-[24px] border border-black/[0.08] bg-white transition-all duration-500 hover:-translate-y-2 hover:border-brand-red hover:shadow-[0_14px_36px_rgba(217,11,15,0.15)]"
         >
             <div className="relative flex h-[310px] items-center justify-center overflow-hidden">
@@ -81,6 +85,25 @@ const ModernProductCard = ({ product, priority = false }) => {
                         </div>
                     )}
                 </div>
+
+                {/* Grade and battery on the card, not only on the product page.
+                    They are two of the three things that decide whether a used
+                    phone is worth opening, and a grid of prices alone makes
+                    every listing look the same. */}
+                {(grade || battery) ? (
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                        {grade ? (
+                            <span className="rounded-full bg-surface-alt px-2.5 py-1 text-[11px] font-bold text-apple-text">
+                                {grade.label}
+                            </span>
+                        ) : null}
+                        {battery ? (
+                            <span className="rounded-full bg-surface-alt px-2.5 py-1 text-[11px] font-bold text-apple-text">
+                                Battery {battery}
+                            </span>
+                        ) : null}
+                    </div>
+                ) : null}
 
                 <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
                     <div>
