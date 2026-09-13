@@ -51,7 +51,7 @@ const SingleCustomerOrder = ({ order }) => {
         <div className="premium-card rounded-[30px] p-6">
             <div className="grid gap-5 lg:grid-cols-[1fr_1fr_220px]">
                 <div className="space-y-2 text-sm text-ink-soft">
-                    <p>Total amount: <strong className="text-apple-text">${total.toFixed(2)}</strong></p>
+                    <p>Total amount: <strong className="text-apple-text">{money(totalCents)}</strong></p>
                     <p>Order ID: <strong className="text-apple-text">{order._id}</strong></p>
                 </div>
                 <div className="space-y-2 text-sm text-ink-soft">

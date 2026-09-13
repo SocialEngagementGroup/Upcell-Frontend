@@ -10,6 +10,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { toast } from 'sonner';
 import { TOAST_ICONS } from '../../utilities/toastIcons';
+import { useTaxRateQuery, DEFAULT_TAX_RATE } from '../../queries/orders';
 import {
     extractApiError,
     validateEmailAddress,

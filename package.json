@@ -5,12 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/generate-sitemap.mjs && vite build",
+    "build": "npm run lint:undef && node scripts/generate-sitemap.mjs && vite build",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
     "sitemap": "node scripts/generate-sitemap.mjs",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "lint:undef": "eslint --config eslint.undef.config.mjs \"src/**/*.{js,jsx}\""
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.61.8",

@@ -15,6 +15,8 @@ import AndroidIcon from '@mui/icons-material/Android';
 import axiosInstance from '../../utilities/axiosInstance';
 import { extractApiError, validateEmailAddress, validatePhoneNumber, validateRequiredText } from '../../utilities/formValidation';
 import useFormAnalytics from '../../utilities/useFormAnalytics';
+import { useTradeInCatalogQuery, useTradeInQuote } from '../../queries/tradeIn';
+import { trackTradeInLead } from '../../utilities/gtm';
 
 /* ───────────── STATIC DATA ───────────── */
 
