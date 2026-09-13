@@ -533,7 +533,7 @@ const TradeIn = () => {
                             )}
 
                             {/* Yes/No Questions */}
-                            {currentQuestion.yes && currentQuestion.no && (
+                            {currentQuestion.type === 'boolean' && (
                                 <div className="mt-6 grid gap-4 md:grid-cols-2">
                                     <button
                                         className="premium-card rounded-[28px] p-6 text-left transition-all duration-300 hover:-translate-y-1 hover:shadow-medium hover:border-green-500/20"
@@ -542,7 +542,7 @@ const TradeIn = () => {
                                         <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-green-50 text-green-600">
                                             <CheckCircleIcon className="!text-[20px]" />
                                         </div>
-                                        <h3 className="text-[20px] font-bold">{currentQuestion.yes}</h3>
+                                        <h3 className="text-[20px] font-bold">{currentQuestion.yes || 'Yes'}</h3>
                                     </button>
                                     <button
                                         className="premium-card rounded-[28px] p-6 text-left transition-all duration-300 hover:-translate-y-1 hover:shadow-medium hover:border-red-500/20"
@@ -551,13 +551,13 @@ const TradeIn = () => {
                                         <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-red-50 text-red-500">
                                             ✕
                                         </div>
-                                        <h3 className="text-[20px] font-bold">{currentQuestion.no}</h3>
+                                        <h3 className="text-[20px] font-bold">{currentQuestion.no || 'No'}</h3>
                                     </button>
                                 </div>
                             )}
 
                             {/* Multiple Choice Questions (Screen/Body condition) */}
-                            {currentQuestion.options && (
+                            {currentQuestion.options?.length > 0 && (
                                 <div className="mt-6 grid gap-4">
                                     {currentQuestion.options.map((option) => (
                                         <button
